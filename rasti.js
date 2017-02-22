@@ -2,7 +2,19 @@ var rasti = function() {
 
     var self = this
 
-    this.activePage = ''
+    this.log = true
+
+    this.activePage = null
+
+    this.activeTheme = {}
+
+    this.themeMap = {
+        page : 'light',
+        panel : 'dark',
+        section : 'mid',
+        field : 'light',
+        btn : 'detail',
+    }
 
     this.pages = {}
 
@@ -13,24 +25,102 @@ var rasti = function() {
     this.utils = {}
 
 
+    this.themes = {
+
+        base : {
+            font : 'normal 14px sans-serif',
+            fontcolor : '#222',
+            palette : {
+                light: '#ddd',
+                mid: '#aaa',
+                dark: '#444',
+                detail: 'darkcyan',
+            },
+        },
+
+        oldsk00l : {
+            font : 'normal 14px monospace',
+            fontcolor : 'green',
+            palette : {
+                light: '#bbb',
+                mid: '#888',
+                dark: '#222',
+                detail: 'green',
+            },
+        },
+
+    }
+
+
     this.templates = {
-        select : function(value, label) {
-            return '<option value="'+ value +'">'+ label +'</option>'
+        select : function(data) {
+            var ret = ''
+            for (var d of data) {
+                d = checkData(d)
+                ret += `<option value="${d.value}">${d.label}</option>`
+            }
+            return ret
         },
 
-        multi : function(value, label) {
-            return '<option value="'+ value +'">'+ label +'</option>'
+        multi : function(data) {
+            var ret = ''
+            for (var d of data) {
+                d = checkData(d)
+                ret += `<option value="${d.value}">${d.label}</option>`
+            }
+            return ret
         },
 
-        buttons : function(value, label) {
-            return '<div value="'+ value +'">'+ label +'</div>'
+        buttons : function(data) {
+            var ret = ''
+            for (var d of data) {
+                d = checkData(d)
+                ret += `<div value="${d.value}">${d.label}</div>`
+            }
+            return ret
         },
 
-        radios : function(value, label) {
-            return '<div>'
-                +   '<input type="radio" name="serv[]" value="'+ value +'">'
-                +   '<label>'+ label +'</label>'
-                + '</div>'
+        radios : function(data) {
+            var uid = random()
+            var ret = ''
+            for (var d of data) {
+                d = checkData(d)
+                ret += `<div>
+                    <input type="radio" name="${uid}[]" value="${d.value}">
+                    <label>${d.label}</label>
+                </div>`
+            }
+            return ret
+        },
+
+        checks : function(data) {
+            var uid = random()
+            var ret = ''
+            for (var d of data) {
+                d = checkData(d)
+                ret += `<div>
+                    <input type="checkbox" name="${uid}[]" value="${d.value}">
+                    <label>${d.label}</label>
+                </div>`
+            }
+            return ret
+        },
+
+        theme : function(values) {
+            return `<style theme>
+                body {
+                    font: ${ values.font };
+                    color: ${ values.fontcolor };
+                }
+                [page]    { background-color: ${ values.page }; }
+                [panel]   { background-color: ${ values.panel }; }
+                [section] { background-color: ${ values.section }; }
+                [field]   { background-color: ${ values.field }; }
+                [btn], .btn, [rasti=buttons] div.active
+                    { background-color: ${ values.btn }; }
+                [btn][disabled], .btn[disabled], [rasti=buttons] div
+                    { background-color: ${ values.section }; }
+            </style>`
         },
     }
 
@@ -40,7 +130,7 @@ var rasti = function() {
             $el.children().each(function(i, el){
                 setTimeout(function(){
                     el.style.opacity = 1
-                    el.style.margin = '15px 0'
+                    el.style.marginTop = i == 0 ? '0' : '15px'
                 }, i * 50);
             })
         }
@@ -48,97 +138,107 @@ var rasti = function() {
 
 
     config = function(config) {
-        self.pages = config.pages || {}
-        self.data = config.data || {}
-        self.ajax = config.ajax || {}
-        self.utils = config.utils || {}
-        Object.assign(self.fx, config.fx || {})
-        Object.assign(self.templates, config.templates || {})
+        for (var key in self) {
+            if ($.type(self[key]) === 'object')
+                Object.assign(self[key], config[key])
+        }
     }
 
 
     init = function(config) {
 
-        // set root page
-        navTo(config.root)
+        // set log
+        if (typeof config.log !== 'undefined') self.log = config.log
+
+        var $el, type, datakey, data, field, $options, template
 
         // create options from data sources
-        var $el, type, datakey, $options, value, label
-
         $('[data]').each(function(i, el) {
             if (el.hasAttribute('img')) return // skip element
             $el = $(el)
             type = $el.attr('rasti') || 'select' // if no type assume select
             datakey = $el.attr('data')
-            if (!self.data[datakey] || !self.data[datakey].length) return log('No data for datakey ['+ datakey +']')
+            data = self.data[datakey]
+            template = self.templates[type]
+            
+            if (!data || !data.length) return log('No data for datakey [%s]', datakey)
+            if (!template) return log('Template for element [%s] not defined', type)
 
             if (type === 'multi') {
-                $options = $('<div options>')
-                $el.append($options)
+                // create options in page
+                field = $el.attr('field')
+                if (!field) return log('Element of type [%s] must have a [field] value', type)
+                $options = $('<div field rasti='+ type +' options='+ field +'>')
+                $el.closest('[page]').append($options)
             }
             else {
                 $options = $el
             }
 
-            self.data[datakey].forEach(function(dat, i) {
-                if (typeof dat === 'string') {
-                    value = label = dat
-                }
-                else if (typeof dat === 'object') {
-                    value = dat.value
-                    label = dat.label
-                    if (!value || !label) return log('Invalid data object, must have value and label')
-                }
-                else return log('Invalid data, must be string or object')
-
-                if (!self.templates[type]) return log('Template ['+ type +'] not defined')
-
-                $options.append(self.templates[type](value, label))
-            })
+            $options.html( template(data) )
 
         })
 
-
         // init multiselects
-        $('[rasti=multi]').each(function(i, el) {
+        $('[rasti=multi]').not('[options]').each(function(i, el) {
+            var $multi = $(el)
+            var $options = $multi.closest('[page]').find('[options='+ $multi.attr('field') +']')
             el.value = []
-            $el = $(el)
-            $el.prepend('<div add>〉</div>')
-            $el.append('<div selected>')
+            el.total = $options.children().length
+            el.max = parseInt($multi.attr('max'))
 
-            $el.find('[add]').click(function(e) {
-                $(this).parent().toggleClass('open')
+            $multi.prepend('<div add>')
+            $multi.append('<div selected>')
+
+            $multi.find('[add]').click(function(e) {
+                $options.siblings('[options]').hide() // hide other options
+                $options.css('left', this.getBoundingClientRect().right).toggle()
             })
 
-            // FIXME
-            $el.focusout(function(e) {
-                $(this).removeClass('open')
+            $options.click(function(e) {
+                if (e.target === this) $(this).hide()
             })
 
-            $el.find('option').click(function(e) {
+            $options.find('option').click(function(e) {
                 var $opt = $(this),
                     val = $opt.attr('value'),
-                    $multi = $opt.closest('[rasti=multi]'),
                     values = $multi[0].value
 
-                if ($opt.parent()[0].hasAttribute('options')) {
+                if ($opt.parent().attr('options')) {
                     // select option
                     $multi.find('[selected]').append($opt)
                     values.push(val)
                 }
                 else {
                     // unselect option
-                    $multi.find('[options]').append($opt)
-                    values.pop(val)
+                    $options.append($opt)
+                    values.remove(val)
                 }
 
-                if ($multi.find('[options]').children().length) {
-                    $multi.removeClass('full')
-                }
-                else {
-                    $multi.removeClass('open').addClass('full')
+                checkFull($multi)            
+            })
+
+            $multi.change(function(){
+                var $selected = $multi.find('[selected]')
+                $selected.empty()
+                for (var val of $multi[0].value) {
+                    $selected.append($options.find('[value='+ val +']'))
+                    if (checkFull($multi)) break
                 }
             })
+
+            function checkFull($multi) {
+                var multi = $multi[0]
+                var isFull = multi.value.length === (multi.max || multi.total)
+                if (isFull) {
+                    $multi.addClass('full')
+                    $options.hide()
+                }
+                else {
+                    $multi.removeClass('full')
+                }
+                return isFull
+            }
 
         })
 
@@ -187,7 +287,7 @@ var rasti = function() {
             var i = $selected.length ? $selected.index() : 0
             $options[i].classList.add('selected')
             // recreate select value
-            $wrapper.attr('value', $el.val() || $options[i].getAttribute('value'))
+            $wrapper.val($el.val() || $options[i].getAttribute('value'))
 
             // add images
             setImg($wrapper, imgpath)
@@ -201,7 +301,7 @@ var rasti = function() {
                 $opt.siblings().removeClass('selected')
                 $opt.addClass('selected')
                 var $wrapper = $opt.closest('[select]')
-                $wrapper.attr('value', $opt.attr('value'))
+                $wrapper.val($opt.attr('value'))
                 var imgpath = $wrapper.attr('img')
                 if (imgpath) setImg($wrapper, imgpath)
             })
@@ -229,7 +329,7 @@ var rasti = function() {
             // TODO add checks
             var params = {}
             if (this.hasAttribute('params')) {
-                var $page = $('[page='+ self.activePage +']')
+                var $page = self.activePage
                 var paramkeys = $(this).attr('params')
                 if (paramkeys) {
                     // get specified params
@@ -251,21 +351,65 @@ var rasti = function() {
         })
 
         // init buttons
-        $('[rasti=buttons] div').click(function(e) {
-            $el = $(this)
-            $el.parent().val($el.attr('value'))
-            $el.siblings().removeClass('active')
-            $el.addClass('active')
+        $('[rasti=buttons]').each(function(i, el) {
+            $el = $(el)
+            $el.find('div').click(function(e) {
+                var $el = $(this)
+                $el.parent().val($el.attr('value'))
+                $el.siblings().removeClass('active')
+                $el.addClass('active')
+            })
+            $el.change(function(e) {
+                var $el = $(this)
+                $el.children().removeClass('active')
+                $el.find('[value="'+ $el.val() +'"]').addClass('active')
+            })
         })
 
         // init radios
-        $('[rasti=radios] input').change(function(e) {
-            $el = $(this)
-            $el.closest('[type=radios]').val($el.attr('value'))
+        $('[rasti=radios]').each(function(i, el) {
+            $el = $(el)
+            $el.find('input').change(function(e) {
+                var $el = $(this)
+                $el.closest('[rasti=radios]').val($el.attr('value'))
+            })
+            $el.find('input +label').click(function(e) {
+                var $el = $(this)
+                $el.prev().click()
+            })
+            $el.change(function(e) {
+                var $el = $(this)
+                $el.find('[value="'+ $el.val() +'"]').prop('checked', true)
+            })
         })
-        $('[rasti=radios] input +label').click(function(e) {
-            $el = $(this)
-            $el.prev().prop('checked', true).change()
+        
+        // init checks
+        $('[rasti=checks]').each(function(i, el) {
+            el.value = []
+            $el = $(el)
+            $el.find('input').change(function(e) {
+                var $el = $(this),
+                    val = $el.attr('value'),
+                    values = $el.closest('[rasti=checks]')[0].value
+                if ($el.prop('checked')) {
+                    values.push(val)
+                }
+                else {
+                    values.remove(val)
+                }
+            })
+            $el.find('input +label').click(function(e) {
+                var $el = $(this)
+                $el.prev().click()
+            })
+            $el.change(function(e) {
+                var $el = $(this), $input, checked
+                $el.find('input').each(function(i, input){
+                    $input = $(input)
+                    checked = $el[0].value.includes($input.attr('value'))
+                    $input.prop('checked', checked)
+                })
+            })
         })
 
         // init render
@@ -285,8 +429,7 @@ var rasti = function() {
             if (!ajax || typeof ajax !== 'function') return log('Ajax method ['+ ajaxkey +'] not defined')
 
             var $form = $('[ajax='+ ajaxkey +']')
-            if (!$form.length) return log('No container element defined for ajax method ['+ ajaxkey
-                + ']. Please define one via ajax attribute')
+            if (!$form.length) return log('No container element defined for ajax method [%s]. Please define one via ajax attribute', ajaxkey)
 
             var reqdata = {}, field
             $form.find('[field]').each(function(i, el){
@@ -303,25 +446,55 @@ var rasti = function() {
 
         })
 
+        // init actions
+        for (var action of 'click change'.split(' ')) {
+            $('['+ action +']').each(function(i, el){
+                $el = $(el)
+                method = $el.attr( action )
+                if ( !app.utils[ method ] ) return log('Utility method [%s] not found', method)
+                $(this).click( app.utils[ method ] )
+            })
+        }
+
+        // set theme
+        setTheme(config.theme || 'base')
+
+        // show root page
+        navTo(config.root || Object.keys(self.pages)[0])
 
 
     }
 
-
-    // utils
-
-    function fixLabel($el) {
-        var $div = $('<div>').attr('label', $el.attr('label'))
-        $el.wrap($div)
-        $el[0].removeAttribute('label')
+    get = function (selector) {
+        var $els = self.activePage.find('['+ selector +']')
+        if (!$els.length) log('Element(s) ['+ selector +'] not found in page ['+ self.activePage.attr('page') +']')
+        return $els
     }
 
-    function setImg($el, basepath) {
-        $el.css('background-image', 'url('+ basepath + $el.attr('value') +'.png)')
+    set = function (selector, value) {
+        // TODO checks
+        var $els = self.activePage.find('['+ selector +']')
+        if (!$els.length) log('Element(s) ['+ selector +'] not found in page ['+ self.activePage.attr('page') +']')
+        $els.each(function(i, el){
+            el.value = value
+            $(el).change()
+        })
     }
 
-    function navTo(pagename, params) {
-        self.activePage = pagename
+    add = function (selector, value) {
+        // TODO checks
+        var $els = self.activePage.find('['+ selector +']')
+        if (!$els.length) log('Element(s) ['+ selector +'] not found in page ['+ self.activePage.attr('page') +']')
+        $els.each(function(i, el){
+            el.value.push(value)
+            $(el).change()
+        })
+    }
+
+    navTo = function (pagename, params) {
+        var $page = $('[page='+ pagename +']')
+        if (!$page) return log('Page [%s] container not found', pagename)
+        self.activePage = $page
         if (params) {
             if (typeof params !== 'object') log('Page params must be an object')
             else {
@@ -330,7 +503,47 @@ var rasti = function() {
             }
         }
         $('[page].active').removeClass('active')
-        $('[page='+ pagename +']').addClass('active')
+        self.activePage.addClass('active')
+    }
+
+    setTheme = function (themeName) {
+        var theme = self.themes[themeName], themeMap
+        if (!theme) return log('Theme [%s] not found', themeName)
+        log('Setting theme [%s]', themeName)
+        self.activeTheme = theme
+        themeMap = theme.map || self.themeMap
+
+        var values = {
+            font : theme.font,
+            fontcolor : theme.fontcolor
+        }, color
+        // map palette colors to attributes
+        for (var attr of Object.keys(themeMap)) {
+            color = theme.palette[themeMap[attr]]
+            if (!color) log('Mapping error in theme [%s]. Palette does not contain color [%s]', themeName, themeMap[attr])
+            else values[attr] = color
+        }
+        // generate theme style and append it to body
+        $('body').append(self.templates.theme(values))
+
+        // apply any styles defined by class
+        for (var key of Object.keys(theme.palette)) {
+            var color = theme.palette[key]
+            $('.' + key).css('background-color', color)
+        }
+    }
+
+
+    // internal utils
+
+    function fixLabel($el) {
+        var $div = $('<div>').attr('label', $el.attr('label'))
+        $el.wrap($div)
+        $el[0].removeAttribute('label')
+    }
+
+    function setImg($el, basepath) {
+        $el.css('background-image', 'url('+ basepath + ($el.val() || $el.attr('value')) +'.png)')
     }
 
     function render(name, data) {
@@ -338,14 +551,13 @@ var rasti = function() {
         if (!template) return log('No template [' + name +']')
 
         var $el = $('[template='+ name +']')
-        if (!$el.length) return log('No element for template [' + name  +']')
+        if (!$el.length) return log('No element for template [%s]', name)
 
         if (!data) {
             var datakey = $el.attr('data')
-            if (!datakey) return log('No data for template [' + name
-                + ']. Please provide in ajax response or via data attribute.')
+            if (!datakey) return log('No data for template [%s]. Please provide in ajax response or via data attribute.', name)
             data = self.data[datakey]
-            if (!data) return log('No data for datakey [' + datakey +']')
+            if (!data) return log('No data for datakey [%s]', datakey)
         }
 
         $el.html( template(data) )
@@ -353,27 +565,70 @@ var rasti = function() {
         var fxkey = $el.attr('fx')
         if (fxkey) {
             var fx = self.fx[fxkey]
-            if (!fx) return log('Fx [' + fxkey  +'] not defined')
+            if (!fx) return log('Fx [%s] not defined', fxkey)
             fx($el)
         }
     }
 
-    function log(text) {
-        console.log(text)
+    function checkData(data) {
+        switch (typeof data) {
+        case 'string':
+            data = {value: data, label: data}
+            break
+        case 'object':
+            if (!data.value || !data.label) log('Invalid data object, must have value and label')
+            break
+        default:
+            log('Invalid data, must be string or object')
+        }
+        return data
     }
+
+    function random() {
+        return (Math.random() * 6 | 0) + 1
+    }
+
+    function log(...params) {
+        if (self.log) console.log.call(this, ...params)
+    }
+    
+
+    // prototype extensions
+
+    (function(){
+
+        Array.prototype.remove = function(el) {
+            var i = this.indexOf(el);
+            if (i >= 0) this.splice(i, 1);
+        }
+
+        String.prototype.capitalize = function() {
+            return this.length && this[0].toUpperCase() + this.slice(1).toLowerCase()
+        }
+
+    })()
 
 
     // api
 
     return {
+        // objects
         pages : this.pages,
         data : this.data,
         ajax : this.ajax,
         utils : this.utils,
+        themes : this.themes,
         templates : this.templates,
         fx : this.fx,
+
+        // methods
         config : config,
         init : init,
+        get : get,
+        set : set,
+        add : add,
+        navTo : navTo,
+        setTheme : setTheme,
     }
 
 }

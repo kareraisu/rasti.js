@@ -6,93 +6,126 @@ body {
 body * {
 	box-sizing: border-box;
 	user-select: none;
+    transition: background-color 0.2s,
+                font 0.2s;
 }
 
 
 [page]:not(.active) {
 	display: none !important;
+    position: relative;
 }
 [page].active {
 	height: 100vh;
     width: 100vw;
-    padding-top: 75px; /* header space */
+}
+[page][header]:before {
+    content: attr(header);
+    display: block;
+    padding: 20px 0;
+    font-size: 2.5em;
+    text-align: center;
 }
 
 
 [panel] {
-    padding: 0 10px;
+    padding: 20px 10px;
 }
-[panel][header] {
+[panel][header],
+[section][header] {
     padding-top: 0;
 }
 [panel][header]:before {
     content: attr(header);
     display: block;
-    margin: 0 -20px;
-    padding: 6px 0;
+    margin: 0 -10px;
+    padding: 10px 0;
+    font-size: 2em;
     text-align: center;
-    color: #fff;
-    background: #234168;
-}
-
-
-[input-group] {
-    padding: 20px;
-}
-[input-group]:before {
-    top: 0;
-    left: 5px;
-    font-size: large !important;
-}
-[input-group] [label] {
-    display: inline-block;
 }
 
 
 [section] {
     position: relative;
-    padding: 2px 10px 10px;
+    padding: 10px;
 }
 [section]:not(:last-child) {
-    border-bottom: 2px solid #eee;
+    margin-bottom: 10px;
 }
-[section][label]:before, [section] [label]:before {
-    color: #000;
+[section][header]:before {
+    content: attr(header);
+    display: block;
+    margin: 0 -10px;
+    padding: 5px 0;
+    font-size: 1.5em;
+    text-align: center;
+}
+[section] [label]:before {
     text-shadow: 0 0 0 #000;
 }
-[section] [field], [section] [btn] {
-    display: block;
+[section]>*:first-child:not([label]) {
+    margin-top: 0px;
+}
+
+
+
+[field], [btn], .field, .btn {
     width: 100%;
-}
-[section]:not([label])>*:first-child:not([label]) {
-    margin-top: 10px;
-}
-
-
-[field], [btn] {
-    display: inline-block;
-    vertical-align: bottom;
     padding: 5px 10px;
-    border: 1px solid #b9b9b9;
-    border-radius: 2px;
-    color: #999;
-    background-color: #fff;
-    font-size: inherit;
-}
-[field][big], [btn][big] {
-    height: 50px;
-    border-width: 4px;
-    border-radius: 4px;
-    font-size: large;
-}
-
-
-[btn] {
     border: 0;
-	color: #fff;
-	background-color: #0f97bd;
+    border-radius: 2px;
+    font-family: inherit !important;
+    font-size: inherit;
+    color: #222;
+}
+[big] [field], [big] [btn], .big .field, .big .btn,
+[big][field], [big][btn], .big.field , .big.btn {
+    height: 50px;
+    border-radius: 4px;
+    font-size: 1.2em;
+}
+[btn], .btn {
 	cursor: pointer;
 }
+[panel] [field], [panel] [btn],
+[panel] .field, [panel] .btn 
+[section] [field], [section] [btn],
+[section] .field, [section] .btn {
+    margin-top: 25px;
+}
+
+
+[label] {
+    margin-top: 25px;
+    vertical-align: bottom;
+}
+[label]>input,
+[label]>select,
+[label]>textarea {
+    margin-top: 0 !important;
+}
+[label]:before {
+    content: attr(label);
+    position: absolute;
+    height: 20px;
+    margin-top: -20px;
+    margin-left: 4px;
+    font-size: 1.2em;
+    color: #eee;
+}
+[label][field]:before {
+    margin-top: -25px;
+    margin-left: -7px;
+}
+[label][field][big]:before {
+    margin-left: 0;
+}
+/*
+[label][rasti=buttons]:before, [label][rasti=radios]:before {
+    margin-top: -20px;
+    margin-left: 5px;
+}
+*/
 
 
 [select] select {
@@ -112,8 +145,6 @@ body * {
 	margin-left: -4px;
 	border: 4px solid #b9b9b9;
     border-radius: 4px;
-    color: #999;
-    background-color: #fff;
 }
 [select] [options] div:hover {
     border: 4px solid #fff;
@@ -135,45 +166,32 @@ body * {
 [rasti=multi] {
     position: relative;
     min-height: 35px;
-    color: #189fc9;
-    text-shadow: 0 0 0 #189fc9;
+    padding-right: 20px;
+    text-shadow: 0 0 0 #000;
 }
 [rasti=multi] [add] {
+    display: flex;
+    align-items: center;
     position: absolute;
-    right: 0px;
-    top: 0px;
-    height: 33px;
+    right: 0;
+    top: 0;
+    height: 100%;
     width: 20px;
-    padding: 2px 0 0 5px;
-    text-align: center;
-    font-size: large;
-    line-height: 1.5;
     cursor: pointer;
-    background: inherit;
+    border-left: 1px solid rgba(0,0,0,0.2);
+}
+[rasti=multi] [add]:before {
+    content: '〉';
+    font-size: x-large;
+    padding-left: 5px;
+}
+[rasti=multi].open [add] {
+    box-shadow: inset 0 0 2px #000;
 }
 [rasti=multi].full [add] {
     display: none;
 }
-[rasti=multi] [options] {
-    display: none;
-    position: absolute;
-    right: -100%;
-    top: 0px;
-    width: 100%;
-    background: #fff;
-    border: 1px solid;
-    padding: 5px 10px;
-    z-index: 10;
-}
-[rasti=multi] [selected] {
-    max-height: 100px;
-    overflow-y: auto;
-}
-[rasti=multi].open [options] {
-    display: block;
-}
 [rasti=multi] option {
-    width: 20px;
     padding: 2px 0;
     cursor: pointer;
 }
@@ -187,41 +205,48 @@ body * {
     border-radius: 50%;
     text-align: center;
     line-height: 1.5;
-    color: #fff;
-    background-color: #189fc9;
 }
-[rasti=multi] [options]>option:before {
-    transform: rotate(45deg);
-}
-[rasti=multi] [options]>option:hover:before {
-    color: #008000;
-    background-color: rgba(0, 128, 0, 0.5);
+[rasti=multi] [selected] {
+    max-height: 100px;
+    overflow-y: auto;
 }
 [rasti=multi] [selected]>option:hover:before {
     color: #d90000;
     background-color: rgba(255, 0, 0, 0.5);
 }
-
-[rasti=buttons], [rasti=radios] {
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    color: inherit;
-    background-color: inherit;
+[rasti=multi][options] {
+    display: none;
+    position: absolute;
+    top: 0;
+    width: 250px;
+    height: 100%;
+    padding: 5px 10px;
+    border: 1px solid;
+    z-index: 10;
+    overflow-y: auto;
 }
-[rasti=buttons] div {
+[rasti=multi][options]>option:before {
+    transform: rotate(45deg);
+}
+[rasti=multi][options]>option:hover:before {
+    color: #008000;
+    background-color: rgba(0, 128, 0, 0.5);
+}
+
+
+[rasti=buttons]>div {
     display: inline-block;
-    margin-right: 5px;
-    margin-top: 7px;
-    padding: 2px 10px;
+    margin: 5px !important;
+    padding: 5px 10px;
     border-radius: 6px;
     border-bottom: 2px solid gray;
-    background-color: #fff;
     cursor: pointer;
 }
-[rasti=buttons] div.active {
-    color: #fff;
-    background: #189fc9;
+
+[rasti=radios]>div,
+[rasti=checks]>div {
+    height: 24px;
+    padding-top: 5px
 }
 
 
@@ -230,54 +255,23 @@ select[field] {
     -moz-appearance: none;
     -webkit-appearance: none;
     padding-right: 25px;
-    border-radius: 4px;
     background-image: url(../img/caret.png);
     background-repeat: no-repeat;
     background-position: right;
-    color: #189fc9;
-    text-shadow: 0 0 0 #189fc9;
     cursor: pointer;
 }
 
 
 textarea[field] {
-    height: 50px;
-    width: auto;
-    margin: 0;
+    height: 70px;
     resize: none;
-    font-family: inherit;
 }
 
 
-input[type=radio], input[type=radio] +label {
-    vertical-align: middle;
+input[type=radio], input[type=radio] +label,
+input[type=checkbox], input[type=checkbox] +label {
+    vertical-align: text-top;
     cursor: pointer;
-}
-
-
-[label] {
-    margin-top: 25px;
-    vertical-align: bottom;
-}
-[label]:before {
-    content: attr(label);
-    position: absolute;
-    height: 20px;
-    margin-top: -20px;
-    margin-left: 4px;
-    font-size: initial;
-    color: #014076;
-}
-[label][field]:before {
-    margin-top: -25px;
-    margin-left: -7px;
-}
-[label][field][big]:before {
-    margin-left: 0;
-}
-[label][rasti=buttons]:before, [label][rasti=radios]:before {
-    margin-top: -20px;
-    margin-left: 5px;
 }
 
 
@@ -287,18 +281,18 @@ input[type=radio], input[type=radio] +label {
     width: 100%;
 }
 .row>div, [row]>div { flex-basis: 100% }
-.row .col-1, [row] [col-1] { flex-basis: 8.33% }
-.row .col-2, [row] [col-2] { flex-basis: 16.66% }
-.row .col-3, [row] [col-3] { flex-basis: 25% }
-.row .col-4, [row] [col-4] { flex-basis: 33.33% }
-.row .col-5, [row] [col-5] { flex-basis: 41.66% }
-.row .col-6, [row] [col-6] { flex-basis: 50%; }
-.row .col-7, [row] [col-7] { flex-basis: 58.33% }
-.row .col-8, [row] [col-8] { flex-basis: 66.66% }
-.row .col-9, [row] [col-9] { flex-basis: 75% }
-.row .col-10, [row] [col-10] { flex-basis: 83.33% }
-.row .col-11, [row] [col-11] { flex-basis: 91.66% }
-.row .col-12, [row] [col-12] { flex-basis: 100% }
+.row>.col-1, [row]>[col-1] { flex-basis: 8.33% }
+.row>.col-2, [row]>[col-2] { flex-basis: 16.66% }
+.row>.col-3, [row]>[col-3] { flex-basis: 25% }
+.row>.col-4, [row]>[col-4] { flex-basis: 33.33% }
+.row>.col-5, [row]>[col-5] { flex-basis: 41.66% }
+.row>.col-6, [row]>[col-6] { flex-basis: 50%; }
+.row>.col-7, [row]>[col-7] { flex-basis: 58.33% }
+.row>.col-8, [row]>[col-8] { flex-basis: 66.66% }
+.row>.col-9, [row]>[col-9] { flex-basis: 75% }
+.row>.col-10, [row]>[col-10] { flex-basis: 83.33% }
+.row>.col-11, [row]>[col-11] { flex-basis: 91.66% }
+/*
 .row [class*=col]:not(:first-child),
 [row] [col-1]:not(:first-child),
 [row] [col-2]:not(:first-child),
@@ -310,24 +304,67 @@ input[type=radio], input[type=radio] +label {
 [row] [col-8]:not(:first-child),
 [row] [col-9]:not(:first-child),
 [row] [col-10]:not(:first-child),
-[row] [col-11]:not(:first-child),
-[row] [col-12]:not(:first-child) { padding-left: 10px; }
+[row] [col-11]:not(:first-child) { margin-left: 10px; }
+*/
 
+/* utils */
 
-[center] {
-    display: block;
-    margin: auto;
+[ib], .ib, [ibchilds]>*, .ibchilds>* {
+    display: inline-block !important;
+    width: auto;
+    vertical-align: bottom;
+}
+
+[center], .center {
+    margin: auto !important;
+}
+
+[float][center], .float.center {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+
+[fullw], .fullw {
+    display: block !important;
+    width: 100% !important;
+}
+
+[fullh], .fullh {
+    display: block !important;
+    height: 100% !important;
+}
+
+[autow], .autow {
+    display: block !important;
+    width: auto !important;
+}
+
+[autoh], .autoh {
+    display: block !important;
+    height: auto !important;
+}
+
+[scrollx], .scrollx {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+}
+
+[scrolly], .scrolly {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+[scroll], .scroll {
+    overflow: auto !important;
 }
 
 
-[float][center] {
-    position: absolute;
-    left: 0;
-    right: 0;
-}
+/* fx */
 
-
-[fullw] {
-    display: block;
-    width: 100%;
+[fx=stack]>* {
+    opacity: 0;
+    margin-top: 100px;
+    transition: opacity 0.5s ease,
+                margin-top 0.5s ease;
 }
