@@ -1,0 +1,19 @@
+.card .photo {
+    height: 100px;
+    width: 100px;
+    border: 1px solid #aaa;
+    border-radius: 2px;
+    background-size: cover;
+    background-position-x: center;
+}
+.card .name {
+    padding-bottom: 10px;
+    font-size: 1.5em;
+}
+.card .actions {
+    font-size: large;
+}
+.card .actions i {
+    padding: 0 7px;
+    cursor: pointer;
+}

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Rasti.js example prototype</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link rel="stylesheet" href="../rasti.css">
+	<link rel="stylesheet" href="app.css">
+
+</head>
+<body>
+	<div page="landing" header="rasti.js example prototype">
+		<div row>
+			<div panel col-6 center big header="Guess the reference!">
+
+				<select
+					field="iam"
+					navparam="iam"
+					data="iam"
+					label="I am"></select>
+
+				<input type="text"
+					field="guess"
+					navparam="guess"
+					label="Your guess"
+					placeholder="I have no idea... the Bible maybe?">
+
+				<button btn nav="results" params>SHOW HINTS</button>
+
+			</div>
+		</div>
+	</div>
+
+	<div row page="results">
+
+		<div col-4 scrolly
+			panel="filter"
+			ajax="getResults"
+			header="FIELDS PANEL">
+
+			<div section header="Your previous input">
+
+				<div rasti="buttons"
+					field="iam"
+					data="iam"
+					label="I am"></div>
+
+				<input type="text"
+					field="guess"
+					label="Your guess was"
+					placeholder="You didn't even try... u_u"></textarea>
+			</div>
+
+			<div section header="Here are some more hints">
+
+				<div rasti="radios"
+					field
+					data="themes"
+					label="Choose a theme"
+					change="applyTheme"></div>
+
+				<div rasti="checks"
+					field="meta"
+					data="meta"
+					label="Meta data"></div>
+
+				<select field="loc"
+					data="locations"
+					label="Location"></select>
+
+				<div rasti="multi"
+					field="party"
+					data="party"
+					label="Party"></div>
+				
+			</div>
+
+			<div section header="Data">
+				<textarea name="data" field disabled style="height: 100px"></textarea>
+			</div>
+
+			<div section>
+				<button big btn
+					submit="getResults"
+					render="cards">GET RESULTS</button>
+			</div>
+
+		</div>
+
+		<div col-8 scrolly
+			panel="results"
+			template="cards"
+			fx="stack"
+			header="RESULTS PANEL"></div>
+
+	</div>
+
+
+	<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
+	<script src="../rasti.js"></script>
+
+	<script>
+		var app = new rasti()
+	</script>
+
+	<script src="charData.js"></script>
+	<script src="app.js"></script>
+
+</body>
+</html>

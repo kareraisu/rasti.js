@@ -130,7 +130,7 @@ var rasti = function() {
             $el.children().each(function(i, el){
                 setTimeout(function(){
                     el.style.opacity = 1
-                    el.style.marginTop = i == 0 ? '0' : '15px'
+                    el.style.marginTop = '15px'
                 }, i * 50);
             })
         }
