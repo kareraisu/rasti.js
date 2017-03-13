@@ -1,10 +1,9 @@
 .card .photo {
     height: 100px;
     width: 100px;
-    border: 1px solid #aaa;
-    border-radius: 2px;
-    background-size: cover;
+    background-size: contain;
     background-position-x: center;
+    background-repeat: no-repeat;
 }
 .card .name {
     padding-bottom: 10px;

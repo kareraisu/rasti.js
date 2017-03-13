@@ -232,6 +232,10 @@ body * {
     color: #008000;
     background-color: rgba(0, 128, 0, 0.5);
 }
+[rasti=multi][options] input {
+    border: 1px solid #000;
+    margin: 10px 0;
+}
 
 
 [rasti=buttons]>div {

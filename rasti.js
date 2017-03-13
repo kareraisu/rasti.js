@@ -62,7 +62,7 @@ var rasti = function() {
             return ret
         },
 
-        multi : function(data) {
+        multi : function(data, filter) {
             var ret = ''
             for (var d of data) {
                 d = checkData(d)
@@ -150,7 +150,7 @@ var rasti = function() {
         // set log
         if (typeof config.log !== 'undefined') self.log = config.log
 
-        var $el, type, datakey, data, field, $options, template
+        var $el, type, datakey, data, field, filter, $options, template
 
         // create options from data sources
         $('[data]').each(function(i, el) {
@@ -169,13 +169,19 @@ var rasti = function() {
                 field = $el.attr('field')
                 if (!field) return log('Element of type [%s] must have a [field] value', type)
                 $options = $('<div field rasti='+ type +' options='+ field +'>')
+                if (el.hasAttribute('filter')) {
+                    $options[0].innerHTML += `<div class="filter">
+                            <input field type="text" placeholder="${ $el.attr('filter') || 'type here to filter options' }">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                        </div>`
+                }
                 $el.closest('[page]').append($options)
             }
             else {
                 $options = $el
             }
 
-            $options.html( template(data) )
+            $options[0].innerHTML += template(data)
 
         })
 
@@ -191,12 +197,9 @@ var rasti = function() {
             $multi.append('<div selected>')
 
             $multi.find('[add]').click(function(e) {
-                $options.siblings('[options]').hide() // hide other options
+                $options.siblings('[options]').hide() // hide other options popups
                 $options.css('left', this.getBoundingClientRect().right).toggle()
-            })
-
-            $options.click(function(e) {
-                if (e.target === this) $(this).hide()
+                if ($options.css('display') === 'block') $options.find('input').focus()
             })
 
             $options.find('option').click(function(e) {
@@ -216,6 +219,18 @@ var rasti = function() {
                 }
 
                 checkFull($multi)            
+            })
+
+            $options.find('input').on('input', function(e) {
+                var searchTerm = $(this).val().toLowerCase()
+                $options.find('option').each(function(i, el) {
+                    if ($(el).text().toLowerCase().includes(searchTerm)) {
+                        $(el).show()
+                    }
+                    else {
+                        $(el).hide()
+                    }
+                })
             })
 
             $multi.change(function(){
@@ -456,7 +471,8 @@ var rasti = function() {
             })
         }
 
-        // set theme
+        // create theme style tag and set theme
+        $('body').append('<style theme>')
         setTheme(config.theme || 'base')
 
         // show root page
@@ -523,8 +539,8 @@ var rasti = function() {
             if (!color) log('Mapping error in theme [%s]. Palette does not contain color [%s]', themeName, themeMap[attr])
             else values[attr] = color
         }
-        // generate theme style and append it to body
-        $('body').append(self.templates.theme(values))
+        // generate theme style and apply it
+        $('style[theme]').html( self.templates.theme(values) )
 
         // apply any styles defined by class
         for (var key of Object.keys(theme.palette)) {
