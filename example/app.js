@@ -26,18 +26,11 @@ app.config({
             'Yggdrasil',
         ],
 
-        party : [
-            'Fei',
-            'Elly',
-            'Citan',
-            'Bart',
-            'Billy',
-            'Ricardo',
-            'Maria',
-            'Emeralda',
-            'Wiseman',
-            'Grahf',
-        ],
+        party : function(render) {
+            // this could be asynchronous
+            var charNames = Object.keys(app.utils.charData)
+            render(charNames)
+        }
 
     },
 
@@ -53,8 +46,8 @@ app.config({
         results : {
 
             init : function(params) {
-                app.get('field=iam').val(params.iam).change()
-                app.get('field=guess').val(params.guess)
+                app.set('field=iam', params.iam)
+                app.set('field=guess', params.guess)
             }
 
         },
@@ -64,12 +57,12 @@ app.config({
 
     ajax : {
 
-        getResults : function(data, cb) {
+        getResults : function(data, render) {
             app.get('name=data').html(JSON.stringify(data, null, 4))
-            var characters = app.utils.getCharData(data.party)
             // ajax simulation
             setTimeout(function() {
-                cb(characters)
+                var characters = app.utils.getCharData(data.party)
+                render(characters)
             }, 500)
         },
 

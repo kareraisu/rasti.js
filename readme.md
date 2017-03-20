@@ -20,21 +20,30 @@ Currently the only dependency is jquery.
 
 ```javascript
 var app = new rasti()
+
 app.config({
     pages: {...},
     data: {...},
     ajax: {...},
     templates: {...},
-    fx: {...}
+    themes: {...},
+    blocks: {...},
+    fx: {...},
+    utils: {...},
 })
-app.init({ root: 'rootpage'})
+
+app.init({
+    root : 'rootPage', // defaults to first page defined in 'pages' config property
+    theme : 'myTheme', // defaults to 'base' theme
+    log : false,       // defaults to true
+})
 ```
 
 
 
 ## API
 
-The whole framework is driven by attributes which can be classified in five categories. Also, there are some utility methods available.
+The whole framework is driven by attributes which can be classified into six categories. Also, there are some utility methods available.
 
 
 ### Navigation
@@ -58,10 +67,10 @@ Binds a params object to a nav action (if used, it must be accompanying a [nav] 
 Applies rasti styles to an element. If it has a value, it will be used as the key for the element's value in a potential ajax method data object.
 
 **[data]**  
-Binds the data source for an element. It's value must be the name of a defined data source (a key in the 'data' property of the rasti config object).
+Binds the data source for an element. It's value must be the name of a defined data source (a key in the {data} config property).
 
 **[ajax]**  
-Binds an ajax method to a container. It's value must be the name of a defined ajax method (a key in the 'ajax' property of the rasti config object).
+Binds an ajax method to a container. It's value must be the name of a defined ajax method (a key in the {ajax} config property).
 
 **[submit]**  
 Defines an element as a trigger for an ajax method. It's value must be the name of a defined ajax method. When the element is clicked, the method is called with a data object containing the current values of all the [field] elements within the [ajax] container bound to the ajax method.
@@ -70,10 +79,10 @@ Defines an element as a trigger for an ajax method. It's value must be the name 
 ### Templating
 
 **[template]**  
-Binds a template to a container. It's value must be the name of a defined template (a key in the 'template' property of the rasti config object). Each time the template is executed, it's output is rendered inside the container.
+Binds a template to a container. It's value must be the name of a defined template (a key in the {template} config property). Each time the template is executed, it's output is rendered inside the container.
 
 **[render]**  
-Defines an element as a trigger for a given template. It's value must be the name of a defined template. When the element is clicked, the template is rendered.
+Defines an element as a trigger for a template. It's value must be the name of a defined template. When the element is clicked, the template is rendered.
 
 **[fx]**  
 Applies a visual effect to an element or container. It's value must be the name of a defined fx. When the element is rendered, the visual effect is displayed.
@@ -94,33 +103,46 @@ Creates a header for a container, it's value becomes the text of the header. Can
 Creates a label for an element, it's value becomes the text of the label. Can be used with any element, except panels and pages.
 
 
+### Actions
+
+**[click]** and **[change]**  
+Bind an utility method to an element's click or change event. It's value must be the name of a defined utility method (a key in the {utils} config property).
+
+
 ### Style
 
 These can be used as attributes or as classes, and have two variants:
 - normal/single (no alteration): they affect the element to which they are applied.
 - container/batch (adding an underscore at the end): they affect all immediate children of the element to which they are applied.
 
-Their names are pretty self-explanatory:
-ib, center, fl-center, fullw, fullh, autow, autoh, scrollx, scrolly, scroll, columns-2, columns-3.
+Their names are pretty straight-forward:
+- ib: inline-block
+- center: common horizontal centering
+- centerx, centery, centerxy: "floating" centering in x, y or both
+- fullw, fullh: full width or height
+- autow, autoh: auto width or height
+- scrollx, scrolly, scroll: scroll in x, y or both
+- columns-2, columns-3: arrange elements in 2 or 3 columns, these are meant for containers, thus they don't have an underscore variant
 
-Note: the last two are meant for containers, thus they don't have an underscore variant.
-
+Also, you can use any theme's color name as a class to apply the color to an element as the background-color upon setting the theme. For example, a div with the class 'detail' will be applied a background-color: 'darkcyan' when setting the theme 'base' (set by default in app.init()). See the configuration section for more details on adding themes.
 
 ### Methods
-**get(selector)**
+**get(selector)**  
 Returns a jquery object of the DOM element specified by the selector.
 
-**set(selector, value)**
+**set(selector, value)**  
 Sets the value of the DOM element specified by the selector.
 
-**add(selector, item)**
-Adds an item to the value of to the DOM element specified by the selector. This must only be used with elements whose value is an array.
+**add(selector, item)**  
+Adds an item to the value of the DOM element specified by the selector. This must only be used with elements whose value is an array.
 
-These three methods target elements in the active page only, and the selectors must be strings with the form 'attribute=value' (or just 'attribute').
+These three methods target elements in the active page only, and the selectors must be strings with the form 'attribute=value' (or just 'attribute'). Their use is encouraged over jquery or native DOM querying since they trigger a change event on the target, which would otherwise need to be explicitly triggered for rasti blocks to update their UI.
 
-**setTheme(themeName)**
-Sets the theme with name themeName, which must of course be correctly defined (either a framework theme or else defined via the rasti config object).
+**setTheme(themeName)**  
+Sets the theme with name themeName, which must of course be correctly defined (either a framework theme or else defined via the {themes} config property).
 
+**updateBlock($el, data)**  
+Updates the options of the given element (which must be a rasti block or a select) according to the given data (array or function), or if no data argument is provided, to the data source specified in the [data] attribute of the element. This allows, for example, to create field dependency (fields whose options depend on other fields' values).
 
 
 ## Custom elements (aka "blocks")
@@ -144,17 +166,21 @@ There is one more custom element that doesn't use the [rasti] attribute.
 **select[img]**  
 Creates a select capable of showing images in its options. The images are retrieved from the relative path specified in the [img] attribute.
 
+### Adding blocks
+Blocks can be added to the framework via the {blocks} config property (see next section).
+
 
 
 ## Configuration
 
-Rasti allows to define the pages, data sources, ajax methods and templates of the app and also to add themes and visual effects through a config object with the corresponding properties (which are objects themselves):
+Rasti allows to define the pages, data sources, ajax methods and templates of the app and also to add themes, "blocks" (custom elements), visual effects and utility methods through a config object with the corresponding properties (which are objects themselves):
 
 **pages: {...}**  
-Defines the pages of the app. Currently the only property available to define is the init function of a page, used to initialize it's state upon navigation using the provided navparams. So if a page doesn't need initialization, it's not necessary to add it here.
+Defines the pages of the app. Currently the only property available to define is the init function of a page, used to initialize it's state upon navigation using the provided navparams.
 
 **data: {...}**  
 Defines the data sources available for binding to elements via the [data] attribute. For templates, data sources can be anything the template expects. For rasti blocks, data sources must be arrays of strings or arrays of objects with string properties 'value' and 'label'.
+Data sources can also be functions with a callback argument, which should be called with the actual data, allowing for ajax-driven data sources.
 
 **ajax: {...}**  
 Defines the ajax methods available for binding to containers via the [ajax] attribute (and to triggers via the [submit] attribute). The ajax methods must take 2 arguments: a data object and a callback function.
@@ -167,40 +193,51 @@ Adds global themes available for applying via the setTheme() method. The themes 
 
 ```javascript
 themeName : {
-    font : 'normal 14px sans-serif',
+    font :      'normal 14px sans-serif',
     fontcolor : '#222',
     palette : {
-        light: '#ddd',
-        mid: '#aaa',
-        dark: '#444',
+        light:  '#ddd',
+        mid:    '#aaa',
+        dark:   '#444',
         detail: 'darkcyan',
     },
 }
 ```
-This is an example using the color names defined in the default theme map. The theming system uses maps to give more flexibility to themes, allowing to create variatons of the same palette. Thus, the names and quantity of the colors are without constraint, but if you want to use your own names, you must define at least one custom theme map, like so:
+
+This is an example using the color names defined in the default theme map. The theming system uses maps to give more flexibility to themes, allowing to create variatons of the same palette. Thus, the names and quantity of the colors are without constraint, but if you want to use your own names, you must define at least one custom theme map with the same color names, like so:
 
 ```javascript
 themeName : {
-    font : 'normal 14px sans-serif',
+    font :      'normal 14px sans-serif',
     fontcolor : '#222',
     palette : {
-        color1: '#ddd',
-        color2: '#aaa',
-        color3: '#444',
-        color4: 'darkcyan',
+        color1 : '#ddd',
+        color2 : '#aaa',
+        color3 : '#444',
+        color4 : 'darkcyan',
     },
     maps : [
-	    mapName: {
-	        page : 'color1',
-	        panel : 'color3',
+	    mapName : {
+	        page :    'color1',
+	        panel :   'color3',
 	        section : 'color2',
-	        field : 'color1',
-	        btn : 'color4',
+	        field :   'color1',
+	        btn :     'color4',
 	    },
     ]
 }
 ```
 
+**blocks: {...}**  
+Adds blocks available to be used via the [rasti] attribute. They must have the following structure:
+
+```javascript
+ blockName : {
+    template : function(data) {...},
+    init : function($el) {...},
+    style : `...`
+}
+```
 
 **fx: {...}**  
 Adds visual effects available for binding to elements or containers via the [fx] attribute. Visual effects must be functions that take a jquery element (the element to which they are bound).
@@ -208,17 +245,21 @@ Rasti comes prepackaged with the following effects to use right out of the box:
 
 * **stack** (container): produces a bottom-to-top stacking effect of the element's children
 
+**utils: {...}**  
+Adds utility methods inside the app namespace available for general use and for binding to click and change events of elements via the [click] and [change] attributes.
+
 
 
 ## Roadmap
 
 These are some of the things I've got in mind:
-[x] themes
-[] ajax data sources
-[] url navigation
-[] i18n support
-[] 'loading' component (bar/dots/circle)
-[] more fx's (fade, slide, twist)
+- [x] ~~themes api~~
+- [x] ~~blocks api~~
+- [x] ~~function data sources~~
+- [ ] url navigation
+- [ ] i18n support
+- [ ] 'loading' component (bar/dots/circle)
+- [ ] more fx's (fade, slide, twist)
 
 
 
