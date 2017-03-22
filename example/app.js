@@ -39,13 +39,14 @@ app.config({
 
         landing : {
 
-            init : function(params) {}
-
         },
 
         results : {
 
+            url : 'results',
+
             init : function(params) {
+                if (!params) return
                 app.set('field=iam', params.iam)
                 app.set('field=guess', params.guess)
             }
@@ -112,6 +113,10 @@ app.config({
         applyTheme : function(e) {
             app.setTheme(this.value)
         },
+
+        setPartyMax : function(e) {
+            app.get('field=party')[0].max = this.value
+        }
 
     },
 

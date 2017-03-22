@@ -128,21 +128,30 @@ Also, you can use any theme's color name as a class to apply the color to an ele
 
 ### Methods
 **get(selector)**  
+selector : string  
 Returns a jquery object of the DOM element specified by the selector.
 
 **set(selector, value)**  
+selector : string, value : any  
 Sets the value of the DOM element specified by the selector.
 
 **add(selector, item)**  
+selector : string, item : any  
 Adds an item to the value of the DOM element specified by the selector. This must only be used with elements whose value is an array.
 
 These three methods target elements in the active page only, and the selectors must be strings with the form 'attribute=value' (or just 'attribute'). Their use is encouraged over jquery or native DOM querying since they trigger a change event on the target, which would otherwise need to be explicitly triggered for rasti blocks to update their UI.
 
+**navTo(pageName, navParams)**  
+pageName : string, navParams : object (optional)  
+Navigates to the given page. If navParams are provided, they are passed to the init function of the page.
+
 **setTheme(themeName)**  
-Sets the theme with name themeName, which must of course be correctly defined (either a framework theme or else defined via the {themes} config property).
+themeName : string  
+Sets the given theme, which must of course be correctly defined (either a framework theme or else defined via the {themes} config property).
 
 **updateBlock($el, data)**  
-Updates the options of the given element (which must be a rasti block or a select) according to the given data (array or function), or if no data argument is provided, to the data source specified in the [data] attribute of the element. This allows, for example, to create field dependency (fields whose options depend on other fields' values).
+$el : jQuery object, data : array or function (optional)  
+Updates the options of the given element (which must be a rasti block or a select) according to the given data, or if no data argument is provided, to the data source specified in the [data] attribute of the element. This allows, for example, to create field dependency (fields whose options depend on other fields' values).
 
 
 ## Custom elements (aka "blocks")
@@ -173,10 +182,12 @@ Blocks can be added to the framework via the {blocks} config property (see next 
 
 ## Configuration
 
-Rasti allows to define the pages, data sources, ajax methods and templates of the app and also to add themes, "blocks" (custom elements), visual effects and utility methods through a config object with the corresponding properties (which are objects themselves):
+Rasti allows to define the pages, data sources, ajax methods and templates of the app and also to add themes, "blocks" (custom elements), visual effects and utility methods via the following config properties (which are objects themselves). These properties can be accesed from the app namespace or they can be extended using the config() method.
 
 **pages: {...}**  
-Defines the pages of the app. Currently the only property available to define is the init function of a page, used to initialize it's state upon navigation using the provided navparams.
+Defines the pages of the app. Pages can have two properties:
+- url: a string which represents the page's url fragment identifier (aka 'hash'), which will be updated upon navigation (or will dictate navigation from the browser location bar).
+- init: a function with takes an optional navParams object, used to initialize the page state upon navigation.
 
 **data: {...}**  
 Defines the data sources available for binding to elements via the [data] attribute. For templates, data sources can be anything the template expects. For rasti blocks, data sources must be arrays of strings or arrays of objects with string properties 'value' and 'label'.
@@ -233,9 +244,9 @@ Adds blocks available to be used via the [rasti] attribute. They must have the f
 
 ```javascript
  blockName : {
-    template : function(data) {...},
-    init : function($el) {...},
-    style : `...`
+    template : function(data) {...}, // data : array
+    init : function($el) {...},      // $el : jQuery object
+    style : `...`                    // string of css rules
 }
 ```
 
@@ -246,7 +257,7 @@ Rasti comes prepackaged with the following effects to use right out of the box:
 * **stack** (container): produces a bottom-to-top stacking effect of the element's children
 
 **utils: {...}**  
-Adds utility methods inside the app namespace available for general use and for binding to click and change events of elements via the [click] and [change] attributes.
+Adds utility methods within the app namespace available for general use and for binding to click and change events of elements via the [click] and [change] attributes.
 
 
 
@@ -256,7 +267,7 @@ These are some of the things I've got in mind:
 - [x] ~~themes api~~
 - [x] ~~blocks api~~
 - [x] ~~function data sources~~
-- [ ] url navigation
+- [x] ~~url navigation~~
 - [ ] i18n support
 - [ ] 'loading' component (bar/dots/circle)
 - [ ] more fx's (fade, slide, twist)

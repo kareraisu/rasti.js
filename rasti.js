@@ -588,6 +588,9 @@ var rasti = function() {
             }
             navTo($(this).attr('nav'), params)
         })
+        window.onpopstate = function(e) {
+            navTo(e.state, null, true)
+        }
 
 
         // init render
@@ -641,8 +644,11 @@ var rasti = function() {
         setTheme(config.theme || 'base')
 
 
-        // show root page
-        navTo(config.root || Object.keys(self.pages)[0])
+        // if hash is present, nav to specified page (if it exists)
+        var hash = location.hash.substring(1)
+        if (hash && self.pages[hash]) navTo(hash)
+        // else nav to root page
+        else navTo(config.root || Object.keys(self.pages)[0])
 
     }
 
@@ -674,19 +680,39 @@ var rasti = function() {
     }
 
 
-    navTo = function (pagename, params) {
-        var $page = $('[page='+ pagename +']')
+    navTo = function (pagename, params, skipPushState) {
+
+        var page = self.pages[pagename],
+            $page = $('[page='+ pagename +']')
+
         if (!$page) return log('Page [%s] container not found', pagename)
+        
         self.activePage = $page
-        if (params) {
-            if (typeof params !== 'object') log('Page params must be an object')
-            else {
-                // TODO sanity checks
-                self.pages[pagename].init(params)
-            }
+
+        if (params && typeof params !== 'object') log('Page params must be an object!')
+            
+        if (page && page.init) {
+            typeof page.init !== 'function'
+                ? log('Page init must be a function!')
+                : page.init(params)
         }
+
         $('[page].active').removeClass('active')
         self.activePage.addClass('active')
+
+        if (skipPushState) return
+        if (page && page.url) {
+            typeof page.url !== 'string'
+                ? log('Page url must be a string!')
+                : window.history.pushState(pagename, null, '#'+page.url)
+        }
+        else {
+            window.history.pushState(pagename, null)
+        }
+
+        
+
+        
     }
 
 
