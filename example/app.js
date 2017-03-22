@@ -114,9 +114,13 @@ app.config({
             app.setTheme(this.value)
         },
 
+        applyLang : function(e) {
+            app.setLang(this.value)
+        },
+
         setPartyMax : function(e) {
             app.get('field=party')[0].max = this.value
-        }
+        },
 
     },
 
@@ -154,7 +158,57 @@ app.config({
                 `
             }
             return html
-        }
+        },
+
+    },
+
+    langs : {
+        en : {
+            title : 'rasti.js example prototype',
+            guess : 'Guess the reference!',
+            iam : 'I am',
+            urguess : 'Your guess',
+            ph1 : 'I have no idea... the Bible maybe?',
+            show_hints : 'SHOW HINTS',
+            fields : 'FIELDS PANEL',
+            previous : 'Your previous input',
+            guesswas : 'Your guess was',
+            ph2: "You didn't even try... u_u",
+            hints : 'Here are some more hints',
+            choose : 'Choose a theme',
+            meta : 'Meta data',
+            location : 'Location',
+            size : 'Max party size:',
+            party : 'Party',
+            data : 'Data',
+            get_results : 'GET RESULTS',
+            results : 'RESULTS PANEL',
+            lang : 'Language',
+            tips : 'Try adding some folks to the party and then click the big button (you might want to extend the max party size first)',
+        },
+        es : {
+            title : 'prototipo ejemplo de rasti.js',
+            guess : 'Adiviná la referencia!',
+            iam : 'Yo soy',
+            urguess : 'Tu suposición',
+            ph1 : 'Ni idea... la Biblia?',
+            show_hints : 'MOSTRAR PISTAS',
+            fields : 'PANEL DE CAMPOS',
+            previous : 'Tu entrada anterior',
+            guesswas : 'Tu suposición fue',
+            ph2: "Ni siquiera intestaste... u_u",
+            hints : 'Acá tenés más pistas',
+            choose : 'Elije un tema',
+            meta : 'Meta datos',
+            location : 'Ubicación',
+            size : 'Tamaño máximo del grupo:',
+            party : 'Grupo',
+            data : 'Datos',
+            get_results : 'OBTENER RESULTADOS',
+            results : 'PANEL DE RESULTADOS',
+            lang : 'Idioma',
+            tips : 'Probá agregando gente al grupo y luego clickeá el botón grande (puede que quieras extender el tamaño del grupo antes)',
+        },
     }
 
 })
@@ -162,10 +216,13 @@ app.config({
 
 app.data.themes = Object.keys(app.themes)
 
+app.data.langs = Object.keys(app.langs)
+
 
 app.init({
     //root : 'results',
     //theme : 'Weltall',
+    //lang : 'es',
     //log : false,
 })
 

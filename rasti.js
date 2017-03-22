@@ -2,6 +2,8 @@ var rasti = function() {
 
     var self = this
 
+    var invalidData = 0
+
     this.log = true
 
     this.activePage = null
@@ -23,6 +25,8 @@ var rasti = function() {
     this.ajax = {}
 
     this.utils = {}
+
+    this.langs = {}
 
 
     this.themes = {
@@ -522,7 +526,7 @@ var rasti = function() {
 
     config = function(config) {
         for (var key in self) {
-            if ($.type(self[key]) === 'object')
+            if ($.type(self[key]) === 'object' && $.type(config[key]) === 'object')
                 Object.assign(self[key], config[key])
         }
     }
@@ -551,15 +555,20 @@ var rasti = function() {
             updateBlock($(el))
         })
 
+        // init lang
+        var langnames = Object.keys(self.langs)
+        if (langnames.length && typeof self.langs[ langnames[0] ] == 'object') {
+            var lang = typeof config.lang == 'string'
+                ? config.lang
+                : langnames[0]
+            setLang(lang)
+        }
+
         // fix labels
-        $('input[label]').each(function(i, el) {
-            fixLabel($(el))
-        })
-        $('select[label]').each(function(i, el) {
-            fixLabel($(el))
-        })
-        $('textarea[label]').each(function(i, el) {
-            fixLabel($(el))
+        'input select textarea'.split(' ').forEach(function(tag){
+            $(tag + '[label]').each(function(i, el) {
+                fixLabel($(el))
+            })
         })
 
 
@@ -580,9 +589,10 @@ var rasti = function() {
                 else {
                     // get all params
                     $page.find('[navparam]').each(function(i, el){
-                        key = $(el).attr('navparam')
-                        if (!key) return log('[navparam] attribute must have a value')
-                        params[key] = $(el).val()
+                        $el = $(el)
+                        key = $el.attr('navparam')
+                        if (!key) return error('Please provide a param name in [navparam] attribute of element:', el)
+                        params[key] = $el.val()
                     })
                 }
             }
@@ -597,7 +607,7 @@ var rasti = function() {
         $('[render]').click(function(e) {
             $el = $(this)
             var tempname = $el.attr('render')
-            if (!tempname) return log('Please provide a template name in render attribute')
+            if (!tempname) return error('Please provide a template name in [render] attribute of element:', el)
 
             var ajaxkey = $el.attr('submit')
             if (!ajaxkey) {
@@ -607,10 +617,10 @@ var rasti = function() {
 
             // get ajax data
             var ajax = self.ajax[ ajaxkey ]
-            if (!ajax || typeof ajax !== 'function') return log('Ajax method ['+ ajaxkey +'] not defined')
+            if (!ajax || typeof ajax !== 'function') return error('Ajax method ['+ ajaxkey +'] is not defined')
 
             var $form = $('[ajax='+ ajaxkey +']')
-            if (!$form.length) return log('No container element defined for ajax method [%s]. Please define one via [ajax] attribute', ajaxkey)
+            if (!$form.length) return error('No container element bound to ajax method [%s]. Please bind one via [ajax] attribute', ajaxkey)
 
             var reqdata = {}, field
             $form.find('[field]').each(function(i, el){
@@ -633,7 +643,7 @@ var rasti = function() {
             $('['+ action +']').each(function(i, el){
                 $el = $(el)
                 method = $el.attr( action )
-                if ( !app.utils[ method ] ) return log('Utility method [%s] not found', method)
+                if ( !app.utils[ method ] ) return error('Undefined utility method "%s" declared in [%s] attribute of element:', method, action, el)
                 $(this).on( action , app.utils[ method ] )
             })
         }
@@ -644,9 +654,9 @@ var rasti = function() {
         setTheme(config.theme || 'base')
 
 
-        // if hash is present, nav to specified page (if it exists)
-        var hash = location.hash.substring(1)
-        if (hash && self.pages[hash]) navTo(hash)
+        // if page hash is present, nav to specified page (if it exists)
+        var page = location.hash.substring(1)
+        if (page && self.pages[page]) navTo(page)
         // else nav to root page
         else navTo(config.root || Object.keys(self.pages)[0])
 
@@ -655,14 +665,14 @@ var rasti = function() {
 
     get = function (selector) {
         var $els = self.activePage.find('['+ selector +']')
-        if (!$els.length) log('Element(s) ['+ selector +'] not found in page ['+ self.activePage.attr('page') +']')
+        if (!$els.length) error('Element(s) ['+ selector +'] not found in page ['+ self.activePage.attr('page') +']')
         return $els
     }
 
     set = function (selector, value) {
         // TODO checks
         var $els = self.activePage.find('['+ selector +']')
-        if (!$els.length) log('Element(s) ['+ selector +'] not found in page ['+ self.activePage.attr('page') +']')
+        if (!$els.length) error('Element(s) ['+ selector +'] not found in page ['+ self.activePage.attr('page') +']')
         $els.each(function(i, el){
             el.value = value
             $(el).change()
@@ -672,7 +682,7 @@ var rasti = function() {
     add = function (selector, value) {
         // TODO checks
         var $els = self.activePage.find('['+ selector +']')
-        if (!$els.length) log('Element(s) ['+ selector +'] not found in page ['+ self.activePage.attr('page') +']')
+        if (!$els.length) error('Element(s) ['+ selector +'] not found in page ['+ self.activePage.attr('page') +']')
         $els.each(function(i, el){
             el.value.push(value)
             $(el).change()
@@ -685,15 +695,15 @@ var rasti = function() {
         var page = self.pages[pagename],
             $page = $('[page='+ pagename +']')
 
-        if (!$page) return log('Page [%s] container not found', pagename)
+        if (!$page) return error('Page [%s] container not found', pagename)
         
         self.activePage = $page
 
-        if (params && typeof params !== 'object') log('Page params must be an object!')
+        if (params && typeof params !== 'object') error('Page [%s] nav params must be an object!', pagename)
             
         if (page && page.init) {
             typeof page.init !== 'function'
-                ? log('Page init must be a function!')
+                ? error('Page [%s] init property must be a function!', pagename)
                 : page.init(params)
         }
 
@@ -703,16 +713,12 @@ var rasti = function() {
         if (skipPushState) return
         if (page && page.url) {
             typeof page.url !== 'string'
-                ? log('Page url must be a string!')
+                ? log('Page [%s] url property must be a string!', pagename)
                 : window.history.pushState(pagename, null, '#'+page.url)
         }
         else {
             window.history.pushState(pagename, null)
         }
-
-        
-
-        
     }
 
 
@@ -730,7 +736,7 @@ var rasti = function() {
         // map palette colors to attributes
         for (var attr of Object.keys(themeMap)) {
             color = theme.palette[themeMap[attr]]
-            if (!color) log('Mapping error in theme [%s]. Palette does not contain color [%s]', themeName, themeMap[attr])
+            if (!color) error('Mapping error in theme [%s]. Palette does not contain color [%s]', themeName, themeMap[attr])
             else values[attr] = color
         }
         // generate theme style and apply it
@@ -744,26 +750,63 @@ var rasti = function() {
     }
 
 
+    setLang = function (langName) {
+        var lang = self.langs[ langName ]
+        if (!lang) return error('Lang [%s] not found', langName)
+        if (typeof lang !== 'object' ) return error('Lang [%s] must be an object!', langName)
+        log('Setting lang [%s]', langName)
+
+        var $elems = $(), $el, keys
+        var attributes = 'label header text placeholder'.split(' ')
+
+        attributes.forEach(function(attr){
+            $elems = $elems.add('['+attr+']')
+        })
+
+        $elems.each(function(i, el) {
+            if (el.hasAttribute('fixed')) el = el.children[0]
+            $el = $(el)   
+            keys = el.langkeys
+            if (!keys) {
+                keys = {}
+                attributes.forEach(function(attr){
+                    if ($el.attr(attr)) keys[attr] = $el.attr(attr)
+                })
+                el.langkeys = keys
+            }
+            attributes.forEach(function(attr){
+                if (keys[attr]) {
+                    string = getString(langName, keys[attr])
+                    attr == 'text'
+                        ? $el.text(string)
+                        : $el.attr(attr, string)
+                }
+            })
+        })
+    }
+
+
     updateBlock = function ($el, data) {
-        var type = $el[0].nodeName == 'SELECT' ? 'select' : $el.attr('rasti')
-        if (!type) return log('Block type is missing, please specify a block type via the [rasti] attribute')
+        var el = $el[0]
+        var type = el.nodeName == 'SELECT' ? 'select' : $el.attr('rasti')
+        if (!type) return error('Missing block type, please provide via [rasti] attribute in element:', el)
         
         var block = self.blocks[type]
-        if (!block) return log('Block of type [%s] is not defined, please define it via the {blocks} config property', type)
+        if (!block) return error('Undefined block type "%s" in [rasti] attribute of element:', type, el)
         
         if (!data) {
             var datakey = $el.attr('data')
-            if (!datakey) return log('Datakey is missing, please specify a datakey via the [data] attribute')
+            if (!datakey) return error('Missing datakey, please provide via [data] attribute in element:', el)
 
             data = self.data[datakey]
-            if (!data) return log('No data for datakey [%s], please define it via the {data} config property', datakey)
+            if (!data) return error('Undefined data source "%s" in [data] attribute of element:', datakey, el)
         }
 
         var $options
 
         if (type === 'multi') {
             var field = $el.attr('field')
-            if (!field) return log('Block of type [%s] must have a [field] value', type)
+            if (!field) return error('Missing [field] attribute value in element:', type, el)
             // check if options div already exists
             $options = $el.closest('[page]').find('[options='+ field +']')
             if (!$options.length) {
@@ -778,6 +821,13 @@ var rasti = function() {
 
         function applyTemplate(data) {
             $options.html( block.template(data) )
+
+            if (invalidData) {
+                var field = $el.attr('field'),
+                    page = $el.closest('[page]').attr('page')
+                warn('Detected %s invalid data entries for field [%s] in page [%s]', invalidData, field, page)
+                invalidData = 0
+            }
         }
 
         typeof data == 'function'
@@ -790,11 +840,12 @@ var rasti = function() {
     // internal utils
     
     function initBlock($el) {
-        var type = $el[0].nodeName == 'SELECT' ? 'select' : $el.attr('rasti')
-        if (!type) return log('Block type is missing, please specify a block type via the [rasti] attribute')
+        var el = $el[0]
+        var type = el.nodeName == 'SELECT' ? 'select' : $el.attr('rasti')
+        if (!type) return error('Missing block type, please provide via [rasti] attribute in element:', el)
         
         var block = self.blocks[type]
-        if (!block) return log('Block of type [%s] is not defined, please define it via the {blocks} config property', type)
+        if (!block) return error('Undefined block type "%s" in [rasti] attribute of element:', type, el)
 
         // if applicable, create options from data source
         if ($el.attr('data')) updateBlock($el)
@@ -804,7 +855,7 @@ var rasti = function() {
 
 
     function fixLabel($el) {
-        var $div = $('<div>').attr('label', $el.attr('label'))
+        var $div = $(`<div fixed label="${ $el.attr('label') }" >`)
         $el.wrap($div)
         $el[0].removeAttribute('label')
     }
@@ -817,16 +868,16 @@ var rasti = function() {
 
     function render(name, data) {
         var template = self.templates[name]
-        if (!template) return log('No template [' + name +']')
+        if (!template) return error('Template [%s] is not defined', name)
 
         var $el = $('[template='+ name +']')
-        if (!$el.length) return log('No element for template [%s]', name)
-
+        if (!$el.length) return error('No element bound to template [%s]. Please bind one via the [template] attribute.', name)
+        var el = $el[0]
         if (!data) {
             var datakey = $el.attr('data')
-            if (!datakey) return log('No data for template [%s]. Please provide in ajax response or via data attribute.', name)
+            if (!datakey) return error('No data found for template [%s]. Please provide in ajax response or via [data] attribute in element:', name, el)
             data = self.data[datakey]
-            if (!data) return log('No data for datakey [%s]', datakey)
+            if (!data) return error('Undefined data source "%s" in [data] attribute of element:', datakey, el)
         }
 
         $el.html( template(data) )
@@ -834,7 +885,7 @@ var rasti = function() {
         var fxkey = $el.attr('fx')
         if (fxkey) {
             var fx = self.fx[fxkey]
-            if (!fx) return log('Fx [%s] not defined', fxkey)
+            if (!fx) return error('Undefined fx "%s" in [fx] attribute of element', fxkey, el)
             fx($el)
         }
     }
@@ -846,12 +897,24 @@ var rasti = function() {
             data = {value: data, label: data}
             break
         case 'object':
-            if (!data.value || !data.label) log('Invalid data object, must have value and label')
+            if (!data.value || !data.label) {
+                error('Invalid data object (must have value and label properties):', data)
+                invalidData++
+            }
             break
         default:
-            log('Invalid data, must be string or object')
+            error('Invalid data (must be string or object):', data)
+            invalidData++
         }
         return data
+    }
+
+
+    function getString(lang, key) {
+        if (typeof self.langs[lang] !== 'object') return error('Lang [%s] is not defined', lang)
+        var string = self.langs[lang][key]
+        if (typeof string !== 'string') error('Lang [%s] does not contain key [%s]', lang, key)
+        else return string
     }
 
 
@@ -863,7 +926,12 @@ var rasti = function() {
     function log(...params) {
         if (self.log) console.log.call(this, ...params)
     }
-    
+    function warn(...params) {
+        if (self.log) console.warn.call(this, ...params)
+    }
+    function error(...params) {
+        if (self.log) console.error.call(this, ...params)
+    }
 
     // prototype extensions
 
@@ -889,10 +957,11 @@ var rasti = function() {
         data : this.data,
         ajax : this.ajax,
         utils : this.utils,
+        langs : this.langs,
         themes : this.themes,
+        blocks : this.blocks,
         templates : this.templates,
         fx : this.fx,
-        blocks : this.blocks,
 
         // methods
         config : config,
@@ -901,6 +970,7 @@ var rasti = function() {
         set : set,
         add : add,
         navTo : navTo,
+        setLang : setLang,
         setTheme : setTheme,
         updateBlock : updateBlock,
     }

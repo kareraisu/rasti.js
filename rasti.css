@@ -29,6 +29,7 @@ body * {
 
 
 [panel] {
+    position: relative;
     padding: 20px 10px;
 }
 [panel][header],
@@ -190,78 +191,109 @@ input[type=checkbox], input[type=checkbox] +label {
 
 [ib], .ib,
 [ib_]>*, .ib_>* {
-    display: inline-block !important;
+    display: inline-block;
     width: auto;
     vertical-align: bottom;
 }
 
-[center], .center,
-[center_]>*, .center_>* {
-    margin: auto !important;
+[autom], .autom,
+[autom_]>*, .autom_>* {
+    margin: auto;
 }
 
 [centerx], .centerx,
 [centerx_]>*, .centerx_>* {
-    position: absolute !important;
-    left: 0 !important;
-    right: 0 !important;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: auto;
 }
 
 [centery], .centery,
 [centery_]>*, .centery_>* {
-    position: absolute !important;
-    top: 0 !important;
-    bottom: 0 !important;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto;
 }
 
-[centerxy], .centerxy,
-[centerxy_]>*, .centerxy_>* {
-    position: absolute !important;
-    left: 0 !important;
-    right: 0 !important;
-    top: 0 !important;
-    bottom: 0 !important;
+[center], .center,
+[center_]>*, .center_>* {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+[top], .top
+[top_]>*, .top_>* {
+    position: absolute;
+    top: 0;
+}
+
+[bottom], .bottom,
+[bottom_]>*, .bottom_>* {
+    position: absolute;
+    bottom: 0;
+}
+
+[left], .left,
+[left_]>*, .left_>* {
+    position: absolute;
+    left: 0;
+}
+
+[right], .right,
+[right_]>*, .right_>* {
+    position: absolute;
+    right: 0;
+}
+
+[fix], .fix {
+    position: fixed;
 }
 
 [fullw], .fullw,
 [fullw_]>*, .fullw_>* {
-    display: block !important;
-    width: 100% !important;
+    display: block;
+    width: 100%;
 }
 
 [fullh], .fullh,
 [fullh_]>*, .fullh_>* {
-    display: block !important;
-    height: 100% !important;
+    display: block;
+    height: 100%;
 }
 
 [autow], .autow,
 [autow_]>*, .autow_>* {
-    display: block !important;
-    width: auto !important;
+    display: block;
+    width: auto;
 }
 
 [autoh], .autoh,
 [autoh_]>*, .autoh_>* {
-    display: block !important;
-    height: auto !important;
+    display: block;
+    height: auto;
 }
 
 [scrollx], .scrollx,
 [scrollx_]>*, .scrollx_>* {
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 [scrolly], .scrolly,
 [scrolly_]>*, .scrolly_>* {
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 [scroll], .scroll,
 [scroll_]>*, .scroll_>* {
-    overflow: auto !important;
+    overflow: auto;
 }
 
 [columns-2], .columns-2 {
@@ -281,6 +313,7 @@ input[type=checkbox], input[type=checkbox] +label {
 [columns-3]>*, .columns-3>* {
     flex-basis: 33.33%;
 }
+[float]
 
 
 /* fx */

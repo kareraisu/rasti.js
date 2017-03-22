@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Rasti.js example prototype</title>
+	<title>rasti.js example prototype</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -10,25 +10,22 @@
 
 </head>
 <body>
-	<div page="landing" header="rasti.js example prototype">
-		<div row>
-			<div panel col-6 center big header="Guess the reference!">
+	<div page="landing" header="title">
+		<div big panel center header="guess" style="height: 50%;width: 50%">
 
-				<select
-					field="iam"
-					navparam="iam"
-					data="iam"
-					label="I am"></select>
+			<select
+				field="iam"
+				navparam="iam"
+				data="iam"
+				label="iam"></select>
 
-				<input type="text"
-					field="guess"
-					navparam="guess"
-					label="Your guess"
-					placeholder="I have no idea... the Bible maybe?">
+			<input type="text"
+				field="guess"
+				navparam="guess"
+				label="urguess"
+				placeholder="ph1">
 
-				<button btn nav="results" params>SHOW HINTS</button>
-
-			</div>
+			<button btn nav="results" params text="show_hints"></button>
 		</div>
 	</div>
 
@@ -37,39 +34,39 @@
 		<div col-4 scrolly
 			panel="filter"
 			ajax="getResults"
-			header="FIELDS PANEL">
+			header="fields">
 
-			<div section header="Your previous input">
+			<div section header="previous">
 
 				<div rasti="buttons"
 					field="iam"
 					data="iam"
-					label="I am"></div>
+					label="iam"></div>
 
 				<input type="text"
 					field="guess"
-					label="Your guess was"
-					placeholder="You didn't even try... u_u">
+					label="guesswas"
+					placeholder="ph2">
 			</div>
 
-			<div section header="Here are some more hints">
+			<div section header="hints">
 
 				<div rasti="radios"
 					field
 					data="themes"
-					label="Choose a theme"
+					label="choose"
 					change="applyTheme"></div>
 
 				<div rasti="checks"
 					field="meta"
 					data="meta"
-					label="Meta data"></div>
+					label="meta"></div>
 
 				<select field="loc"
 					data="locations"
-					label="Location"></select>
+					label="location"></select>
 
-				<div label="Max party size:">	
+				<div label="size">	
 					<input type="range"
 						value="1" min="1" max="10"
 						change="setPartyMax"
@@ -79,19 +76,20 @@
 					<div rasti="multi" max=1 filter="start typing a name!"
 						field="party"
 						data="party"
-						label="Party"></div>
+						label="party"></div>
 				</div>
 				
 			</div>
 
-			<div section header="Data">
+			<div section header="data">
 				<textarea name="data" field disabled style="height: 100px"></textarea>
 			</div>
 
 			<div section>
 				<button big btn
 					submit="getResults"
-					render="cards">GET RESULTS</button>
+					render="cards"
+					text="get_results"></button>
 			</div>
 
 		</div>
@@ -100,10 +98,15 @@
 			panel="results"
 			template="cards"
 			fx="stack"
-			header="RESULTS PANEL"></div>
+			header="results">
+				<div section center text="tips" style="width: 50%; height: 50%; text-align: center"></div>
+			</div>
 
 	</div>
 
+	<div section top right style="width: 100px">
+		<select field data="langs" label="lang" change="applyLang" ></select>
+	</div>
 
 	<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
 	<script src="../rasti.js"></script>
