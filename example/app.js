@@ -45,11 +45,19 @@ app.config({
 
             url : 'results',
 
-            init : function(params) {
-                if (!params) return
-                app.set('field=iam', params.iam)
-                app.set('field=guess', params.guess)
-            }
+            init : function() {
+                app.get('field=lang').find('[value=en]').addClass('active')
+                app.get('field=theme').find('[value=Weltall]').prop('checked', true)
+            },
+
+            nav : function(params) {
+
+                if (params) {
+                    app.get('name=iam').html(params.iam)
+                    app.set('field=guess', params.guess)
+                }
+
+            },
 
         },
 
@@ -70,44 +78,6 @@ app.config({
     },
 
 
-    themes : {
-
-        Weltall : {
-            font : 'normal 14px sans-serif',
-            fontcolor : '#eee',
-            palette : {
-                light: '#B5C1E2',
-                mid: '#445288',
-                dark: '#263256',
-                detail: '#C94C40',
-            }
-        },
-
-        Heimdal : {
-            font : 'normal 14px fantasy',
-            fontcolor : '#eee',
-            palette : {
-                light: '#E0DEDE',
-                mid: '#436F6E',
-                dark: '#1D3638',
-                detail: '#DFD665',
-            }
-        },
-
-        Brigandier : {
-            font : 'normal 14px sans-serif',
-            fontcolor : '#eee',
-            palette : {
-                light: '#C04542',
-                mid: '#7C1E1A',
-                dark: '#4B1817',
-                detail: '#DDCB41',
-            }
-        },
-
-    },
-
-
     utils : {
 
         applyTheme : function(e) {
@@ -121,6 +91,35 @@ app.config({
         setPartyMax : function(e) {
             app.get('field=party')[0].max = this.value
         },
+
+        doSomethingAndAlso : function(data) {
+            if (app.utils.chatting) return
+            app.utils.chatting = true
+            var lines = [
+                'do sth besides rendering cards? ok, lets see...', '',
+                '    2 + 2 =', 2+2,
+                '    ... thats basic', '',
+                '    the value of pi is', Math.PI,
+                '    ... mmm i like pie', '',
+                '    typeof [] == "%s"', typeof [],
+                '    ... of course', '',
+                '    wait what?', `
+
+              ( |\\  //|
+               \\|\\\\//\\|
+                 /66\\
+                ((_v.)
+                 > "<  
+            `
+            ]
+            function chat(){
+                console.log(lines.shift(), lines.shift())
+                if (lines.length) setTimeout(chat, 2000)
+                else app.utils.chatting = false
+            }
+            chat()
+
+        }
 
     },
 
@@ -162,6 +161,42 @@ app.config({
 
     },
 
+
+    themes : {
+
+        Weltall : {
+            font : 'normal 14px sans-serif',
+            palette : {
+                light: '#B5C1E2',
+                mid: '#445288',
+                dark: '#263256',
+                detail: '#C94C40',
+            }
+        },
+
+        Heimdal : {
+            font : 'normal 14px fantasy',
+            palette : {
+                light: '#E0DEDE',
+                mid: '#436F6E',
+                dark: '#1D3638',
+                detail: '#DFD665',
+            }
+        },
+
+        Brigandier : {
+            font : 'normal 14px sans-serif',
+            palette : {
+                light: '#C04542',
+                mid: '#7C1E1A',
+                dark: '#4B1817',
+                detail: '#DDCB41',
+            }
+        },
+
+    },
+
+
     langs : {
         en : {
             title : 'rasti.js example prototype',
@@ -170,19 +205,19 @@ app.config({
             urguess : 'Your guess',
             ph1 : 'I have no idea... the Bible maybe?',
             show_hints : 'SHOW HINTS',
-            fields : 'FIELDS PANEL',
+            fields : 'FIELDS',
             previous : 'Your previous input',
             guesswas : 'Your guess was',
             ph2: "You didn't even try... u_u",
             hints : 'Here are some more hints',
-            choose : 'Choose a theme',
+            theme : 'Theme',
             meta : 'Meta data',
             location : 'Location',
             size : 'Max party size:',
             party : 'Party',
             data : 'Data',
-            get_results : 'GET RESULTS',
-            results : 'RESULTS PANEL',
+            get_results : 'SHOW RESULTS',
+            results : 'RESULTS',
             lang : 'Language',
             tips : 'Try adding some folks to the party and then click the big button (you might want to extend the max party size first)',
         },
@@ -193,19 +228,19 @@ app.config({
             urguess : 'Tu suposición',
             ph1 : 'Ni idea... la Biblia?',
             show_hints : 'MOSTRAR PISTAS',
-            fields : 'PANEL DE CAMPOS',
+            fields : 'CAMPOS',
             previous : 'Tu entrada anterior',
             guesswas : 'Tu suposición fue',
             ph2: "Ni siquiera intestaste... u_u",
             hints : 'Acá tenés más pistas',
-            choose : 'Elije un tema',
+            theme : 'Tema',
             meta : 'Meta datos',
             location : 'Ubicación',
-            size : 'Tamaño máximo del grupo:',
+            size : 'Tamaño máx del grupo:',
             party : 'Grupo',
             data : 'Datos',
-            get_results : 'OBTENER RESULTADOS',
-            results : 'PANEL DE RESULTADOS',
+            get_results : 'MOSTRAR RESULTADOS',
+            results : 'RESULTADOS',
             lang : 'Idioma',
             tips : 'Probá agregando gente al grupo y luego clickeá el botón grande (puede que quieras extender el tamaño del grupo antes)',
         },
@@ -221,7 +256,7 @@ app.data.langs = Object.keys(app.langs)
 
 app.init({
     //root : 'results',
-    //theme : 'Weltall',
+    theme : 'Weltall',
     //lang : 'es',
     //log : false,
 })

@@ -11,13 +11,14 @@
 </head>
 <body>
 	<div page="landing" header="title">
-		<div big panel center header="guess" style="height: 50%;width: 50%">
+		<div big panel center header="guess"
+			style="height: 50%;width: 50%">
 
-			<select
+			<div rasti="buttons"
 				field="iam"
 				navparam="iam"
 				data="iam"
-				label="iam"></select>
+				label="iam"></div>
 
 			<input type="text"
 				field="guess"
@@ -29,19 +30,16 @@
 		</div>
 	</div>
 
-	<div row page="results">
+	<div row page="results" ajax="getResults">
 
-		<div col-4 scrolly
+		<div col-3 scrolly
 			panel="filter"
-			ajax="getResults"
 			header="fields">
 
 			<div section header="previous">
 
-				<div rasti="buttons"
-					field="iam"
-					data="iam"
-					label="iam"></div>
+				<div name="iam"
+					style="font-size: 4em; text-align: center;">?</div>
 
 				<input type="text"
 					field="guess"
@@ -51,11 +49,18 @@
 
 			<div section header="hints">
 
-				<div rasti="radios"
-					field
-					data="themes"
-					label="choose"
-					change="applyTheme"></div>
+				<div rasti="multi" max=1 filter="start typing a name!"
+					field="party"
+					data="party"
+					label="party"></div>
+
+				<div label="size">	
+					<input type="range"
+						value="1" min="1" max="10"
+						change="setPartyMax"
+						onchange="partyMax.value = this.value">
+					<output id="partyMax">1</output>
+				</div>
 
 				<div rasti="checks"
 					field="meta"
@@ -65,47 +70,45 @@
 				<select field="loc"
 					data="locations"
 					label="location"></select>
-
-				<div label="size">	
-					<input type="range"
-						value="1" min="1" max="10"
-						change="setPartyMax"
-						onchange="partyMax.value = this.value">
-					<output id="partyMax">1</output>
-
-					<div rasti="multi" max=1 filter="start typing a name!"
-						field="party"
-						data="party"
-						label="party"></div>
-				</div>
 				
 			</div>
 
-			<div section header="data">
-				<textarea name="data" field disabled style="height: 100px"></textarea>
-			</div>
-
-			<div section>
-				<button big btn
-					submit="getResults"
-					render="cards"
-					text="get_results"></button>
-			</div>
-
+			<button big btn
+				submit="getResults"
+				then="doSomethingAndAlso"
+				render="cards"
+				text="get_results"></button>
 		</div>
 
-		<div col-8 scrolly
+		<div col-7 scrolly
 			panel="results"
 			template="cards"
 			fx="stack"
 			header="results">
-				<div section center text="tips" style="width: 50%; height: 50%; ; font-size: large; text-align: center"></div>
+
+			<div section centerx text="tips"
+				style="top: 40%; width: 50%; font-size: large; text-align: center"></div>
+		</div>
+
+		<div col-2 panel>
+			<div section header="Config">				
+				<div rasti="buttons"
+					field="lang"
+					data="langs"
+					label="lang"
+					change="applyLang"></div>
+
+				<div rasti="radios"
+					field="theme"
+					data="themes"
+					label="theme"
+					change="applyTheme"></div>
 			</div>
 
-	</div>
+			<textarea name="data" label="data" field disabled
+				style="height: 300px"></textarea>
+		</div>
 
-	<div section top right style="width: 100px">
-		<select field data="langs" label="lang" change="applyLang" ></select>
 	</div>
 
 	<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>

@@ -6,6 +6,8 @@ var rasti = function() {
 
     this.log = true
 
+    this.root = ''
+
     this.activePage = null
 
     this.activeTheme = {}
@@ -62,7 +64,7 @@ var rasti = function() {
             return `
                 body {
                     font: ${ values.font };
-                    color: ${ values.text };
+                    color: ${ values.text[0] };
                 }
                 [page]    { background-color: ${ values.page[0] }; }
                 [page][header]:before { color: ${ values.page[1] }; }
@@ -77,7 +79,7 @@ var rasti = function() {
                       color: ${ values.btn[1] }; }
                 [btn][disabled], .btn[disabled], [rasti=buttons] div
                     { background-color: ${ values.section[0] }; }
-                [label]:before { color: ${ values.label }; }
+                [label]:before { color: ${ values.label[0] }; }
                 `
         },
 
@@ -112,9 +114,9 @@ var rasti = function() {
             init : function($el) {
                 $el.find('div').click(function(e) {
                     var $el = $(this)
-                    $el.parent().val($el.attr('value'))
-                    $el.siblings().removeClass('active')
-                    $el.addClass('active')
+                    $el.parent()
+                        .val($el.attr('value'))
+                        .trigger('change')
                 })
                 $el.change(function(e) {
                     var $el = $(this)
@@ -543,6 +545,12 @@ var rasti = function() {
         // set log
         if (typeof config.log !== 'undefined') self.log = config.log
 
+
+        // set root page
+        self.root = config.root || Object.keys(self.pages)[0]
+        if (!self.root) return error('Root page is not defined')
+        
+
         // append blocks styles
         var styles = '<style blocks>'
         for (var key in self.blocks) {
@@ -551,15 +559,36 @@ var rasti = function() {
         styles += '</style>'
         $('body').append(styles)
 
+
         // init rasti blocks
-        $('[rasti]').not('[options]').each(function(i, el) {
+        $('[rasti]').each(function(i, el) {
             initBlock($(el))
         })
+
 
         // create options for selects with data source
         $('select[data]').each(function(i, el) {
             updateBlock($(el))
         })
+
+
+        // init pages
+        var page, $page
+        for (var name in self.pages) {
+            page = self.pages[name]
+            if (typeof page != 'object') return error('Page [%s] must be an object!', name)
+            $page = $('[page='+ name +']')
+            if ( !$page.length ) return error('No container element bound to page [%s]. Please bind one via [page] attribute', name)
+            if (page.init) {
+                if (typeof page.init != 'function') return error('Page [%s] init property must be a function!', name)
+                else {
+                    log('Initializing page [%s]', name)
+                    self.activePage = $page
+                    page.init()
+                }
+            }
+        }
+
 
         // init lang
         var langnames = Object.keys(self.langs)
@@ -569,6 +598,7 @@ var rasti = function() {
                 : langnames[0]
             setLang(lang)
         }
+
 
         // fix labels
         'input select textarea'.split(' ').forEach(function(tag){
@@ -580,11 +610,15 @@ var rasti = function() {
 
         // init nav
         $('[nav]').click(function(e) {
-            // TODO add checks
-            var params = {}
+            var $el = $(this),
+                page = $el.attr('nav'),
+                params = {}
+
+            if (!page) return error('Please provide a page name in [nav] attribute of element:', el)
+
             if (this.hasAttribute('params')) {
                 var $page = self.activePage
-                var paramkeys = $(this).attr('params')
+                var paramkeys = $el.attr('params')
                 if (paramkeys) {
                     // get specified params
                     paramkeys = paramkeys.split(' ')
@@ -602,45 +636,34 @@ var rasti = function() {
                     })
                 }
             }
-            navTo($(this).attr('nav'), params)
+            navTo(page, params)
         })
-        window.onpopstate = function(e) {
-            navTo(e.state, null, true)
-        }
+
+
+        // init submit
+        $('[submit]').click(function(e) {
+            $el = $(this)
+            var method = $el.attr('submit'),
+                callback = $el.attr('then')
+            if (!method) return error('Plase provide an ajax method in [submit] attribute')
+            if (callback && !self.utils[callback]) error('Utility method [%s] provided in [then] attribute is not defined', callback)
+            submitAjax(method, self.utils[callback])
+        })
 
 
         // init render
         $('[render]').click(function(e) {
             $el = $(this)
-            var tempname = $el.attr('render')
-            if (!tempname) return error('Please provide a template name in [render] attribute of element:', el)
+            var template = $el.attr('render')
+            if (!template) return error('Please provide a template name in [render] attribute of element:', el)
 
-            var ajaxkey = $el.attr('submit')
-            if (!ajaxkey) {
-                render(tempname)
-                return
+            var method = $el.attr('submit')
+            if (method) {
+                submitAjax(method, function(resdata){
+                    render(template, resdata)
+                })
             }
-
-            // get ajax data
-            var ajax = self.ajax[ ajaxkey ]
-            if (!ajax || typeof ajax !== 'function') return error('Ajax method ['+ ajaxkey +'] is not defined')
-
-            var $form = $('[ajax='+ ajaxkey +']')
-            if (!$form.length) return error('No container element bound to ajax method [%s]. Please bind one via [ajax] attribute', ajaxkey)
-
-            var reqdata = {}, field
-            $form.find('[field]').each(function(i, el){
-                $el = $(el)
-                field = $el.attr('field')
-                if (field) {
-                    reqdata[field] = $el.val() || $el.attr('value')
-                }
-            })
-
-            ajax(reqdata, function(resdata){
-                render(tempname, resdata)
-            })
-
+            else render(template)
         })
 
 
@@ -660,25 +683,33 @@ var rasti = function() {
         setTheme(config.theme || 'base')
 
 
-        // if page hash is present, nav to specified page (if it exists)
+        // bind nav handler to popstate event
+        window.onpopstate = function(e) {
+            var page = e.state || location.hash.substring(1)
+            page && self.pages[page]
+                ? e.state ? navTo(page, null, true) : navTo(page)
+                : navTo(self.root)
+        }
+
+
+        // nav to page in hash or to root
         var page = location.hash.substring(1)
-        if (page && self.pages[page]) navTo(page)
-        // else nav to root page
-        else navTo(config.root || Object.keys(self.pages)[0])
+        navTo(page && self.pages[page] ? page : self.root)
 
     }
 
 
     get = function (selector) {
+        if ( !self.activePage || !self.activePage.length ) return error('Cannot get(%s), active page is not defined', selector)
         var $els = self.activePage.find('['+ selector +']')
-        if (!$els.length) error('Element(s) ['+ selector +'] not found in page ['+ self.activePage.attr('page') +']')
+        if (!$els.length) error('Cannot get(%s), element not found in page [%s]', selector, self.activePage.attr('page'))
         return $els
     }
 
-    set = function (selector, value) {
-        // TODO checks
+    set = function (selector, value) {        
+        if ( !self.activePage || !self.activePage.length ) return error('Cannot set(%s), active page is not defined', selector)
         var $els = self.activePage.find('['+ selector +']')
-        if (!$els.length) error('Element(s) ['+ selector +'] not found in page ['+ self.activePage.attr('page') +']')
+        if (!$els.length) error('Cannot set(%s), element not found in page [%s]', selector, self.activePage.attr('page'))
         $els.each(function(i, el){
             el.value = value
             $(el).change()
@@ -686,9 +717,9 @@ var rasti = function() {
     }
 
     add = function (selector, value) {
-        // TODO checks
+        if ( !self.activePage || !self.activePage.length ) return error('Cannot add(%s), active page is not defined', selector)
         var $els = self.activePage.find('['+ selector +']')
-        if (!$els.length) error('Element(s) ['+ selector +'] not found in page ['+ self.activePage.attr('page') +']')
+        if (!$els.length) error('Cannot add(%s), element not found in page [%s]', selector, self.activePage.attr('page'))
         $els.each(function(i, el){
             el.value.push(value)
             $(el).change()
@@ -701,16 +732,17 @@ var rasti = function() {
         var page = self.pages[pagename],
             $page = $('[page='+ pagename +']')
 
+        if (!page) return error('Page [%s] not found', pagename)
         if (!$page) return error('Page [%s] container not found', pagename)
         
         self.activePage = $page
 
         if (params && typeof params !== 'object') error('Page [%s] nav params must be an object!', pagename)
             
-        if (page && page.init) {
-            typeof page.init !== 'function'
-                ? error('Page [%s] init property must be a function!', pagename)
-                : page.init(params)
+        if (page && page.nav) {
+            typeof page.nav !== 'function'
+                ? error('Page [%s] nav property must be a function!', pagename)
+                : page.nav(params)
         }
 
         $('[page].active').removeClass('active')
@@ -877,7 +909,7 @@ var rasti = function() {
         if (!template) return error('Template [%s] is not defined', name)
 
         var $el = $('[template='+ name +']')
-        if (!$el.length) return error('No element bound to template [%s]. Please bind one via the [template] attribute.', name)
+        if (!$el.length) return error('No element bound to template [%s]. Please bind one via [template] attribute.', name)
         var el = $el[0]
         if (!data) {
             var datakey = $el.attr('data')
@@ -894,6 +926,26 @@ var rasti = function() {
             if (!fx) return error('Undefined fx "%s" in [fx] attribute of element', fxkey, el)
             fx($el)
         }
+    }
+
+
+    function submitAjax(method, callback) {
+        var ajax = self.ajax[ method ]
+        if (!ajax || typeof ajax !== 'function') return error('Ajax method ['+ method +'] is not defined')
+
+        var $form = $('[ajax='+ method +']')
+        if (!$form.length) return error('No container element bound to ajax method [%s]. Please bind one via [ajax] attribute', method)
+
+        var reqdata = {}, field
+        $form.find('[field]').each(function(i, el){
+            $el = $(el)
+            field = $el.attr('field')
+            if (field) {
+                reqdata[field] = $el.val() || $el.attr('value')
+            }
+        })
+
+        ajax(reqdata, callback)
     }
 
 
@@ -919,7 +971,7 @@ var rasti = function() {
     function getString(lang, key) {
         if (typeof self.langs[lang] !== 'object') return error('Lang [%s] is not defined', lang)
         var string = self.langs[lang][key]
-        if (typeof string !== 'string') error('Lang [%s] does not contain key [%s]', lang, key)
+        if (typeof string !== 'string') warn('Lang [%s] does not contain key [%s]', lang, key)
         else return string
     }
 

@@ -30,7 +30,11 @@ body * {
 
 [panel] {
     position: relative;
-    padding: 20px 10px;
+    padding: 20px 15px;
+    margin: 20px 15px 20px 0;
+}
+[panel]:first-of-type {
+    margin-left: 15px;
 }
 [panel][header],
 [section][header] {
@@ -50,8 +54,8 @@ body * {
     position: relative;
     padding: 10px;
 }
-[section]:not(:last-child) {
-    margin-bottom: 10px;
+[section]:not(:last-of-type) {
+    margin-bottom: 15px;
 }
 [section][header]:before {
     content: attr(header);
@@ -81,24 +85,28 @@ body * {
 }
 [big] [field], [big] [btn], .big .field, .big .btn,
 [big][field], [big][btn], .big.field , .big.btn {
-    height: 50px;
+    min-height: 50px;
     border-radius: 4px;
     font-size: 1.2em;
 }
 [btn], .btn {
 	cursor: pointer;
 }
-[panel] [field], [panel] [btn],
-[panel] .field, [panel] .btn 
-[section] [field], [section] [btn],
+[panel] [field], [panel] [btn], [panel] [label],
+[panel] .field, [panel] .btn,
+[section] [field], [section] [btn], [section] [label],
 [section] .field, [section] .btn {
     margin-top: 25px;
+    margin-bottom: 15px;
 }
 
 
 [label] {
     margin-top: 25px;
     vertical-align: bottom;
+}
+[label][fixed]>* {
+    margin-bottom: 0;
 }
 [label]>input,
 [label]>select,
@@ -153,11 +161,17 @@ input[type=checkbox], input[type=checkbox] +label {
     cursor: pointer;
 }
 
+input[type=radio] +label,
+input[type=checkbox] +label {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50%;
+}
+
 
 .row, [row] {
     display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
     width: 100%;
 }
 .row>div, [row]>div { flex-basis: 100% }
@@ -198,7 +212,7 @@ input[type=checkbox], input[type=checkbox] +label {
 
 [autom], .autom,
 [autom_]>*, .autom_>* {
-    margin: auto;
+    margin: auto !important;
 }
 
 [centerx], .centerx,
@@ -206,7 +220,7 @@ input[type=checkbox], input[type=checkbox] +label {
     position: absolute;
     left: 0;
     right: 0;
-    margin: auto;
+    margin: auto !important;
 }
 
 [centery], .centery,
@@ -214,7 +228,7 @@ input[type=checkbox], input[type=checkbox] +label {
     position: absolute;
     top: 0;
     bottom: 0;
-    margin: auto;
+    margin: auto !important;
 }
 
 [center], .center,
@@ -224,7 +238,7 @@ input[type=checkbox], input[type=checkbox] +label {
     right: 0;
     top: 0;
     bottom: 0;
-    margin: auto;
+    margin: auto !important;
 }
 
 [top], .top
@@ -313,7 +327,6 @@ input[type=checkbox], input[type=checkbox] +label {
 [columns-3]>*, .columns-3>* {
     flex-basis: 33.33%;
 }
-[float]
 
 
 /* fx */
