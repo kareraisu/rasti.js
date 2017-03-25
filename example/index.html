@@ -91,7 +91,7 @@
 		</div>
 
 		<div col-2 panel>
-			<div section header="Config">				
+			<div section header="Config">			
 				<div rasti="buttons"
 					field="lang"
 					data="langs"
@@ -103,10 +103,16 @@
 					data="themes"
 					label="theme"
 					change="applyTheme"></div>
+
+				<div rasti="buttons"
+				    data="themeMaps"
+				    change="applyTheme"></div>
 			</div>
 
-			<textarea name="data" label="data" field disabled
-				style="height: 300px"></textarea>
+			<div section header="data">
+				<textarea name="data" field disabled
+					style="height: 200px"></textarea>
+			</div>
 		</div>
 
 	</div>

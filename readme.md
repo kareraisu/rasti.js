@@ -145,9 +145,9 @@ These three methods target elements in the active page only, and the selectors m
 pageName : string, navParams : object (optional)  
 Navigates to the given page. If navParams are provided, they are passed to the init function of the page.
 
-**setTheme(themeName)**  
-themeName : string  
-Sets the given theme, which must of course be correctly defined (either a framework theme or else defined via the {themes} config property).
+**setTheme(themeName, mapName)**  
+themeName : string, mapName : string (optional)  
+Sets the given theme, which must be correctly defined (either a default framework theme or else defined via the {themes} config property). If a map name is provided, it will be first looked up in the theme and then -if not found- in the framework. If the map name is not found in neither, or is not provided, the default 'light' map will be used.
 
 **updateBlock($el, data)**  
 $el : jQuery object, data : array or function (optional)  
@@ -205,39 +205,31 @@ Adds global themes available for applying via the setTheme() method. The themes 
 ```javascript
 themeName : {
     font :      'normal 14px sans-serif',
-    fontcolor : '#222',
     palette : {
         light:  '#ddd',
         mid:    '#aaa',
         dark:   '#444',
         detail: 'darkcyan',
     },
+    maps : {
+        mapName1 : {
+            page :    'light detail',
+            panel :   'dark detail',
+            section : 'mid dark',
+            field :   'light dark',
+            btn :     'detail light',
+            text :    'dark',
+            label :   'light',
+        },
+        mapName2 : {...},
+    }
 }
 ```
 
-This is an example using the color names defined in the default theme map. The theming system uses maps to give more flexibility to themes, allowing to create variatons of the same palette. Thus, the names and quantity of the colors are without constraint, but if you want to use your own names, you must define at least one custom theme map with the same color names, like so:
+This is an example using the color names defined in the default themes and maps. The theming system uses maps to give more flexibility to themes, allowing to create variatons of the same palette. Thus, the names and quantity of the colors are without constraint, but if you want to use your own names, you must define at least one custom theme map with those names. If no map is defined, the default 'light' map will be used (in which case your theme must use the default color names or it won't load).
 
-```javascript
-themeName : {
-    font :      'normal 14px sans-serif',
-    fontcolor : '#222',
-    palette : {
-        color1 : '#ddd',
-        color2 : '#aaa',
-        color3 : '#444',
-        color4 : 'darkcyan',
-    },
-    maps : [
-	    mapName : {
-	        page :    'color1',
-	        panel :   'color3',
-	        section : 'color2',
-	        field :   'color1',
-	        btn :     'color4',
-	    },
-    ]
-}
-```
+All theme map keys except 'text' and 'label' expect two colors, the first will be used for the background and the second for the header (in the case of containers) or the text of the element. (page, panel, section : 'bgcolor headercolor', fiel, btn : 'bgcolor textcolor').
+
 
 **blocks: {...}**  
 Adds blocks available to be used via the [rasti] attribute. They must have the following structure:
@@ -268,7 +260,7 @@ These are some of the things I've got in mind:
 - [x] ~~blocks api~~
 - [x] ~~function data sources~~
 - [x] ~~url navigation~~
-- [ ] i18n support
+- [x] i18n support (done - documentation pending)
 - [ ] 'loading' component (bar/dots/circle)
 - [ ] more fx's (fade, slide, twist)
 

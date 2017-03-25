@@ -81,7 +81,9 @@ app.config({
     utils : {
 
         applyTheme : function(e) {
-            app.setTheme(this.value)
+            var theme = app.get('field=theme').val(),
+                map = app.get('data=themeMaps').val()
+            app.setTheme(theme, map)
         },
 
         applyLang : function(e) {
@@ -171,7 +173,7 @@ app.config({
                 mid: '#445288',
                 dark: '#263256',
                 detail: '#C94C40',
-            }
+            },
         },
 
         Heimdal : {
@@ -181,7 +183,7 @@ app.config({
                 mid: '#436F6E',
                 dark: '#1D3638',
                 detail: '#DFD665',
-            }
+            },
         },
 
         Brigandier : {
@@ -191,7 +193,7 @@ app.config({
                 mid: '#7C1E1A',
                 dark: '#4B1817',
                 detail: '#DDCB41',
-            }
+            },
         },
 
     },
@@ -250,6 +252,8 @@ app.config({
 
 
 app.data.themes = Object.keys(app.themes)
+
+app.data.themeMaps = Object.keys(app.themeMaps)
 
 app.data.langs = Object.keys(app.langs)
 

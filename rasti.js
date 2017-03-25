@@ -12,16 +12,6 @@ var rasti = function() {
 
     this.activeTheme = {}
 
-    this.themeMap = {
-        page : 'light detail',
-        panel : 'dark detail',
-        section : 'mid dark',
-        field : 'light dark',
-        btn : 'detail light',
-        text : 'dark',
-        label : 'light',
-    }
-
     this.pages = {}
 
     this.data = {}
@@ -29,6 +19,8 @@ var rasti = function() {
     this.ajax = {}
 
     this.utils = {}
+
+    this.templates = {}
 
     this.langs = {}
 
@@ -58,31 +50,27 @@ var rasti = function() {
     }
 
 
-    this.templates = {
+    this.themeMaps = {
 
-        theme : function(values) {
-            return `
-                body {
-                    font: ${ values.font };
-                    color: ${ values.text[0] };
-                }
-                [page]    { background-color: ${ values.page[0] }; }
-                [page][header]:before { color: ${ values.page[1] }; }
-                [panel]   { background-color: ${ values.panel[0] }; }
-                [panel][header]:before { color: ${ values.panel[1] }; }
-                [section] { background-color: ${ values.section[0] }; }
-                [section][header]:before { color: ${ values.section[1] }; }
-                [field]   { background-color: ${ values.field[0] };
-                            color: ${ values.field[1] }; }
-                [btn], .btn, [rasti=buttons] div.active
-                    { background-color: ${ values.btn[0] };
-                      color: ${ values.btn[1] }; }
-                [btn][disabled], .btn[disabled], [rasti=buttons] div
-                    { background-color: ${ values.section[0] }; }
-                [label]:before { color: ${ values.label[0] }; }
-                `
+        light : {
+            page : 'light detail',
+            panel : 'dark detail',
+            section : 'mid dark',
+            field : 'light dark',
+            btn : 'detail light',
+            text : 'dark',
+            label : 'light',
         },
 
+        dark : {
+            page : 'mid detail',
+            panel : 'dark detail',
+            section : 'mid dark',
+            field : 'dark light',
+            btn : 'detail dark',
+            text : 'dark',
+            label : 'dark',
+        },
     }
 
 
@@ -760,13 +748,20 @@ var rasti = function() {
     }
 
 
-    setTheme = function (themeName) {
+    setTheme = function (themeName, mapName) {
         var theme = self.themes[themeName], themeMap
         if (!theme) return log('Theme [%s] not found', themeName)
-        log('Setting theme [%s]', themeName)
+        
         self.activeTheme = theme
-        themeMap = theme.map || self.themeMap
+        themeMap = mapName && theme.maps && theme.maps[mapName]
+                ? theme.maps[mapName]
+                : mapName && self.themeMaps[mapName]
+                    ? self.themeMaps[mapName]
+                    : theme.maps && Object.keys(theme.maps).length
+                        ? theme.maps[ Object.keys(theme.maps)[0] ]
+                        : self.themeMaps.light
 
+        log('Setting theme [%s] (%s)', themeName, mapName || 'light')
         var values = {
             font : theme.font,
         }, colors, bg, text
@@ -778,7 +773,7 @@ var rasti = function() {
             else values[attr] = colors
         }
         // generate theme style and apply it
-        $('style[theme]').html( self.templates.theme(values) )
+        $('style[theme]').html( getThemeStyle(values) )
 
         // apply any styles defined by class
         for (var key of Object.keys(theme.palette)) {
@@ -968,6 +963,30 @@ var rasti = function() {
     }
 
 
+    function getThemeStyle(values) {
+        return `
+            body {
+                font: ${ values.font };
+                color: ${ values.text[0] };
+            }
+            [page]    { background-color: ${ values.page[0] }; }
+            [page][header]:before { color: ${ values.page[1] }; }
+            [panel]   { background-color: ${ values.panel[0] }; }
+            [panel][header]:before { color: ${ values.panel[1] }; }
+            [section] { background-color: ${ values.section[0] }; }
+            [section][header]:before { color: ${ values.section[1] }; }
+            [field]   { background-color: ${ values.field[0] };
+                        color: ${ values.field[1] }; }
+            [btn], .btn, [rasti=buttons] div.active
+                { background-color: ${ values.btn[0] };
+                  color: ${ values.btn[1] }; }
+            [btn][disabled], .btn[disabled], [rasti=buttons] div
+                { background-color: ${ values.section[0] }; }
+            [label]:before { color: ${ values.label[0] }; }
+            `
+    }
+
+
     function getString(lang, key) {
         if (typeof self.langs[lang] !== 'object') return error('Lang [%s] is not defined', lang)
         var string = self.langs[lang][key]
@@ -1017,6 +1036,7 @@ var rasti = function() {
         utils : this.utils,
         langs : this.langs,
         themes : this.themes,
+        themeMaps : this.themeMaps,
         blocks : this.blocks,
         templates : this.templates,
         fx : this.fx,
