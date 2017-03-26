@@ -43,7 +43,7 @@ app.init({
 
 ## API
 
-The whole framework is driven by attributes which can be classified into six categories. Also, there are some utility methods available.
+The whole framework is driven by attributes which can be classified into seven categories. Also, there are some utility methods available.
 
 
 ### Navigation
@@ -96,11 +96,19 @@ Define a container of related content. Panels contain sections.
 **[row]** and **[col-1]** to **[col-12]**  
 Define a responsive grid a la bootstrap (12 columns grid system). Rows contain columns.
 
+
+### Text
+
 **[header]**  
 Creates a header for a container, it's value becomes the text of the header. Can be used with panels and pages.
 
 **[label]**  
 Creates a label for an element, it's value becomes the text of the label. Can be used with any element, except panels and pages.
+
+**[text]**  
+Creates text within an element, it's value becomes the text.
+
+These three attributes can be localized by using a language key for their value.
 
 
 ### Actions
@@ -126,6 +134,7 @@ Their names are pretty straight-forward:
 
 Also, you can use any theme's color name as a class to apply the color to an element as the background-color upon setting the theme. For example, a div with the class 'detail' will be applied a background-color: 'darkcyan' when setting the theme 'base' (set by default in app.init()). See the configuration section for more details on adding themes.
 
+
 ### Methods
 **get(selector)**  
 selector : string  
@@ -147,7 +156,11 @@ Navigates to the given page. If navParams are provided, they are passed to the i
 
 **setTheme(themeName, mapName)**  
 themeName : string, mapName : string (optional)  
-Sets the given theme, which must be correctly defined (either a default framework theme or else defined via the {themes} config property). If a map name is provided, it will be first looked up in the theme and then -if not found- in the framework. If the map name is not found in neither, or is not provided, the default 'light' map will be used.
+Loads the given theme (either a default framework theme or else defined via the {themes} config property). If a map name is provided, it will be first looked up in the theme and then -if not found- in the framework. If the map name is not found in neither, or is not provided, the default 'light' map will be used.
+
+**setLang(langName)**  
+langName : string  
+Loads the given language (which must be defined via the {langs} config property).
 
 **updateBlock($el, data)**  
 $el : jQuery object, data : array or function (optional)  
@@ -185,9 +198,10 @@ Blocks can be added to the framework via the {blocks} config property (see next 
 Rasti allows to define the pages, data sources, ajax methods and templates of the app and also to add themes, "blocks" (custom elements), visual effects and utility methods via the following config properties (which are objects themselves). These properties can be accesed from the app namespace or they can be extended using the config() method.
 
 **pages: {...}**  
-Defines the pages of the app. Pages can have two properties:
+Defines the pages of the app. Pages must be objects which can have any or all of the following properties:
 - url: a string which represents the page's url fragment identifier (aka 'hash'), which will be updated upon navigation (or will dictate navigation from the browser location bar).
-- init: a function with takes an optional navParams object, used to initialize the page state upon navigation.
+- init: a function with no arguments which is used to initialize the page state (this function is called once during app initialization).
+- nav: a function which takes an optional 'navParams' object argument, used to update the page state upon navigation (this function is called everytime the user navigates to the page).
 
 **data: {...}**  
 Defines the data sources available for binding to elements via the [data] attribute. For templates, data sources can be anything the template expects. For rasti blocks, data sources must be arrays of strings or arrays of objects with string properties 'value' and 'label'.
@@ -230,6 +244,8 @@ This is an example using the color names defined in the default themes and maps.
 
 All theme map keys except 'text' and 'label' expect two colors, the first will be used for the background and the second for the header (in the case of containers) or the text of the element. (page, panel, section : 'bgcolor headercolor', fiel, btn : 'bgcolor textcolor').
 
+**langs: {...}**  
+Adds languages available for loading via the setLang() method. Languages nust be simple maps of strings (objects with string properties). Upon loading the language, all [header], [label] and [placeholder] attributes whose value matches a key of the language map will have their value replaced by the corresponding string. [text] attributes values are also matched against the language map, but the corresponding string is applied as the element's inner html.
 
 **blocks: {...}**  
 Adds blocks available to be used via the [rasti] attribute. They must have the following structure:
@@ -260,7 +276,7 @@ These are some of the things I've got in mind:
 - [x] ~~blocks api~~
 - [x] ~~function data sources~~
 - [x] ~~url navigation~~
-- [x] i18n support (done - documentation pending)
+- [x] ~~i18n support~~
 - [ ] 'loading' component (bar/dots/circle)
 - [ ] more fx's (fade, slide, twist)
 
