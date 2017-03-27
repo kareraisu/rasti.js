@@ -1,6 +1,8 @@
-# Rasti.js <img align=right height=200 src="http://www.rasti.com.ar/files/img_products/avion-2.png">
+# Rasti.js
 
-Rasti is a tiny frontend framework for building prototypes in a fast and simple way. It was born from the process of building a prototype in which I wanted to be able to write just the essential, while also making the code as expressive as possible. This led to a super-terse attribute-driven html api backed by a simple config object.
+<img align=right height=150 src="http://www.rasti.com.ar/files/img_products/avion-2.png">
+
+Rasti is a tiny frontend framework for building prototypes in a fast and simple way. It was born from the process of building a prototype in which I wanted to be able to write just the essential, while also making the code as expressive as possible. This led to a super-terse attribute-driven html api backed by simple config objects.
 
 
 
@@ -46,10 +48,33 @@ app.init({
 The whole framework is driven by attributes which can be classified into seven categories. Also, there are some utility methods available.
 
 
-### Navigation
+### Structure
 
 **[page]**  
 Defines a page of the app. A page is a top-level container. It's value must be a unique name among all the page containers defined within the app.
+
+**[panel]** and **[section]**  
+Define a container of related content. Panels contain sections.
+
+**[row]** and **[col-1]** to **[col-12]**  
+Define a responsive grid a la bootstrap (12 columns grid system). Rows contain columns.
+
+
+### Text
+
+**[header]**  
+Creates a header for a container, it's value becomes the text of the header. Can be used with panels and pages.
+
+**[label]**  
+Creates a label for an element, it's value becomes the text of the label. Can be used with any element, except panels and pages.
+
+**[text]**  
+Creates text within an element, it's value becomes the text.
+
+These three attributes can be localized by using a language key for their value.
+
+
+### Navigation
 
 **[nav]**  
 Defines a navigation action. It's value must be the name of a page. When the element is clicked, the app navigates to the specified page.
@@ -59,6 +84,31 @@ Defines a navigation parameter. It's value must be a unique name among all the n
 
 **[params]**  
 Binds a params object to a nav action (if used, it must be accompanying a [nav] attribute). It's value must be a series of space separated navparam names, or empty. The current value of all specified navparam elements within the current page will be copied into an object which will be passed to the init function of the target page. If the attribute value is empty, the prior will apply to all existing navparam elements within the current page.
+
+
+### Blocks (custom elements)
+
+Rasti comes with a couple of custom elements for speeding up UI implementation. These elements are available via the [rasti] attribute:
+
+**[rasti=radios]**  
+Creates a group of related radio buttons.
+
+**[rasti=buttons]**  
+Creates a group of small related persistent buttons (currently singletons).
+
+**[rasti=multi]**  
+Creates a multi select element whose value is an array.
+Options:
+- [max] : must be a number, sets the maximum number of options that can be selected at once.
+- [filter] : must be a string or empty, enables filtering options via an input field, it's value will be the input's placeholder text.
+
+There is one more custom element that doesn't use the [rasti] attribute.
+
+**select[img]**  
+Creates a select capable of showing images in its options. The images are retrieved from the relative path specified in the [img] attribute.
+
+#### Adding blocks
+Blocks can be added to the framework via the {blocks} config property (see the Configuration section).
 
 
 ### Data
@@ -86,29 +136,6 @@ Defines an element as a trigger for a template. It's value must be the name of a
 
 **[fx]**  
 Applies a visual effect to an element or container. It's value must be the name of a defined fx. When the element is rendered, the visual effect is displayed.
-
-
-### Structure
-
-**[panel]** and **[section]**  
-Define a container of related content. Panels contain sections.
-
-**[row]** and **[col-1]** to **[col-12]**  
-Define a responsive grid a la bootstrap (12 columns grid system). Rows contain columns.
-
-
-### Text
-
-**[header]**  
-Creates a header for a container, it's value becomes the text of the header. Can be used with panels and pages.
-
-**[label]**  
-Creates a label for an element, it's value becomes the text of the label. Can be used with any element, except panels and pages.
-
-**[text]**  
-Creates text within an element, it's value becomes the text.
-
-These three attributes can be localized by using a language key for their value.
 
 
 ### Actions
@@ -167,35 +194,10 @@ $el : jQuery object, data : array or function (optional)
 Updates the options of the given element (which must be a rasti block or a select) according to the given data, or if no data argument is provided, to the data source specified in the [data] attribute of the element. This allows, for example, to create field dependency (fields whose options depend on other fields' values).
 
 
-## Custom elements (aka "blocks")
-
-Rasti comes with a couple of custom elements for speeding up UI implementation. These elements are available via the [rasti] attribute:
-
-**[rasti=radios]**  
-Creates a group of related radio buttons.
-
-**[rasti=buttons]**  
-Creates a group of small related persistent buttons (currently singletons).
-
-**[rasti=multi]**  
-Creates a multi select element whose value is an array.
-Options:
-- [max] : must be a number, sets the maximum number of options that can be selected at once.
-- [filter] : must be a string or empty, enables filtering options via an input field, it's value will be the input's placeholder text.
-
-There is one more custom element that doesn't use the [rasti] attribute.
-
-**select[img]**  
-Creates a select capable of showing images in its options. The images are retrieved from the relative path specified in the [img] attribute.
-
-### Adding blocks
-Blocks can be added to the framework via the {blocks} config property (see next section).
-
-
 
 ## Configuration
 
-Rasti allows to define the pages, data sources, ajax methods and templates of the app and also to add themes, "blocks" (custom elements), visual effects and utility methods via the following config properties (which are objects themselves). These properties can be accesed from the app namespace or they can be extended using the config() method.
+Rasti allows to define the pages, data sources, ajax methods and templates of the app and also to add themes, languages, "blocks" (custom elements), visual effects and utility methods via the following config properties, which are objects. These properties can be accesed from the app namespace or they can be extended using the config() method.
 
 **pages: {...}**  
 Defines the pages of the app. Pages must be objects which can have any or all of the following properties:
@@ -213,7 +215,7 @@ Defines the ajax methods available for binding to containers via the [ajax] attr
 **templates: {...}**  
 Defines the templates available for binding to containers via the [template] attribute (and to triggers via the [render] attribute). The templates must be functions that take a data object or array.
 
-**themes: {...}**
+**themes: {...}**  
 Adds global themes available for applying via the setTheme() method. The themes must be objects with the following structure:
 
 ```javascript
