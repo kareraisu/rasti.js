@@ -4,14 +4,16 @@ var rasti = function() {
 
     var invalidData = 0
 
+    // internal properties
     this.log = true
 
     this.root = ''
 
     this.activePage = null
 
-    this.activeTheme = {}
+    this.pagers = new Map()
 
+    // exposed config objects
     this.pages = {}
 
     this.data = {}
@@ -239,7 +241,6 @@ var rasti = function() {
                 }
 
                 $el.find('[add]').click(function(e) {
-                    // $options = self.activePage.find('[options='+ $(this).parent().attr('field') +']')
                     $options.siblings('[options]').hide() // hide other options
                     $options.css('left', this.getBoundingClientRect().right).toggle()
                     $options.find('input').focus()
@@ -520,6 +521,8 @@ var rasti = function() {
     }
 
 
+    // exposed methods
+
     config = function(config) {
         for (var key in self) {
             if ($.type(self[key]) === 'object' && $.type(config[key]) === 'object')
@@ -531,7 +534,7 @@ var rasti = function() {
     init = function(config) {
 
         // set log
-        if (typeof config.log !== 'undefined') self.log = config.log
+        if (is(config.log,'boolean')) self.log = config.log
 
 
         // set root page
@@ -564,11 +567,11 @@ var rasti = function() {
         var page, $page
         for (var name in self.pages) {
             page = self.pages[name]
-            if (typeof page != 'object') return error('Page [%s] must be an object!', name)
+            if ( !is(page, 'object') ) return error('Page [%s] must be an object!', name)
             $page = $('[page='+ name +']')
             if ( !$page.length ) return error('No container element bound to page [%s]. Please bind one via [page] attribute', name)
             if (page.init) {
-                if (typeof page.init != 'function') return error('Page [%s] init property must be a function!', name)
+                if ( !is(page.init, 'function') ) return error('Page [%s] init property must be a function!', name)
                 else {
                     log('Initializing page [%s]', name)
                     self.activePage = $page
@@ -580,8 +583,8 @@ var rasti = function() {
 
         // init lang
         var langnames = Object.keys(self.langs)
-        if (langnames.length && typeof self.langs[ langnames[0] ] == 'object') {
-            var lang = typeof config.lang == 'string'
+        if (langnames.length && is(self.langs[ langnames[0] ], 'object') ) {
+            var lang = is(config.lang, 'string')
                 ? config.lang
                 : langnames[0]
             setLang(lang)
@@ -632,26 +635,27 @@ var rasti = function() {
         $('[submit]').click(function(e) {
             $el = $(this)
             var method = $el.attr('submit'),
-                callback = $el.attr('then')
+                callback = $el.attr('then'),
+                template = $el.attr('render'),
+                isValidCB = callback && is(self.utils[callback], 'function')
+
             if (!method) return error('Plase provide an ajax method in [submit] attribute')
-            if (callback && !self.utils[callback]) error('Utility method [%s] provided in [then] attribute is not defined', callback)
-            submitAjax(method, self.utils[callback])
+
+            if (callback && !isValidCB) error('Utility method [%s] provided in [then] attribute is not defined', callback)
+            
+            submitAjax(method, function(resdata){
+                if (isValidCB) self.utils[callback](resdata)
+                if (template) render(template, resdata)
+            })
         })
 
 
         // init render
-        $('[render]').click(function(e) {
+        $('[render]').not('[submit]').click(function(e) {
             $el = $(this)
             var template = $el.attr('render')
             if (!template) return error('Please provide a template name in [render] attribute of element:', el)
-
-            var method = $el.attr('submit')
-            if (method) {
-                submitAjax(method, function(resdata){
-                    render(template, resdata)
-                })
-            }
-            else render(template)
+            render(template)
         })
 
 
@@ -725,10 +729,10 @@ var rasti = function() {
         
         self.activePage = $page
 
-        if (params && typeof params !== 'object') error('Page [%s] nav params must be an object!', pagename)
+        if ( params && !is(params, 'object') ) error('Page [%s] nav params must be an object!', pagename)
             
         if (page && page.nav) {
-            typeof page.nav !== 'function'
+            !is(page.nav, 'function')
                 ? error('Page [%s] nav property must be a function!', pagename)
                 : page.nav(params)
         }
@@ -738,7 +742,7 @@ var rasti = function() {
 
         if (skipPushState) return
         if (page && page.url) {
-            typeof page.url !== 'string'
+            !is(page.url, 'string')
                 ? log('Page [%s] url property must be a string!', pagename)
                 : window.history.pushState(pagename, null, '#'+page.url)
         }
@@ -786,7 +790,7 @@ var rasti = function() {
     setLang = function (langName) {
         var lang = self.langs[ langName ]
         if (!lang) return error('Lang [%s] not found', langName)
-        if (typeof lang !== 'object' ) return error('Lang [%s] must be an object!', langName)
+        if ( !is(lang,'object') ) return error('Lang [%s] must be an object!', langName)
         log('Setting lang [%s]', langName)
 
         var $elems = $(), $el, keys
@@ -863,7 +867,7 @@ var rasti = function() {
             }
         }
 
-        typeof data == 'function'
+        is(data, 'function')
             ? data(applyTemplate)
             : applyTemplate(data)
 
@@ -906,6 +910,7 @@ var rasti = function() {
         var $el = $('[template='+ name +']')
         if (!$el.length) return error('No element bound to template [%s]. Please bind one via [template] attribute.', name)
         var el = $el[0]
+
         if (!data) {
             var datakey = $el.attr('data')
             if (!datakey) return error('No data found for template [%s]. Please provide in ajax response or via [data] attribute in element:', name, el)
@@ -913,7 +918,9 @@ var rasti = function() {
             if (!data) return error('Undefined data source "%s" in [data] attribute of element:', datakey, el)
         }
 
-        $el.html( template(data) )
+        var paging = $el.attr('paging')
+        if (paging) initPager($el, data)
+        else $el.html( template(data) )
 
         var fxkey = $el.attr('fx')
         if (fxkey) {
@@ -924,9 +931,41 @@ var rasti = function() {
     }
 
 
+    function initPager($el, data) {
+        var name = $el.attr('template'),
+            template = self.templates[name],
+            page_size = parseInt($el.attr('paging')),
+            pager = newPager(name, data, page_size)
+
+        $el.html(`
+            <div class="results scrolly"></div>
+            <div class="controls bottom centerx">
+                <button class="prev">&lt;</button>
+                <span class="current"></span>
+                <button class="next">&gt;</button>
+            </div>
+        `)
+
+        $controls = $el.children('.controls')
+        $results = $el.children('.results')
+
+        $controls.on('click', '.next', function(e){
+            $results.html(template( pager.next() ))
+            $controls.find('.current').html(pager.page)
+        })
+
+        $controls.on('click', '.prev', function(e){
+            $results.html(template( pager.prev() ))
+            $controls.find('.current').html(pager.page)
+        })
+
+        $controls.find('.next').click()
+    }
+
+
     function submitAjax(method, callback) {
         var ajax = self.ajax[ method ]
-        if (!ajax || typeof ajax !== 'function') return error('Ajax method ['+ method +'] is not defined')
+        if ( !is(ajax, 'function') ) return error('Ajax method ['+ method +'] is not defined')
 
         var $form = $('[ajax='+ method +']')
         if (!$form.length) return error('No container element bound to ajax method [%s]. Please bind one via [ajax] attribute', method)
@@ -988,15 +1027,42 @@ var rasti = function() {
 
 
     function getString(lang, key) {
-        if (typeof self.langs[lang] !== 'object') return error('Lang [%s] is not defined', lang)
+        if ( !is(self.langs[lang], 'object') ) {
+            error('Lang [%s] is not defined', lang)
+            return
+        }
         var string = self.langs[lang][key]
-        if (typeof string !== 'string') warn('Lang [%s] does not contain key [%s]', lang, key)
+        if ( !is(string, 'string') ) warn('Lang [%s] does not contain key [%s]', lang, key)
         else return string
+    }
+
+    
+    function getPager(id) {
+        let pager = self.pagers.get(id)
+        if (!pager) error('No pager for template [%s]', id)
+        return pager
+    }
+    function newPager(id, results, page_size) {
+        let pager = new Pager(id, results, page_size)
+        self.pagers.set(id, pager)
+        return pager
+    }
+    function deletePager(pager) {
+        if (!pager || !pager.id) return
+        self.pagers.delete(pager.id)
     }
 
 
     function random() {
         return (Math.random() * 6 | 0) + 1
+    }
+
+    function is(el, type) {
+        var isValidType = 'object function array string number boolean'.split(' ').includes(type)
+        if ( !isValidType ) throw 'Invalid type ' + type
+        return type === 'array'
+            ? Object.prototype.toString.call(el) === '[object Array]'
+            : typeof el === type
     }
 
 
@@ -1009,6 +1075,64 @@ var rasti = function() {
     function error(...params) {
         if (self.log) console.error.call(this, ...params)
     }
+
+
+    class Pager {
+
+      constructor(id, results, page_size) {
+        this.id = id
+        if ( !is(id, 'string') ) return error('Pager id must be a string')
+        this.logid = `Pager for template [${ this.id }]:`
+        if ( !is(results, 'array') ) return error('%s Results must be an array', this.logid)
+        if ( !is(page_size, 'number') ) return error('%s Page size must be a number', this.logid)
+        this.results = results
+        this.page_size = page_size
+        this.page = 0
+        
+      }
+
+      next() {
+        if (this.hasNext()) this.page++
+        else warn('%s No next page', this.logid)
+        return this.getPageResults(this.page)
+      }
+
+      prev() {
+        if (this.hasPrev()) this.page--
+        else warn('%s No previous page', this.logid)
+        return this.getPageResults(this.page)
+      }
+
+      hasNext() {
+        return this.results.length > this.page * this.page_size
+      }
+
+      hasPrev() {
+        return this.page > 1
+      }
+
+      setPageSize(size) {
+        if ( !is(size, 'number') ) return error('%s Must specify a number as the page size', this.logid)
+        this.page_size = size
+      }
+
+      getPageResults(page) {
+        if ( !is(page, 'number') ) {
+            error('%s Must specify a page number to get results from', this.logid)
+            return []
+        }
+        try {
+            var i = (page -1) * this.page_size
+            return this.results.slice(i, i + this.page_size)
+        }
+        catch(err) {
+            error('%s Could not get results of page %s, error:', this.logid, page, err)
+            return []
+        }
+      }
+
+    }
+
 
     // prototype extensions
 

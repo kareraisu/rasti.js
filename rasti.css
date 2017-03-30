@@ -112,6 +112,19 @@ body * {
     margin-top: -30px;
 }
 
+
+[template] .results {
+    max-height: 85%;
+    margin: 0 -15px;
+    padding: 0 15px;
+}
+[template] .controls {
+    padding: 15px;
+    color: #fff;
+    text-align: center;
+}
+
+
 [label] {
     margin-top: 25px;
     vertical-align: bottom;

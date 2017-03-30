@@ -134,6 +134,9 @@ Binds a template to a container. It's value must be the name of a defined templa
 **[render]**  
 Defines an element as a trigger for a template. It's value must be the name of a defined template. When the element is clicked, the template is rendered.
 
+**[paging]**  
+Adds paging to a template. It's value must be a number, which indicates the page size (the maximum number of elements a page can hold).
+
 **[fx]**  
 Applies a visual effect to an element or container. It's value must be the name of a defined fx. When the element is rendered, the visual effect is displayed.
 
@@ -279,6 +282,7 @@ These are some of the things I've got in mind:
 - [x] ~~function data sources~~
 - [x] ~~url navigation~~
 - [x] ~~i18n support~~
+- [x] ~~paging~~
 - [ ] 'loading' component (bar/dots/circle)
 - [ ] more fx's (fade, slide, twist)
 
