@@ -94,6 +94,12 @@ body * {
     margin-top: 25px;
     margin-bottom: 15px;
 }
+[btn][ib], [btn].ib, .btn[ib], .btn.ib,
+[ib_]>[btn], [ib_]>.btn, .ib_>[btn], .ib_>.btn {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
 [big] [field], [big] [btn], .big .field, .big .btn,
 [big][field], [big][btn], .big.field , .big.btn {
     min-height: 50px;
@@ -113,6 +119,12 @@ body * {
 }
 
 
+[template] {
+    height: 100%;
+}
+[template][header] {
+    height: calc(100% - 40px);
+}
 [template] .results {
     max-height: 85%;
     margin: 0 -15px;
@@ -261,6 +273,13 @@ input[type="checkbox"]:checked + label:before {
     vertical-align: bottom;
 }
 
+[floatl], .floatl {
+    float: left;
+}
+[floatr], .floatr {
+    float: right;
+}
+
 [autom], .autom,
 [autom_]>*, .autom_>* {
     margin: auto !important;
@@ -367,7 +386,12 @@ input[type="checkbox"]:checked + label:before {
     align-content: flex-start;
 }
 [columns-2]>*, .columns-2>* {
-    flex-basis: 50%;
+    width: 48%;
+    margin-right: 2%;
+}
+[columns-2]>*:nth-child(2n),
+.columns-2>*:nth-child(2n){
+    margin-right: 0;
 }
 
 [columns-3], .columns-3 {
@@ -376,7 +400,12 @@ input[type="checkbox"]:checked + label:before {
     align-content: flex-start;
 }
 [columns-3]>*, .columns-3>* {
-    flex-basis: 33.33%;
+    width: 32%;
+    margin-right: 2%;
+}
+[columns-3]>*:nth-child(3n),
+.columns-3>*:nth-child(3n){
+    margin-right: 0;
 }
 
 

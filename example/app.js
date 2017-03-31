@@ -46,8 +46,9 @@ app.config({
             url : 'results',
 
             init : function() {
-                app.get('field=lang').find('[value=en]').addClass('active')
-                app.get('field=theme').find('[value=Weltall]').prop('checked', true)
+                app.set('field=lang', 'en')
+                app.set('data=themeMaps', 'light')
+                app.set('field=theme', 'Weltall')
             },
 
             nav : function(params) {
@@ -121,7 +122,7 @@ app.config({
             }
             chat()
 
-        }
+        },
 
     },
 
@@ -137,13 +138,13 @@ app.config({
                     <div class="name">${obj.name}</div>
                     <div class="row">
                       <div class="data col-8 row">
-                        <div class="col-4">
+                        <div class="labels col-4">
                             <em>Occupation:</em><br/>
                             <em>Location:</em><br/>
                             <em>Weapon:</em><br/>
                             <em>Email:</em>
                         </div>
-                        <div class="col-8">
+                        <div class="values col-8">
                             ${obj.occupation}<br/>
                             ${obj.location}<br/>
                             ${obj.weapon}<br/>

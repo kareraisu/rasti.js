@@ -935,14 +935,36 @@ var rasti = function() {
         var name = $el.attr('template'),
             template = self.templates[name],
             page_size = parseInt($el.attr('paging')),
-            pager = newPager(name, data, page_size)
+            pager = newPager(name, data, page_size),
+            paging, columns, sizes
+
+        if ($el[0].hasAttribute('columns')) columns = `
+            <div class="columns floatl ib_">
+                <label>Columns:</label>
+                <button btn>1</button>
+                <button btn value=2>2</button>
+                <button btn value=3>3</button>
+            </div>`
+
+        if (pager.total > 1) paging = `<div class="paging ib_">
+                <button class="btn prev">&lt;</button>
+                <span class="page"></span>
+                <button class="btn next">&gt;</button>
+            </div>`
+
+        sizes = `<div class="sizes floatr ib_">
+                <label>Page size:</label>
+                <button btn value=5>5</button>
+                <button btn value=10>10</button>
+                <button btn value=20>20</button>
+            </div>`
 
         $el.html(`
             <div class="results scrolly"></div>
-            <div class="controls bottom centerx">
-                <button class="prev">&lt;</button>
-                <span class="current"></span>
-                <button class="next">&gt;</button>
+            <div class="controls bottom centerx ib_">
+                ${ columns || '' }
+                ${ paging || '' }
+                ${ sizes }
             </div>
         `)
 
@@ -951,12 +973,29 @@ var rasti = function() {
 
         $controls.on('click', '.next', function(e){
             $results.html(template( pager.next() ))
-            $controls.find('.current').html(pager.page)
+            $controls.find('.page').html(pager.page + '/' + pager.total)
         })
 
         $controls.on('click', '.prev', function(e){
             $results.html(template( pager.prev() ))
-            $controls.find('.current').html(pager.page)
+            $controls.find('.page').html(pager.page + '/' + pager.total)
+        })
+
+        $controls.on('click', '.sizes button', function(e){
+            pager.setPageSize(this.value)
+            $results.html(template( pager.next() ))
+            if (pager.total > 1) {
+                $controls.find('.paging').show()
+                    .find('.page').html(pager.page + '/' + pager.total)
+            }
+            else {
+                $controls.find('.paging').hide()
+            }
+        })
+
+        $controls.on('click', '.columns button', function(e){
+            $results.removeClass('columns-2 columns-3')
+                .addClass(this.value ? 'columns-' + this.value : '')
         })
 
         $controls.find('.next').click()
@@ -1088,6 +1127,7 @@ var rasti = function() {
         this.results = results
         this.page_size = page_size
         this.page = 0
+        this.total = Math.ceil(this.results.length / this.page_size)
         
       }
 
@@ -1112,8 +1152,11 @@ var rasti = function() {
       }
 
       setPageSize(size) {
+        size = parseInt(size)
         if ( !is(size, 'number') ) return error('%s Must specify a number as the page size', this.logid)
         this.page_size = size
+        this.page = 0
+        this.total = Math.ceil(this.results.length / this.page_size)
       }
 
       getPageResults(page) {

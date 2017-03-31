@@ -9,10 +9,24 @@
     padding-bottom: 10px;
     font-size: 1.5em;
 }
+.card .data {
+    max-width: 200px;
+}
+.card .values {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+}
 .card .actions {
     font-size: large;
 }
 .card .actions i {
     padding: 0 7px;
     cursor: pointer;
+}
+
+[text=tips] {
+    top: 40%;
+    width: 50%;
+    font-size: large;
+    text-align: center;
 }
