@@ -4,6 +4,11 @@ var rasti = function() {
 
     var invalidData = 0
 
+    var is = {} // utility object
+    'object function array string number regex boolean'.split(' ').forEach(function(t){
+        is[t] = function(exp){ return type(exp) === t }
+    })
+
     // internal properties
 
     this.activePage = null
@@ -14,12 +19,13 @@ var rasti = function() {
 
     this.pagers = new Map()
 
-    // exposed config objects
+    // config objects
 
     this.options = {
         log : true,
         root : '',
         theme : 'base',
+        themeMap : 'dark',
         lang : '',
     }
 
@@ -29,7 +35,11 @@ var rasti = function() {
 
     this.ajax = {}
 
-    this.utils = {}
+    this.utils = {
+        is : is,
+        type : type,
+        sameType : sameType,
+    }
 
     this.templates = {}
 
@@ -63,16 +73,6 @@ var rasti = function() {
 
     this.themeMaps = {
 
-        light : {
-            page : 'light detail',
-            panel : 'dark detail',
-            section : 'mid dark',
-            field : 'light dark',
-            btn : 'detail light',
-            text : 'dark',
-            label : 'light',
-        },
-
         dark : {
             page : 'mid detail',
             panel : 'dark detail',
@@ -82,6 +82,17 @@ var rasti = function() {
             text : 'dark',
             label : 'dark',
         },
+
+        light : {
+            page : 'light detail',
+            panel : 'dark detail',
+            section : 'mid dark',
+            field : 'light dark',
+            btn : 'detail light',
+            text : 'dark',
+            label : 'light',
+        },
+        
     }
 
 
@@ -530,9 +541,9 @@ var rasti = function() {
     }
 
 
-    // exposed methods
+    // methods
 
-    config = function(config) {
+    function config(config) {
         for (var key in self) {
             if ($.type(self[key]) === 'object' && $.type(config[key]) === 'object')
                 Object.assign(self[key], config[key])
@@ -540,16 +551,28 @@ var rasti = function() {
     }
 
 
-    init = function(options) {
+    function init(options) {
 
-        // set log
-        if (is(options.log,'boolean')) self.options.log = options.log
+        // cache options
+        Object.keys(self.options).forEach(function(name){
+            if ( sameType(self.options[name], options[name]) ) self.options[name] = options[name]
+        })
 
 
-        // set root page
-        self.options.root = options.root || Object.keys(self.pages)[0]
-        if (!self.options.root) return error('Root page is not defined')
+        // define root page (if not already defined)
+        if (!self.options.root) {
+            keys = Object.keys(self.pages)
+            if (keys.length) self.options.root = keys[0]
+            else return error('Root page is not defined')
+        }
         
+
+        // define lang (if not already defined)
+        if (!self.options.lang) {
+            keys = Object.keys(self.langs)
+            if (keys.length) self.options.lang = keys[0]
+        }
+
 
         // append blocks styles
         var styles = '<style blocks>'
@@ -612,7 +635,7 @@ var rasti = function() {
             var method = $el.attr('submit'),
                 callback = $el.attr('then'),
                 template = $el.attr('render'),
-                isValidCB = callback && is(self.utils[callback], 'function')
+                isValidCB = callback && is.function(self.utils[callback])
 
             if (!method) return error('Plase provide an ajax method in [submit] attribute')
 
@@ -649,11 +672,11 @@ var rasti = function() {
         var page, $page
         for (var name in self.pages) {
             page = self.pages[name]
-            if ( !is(page, 'object') ) return error('Page [%s] must be an object!', name)
+            if ( !is.object(page) ) return error('Page [%s] must be an object!', name)
             $page = $('[page='+ name +']')
             if ( !$page.length ) return error('No container element bound to page [%s]. Please bind one via [page] attribute', name)
             if (page.init) {
-                if ( !is(page.init, 'function') ) return error('Page [%s] init property must be a function!', name)
+                if ( !is.function(page.init) ) return error('Page [%s] init property must be a function!', name)
                 else {
                     log('Initializing page [%s]', name)
                     self.activePage = $page
@@ -663,15 +686,8 @@ var rasti = function() {
         }
 
 
-        // init lang
-        if ( is(options.lang, 'string') ) self.options.lang = options.lang
-        if ( !self.activeLang ) {
-            var langnames = Object.keys(self.langs)
-            if (langnames.length && is(self.langs[ langnames[0] ], 'object') ) {
-                var lang = self.options.lang || langnames[0]
-                setLang(lang)
-            }
-        }
+        // set lang (if not already set)
+        if ( !self.activeLang ) setLang(self.options.lang)
 
 
         // fix labels
@@ -682,9 +698,8 @@ var rasti = function() {
         })
 
 
-        // create theme style tag and set theme
-        if ( is(options.theme, 'string') ) self.options.theme = options.theme
-        if ( !self.activeTheme ) setTheme(self.options.theme)
+        // set theme (if not already set)
+        if ( !self.activeTheme ) setTheme(self.options.theme, self.options.themMap)
 
 
         // bind nav handler to popstate event
@@ -703,14 +718,14 @@ var rasti = function() {
     }
 
 
-    get = function (selector) {
+    function get(selector) {
         if ( !self.activePage || !self.activePage.length ) return error('Cannot get(%s), active page is not defined', selector)
         var $els = self.activePage.find('['+ selector +']')
         if (!$els.length) error('Cannot get(%s), element not found in page [%s]', selector, self.activePage.attr('page'))
         return $els
     }
 
-    set = function (selector, value) {        
+    function set(selector, value) {        
         if ( !self.activePage || !self.activePage.length ) return error('Cannot set(%s), active page is not defined', selector)
         var $els = self.activePage.find('['+ selector +']')
         if (!$els.length) error('Cannot set(%s), element not found in page [%s]', selector, self.activePage.attr('page'))
@@ -720,7 +735,7 @@ var rasti = function() {
         })
     }
 
-    add = function (selector, value) {
+    function add(selector, value) {
         if ( !self.activePage || !self.activePage.length ) return error('Cannot add(%s), active page is not defined', selector)
         var $els = self.activePage.find('['+ selector +']')
         if (!$els.length) error('Cannot add(%s), element not found in page [%s]', selector, self.activePage.attr('page'))
@@ -731,7 +746,7 @@ var rasti = function() {
     }
 
 
-    navTo = function (pagename, params, skipPushState) {
+    function navTo(pagename, params, skipPushState) {
 
         var page = self.pages[pagename],
             $page = $('[page='+ pagename +']')
@@ -741,10 +756,10 @@ var rasti = function() {
         
         self.activePage = $page
 
-        if ( params && !is(params, 'object') ) error('Page [%s] nav params must be an object!', pagename)
+        if ( params && !is.object(params) ) error('Page [%s] nav params must be an object!', pagename)
             
         if (page && page.nav) {
-            !is(page.nav, 'function')
+            !is.function(page.nav)
                 ? error('Page [%s] nav property must be a function!', pagename)
                 : page.nav(params)
         }
@@ -754,7 +769,7 @@ var rasti = function() {
 
         if (skipPushState) return
         if (page && page.url) {
-            !is(page.url, 'string')
+            !is.string(page.url)
                 ? log('Page [%s] url property must be a string!', pagename)
                 : window.history.pushState(pagename, null, '#'+page.url)
         }
@@ -764,19 +779,19 @@ var rasti = function() {
     }
 
 
-    setTheme = function (themeName, mapName) {
-        var theme = self.themes[themeName], themeMap
+    function setTheme(themeName, mapName) {
+        var theme = self.themes[themeName]
         if (!theme) return log('Theme [%s] not found', themeName)
         
-        themeMap = mapName && theme.maps && theme.maps[mapName]
+        var themeMap = mapName && theme.maps && theme.maps[mapName]
                 ? theme.maps[mapName]
                 : mapName && self.themeMaps[mapName]
                     ? self.themeMaps[mapName]
                     : theme.maps && Object.keys(theme.maps).length
                         ? theme.maps[ Object.keys(theme.maps)[0] ]
-                        : self.themeMaps.light
+                        : self.themeMaps.dark
 
-        log('Setting theme [%s] (%s)', themeName, mapName || 'light')
+        log('Setting theme [%s] (%s)', themeName, mapName || 'dark')
         self.activeTheme = theme
         
         var values = {
@@ -800,10 +815,10 @@ var rasti = function() {
     }
 
 
-    setLang = function (langName) {
+    function setLang(langName) {
         var lang = self.langs[ langName ]
         if (!lang) return error('Lang [%s] not found', langName)
-        if ( !is(lang,'object') ) return error('Lang [%s] must be an object!', langName)
+        if ( !is.object(lang) ) return error('Lang [%s] must be an object!', langName)
         log('Setting lang [%s]', langName)
         self.activeLang = langName
 
@@ -837,7 +852,7 @@ var rasti = function() {
     }
 
 
-    updateBlock = function ($el, data) {
+    function updateBlock($el, data) {
         var el = $el[0]
         var type = el.nodeName == 'SELECT' ? 'select' : $el.attr('rasti')
         if (!type) return error('Missing block type, please provide via [rasti] attribute in element:', el)
@@ -881,7 +896,7 @@ var rasti = function() {
             }
         }
 
-        is(data, 'function')
+        is.function(data)
             ? data(applyTemplate)
             : applyTemplate(data)
 
@@ -1018,7 +1033,7 @@ var rasti = function() {
 
     function submitAjax(method, callback) {
         var ajax = self.ajax[ method ]
-        if ( !is(ajax, 'function') ) return error('Ajax method ['+ method +'] is not defined')
+        if ( !is.function(ajax) ) return error('Ajax method ['+ method +'] is not defined')
 
         var $form = $('[ajax='+ method +']')
         if (!$form.length) return error('No container element bound to ajax method [%s]. Please bind one via [ajax] attribute', method)
@@ -1080,12 +1095,12 @@ var rasti = function() {
 
 
     function getString(lang, key) {
-        if ( !is(self.langs[lang], 'object') ) {
+        if ( !is.object(self.langs[lang]) ) {
             error('Lang [%s] is not defined', lang)
             return
         }
         var string = self.langs[lang][key]
-        if ( !is(string, 'string') ) warn('Lang [%s] does not contain key [%s]', lang, key)
+        if ( !is.string(string) ) warn('Lang [%s] does not contain key [%s]', lang, key)
         else return string
     }
 
@@ -1110,12 +1125,14 @@ var rasti = function() {
         return (Math.random() * 6 | 0) + 1
     }
 
-    function is(el, type) {
-        var isValidType = 'object function array string number boolean'.split(' ').includes(type)
-        if ( !isValidType ) throw 'Invalid type ' + type
-        return type === 'array'
-            ? Object.prototype.toString.call(el) === '[object Array]'
-            : typeof el === type
+
+
+    function type(exp) {
+        var clazz = Object.prototype.toString.call(exp)
+        return clazz.substring(8, clazz.length-1).toLowerCase()
+    }
+    function sameType(exp1, exp2) {
+        return type(exp1) === type(exp2)
     }
 
 
@@ -1134,10 +1151,10 @@ var rasti = function() {
 
       constructor(id, results, page_size) {
         this.id = id
-        if ( !is(id, 'string') ) return error('Pager id must be a string')
+        if ( !is.string(id) ) return error('Pager id must be a string')
         this.logid = `Pager for template [${ this.id }]:`
-        if ( !is(results, 'array') ) return error('%s Results must be an array', this.logid)
-        if ( !is(page_size, 'number') ) return error('%s Page size must be a number', this.logid)
+        if ( !is.array(results) ) return error('%s Results must be an array', this.logid)
+        if ( !is.number(page_size) ) return error('%s Page size must be a number', this.logid)
         this.results = results
         this.page_size = page_size
         this.page = 0
@@ -1167,14 +1184,14 @@ var rasti = function() {
 
       setPageSize(size) {
         size = parseInt(size)
-        if ( !is(size, 'number') ) return error('%s Must specify a number as the page size', this.logid)
+        if ( !is.number(size) ) return error('%s Must specify a number as the page size', this.logid)
         this.page_size = size
         this.page = 0
         this.total = Math.ceil(this.results.length / this.page_size)
       }
 
       getPageResults(page) {
-        if ( !is(page, 'number') ) {
+        if ( !is.number(page) ) {
             error('%s Must specify a page number to get results from', this.logid)
             return []
         }
