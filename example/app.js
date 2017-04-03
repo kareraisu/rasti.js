@@ -46,9 +46,9 @@ app.config({
             url : 'results',
 
             init : function() {
-                app.set('field=lang', 'en')
-                app.set('data=themeMaps', 'light')
-                app.set('field=theme', 'Weltall')
+                app.set('field=lang', app.options.lang || 'en')
+                app.set('data=themeMaps', app.options.themeMap || 'dark')
+                app.set('field=theme', app.options.theme || 'base')
             },
 
             nav : function(params) {
@@ -84,7 +84,7 @@ app.config({
         applyTheme : function(e) {
             var theme = app.get('field=theme').val(),
                 map = app.get('data=themeMaps').val()
-            app.setTheme(theme, map)
+            if (theme && map) app.setTheme(theme, map)
         },
 
         applyLang : function(e) {
@@ -260,10 +260,10 @@ app.data.langs = Object.keys(app.langs)
 
 
 app.init({
-    //root : 'results',
-    theme : 'Weltall',
-    //lang : 'es',
     //log : false,
+    //root : 'results',
+    //theme : 'Weltall',
+    //lang : 'es',
 })
 
 

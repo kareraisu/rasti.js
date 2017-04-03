@@ -5,15 +5,24 @@ var rasti = function() {
     var invalidData = 0
 
     // internal properties
-    this.log = true
-
-    this.root = ''
 
     this.activePage = null
+
+    this.activeTheme = ''
+
+    this.activeLang = ''
 
     this.pagers = new Map()
 
     // exposed config objects
+
+    this.options = {
+        log : true,
+        root : '',
+        theme : 'base',
+        lang : '',
+    }
+
     this.pages = {}
 
     this.data = {}
@@ -531,15 +540,15 @@ var rasti = function() {
     }
 
 
-    init = function(config) {
+    init = function(options) {
 
         // set log
-        if (is(config.log,'boolean')) self.log = config.log
+        if (is(options.log,'boolean')) self.options.log = options.log
 
 
         // set root page
-        self.root = config.root || Object.keys(self.pages)[0]
-        if (!self.root) return error('Root page is not defined')
+        self.options.root = options.root || Object.keys(self.pages)[0]
+        if (!self.options.root) return error('Root page is not defined')
         
 
         // append blocks styles
@@ -549,6 +558,8 @@ var rasti = function() {
         }
         styles += '</style>'
         $('body').append(styles)
+        // append theme style container
+        $('body').append('<style theme>')
 
 
         // init rasti blocks
@@ -560,42 +571,6 @@ var rasti = function() {
         // create options for selects with data source
         $('select[data]').each(function(i, el) {
             updateBlock($(el))
-        })
-
-
-        // init pages
-        var page, $page
-        for (var name in self.pages) {
-            page = self.pages[name]
-            if ( !is(page, 'object') ) return error('Page [%s] must be an object!', name)
-            $page = $('[page='+ name +']')
-            if ( !$page.length ) return error('No container element bound to page [%s]. Please bind one via [page] attribute', name)
-            if (page.init) {
-                if ( !is(page.init, 'function') ) return error('Page [%s] init property must be a function!', name)
-                else {
-                    log('Initializing page [%s]', name)
-                    self.activePage = $page
-                    page.init()
-                }
-            }
-        }
-
-
-        // init lang
-        var langnames = Object.keys(self.langs)
-        if (langnames.length && is(self.langs[ langnames[0] ], 'object') ) {
-            var lang = is(config.lang, 'string')
-                ? config.lang
-                : langnames[0]
-            setLang(lang)
-        }
-
-
-        // fix labels
-        'input select textarea'.split(' ').forEach(function(tag){
-            $(tag + '[label]').each(function(i, el) {
-                fixLabel($(el))
-            })
         })
 
 
@@ -670,9 +645,46 @@ var rasti = function() {
         }
 
 
+        // init pages
+        var page, $page
+        for (var name in self.pages) {
+            page = self.pages[name]
+            if ( !is(page, 'object') ) return error('Page [%s] must be an object!', name)
+            $page = $('[page='+ name +']')
+            if ( !$page.length ) return error('No container element bound to page [%s]. Please bind one via [page] attribute', name)
+            if (page.init) {
+                if ( !is(page.init, 'function') ) return error('Page [%s] init property must be a function!', name)
+                else {
+                    log('Initializing page [%s]', name)
+                    self.activePage = $page
+                    page.init()
+                }
+            }
+        }
+
+
+        // init lang
+        if ( is(options.lang, 'string') ) self.options.lang = options.lang
+        if ( !self.activeLang ) {
+            var langnames = Object.keys(self.langs)
+            if (langnames.length && is(self.langs[ langnames[0] ], 'object') ) {
+                var lang = self.options.lang || langnames[0]
+                setLang(lang)
+            }
+        }
+
+
+        // fix labels
+        'input select textarea'.split(' ').forEach(function(tag){
+            $(tag + '[label]').each(function(i, el) {
+                fixLabel($(el))
+            })
+        })
+
+
         // create theme style tag and set theme
-        $('body').append('<style theme>')
-        setTheme(config.theme || 'base')
+        if ( is(options.theme, 'string') ) self.options.theme = options.theme
+        if ( !self.activeTheme ) setTheme(self.options.theme)
 
 
         // bind nav handler to popstate event
@@ -680,13 +692,13 @@ var rasti = function() {
             var page = e.state || location.hash.substring(1)
             page && self.pages[page]
                 ? e.state ? navTo(page, null, true) : navTo(page)
-                : navTo(self.root)
+                : navTo(self.options.root)
         }
 
 
         // nav to page in hash or to root
         var page = location.hash.substring(1)
-        navTo(page && self.pages[page] ? page : self.root)
+        navTo(page && self.pages[page] ? page : self.options.root)
 
     }
 
@@ -756,7 +768,6 @@ var rasti = function() {
         var theme = self.themes[themeName], themeMap
         if (!theme) return log('Theme [%s] not found', themeName)
         
-        self.activeTheme = theme
         themeMap = mapName && theme.maps && theme.maps[mapName]
                 ? theme.maps[mapName]
                 : mapName && self.themeMaps[mapName]
@@ -766,6 +777,8 @@ var rasti = function() {
                         : self.themeMaps.light
 
         log('Setting theme [%s] (%s)', themeName, mapName || 'light')
+        self.activeTheme = theme
+        
         var values = {
             font : theme.font,
         }, colors, bg, text
@@ -792,6 +805,7 @@ var rasti = function() {
         if (!lang) return error('Lang [%s] not found', langName)
         if ( !is(lang,'object') ) return error('Lang [%s] must be an object!', langName)
         log('Setting lang [%s]', langName)
+        self.activeLang = langName
 
         var $elems = $(), $el, keys
         var attributes = 'label header text placeholder'.split(' ')
@@ -1106,13 +1120,13 @@ var rasti = function() {
 
 
     function log(...params) {
-        if (self.log) console.log.call(this, ...params)
+        if (self.options.log) console.log.call(this, ...params)
     }
     function warn(...params) {
-        if (self.log) console.warn.call(this, ...params)
+        if (self.options.log) console.warn.call(this, ...params)
     }
     function error(...params) {
-        if (self.log) console.error.call(this, ...params)
+        if (self.options.log) console.error.call(this, ...params)
     }
 
 
@@ -1207,6 +1221,7 @@ var rasti = function() {
         blocks : this.blocks,
         templates : this.templates,
         fx : this.fx,
+        options : this.options,
 
         // methods
         config : config,
