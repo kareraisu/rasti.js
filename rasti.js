@@ -947,6 +947,8 @@ var rasti = function() {
             if (!data) return error('Undefined data source "%s" in [data] attribute of element:', datakey, el)
         }
 
+        if (!data.length) return $el.empty() // no results
+
         var paging = $el.attr('paging')
         if (paging) initPager($el, data)
         else $el.html( template(data) )
@@ -1027,7 +1029,8 @@ var rasti = function() {
                 .addClass(this.value ? 'columns-' + this.value : '')
         })
 
-        $controls.find('.next').click()
+        $results.html(template( pager.next() ))
+        $controls.find('.page').html(pager.page + '/' + pager.total)
     }
 
 
