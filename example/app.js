@@ -73,7 +73,7 @@ app.config({
             setTimeout(function() {
                 var characters = app.utils.getCharData(data.party)
                 render(characters)
-            }, 500)
+            }, 2000)
         },
 
     },

@@ -553,10 +553,12 @@ var rasti = function() {
 
     function init(options) {
 
-        // cache options
-        Object.keys(self.options).forEach(function(name){
-            if ( sameType(self.options[name], options[name]) ) self.options[name] = options[name]
-        })
+        // cache options (if applicable)
+        if (is.object(options)) {
+            Object.keys(self.options).forEach(function(name){
+                if ( sameType(self.options[name], options[name]) ) self.options[name] = options[name]
+            })
+        }
 
 
         // define root page (if not already defined)
@@ -631,8 +633,8 @@ var rasti = function() {
 
         // init submit
         $('[submit]').click(function(e) {
-            $el = $(this)
-            var method = $el.attr('submit'),
+            var $el = $(this),
+                method = $el.attr('submit'),
                 callback = $el.attr('then'),
                 template = $el.attr('render'),
                 isValidCB = callback && is.function(self.utils[callback])
@@ -641,17 +643,20 @@ var rasti = function() {
 
             if (callback && !isValidCB) error('Utility method [%s] provided in [then] attribute is not defined', callback)
             
+            $el.addClass('loading').attr('disabled', true)
+
             submitAjax(method, function(resdata){
                 if (isValidCB) self.utils[callback](resdata)
-                if (template) render(template, resdata)
+                if (template) render(template, resdata, $el)
+                $el.removeClass('loading').removeAttr('disabled')
             })
         })
 
 
         // init render
         $('[render]').not('[submit]').click(function(e) {
-            $el = $(this)
-            var template = $el.attr('render')
+            var $el = $(this),
+                template = $el.attr('render')
             if (!template) return error('Please provide a template name in [render] attribute of element:', el)
             render(template)
         })
@@ -660,8 +665,8 @@ var rasti = function() {
         // init actions
         for (var action of 'click change'.split(' ')) {
             $('['+ action +']').each(function(i, el){
-                $el = $(el)
-                method = $el.attr( action )
+                var $el = $(el),
+                    method = $el.attr( action )
                 if ( !app.utils[ method ] ) return error('Undefined utility method "%s" declared in [%s] attribute of element:', method, action, el)
                 $(this).on( action , app.utils[ method ] )
             })
@@ -686,8 +691,8 @@ var rasti = function() {
         }
 
 
-        // set lang (if not already set)
-        if ( !self.activeLang ) setLang(self.options.lang)
+        // set lang (if applicable and not already set)
+        if ( is.object(self.options.lang) && !self.activeLang ) setLang(self.options.lang)
 
 
         // fix labels
@@ -695,6 +700,13 @@ var rasti = function() {
             $(tag + '[label]').each(function(i, el) {
                 fixLabel($(el))
             })
+        })
+
+
+        // generate texts
+        $('[text]').each(function(i, el) {
+            var $el = $(el)
+            $el.text( $el.attr('text') )
         })
 
 
@@ -822,7 +834,7 @@ var rasti = function() {
         log('Setting lang [%s]', langName)
         self.activeLang = langName
 
-        var $elems = $(), $el, keys
+        var $elems = $(), $el, keys, string
         var attributes = 'label header text placeholder'.split(' ')
 
         attributes.forEach(function(attr){
@@ -843,9 +855,8 @@ var rasti = function() {
             attributes.forEach(function(attr){
                 if (keys[attr]) {
                     string = getString(langName, keys[attr])
-                    attr == 'text'
-                        ? $el.text(string)
-                        : $el.attr(attr, string)
+                    $el.attr(attr, string)
+                    if (attr === 'text') $el.text(string)
                 }
             })
         })
@@ -959,6 +970,7 @@ var rasti = function() {
             if (!fx) return error('Undefined fx "%s" in [fx] attribute of element', fxkey, el)
             fx($el)
         }
+
     }
 
 
@@ -1090,8 +1102,6 @@ var rasti = function() {
             [btn], .btn, [rasti=buttons] div.active
                 { background-color: ${ values.btn[0] };
                   color: ${ values.btn[1] }; }
-            [btn][disabled], .btn[disabled], [rasti=buttons] div
-                { background-color: ${ values.section[0] }; }
             [label]:before { color: ${ values.label[0] }; }
             `
     }
@@ -1250,6 +1260,7 @@ var rasti = function() {
         set : set,
         add : add,
         navTo : navTo,
+        render : render,
         setLang : setLang,
         setTheme : setTheme,
         updateBlock : updateBlock,
