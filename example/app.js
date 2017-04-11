@@ -152,7 +152,7 @@ app.config({
                         </div>
                       </div>
                       <div class="actions col-4 ib_">
-                        <div class="btn">CONTACT</div><br/><i class="fa fa-star-o"/>|<i class="fa fa-print"/>|<i class="fa fa-envelope"></i>
+                        <button btn>CONTACT</button>
                       </div>
                     </div>
                   </div>

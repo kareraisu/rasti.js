@@ -856,7 +856,6 @@ var rasti = function() {
                 if (keys[attr]) {
                     string = getString(langName, keys[attr])
                     $el.attr(attr, string)
-                    if (attr === 'text') $el.text(string)
                 }
             })
         })
@@ -958,17 +957,16 @@ var rasti = function() {
             if (!data) return error('Undefined data source "%s" in [data] attribute of element:', datakey, el)
         }
 
-        if (!data.length) return $el.empty() // no results
+        if (!data.length) return $el.html('<div msg center textc>NO RESULTS</div>')
 
         var paging = $el.attr('paging')
-        if (paging) initPager($el, data)
-        else $el.html( template(data) )
+        paging ? initPager($el, data) : $el.html( template(data) )
 
         var fxkey = $el.attr('fx')
         if (fxkey) {
             var fx = self.fx[fxkey]
             if (!fx) return error('Undefined fx "%s" in [fx] attribute of element', fxkey, el)
-            fx($el)
+            paging ? fx($el.find('.results')) : fx($el)
         }
 
     }
@@ -977,6 +975,7 @@ var rasti = function() {
     function initPager($el, data) {
         var name = $el.attr('template'),
             template = self.templates[name],
+            fx = $el.attr('fx') && self.fx[$el.attr('fx')],
             page_size = parseInt($el.attr('paging')),
             pager = newPager(name, data, page_size),
             paging, columns, sizes
@@ -1004,7 +1003,7 @@ var rasti = function() {
 
         $el.html(`
             <div class="results scrolly"></div>
-            <div class="controls bottom centerx ib_">
+            <div class="controls small bottom centerx ib_">
                 ${ columns || '' }
                 ${ paging || '' }
                 ${ sizes }
@@ -1015,25 +1014,19 @@ var rasti = function() {
         $results = $el.children('.results')
 
         $controls.on('click', '.next', function(e){
-            $results.html(template( pager.next() ))
-            $controls.find('.page').html(pager.page + '/' + pager.total)
+            update( pager.next() )
         })
 
         $controls.on('click', '.prev', function(e){
-            $results.html(template( pager.prev() ))
-            $controls.find('.page').html(pager.page + '/' + pager.total)
+            update( pager.prev() )
         })
 
         $controls.on('click', '.sizes button', function(e){
             pager.setPageSize(this.value)
-            $results.html(template( pager.next() ))
-            if (pager.total > 1) {
-                $controls.find('.paging').show()
-                    .find('.page').html(pager.page + '/' + pager.total)
-            }
-            else {
-                $controls.find('.paging').hide()
-            }
+            update( pager.next() )
+            pager.total > 1
+                ? $controls.find('.paging').show()
+                : $controls.find('.paging').hide()
         })
 
         $controls.on('click', '.columns button', function(e){
@@ -1043,6 +1036,12 @@ var rasti = function() {
 
         $results.html(template( pager.next() ))
         $controls.find('.page').html(pager.page + '/' + pager.total)
+
+        function update(data){
+            $results.html( template(data) )
+            $controls.find('.page').html(pager.page + '/' + pager.total)
+            if ( is.function(fx) ) fx($results)
+        }
     }
 
 
@@ -1240,6 +1239,11 @@ var rasti = function() {
     // api
 
     return {
+        // values
+        activePage : function() {
+            return self.activePage
+        },
+        
         // objects
         pages : this.pages,
         data : this.data,

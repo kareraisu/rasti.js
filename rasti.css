@@ -3,9 +3,9 @@ body {
     font-family: sans-serif;
     font-size: 14px;
 }
-* {
-    box-sizing: border-box;
-    user-select: none;
+*, *:before, *:after {
+	box-sizing: border-box;
+	user-select: none;
     transition: background-color 0.2s,
                 font 0.2s;
 }
@@ -24,33 +24,16 @@ input {
 [page]:not(.active) {
 	display: none !important;
 }
-[page][header]:before {
-    content: attr(header);
-    display: block;
-    padding: 20px 0;
-    font-size: 2.5em;
-    text-align: center;
-    background-color: inherit;
-}
 
 
 [panel] {
     position: relative;
-    padding: 20px 15px;
     margin: 20px 15px;
+    padding: 20px 15px;
     border-radius: 4px;
 }
-[panel][header],
-[section][header] {
-    padding-top: 0;
-}
-[panel][header]:before {
-    content: attr(header);
-    display: block;
-    margin: 0 -10px;
-    padding: 10px 0;
-    font-size: 2em;
-    text-align: center;
+[row]>[panel]:not(:first-child) {
+    margin-left: 0 !important;
 }
 
 
@@ -62,19 +45,41 @@ input {
 [section]:not(:last-of-type) {
     margin-bottom: 15px;
 }
-[section][header]:before {
-    content: attr(header);
-    display: block;
-    margin: 0 -10px;
-    padding: 5px 0;
-    font-size: 1.5em;
-    text-align: center;
-}
 [section] [label]:before {
     text-shadow: 0 0 0 #000;
 }
 [section]>*:first-child:not([label]) {
     margin-top: 0px;
+}
+
+
+[page][header] {
+    padding-top: 80px;
+}
+[panel][header] {
+    padding-top: 60px;
+}
+[page][header]:before,
+[panel][header]:before {
+    content: attr(header);
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 90px;
+    width: 100%;
+    padding: 20px 0;
+    font-size: 2.5em;
+    text-align: center;
+}
+[panel][header]:before {
+    height: 60px;
+    padding: 10px 0;
+    font-size: 2em;
+}
+[section][header]:before {
+    margin: 0 -10px;
+    padding: 5px 0;
+    font-size: 1.5em;
 }
 
 
@@ -115,11 +120,21 @@ input {
     margin-bottom: 0;
 }
 
+[big][field], [big][btn], .big.field , .big.btn,
+[big].field, [big].btn, .big[field] , .big[btn],
 [big] [field], [big] [btn], .big .field, .big .btn,
-[big][field], [big][btn], .big.field , .big.btn {
-    min-height: 50px;
+[big] .field, [big] .btn, .big [field] , .big [btn] {
+    height: 70px;
     margin-top: 25px;
     font-size: 1.5em;
+}
+[small][field], [small][btn], .small.field , .small.btn,
+[small].field, [small].btn, .small[field] , .small[btn],
+[small] [field], [small] [btn], .small .field, .small .btn,
+[small] .field, [small] .btn, .small [field] , .small [btn] {
+    height: 25px;
+    margin-top: 15px;
+    font-size: 1em;
 }
 [big] [label], .big [label]{
     margin-top: 25px;
@@ -133,9 +148,6 @@ input {
 }
 
 
-[template] {
-    height: 100%;
-}
 [template] .results {
     max-height: 85%;
     margin: 0 -15px;
@@ -389,25 +401,21 @@ input[type="checkbox"]:checked + label:before {
 
 [fullw], .fullw,
 [fullw_]>*, .fullw_>* {
-    display: block;
     width: 100%;
 }
 
 [fullh], .fullh,
 [fullh_]>*, .fullh_>* {
-    display: block;
     height: 100%;
 }
 
 [autow], .autow,
 [autow_]>*, .autow_>* {
-    display: block;
     width: auto;
 }
 
 [autoh], .autoh,
 [autoh_]>*, .autoh_>* {
-    display: block;
     height: auto;
 }
 
@@ -456,15 +464,28 @@ input[type="checkbox"]:checked + label:before {
     margin-right: 0;
 }
 
+[msg], .msg {
+    height: 50%;
+    width: 50%;
+    padding: 15% 5%;
+    font-size: large;
+}
 
 /* fx */
 
-[fx=stack]>* {
+[fx=stack]:not([paging]) > *,
+[fx=stack][paging] > .results > * {
     opacity: 0;
     margin-top: 100px;
     transition: opacity 0.5s ease,
                 margin-top 0.5s ease;
 }
+[fx=stack]:not([paging]).fxdone > *,
+[fx=stack][paging] > .results.fxdone > * {
+    opacity: 1;
+    margin-top: 15px;
+}
+
 
 .flip-container {
     perspective: 1000px;
@@ -541,3 +562,4 @@ input[type="checkbox"]:checked + label:before {
     }
 
 }
+
