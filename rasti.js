@@ -25,7 +25,6 @@ var rasti = function() {
         log : true,
         root : '',
         theme : 'base',
-        themeMap : 'dark',
         lang : '',
     }
 
@@ -51,20 +50,13 @@ var rasti = function() {
         base : {
             font : 'normal 14px sans-serif',
             palette : {
-                light: '#ddd',
-                mid: '#999',
-                dark: '#444',
-                detail: 'darkcyan',
-            },
-        },
-
-        oldsk00l : {
-            font : 'normal 14px monospace',
-            palette : {
-                light: '#999',
-                mid: '#666',
-                dark: '#222',
-                detail: 'green',
+                white  : '#fff',
+                light  : '#ddd',
+                mid    : '#999',
+                dark   : '#444',
+                darker : '#222',
+                detail : 'darkcyan',
+                alpha  : 'rgba(255,255,255,0.1)',
             },
         },
 
@@ -74,23 +66,25 @@ var rasti = function() {
     this.themeMaps = {
 
         dark : {
-            page : 'mid detail',
-            panel : 'dark detail',
-            section : 'mid dark',
-            field : 'dark light',
-            btn : 'detail dark',
-            text : 'dark',
-            label : 'dark',
+            page    : 'darker detail',
+            panel   : 'dark alpha',
+            section : 'mid alpha',
+            field   : 'light dark',
+            btn     : 'detail dark',
+            header  : 'darker',
+            label   : 'darker',
+            text    : 'darker',
         },
 
         light : {
-            page : 'light detail',
-            panel : 'dark detail',
-            section : 'mid dark',
-            field : 'light dark',
-            btn : 'detail light',
-            text : 'dark',
-            label : 'light',
+            page    : 'white detail',
+            panel   : 'mid alpha',
+            section : 'light alpha',
+            field   : 'white dark',
+            btn     : 'detail light',
+            header  : 'white',
+            label   : 'dark',
+            text    : 'dark',
         },
         
     }
@@ -260,7 +254,7 @@ var rasti = function() {
                     $el.append('<div selected>')
                 }
 
-                $el.find('[add]').click(function(e) {
+                $el.click(function(e) {
                     $options.siblings('[options]').hide() // hide other options
                     $options.css('left', this.getBoundingClientRect().right).toggle()
                     $options.find('input').focus()
@@ -711,7 +705,7 @@ var rasti = function() {
 
 
         // set theme (if not already set)
-        if ( !self.activeTheme ) setTheme(self.options.theme, self.options.themMap)
+        if ( !self.activeTheme ) setTheme(self.options.theme)
 
 
         // bind nav handler to popstate event
@@ -791,19 +785,16 @@ var rasti = function() {
     }
 
 
-    function setTheme(themeName, mapName) {
-        var theme = self.themes[themeName]
-        if (!theme) return log('Theme [%s] not found', themeName)
-        
-        var themeMap = mapName && theme.maps && theme.maps[mapName]
-                ? theme.maps[mapName]
-                : mapName && self.themeMaps[mapName]
-                    ? self.themeMaps[mapName]
-                    : theme.maps && Object.keys(theme.maps).length
-                        ? theme.maps[ Object.keys(theme.maps)[0] ]
-                        : self.themeMaps.dark
+    function setTheme(themeString) {
+        var themeName = themeString.split(' ')[0],
+            theme = self.themes[themeName]
 
-        log('Setting theme [%s] (%s)', themeName, mapName || 'dark')
+        if (!theme) return log('Theme [%s] not found', themeName)
+
+        var mapName = themeString.split(' ')[1] || ( is.object(theme.maps) && Object.keys(theme.maps)[0] ) || 'dark',
+            themeMap = ( is.object(theme.maps) && theme.maps[mapName] ) || self.themeMaps[mapName]
+
+        log('Setting theme [%s - %s]', themeName, mapName)
         self.activeTheme = theme
         
         var values = {
@@ -1091,17 +1082,25 @@ var rasti = function() {
                 color: ${ values.text[0] };
             }
             [page]    { background-color: ${ values.page[0] }; }
-            [page][header]:before { color: ${ values.page[1] }; }
             [panel]   { background-color: ${ values.panel[0] }; }
-            [panel][header]:before { color: ${ values.panel[1] }; }
             [section] { background-color: ${ values.section[0] }; }
-            [section][header]:before { color: ${ values.section[1] }; }
-            [field]   { background-color: ${ values.field[0] };
-                        color: ${ values.field[1] }; }
-            [btn], .btn, [rasti=buttons] div.active
-                { background-color: ${ values.btn[0] };
-                  color: ${ values.btn[1] }; }
-            [label]:before { color: ${ values.label[0] }; }
+
+            [page][header]:before    { background-color: ${ values.page[1] }; }
+            [panel][header]:before   { background-color: ${ values.panel[1] }; }
+            [section][header]:before { background-color: ${ values.section[1] }; }
+
+            [field] {
+                background-color: ${ values.field[0] };
+                color: ${ values.field[1] };
+            }
+
+            [btn], .btn, [rasti=buttons] div.active {
+                background-color: ${ values.btn[0] };
+                color: ${ values.btn[1] }; 
+            }
+
+            [header]:before { color: ${ values.header[0] }; }
+            [label]:before  { color: ${ values.label[0] }; }
             `
     }
 
@@ -1242,6 +1241,12 @@ var rasti = function() {
         // values
         activePage : function() {
             return self.activePage
+        },
+        activeLang : function() {
+            return self.activeLang
+        },
+        activeTheme : function() {
+            return self.activeTheme
         },
         
         // objects

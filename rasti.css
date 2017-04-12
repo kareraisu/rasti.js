@@ -4,8 +4,8 @@ body {
     font-size: 14px;
 }
 *, *:before, *:after {
-	box-sizing: border-box;
-	user-select: none;
+    box-sizing: border-box;
+    user-select: none;
     transition: background-color 0.2s,
                 font 0.2s;
 }
@@ -54,10 +54,10 @@ input {
 
 
 [page][header] {
-    padding-top: 80px;
+    padding-top: 95px;
 }
 [panel][header] {
-    padding-top: 60px;
+    padding-top: 65px;
 }
 [page][header]:before,
 [panel][header]:before {
@@ -65,14 +65,14 @@ input {
     position: absolute;
     top: 0;
     left: 0;
-    height: 90px;
+    height: 80px;
     width: 100%;
     padding: 20px 0;
     font-size: 2.5em;
     text-align: center;
 }
 [panel][header]:before {
-    height: 60px;
+    height: 50px;
     padding: 10px 0;
     font-size: 2em;
 }
@@ -538,6 +538,7 @@ input[type="checkbox"]:checked + label:before {
         padding: 10px;
         line-height: 0.7;
         white-space: normal;
+        z-index: 1;
     }
     [page] * {
         white-space: normal;
@@ -545,7 +546,6 @@ input[type="checkbox"]:checked + label:before {
 
     [panel] {
         display: inline-block;
-        position: static;
         height: 100vh;
         width: 100vw;
         margin: 0 !important;
