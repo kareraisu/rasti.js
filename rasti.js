@@ -232,9 +232,12 @@ var rasti = function() {
                 return ret
             },
             init : function($el) {
-                var el = $el[0]
-                var $options = $el.closest('[page]').find('[options='+ $el.attr('field') +']')
-                var initialized = $el.find('[add]').length
+                var el = $el[0],
+                    field = $el.attr('field'),
+                    fieldselector = '[field='+ field +']',
+                    optselector = '[options='+ field +']',
+                    $options = $el.closest('[page]').find(optselector),
+                    initialized = is.number(el.total)
                 
                 el.value = []
                 el.total = $options.children().length
@@ -244,7 +247,6 @@ var rasti = function() {
                     // empty selected options (and remove full class in case it was full)
                     $el.find('[selected]').empty()
                     $el.removeClass('full')
-                    $el.parent().find('.addLocation').css('display', 'block')
                     // then exit (skip all bindings)
                     return
                 }
@@ -254,30 +256,24 @@ var rasti = function() {
                     $el.append('<div selected>')
                 }
 
-                $el.click(function(e) {
+                $el.on('click', function(e) {
                     $options.siblings('[options]').hide() // hide other options
-                    $options.css('left', this.getBoundingClientRect().right).toggle()
+                    $options.css('left', this.getBoundingClientRect().right).show()
                     $options.find('input').focus()
                 })
 
                 $options.click(function(e) {
                     $options.find('input').focus()
-                    // if (e.target === this) $(this).hide()
                 })
 
-                $options.on('click', 'div i', function(e) {
+                $el.closest('[page]').on('click', '*:not(option)', function(e) {
+                    if (e.target.getAttribute('field') === field
+                        || e.target.parentNode.getAttribute('field') === field) return
                     $options.hide()
                 })
 
-                $options.on('focusout', 'input', function(e) {
-                    setTimeout(function(){
-                        if ($options.has(document.activeElement).length == 0) {
-                            $options.hide()
-                        }
-                    }, 300)
-                })
-
                 var toggleOption = function(e) {
+                    e.stopPropagation()
                     $options.find('input').focus()
                     var $opt = $(e.target),
                         val = $opt.attr('value'),
@@ -285,16 +281,12 @@ var rasti = function() {
 
                     if ($opt.parent().attr('options')) {
                         // select option
-                        $el.find('[selected]').append('<div class="deleteOption"><i close class="fa fa-times" aria-hidden="true"></i></div>')
-                        $("div.deleteOption", $el.find('[selected]')).last().append($opt)
+                        $el.find('[selected]').append($opt)
                         values.push(val)
                     }
                     else {
                         // unselect option
-                        deleteOption = $opt.parent()
                         $options.append($opt)
-                        deleteOption.remove()
-                        values.remove(val.capitalize())
                         values.remove(val)
                     }
                     checkFull($el)
@@ -305,20 +297,8 @@ var rasti = function() {
 
                 $el.on('click', 'option', toggleOption)
 
-                $el.find('[selected]').on("click", "div > i", function(e) {
-                    $(this).next().trigger("click")
-                })
-
                 $options.on('input', 'input', function(e) {
-                    var searchTerm = $(this).val().toUpperCase()
-                    $options.find('option').each(function(i, el) {
-                        if (searchTerm === $(el).text().substring(0,searchTerm.length)) {
-                            $(el).css('display', 'block')
-                        }
-                        else {
-                            $(el).css('display', 'none')
-                        }
-                    })
+                    $options.find('option').hide().filter('[value*='+ this.value +']').show()
                 })
 
                 $el.change(function(e, params){
@@ -340,12 +320,10 @@ var rasti = function() {
                     if (isFull) {
                         $el.addClass('full')
                         $options.hide()
-                        $el.parent().find('.addLocation').css('display', 'none')
 
                     }
                     else {
                         $el.removeClass('full')
-                        $el.parent().find('.addLocation').css('display', 'block')
                     }
                     return isFull
                 }
@@ -356,6 +334,7 @@ var rasti = function() {
                     min-height: 35px;
                     padding-right: 20px;
                     text-shadow: 0 0 0 #000;
+                    cursor: pointer;
                 }
                 [rasti=multi] [add] {
                     display: flex;
@@ -365,7 +344,6 @@ var rasti = function() {
                     top: 0;
                     height: 100%;
                     width: 20px;
-                    cursor: pointer;
                     border-left: 1px solid rgba(0,0,0,0.2);
                 }
                 [rasti=multi] [add]:before {
@@ -376,12 +354,14 @@ var rasti = function() {
                 [rasti=multi].open [add] {
                     box-shadow: inset 0 0 2px #000;
                 }
+                [rasti=multi].full {
+                    padding-right: 5px;
+                }
                 [rasti=multi].full [add] {
                     display: none;
                 }
                 [rasti=multi] option {
                     padding: 2px 0;
-                    cursor: pointer;
                 }
                 [rasti=multi] option:before {
                     content: '✕';

@@ -59,8 +59,12 @@ input {
 [panel][header] {
     padding-top: 65px;
 }
+[section][header] {
+    padding-top: 55px;
+}
 [page][header]:before,
-[panel][header]:before {
+[panel][header]:before,
+[section][header]:before {
     content: attr(header);
     position: absolute;
     top: 0;
@@ -77,7 +81,7 @@ input {
     font-size: 2em;
 }
 [section][header]:before {
-    margin: 0 -10px;
+    height: 40px;
     padding: 5px 0;
     font-size: 1.5em;
 }
@@ -125,7 +129,7 @@ input {
 [big] [field], [big] [btn], .big .field, .big .btn,
 [big] .field, [big] .btn, .big [field] , .big [btn] {
     height: 70px;
-    margin-top: 25px;
+    margin-bottom: 25px;
     font-size: 1.5em;
 }
 [small][field], [small][btn], .small.field , .small.btn,
@@ -133,7 +137,7 @@ input {
 [small] [field], [small] [btn], .small .field, .small .btn,
 [small] .field, [small] .btn, .small [field] , .small [btn] {
     height: 25px;
-    margin-top: 15px;
+    margin-bottom: 15px;
     font-size: 1em;
 }
 [big] [label], .big [label]{
@@ -149,11 +153,12 @@ input {
 
 
 [template] .results {
-    max-height: 85%;
+    max-height: calc(100% - 40px);
     margin: 0 -15px;
     padding: 0 15px;
 }
 [template] .controls {
+    height: 60px;
     padding: 15px;
     color: #fff;
     text-align: center;
@@ -243,7 +248,6 @@ input[type="checkbox"] + label:before {
     position: absolute;
     height: 16px;
     width: 16px;
-    margin-top: -2px;
     margin-left: -22px;
     padding: 0;
     border: 1px solid #999;
@@ -255,8 +259,8 @@ input[type="checkbox"] + label:before {
 input[type="radio"] + label:before {
     content: "\25cf";
     border-radius: 50%;
-    font-size: 1.4em;
-    line-height: 0.8;
+    font-size: 1.3em;
+    line-height: 0.6;
 }
 input[type="radio"]:checked + label:before,
 input[type="checkbox"]:checked + label:before {
@@ -330,7 +334,6 @@ input[type="checkbox"]:checked + label:before {
 [ib_]>*, .ib_>* {
     display: inline-block;
     width: auto;
-    vertical-align: bottom;
 }
 
 [floatl], .floatl {
@@ -480,12 +483,6 @@ input[type="checkbox"]:checked + label:before {
     transition: opacity 0.5s ease,
                 margin-top 0.5s ease;
 }
-[fx=stack]:not([paging]).fxdone > *,
-[fx=stack][paging] > .results.fxdone > * {
-    opacity: 1;
-    margin-top: 15px;
-}
-
 
 .flip-container {
     perspective: 1000px;
