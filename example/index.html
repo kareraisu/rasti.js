@@ -35,11 +35,12 @@
 		</div>
 	</div>
 
-	<div row page="results" ajax="getResults">
+	<div row page="results" ajax="getResults" tabs=tablet>
 
 		<div col-3 scrolly
 			panel="filter"
-			header="fields">
+			header="fields"
+			label="fields">
 
 			<div section header="previous">
 
@@ -88,6 +89,7 @@
 		<div col-7
 			panel="results"
 			header="results"
+			label="results"
 			template="cards"
 			paging="3" columns
 			fx="stack">
@@ -97,8 +99,8 @@
 
 		</div>
 
-		<div col-2 panel scrolly>
-			<div section header="Config">			
+		<div col-2 panel scrolly label="config">
+			<div section header="config">			
 				<div rasti="buttons"
 					field="lang"
 					data="langs"

@@ -573,6 +573,12 @@ var rasti = function() {
         })
 
 
+        // create tabs
+        $('[tabs]').each(function(i, el) {
+            createTabs($(el))
+        })
+
+
         // init nav
         $('[nav]').click(function(e) {
             var $el = $(this),
@@ -765,6 +771,36 @@ var rasti = function() {
     }
 
 
+    function render(name, data) {
+        var template = self.templates[name]
+        if (!template) return error('Template [%s] is not defined', name)
+
+        var $el = $('[template='+ name +']')
+        if (!$el.length) return error('No element bound to template [%s]. Please bind one via [template] attribute.', name)
+        var el = $el[0]
+
+        if (!data) {
+            var datakey = $el.attr('data')
+            if (!datakey) return error('No data found for template [%s]. Please provide in ajax response or via [data] attribute in element:', name, el)
+            data = self.data[datakey]
+            if (!data) return error('Undefined data source "%s" in [data] attribute of element:', datakey, el)
+        }
+
+        if (!data.length) return $el.html('<div msg center textc>NO RESULTS</div>')
+
+        var paging = $el.attr('paging')
+        paging ? initPager($el, data) : $el.html( template(data) )
+
+        var fxkey = $el.attr('fx')
+        if (fxkey) {
+            var fx = self.fx[fxkey]
+            if (!fx) return error('Undefined fx "%s" in [fx] attribute of element', fxkey, el)
+            paging ? fx($el.find('.results')) : fx($el)
+        }
+
+    }
+
+
     function setTheme(themeString) {
         var themeName = themeString.split(' ')[0],
             theme = self.themes[themeName]
@@ -885,7 +921,43 @@ var rasti = function() {
 
 
     // internal utils
+
+    function createTabs($el) {
+        var $tabs = $el.children(':not([options])'),
+            $labels = $('<div class="tab-labels"><div class="bar"></div></div>'),
+            $tab, label
+
+        $tabs.each(function(i, tab){
+            $tab = $(tab)
+            $tab.attr('tab', i)
+            label = $tab.attr('label') || $tab.attr('header') || $tab.attr('name') || 'TAB '+ i
+
+            $labels.append($(`<div tab=${i} text="${ label }">`))
+        })
+
+        $el.append($labels)
+
+        $labels.on('click', function(e){
+            var $label = $(e.target),
+                tabnr = $label.attr('tab'),
+                $tab = $tabs.filter(`[tab="${ tabnr }"]`)
+
+            $tabs.removeClass('active')
+            $tab.addClass('active')
+
+            $labels.children().removeClass('active')
+            $label.addClass('active')
+
+            $labels.find('.bar').css({
+                width : $label.css('width'),
+                left : $label[0].getBoundingClientRect().left
+            })
+        })
+
+        $labels.children().first().click()
+    }
     
+
     function initBlock($el) {
         var el = $el[0]
         var type = el.nodeName == 'SELECT' ? 'select' : $el.attr('rasti')
@@ -898,48 +970,6 @@ var rasti = function() {
         if ($el.attr('data')) updateBlock($el)
 
         block.init($el)
-    }
-
-
-    function fixLabel($el) {
-        var $div = $(`<div fixed label="${ $el.attr('label') }" >`)
-        $el.wrap($div)
-        $el[0].removeAttribute('label')
-    }
-
-
-    function setImg($el, basepath) {
-        $el.css('background-image', 'url('+ basepath + ($el.val() || $el.attr('value')) +'.png)')
-    }
-
-
-    function render(name, data) {
-        var template = self.templates[name]
-        if (!template) return error('Template [%s] is not defined', name)
-
-        var $el = $('[template='+ name +']')
-        if (!$el.length) return error('No element bound to template [%s]. Please bind one via [template] attribute.', name)
-        var el = $el[0]
-
-        if (!data) {
-            var datakey = $el.attr('data')
-            if (!datakey) return error('No data found for template [%s]. Please provide in ajax response or via [data] attribute in element:', name, el)
-            data = self.data[datakey]
-            if (!data) return error('Undefined data source "%s" in [data] attribute of element:', datakey, el)
-        }
-
-        if (!data.length) return $el.html('<div msg center textc>NO RESULTS</div>')
-
-        var paging = $el.attr('paging')
-        paging ? initPager($el, data) : $el.html( template(data) )
-
-        var fxkey = $el.attr('fx')
-        if (fxkey) {
-            var fx = self.fx[fxkey]
-            if (!fx) return error('Undefined fx "%s" in [fx] attribute of element', fxkey, el)
-            paging ? fx($el.find('.results')) : fx($el)
-        }
-
     }
 
 
@@ -1015,6 +1045,21 @@ var rasti = function() {
         }
     }
 
+    function getPager(id) {
+        let pager = self.pagers.get(id)
+        if (!pager) error('No pager for template [%s]', id)
+        return pager
+    }
+    function newPager(id, results, page_size) {
+        let pager = new Pager(id, results, page_size)
+        self.pagers.set(id, pager)
+        return pager
+    }
+    function deletePager(pager) {
+        if (!pager || !pager.id) return
+        self.pagers.delete(pager.id)
+    }
+
 
     function submitAjax(method, callback) {
         var ajax = self.ajax[ method ]
@@ -1069,6 +1114,9 @@ var rasti = function() {
             [panel][header]:before   { background-color: ${ values.panel[1] }; }
             [section][header]:before { background-color: ${ values.section[1] }; }
 
+            [tabs] > .tab-labels        { background-color: ${ values.panel[0] }; }
+            [tabs] > .tab-labels > .bar { background-color: ${ values.btn[0] }; }
+
             [field] {
                 background-color: ${ values.field[0] };
                 color: ${ values.field[1] };
@@ -1095,27 +1143,22 @@ var rasti = function() {
         else return string
     }
 
-    
-    function getPager(id) {
-        let pager = self.pagers.get(id)
-        if (!pager) error('No pager for template [%s]', id)
-        return pager
+
+    function fixLabel($el) {
+        var $div = $(`<div fixed label="${ $el.attr('label') }" >`)
+        $el.wrap($div)
+        $el[0].removeAttribute('label')
     }
-    function newPager(id, results, page_size) {
-        let pager = new Pager(id, results, page_size)
-        self.pagers.set(id, pager)
-        return pager
-    }
-    function deletePager(pager) {
-        if (!pager || !pager.id) return
-        self.pagers.delete(pager.id)
+
+
+    function setImg($el, basepath) {
+        $el.css('background-image', 'url('+ basepath + ($el.val() || $el.attr('value')) +'.png)')
     }
 
 
     function random() {
         return (Math.random() * 6 | 0) + 1
     }
-
 
 
     function type(exp) {

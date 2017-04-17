@@ -32,18 +32,16 @@ input {
     padding: 20px 15px;
     border-radius: 4px;
 }
-[row]>[panel]:not(:first-child) {
+[row]>[panel]:not(:first-of-type) {
     margin-left: 0 !important;
 }
 
 
 [section] {
     position: relative;
+    margin-bottom: 15px;
     padding: 10px;
     border-radius: 4px;
-}
-[section]:not(:last-of-type) {
-    margin-bottom: 15px;
 }
 [section] [label]:before {
     text-shadow: 0 0 0 #000;
@@ -115,7 +113,6 @@ input {
 [panel] .field, [panel] .btn,
 [section] [field], [section] [btn], [section] [label],
 [section] .field, [section] .btn {
-    margin-top: 25px;
     margin-bottom: 15px;
 }
 [btn][ib], [btn].ib, .btn[ib], .btn.ib,
@@ -165,6 +162,48 @@ input {
 }
 
 
+[tabs] > .tab-labels {
+    display: none;
+    position: fixed;
+    top: 0;
+    min-width: 100vw;
+    white-space: nowrap;
+    height: 30px;
+    padding: 0;
+    border-radius: 0;
+    z-index: 1;
+}
+[tabs] > .tab-labels > [tab] {
+    flex: 1 1 auto;
+    min-width: 10px;
+    padding: 5px;
+    text-align: center;
+    text-shadow: 0 0 0 #000;
+    cursor: pointer;
+}
+[tabs] > .tab-labels > .bar {
+    position: absolute;
+    bottom: 0;
+    height: 3px;
+    transition: left 0.2s, width 0.2s;
+}
+[tabs] > .tab-labels > .active {
+    filter: contrast(1.5);
+}
+
+[tabs]:not([tabs="phone"]):not([tabs="tablet"]) > .tab-labels {
+    display: flex;
+}
+[tabs]:not([tabs="phone"]):not([tabs="tablet"]) > *:not(.tab-labels) {
+    display: none;
+    height: calc(100% - 30px);
+    margin-top: 30px !important;
+}
+[tabs]:not([tabs="phone"]):not([tabs="tablet"]) > .active {
+    display: block;
+}
+
+
 [label] {
     margin-top: 25px;
     vertical-align: bottom;
@@ -177,7 +216,7 @@ input {
 [label]>textarea {
     margin-top: 0 !important;
 }
-[label]:before {
+[label]:not([header]):before {
     content: attr(label);
     position: absolute;
     height: 20px;
@@ -301,10 +340,6 @@ input[type="checkbox"]:checked + label:before {
 [row] [col-9]:not(:first-child),
 [row] [col-10]:not(:first-child),
 [row] [col-11]:not(:first-child) { margin-left: 15px; }
-
-[row]>[panel]:not(:first-child) {
-    margin-left: 0;
-}
 
 
 /* utils */
@@ -512,12 +547,25 @@ input[type="checkbox"]:checked + label:before {
 
 /* media queries */
 
+/* tablet */
 @media only screen and (max-device-width: 800px) {
 
+    [tabs=tablet] > .tab-labels {
+        display: flex;
+    }
+    [tabs=tablet] > *:not(.tab-labels) {
+        display: none;
+        height: calc(100% - 30px);
+        margin-top: 30px !important;
+    }
+    [tabs=tablet] > .active {
+        display: block;
+    }
 
 }
 
-@media only screen and (max-device-width: 400px) {
+/* phone */
+@media only screen and (max-device-width: 500px) {
 
     [page]{
         display: inline-block;
@@ -546,6 +594,7 @@ input[type="checkbox"]:checked + label:before {
         height: 100vh;
         width: 100vw;
         margin: 0 !important;
+        border-radius: 0;
         vertical-align: top;
     }
 
@@ -557,6 +606,19 @@ input[type="checkbox"]:checked + label:before {
     [template] .controls .sizes {
         display: none;
     }
+
+    [tabs=phone] > .tab-labels {
+        display: flex;
+    }
+    [tabs=phone] > *:not(.tab-labels) {
+        display: none;
+        height: calc(100% - 30px);
+        margin-top: 30px !important;
+    }
+    [tabs=phone] > .active {
+        display: block;
+    }
+
 
 }
 
