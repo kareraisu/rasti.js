@@ -5,6 +5,9 @@ body {
 }
 *, *:before, *:after {
     box-sizing: border-box;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
     transition: background-color 0.2s,
                 font 0.2s;
@@ -216,18 +219,20 @@ input {
 [label]>textarea {
     margin-top: 0 !important;
 }
-[label]:not([header]):before {
+[label]:not([panel]):not([section]):before {
     content: attr(label);
     position: absolute;
     height: 20px;
-    margin-top: -22px;
-    margin-left: 4px;
     font-size: 1.2em;
     color: #eee;
 }
 [label][field]:before {
     margin-top: -27px;
     margin-left: -7px;
+}
+[label][fixed]:before {
+    margin-top: -22px;
+    margin-left: 4px;
 }
 [label][field][big]:before {
     margin-left: 0;

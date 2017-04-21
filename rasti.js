@@ -22,10 +22,10 @@ var rasti = function() {
     // config objects
 
     this.options = {
-        log : true,
-        root : '',
+        log   : true,
+        root  : '',
         theme : 'base',
-        lang : '',
+        lang  : '',
     }
 
     this.pages = {}
@@ -672,7 +672,13 @@ var rasti = function() {
 
 
         // set lang (if applicable and not already set)
-        if ( is.object(self.options.lang) && !self.activeLang ) setLang(self.options.lang)
+        if ( self.options.lang && !self.activeLang ) setLang(self.options.lang)
+        // if no lang, generate texts
+        if ( !self.options.lang ) {
+            $('[text]').each(function(i, el) {
+                $(el).text( $(el).attr('text') )
+            })
+        }
 
 
         // fix labels
@@ -680,13 +686,6 @@ var rasti = function() {
             $(tag + '[label]').each(function(i, el) {
                 fixLabel($(el))
             })
-        })
-
-
-        // generate texts
-        $('[text]').each(function(i, el) {
-            var $el = $(el)
-            $el.text( $el.attr('text') )
         })
 
 
@@ -707,6 +706,8 @@ var rasti = function() {
         var page = location.hash.substring(1)
         navTo(page && self.pages[page] ? page : self.options.root)
 
+
+        $(document).trigger('rasti-ready')
     }
 
 
@@ -810,7 +811,7 @@ var rasti = function() {
         var mapName = themeString.split(' ')[1] || ( is.object(theme.maps) && Object.keys(theme.maps)[0] ) || 'dark',
             themeMap = ( is.object(theme.maps) && theme.maps[mapName] ) || self.themeMaps[mapName]
 
-        log('Setting theme [%s - %s]', themeName, mapName)
+        log('Setting theme [%s:%s]', themeName, mapName)
         self.activeTheme = theme
         
         var values = {
@@ -852,6 +853,7 @@ var rasti = function() {
             if (el.hasAttribute('fixed')) el = el.children[0]
             $el = $(el)   
             keys = el.langkeys
+
             if (!keys) {
                 keys = {}
                 attributes.forEach(function(attr){
@@ -859,12 +861,13 @@ var rasti = function() {
                 })
                 el.langkeys = keys
             }
-            attributes.forEach(function(attr){
-                if (keys[attr]) {
-                    string = getString(langName, keys[attr])
-                    $el.attr(attr, string)
-                }
-            })
+
+            for (var attr in keys) {
+                string = getString(langName, keys[attr])
+                attr === 'text'
+                    ? $el.text(string || keys[attr])
+                    : string ? $el.attr(attr, string) : null
+            }
         })
     }
 
@@ -924,18 +927,18 @@ var rasti = function() {
 
     function createTabs($el) {
         var $tabs = $el.children(':not([options])'),
-            $labels = $('<div class="tab-labels"><div class="bar"></div></div>'),
+            $labels = $('<div class="tab-labels">'),
             $tab, label
 
         $tabs.each(function(i, tab){
             $tab = $(tab)
             $tab.attr('tab', i)
-            label = $tab.attr('label') || $tab.attr('header') || $tab.attr('name') || 'TAB '+ i
+            label = $tab.attr('label') || $tab.attr('header') || $tab.attr('name') || 'TAB ' + (i+1)
 
             $labels.append($(`<div tab=${i} text="${ label }">`))
         })
 
-        $el.append($labels)
+        $labels.append('<div class="bar">').appendTo($el)
 
         $labels.on('click', function(e){
             var $label = $(e.target),
@@ -954,7 +957,7 @@ var rasti = function() {
             })
         })
 
-        $labels.children().first().click()
+        $(document).on('rasti-ready', function(e){ $labels.children().first().click() })
     }
     
 
@@ -1262,15 +1265,9 @@ var rasti = function() {
 
     return {
         // values
-        activePage : function() {
-            return self.activePage
-        },
-        activeLang : function() {
-            return self.activeLang
-        },
-        activeTheme : function() {
-            return self.activeTheme
-        },
+        activePage : function() { return self.activePage },
+        activeLang : function() { return self.activeLang },
+        activeTheme : function() { return self.activeTheme },
         
         // objects
         pages : this.pages,
