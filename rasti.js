@@ -935,14 +935,14 @@ var rasti = function() {
             $tab.attr('tab', i)
             label = $tab.attr('label') || $tab.attr('header') || $tab.attr('name') || 'TAB ' + (i+1)
 
-            $labels.append($(`<div tab=${i} text="${ label }">`))
+            $labels.append($(`<div tab-label=${i} text="${ label }">`))
         })
 
         $labels.append('<div class="bar">').appendTo($el)
 
         $labels.on('click', function(e){
             var $label = $(e.target),
-                tabnr = $label.attr('tab'),
+                tabnr = $label.attr('tab-label'),
                 $tab = $tabs.filter(`[tab="${ tabnr }"]`)
 
             $tabs.removeClass('active')

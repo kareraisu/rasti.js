@@ -97,6 +97,7 @@ app.config({
 
         doSomethingAndAlso : function(data) {
             if (app.utils.chatting) return
+                app.get('tab-label="1"').click()
             app.utils.chatting = true
             var lines = [
                 'do sth besides rendering cards? ok, lets see...', '',
@@ -262,7 +263,7 @@ app.data.langs = Object.keys(app.langs)
 app.init({
     //log : false,
     //root : 'results',
-    //theme : 'Weltall light',
+    theme : 'Weltall',
     //lang : 'es',
 })
 
