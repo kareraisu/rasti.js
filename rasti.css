@@ -36,7 +36,7 @@ input {
     border-radius: 4px;
 }
 [row]>[panel]:not(:first-of-type) {
-    margin-left: 0 !important;
+    margin-left: 0;
 }
 
 
@@ -128,7 +128,7 @@ input {
 [big].field, [big].btn, .big[field] , .big[btn],
 [big] [field], [big] [btn], .big .field, .big .btn,
 [big] .field, [big] .btn, .big [field] , .big [btn] {
-    height: 70px;
+    min-height: 70px;
     margin-bottom: 25px;
     font-size: 1.5em;
 }
@@ -183,7 +183,6 @@ input {
     align-items: center;
     flex: 1 1 auto;
     min-width: 50px;
-    max-width: 150px;
     padding: 5px;
     font-size: 1.2em;
     line-height: 1;
@@ -220,7 +219,8 @@ input {
     max-height: 500px;
     max-width: 500px;
 }
-[modal]:before, [options]:before {
+
+[backdrop]:before, .backdrop:before {
     content: '';
     position: fixed;
     top: 0;
@@ -228,7 +228,6 @@ input {
     height: 100vh;
     width: 100vw;
     background-color: rgba(0,0,0,0.5)
-
 }
 
 
@@ -370,6 +369,11 @@ input[type="checkbox"]:checked + label:before {
 [row] [col-9]:not(:first-child),
 [row] [col-10]:not(:first-child),
 [row] [col-11]:not(:first-child) { margin-left: 15px; }
+
+
+.page-options {
+    flex-basis: initial !important;
+}
 
 
 /* utils */
@@ -534,14 +538,18 @@ input[type="checkbox"]:checked + label:before {
 }
 
 [msg], .msg {
-    height: 50%;
-    width: 50%;
-    padding: 15% 5%;
+    height: 60%;
+    width: 60%;
+    padding: 10% 5%;
     font-size: large;
 }
 
+
 /* fx */
 
+[fx=stack] {
+    padding-top: 0 !important;
+}
 [fx=stack]:not([paging]) > *,
 [fx=stack][paging] > .results > * {
     opacity: 0;
@@ -581,6 +589,39 @@ input[type="checkbox"]:checked + label:before {
 /* tablet */
 @media only screen and (max-device-width: 800px) {
 
+    [page]{
+        display: inline-block;
+        width: auto !important;
+        white-space: nowrap;
+    }
+    [page][header] {
+        padding-top: 80px;
+    }
+    [page][header]:before {
+        position: fixed;
+        top: 0;
+        max-height: 80px;
+        width: 100vw;
+        padding: 10px;
+        line-height: 0.8;
+        white-space: normal;
+        z-index: 1;
+    }
+    [page] * {
+        white-space: normal;
+    }
+
+    [panel] {
+        display: inline-block;
+        position: relative;
+        height: 100vh;
+        width: 80vw;
+        margin-left: 10vw !important;
+        margin-right: 10vw;
+        border-radius: 0;
+        vertical-align: top;
+    }
+
     [tabs=tablet] > .tab-labels {
         display: flex;
     }
@@ -593,44 +634,30 @@ input[type="checkbox"]:checked + label:before {
         display: block;
     }
 
+    .hide-tablet {
+        display: none;
+    }
+    .show-tablet {
+        display: block;
+    }
+
+    [header][hide-header-tablet] {
+        padding-top: 20px;
+    }
+    [header][hide-header-tablet]:before {
+        display: none;
+    }
+
+
 }
 
 /* phone */
 @media only screen and (max-device-width: 500px) {
 
-    [page]{
-        display: inline-block;
-        width: auto !important;
-        white-space: nowrap;
-    }
-    [page][header] {
-        padding-top: 20%;
-    }
-    [page][header]:before {
-        position: fixed;
-        top: 0;
-        max-height: 20%;
-        width: 100vw;
-        padding: 10px;
-        line-height: 0.7;
-        white-space: normal;
-        z-index: 1;
-    }
-    [page] * {
-        white-space: normal;
-    }
-
     [panel] {
-        display: inline-block;
-        height: 100vh;
         width: 100vw;
-        margin: 0 !important;
-        border-radius: 0;
-        vertical-align: top;
-    }
-
-    [row]>[panel]:not(:first-child) {
-        margin-left: 15px;
+        margin-left: 0 !important;
+        margin-right: 0;
     }
 
     [template] .controls .columns,
@@ -656,6 +683,20 @@ input[type="checkbox"]:checked + label:before {
         right: 0;
         height: 80% !important;
         margin: auto;
+    }
+
+    .hide-phone {
+        display: none;
+    }
+    .show-phone {
+        display: block;
+    }
+
+    [header][hide-header-phone] {
+        padding-top: 20px;
+    }
+    [header][hide-header-phone]:before {
+        display: none;
     }
 
 

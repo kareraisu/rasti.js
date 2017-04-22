@@ -12,7 +12,7 @@ app.utils.charData = {
         occupation : 'Gebler Soldier',
         location : 'unknown',
         weapon : 'Eather',
-        email : 'evanhouten@gebler.com',
+        email : 'elly@gebler.com',
         img : 'elly.gif',
     },
     Citan : {

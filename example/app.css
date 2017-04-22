@@ -1,3 +1,6 @@
+.card {
+    margin-bottom: 0;
+}
 .card .photo {
     height: 100px;
     width: 100px;
@@ -15,17 +18,4 @@
 .card .values {
     overflow-x: hidden;
     text-overflow: ellipsis;
-}
-.card .actions {
-    font-size: large;
-}
-.card .actions i {
-    padding: 0 7px;
-    cursor: pointer;
-}
-
-[text=tips] {
-    width: 50%;
-    font-size: large;
-    text-align: center;
 }

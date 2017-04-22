@@ -134,29 +134,24 @@ app.config({
             for (var obj of results) {
                 html += `
                 <div class="card row" section="section">
-                  <div class="photo col-2" style="background-image: url(http://shrines.rpgclassics.com/psx/xeno/images/${obj.img}"></div>
-                  <div class="col-10">
-                    <div class="name">${obj.name}</div>
-                    <div class="row">
-                      <div class="data col-8 row">
-                        <div class="labels col-4">
-                            <em>Occupation:</em><br/>
-                            <em>Location:</em><br/>
-                            <em>Weapon:</em><br/>
-                            <em>Email:</em>
+                    <div class="photo col-2" style="background-image: url(http://shrines.rpgclassics.com/psx/xeno/images/${obj.img}"></div>
+                    <div class="col-10">
+                        <div class="name">${obj.name}</div>
+                        <div class="row">
+                            <div class="labels col-4">
+                                <em>Occupation:</em><br/>
+                                <em>Location:</em><br/>
+                                <em>Weapon:</em><br/>
+                                <em>Email:</em>
+                            </div>
+                            <div class="values col-8">
+                                ${obj.occupation}<br/>
+                                ${obj.location}<br/>
+                                ${obj.weapon}<br/>
+                                ${obj.email}
+                            </div>
                         </div>
-                        <div class="values col-8">
-                            ${obj.occupation}<br/>
-                            ${obj.location}<br/>
-                            ${obj.weapon}<br/>
-                            ${obj.email}
-                        </div>
-                      </div>
-                      <div class="actions col-4 ib_">
-                        <button btn>CONTACT</button>
-                      </div>
                     </div>
-                  </div>
                 </div>
                 `
             }

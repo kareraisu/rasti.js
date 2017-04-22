@@ -258,6 +258,7 @@ var rasti = function() {
 
                 $el.on('click', function(e) {
                     $options.siblings('[options]').hide() // hide other options
+                    if (onMobile) $options.parent().addClass('backdrop')
                     $options.css('left', this.getBoundingClientRect().right).show()
                     $options.find('input').focus()
                 })
@@ -269,6 +270,7 @@ var rasti = function() {
                 $el.closest('[page]').on('click', '*:not(option)', function(e) {
                     if (e.target.getAttribute('field') === field
                         || e.target.parentNode.getAttribute('field') === field) return
+                    if (onMobile) $options.parent().removeClass('backdrop')
                     $options.hide()
                 })
 
@@ -319,8 +321,8 @@ var rasti = function() {
                     var isFull = multi.value.length >= (multi.max || multi.total)
                     if (isFull) {
                         $el.addClass('full')
+                        if (onMobile) $options.parent().removeClass('backdrop')
                         $options.hide()
-
                     }
                     else {
                         $el.removeClass('full')
@@ -557,8 +559,16 @@ var rasti = function() {
         }
         styles += '</style>'
         $('body').append(styles)
+
+
         // append theme style container
         $('body').append('<style theme>')
+
+
+        // append page-options containers
+        $('[page]').each(function(i, el) {
+            $(el).append('<div class="page-options">')
+        })
 
 
         // init rasti blocks
@@ -898,7 +908,7 @@ var rasti = function() {
             if (!$options.length) {
                 // if not create it and append it to page
                 $options = $('<div field rasti='+ type +' options='+ field +'>')
-                $el.closest('[page]').append($options)
+                $el.closest('[page]').children('.page-options').append($options)
             }   
         }
         else {
@@ -926,7 +936,7 @@ var rasti = function() {
     // internal utils
 
     function createTabs($el) {
-        var $tabs = $el.children(':not([options])'),
+        var $tabs = $el.children(':not(.page-options)'),
             $labels = $('<div class="tab-labels">'),
             $tab, label
 
@@ -1156,6 +1166,11 @@ var rasti = function() {
 
     function setImg($el, basepath) {
         $el.css('background-image', 'url('+ basepath + ($el.val() || $el.attr('value')) +'.png)')
+    }
+
+
+    function onMobile() {
+        return window.innerWidth < 500
     }
 
 
