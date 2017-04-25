@@ -225,11 +225,11 @@ var rasti = function() {
         multi : {
             template : function(data, $el) {
                 var ret = $el[0].hasAttribute('filter')
-                    ? `<div class="filter"><input field type="text" placeholder="${ $el.attr('filter') || 'type here to filter options' }"/></div>`
+                    ? `<input field type="text" placeholder="${ $el.attr('filter') || self.options.multiFilterText }"/>`
                     : ''
                 for (var d of data) {
                     d = checkData(d)
-                    ret += `<option value="${d.value}" alias="${d.alias}">${d.label}</option>`
+                    ret += `<option value="${d.value}" alias="${d.alias.toLowerCase()}">${d.label}</option>`
                 }
                 return ret
             },
@@ -255,24 +255,21 @@ var rasti = function() {
 
                 $el.prepend('<div add>')
                 $el.append('<div selected>')
+                var $selected = $el.find('[selected]')
 
                 // bindings
 
                 $el.on('click', function(e) {
                     $options.siblings('[options]').hide() // hide other options
-                    if (onMobile) $options.parent().addClass('backdrop')
+                    if ( onMobile() ) $options.parent().addClass('backdrop')
                     $options.css('left', this.getBoundingClientRect().right).show()
                     $options.find('input').focus()
                 })
 
-                $options.click(function(e) {
-                    $options.find('input').focus()
-                })
-
                 $el.closest('[page]').on('click', '*:not(option)', function(e) {
-                    if (e.target.getAttribute('field') === field
-                        || e.target.parentNode.getAttribute('field') === field) return
-                    if (onMobile) $options.parent().removeClass('backdrop')
+                    if ( $(e.target).attr('field') === field
+                      || $(e.target).parent().attr('field') === field ) return
+                    if ( onMobile() ) $options.parent().removeClass('backdrop')
                     $options.hide()
                 })
 
@@ -293,43 +290,51 @@ var rasti = function() {
                         $options.append($opt)
                         values.remove(val)
                     }
-                    checkFull($el)
+                    checkFull()
                     $el.trigger('change', {ui: true}) 
                 }
 
-                $options.on('click', 'option', toggleOption)
-
                 $el.on('click', 'option', toggleOption)
 
+                $options.on('click', 'option', toggleOption)
+
+                $options.on('click', function(e) { $options.find('input').focus() })
+
                 $options.on('input', 'input', function(e) {
-                    $options.find('option').hide()
-                        .filter('[alias*='+ this.value +']').show()
+                    this.value
+                        ? $options.find('option').hide().filter('[alias*='+ this.value +']').show()
+                        : $options.find('option').show()
                 })
 
-                $el.change(function(e, params){
+                $el.on('change', function(e, params){
                     if (params && params.ui) return // triggered from ui, do nothing
-                    var $selected = $el.find('[selected]')
-                    $selected.each(function(i, el) {
-                        // TODO revisar si no pincha
+                    $selected.children().each(function(i, el) {
                         $options.append(el)
                     })
-                    for (var val of $el[0].value) {
+                    for (var val of el.value) {
                         $selected.append($options.find('[value='+ val +']'))
-                        if (checkFull($el)) break
+                        if ( checkFull() ) break
                     }
                 })
 
-                function checkFull($el) {
-                    var multi = $el[0]
-                    var isFull = multi.value.length >= (multi.max || multi.total)
+                function checkFull() {
+                    var qty = $selected.children().length,
+                        dif = el.value.length - qty,
+                        isFull = qty >= (el.max || el.total)
+
                     if (isFull) {
+                        if (dif > 0) {
+                            el.value = el.value.slice(0, qty)
+                            warn('Dropped %s overflowed values in el:', dif, el)
+                        }
                         $el.addClass('full')
-                        if (onMobile) $options.parent().removeClass('backdrop')
+                        if ( onMobile() ) $options.parent().removeClass('backdrop')
                         $options.hide()
                     }
                     else {
                         $el.removeClass('full')
                     }
+                    
                     return isFull
                 }
             },
@@ -741,12 +746,15 @@ var rasti = function() {
         })
     }
 
-    function add(selector, value) {
+    function add(selector, ...values) {
         if ( !self.activePage || !self.activePage.length ) return error('Cannot add(%s), active page is not defined', selector)
         var $els = self.activePage.find('['+ selector +']')
         if (!$els.length) error('Cannot add(%s), element not found in page [%s]', selector, self.activePage.attr('page'))
         $els.each(function(i, el){
-            el.value.push(value)
+            values.forEach(function(val){
+                if (is.array(val)) el.value = el.value.concat(val)
+                else el.value.push(val)
+            })
             $(el).change()
         })
     }

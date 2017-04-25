@@ -49,6 +49,7 @@ app.config({
                 app.set('field=lang', app.options.lang)
                 app.set('field=theme', app.options.theme.split(' ')[0])
                 app.set('data=themeMaps', app.options.theme.split(' ')[1] || 'dark')
+                app.add('field=party', ['Fei','Elly'], 'Citan')
             },
 
             nav : function(params) {

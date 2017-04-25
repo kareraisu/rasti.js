@@ -76,15 +76,15 @@
 
             <div section header="hints">
 
-                <div rasti="multi" max=1 filter="start typing a name!"
+                <div rasti="multi" max=3 filter="start typing a name!"
                     field="party"
                     data="party"
                     label="party"></div>
 
                 <div label="size" inline>   
-                    <output ib id="partyMax" style="width: 15%">1</output>
+                    <output ib id="partyMax" style="width: 15%">3</output>
                     <input type="range" style="width: 80%"
-                        value="1" min="1" max="10"
+                        value="3" min="1" max="10"
                         change="setPartyMax"
                         onchange="partyMax.value = this.value">
                 </div>
