@@ -29,7 +29,12 @@ app.config({
         party : function(render) {
             // this could be asynchronous
             var charNames = Object.keys(app.utils.charData)
-            render(charNames)
+            var alias = {
+                Fei : 'Fong Wong Id Lakan',
+                Elly : 'Elhaym Van Houten',
+                Citan : 'Doctor Uzuki',
+            }
+            render( charNames.map(name => { return {label: name, value: name, alias: alias[name]} } ) )
         }
 
     },

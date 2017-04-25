@@ -229,7 +229,7 @@ var rasti = function() {
                     : ''
                 for (var d of data) {
                     d = checkData(d)
-                    ret += `<option value="${d.value}" alias="${d.alias.toLowerCase()}">${d.label}</option>`
+                    ret += `<option value="${d.value}" alias="${d.alias}">${d.label}</option>`
                 }
                 return ret
             },
@@ -334,7 +334,7 @@ var rasti = function() {
                     else {
                         $el.removeClass('full')
                     }
-                    
+
                     return isFull
                 }
             },
@@ -1110,17 +1110,27 @@ var rasti = function() {
     function checkData(data) {
         switch (typeof data) {
         case 'string':
-            data = {value: data, label: data, alias: data}
+            data = {value: data, label: data, alias: data.toLowerCase()}
             break
         case 'object':
-            if (!data.value || !data.label) {
-                error('Invalid data object (must have value and label properties):', data)
+            if ( !is.string(data.value) || !is.string(data.label) ) {
+                error('Invalid data object (must have string properties "value" and "label"):', data)
                 invalidData++
+                data = {value: '', label: 'INVALID DATA', alias: ''}
             }
+            else if ( !is.string(data.alias) ) {
+                if (data.alias) {
+                    error('Invalid data property "alias" (must be a string):', data)
+                    invalidData++
+                }
+                data.alias = data.value.toLowerCase()
+            }
+            else data.alias = data.alias.toLowerCase() +' '+ data.value.toLowerCase()
             break
         default:
-            error('Invalid data (must be string or object):', data)
+            error('Invalid data (must be a string or an object):', data)
             invalidData++
+            data = {value: '', label: 'INVALID DATA', alias: ''}
         }
         return data
     }
