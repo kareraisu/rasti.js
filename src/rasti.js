@@ -107,7 +107,7 @@ var rasti = function() {
     this.blocks = {
 
         buttons : {
-            template : function(data) {
+            template : function(data, $el) {
                 var ret = ''
                 for (var d of data) {
                     d = checkData(d)
@@ -141,7 +141,7 @@ var rasti = function() {
         },
 
         radios : {
-            template : function(data) {
+            template : function(data, $el) {
                 var uid = random()
                 var ret = ''
                 for (var d of data) {
@@ -176,7 +176,7 @@ var rasti = function() {
         },
         
         checks : {
-            template : function(data) {
+            template : function(data, $el) {
                 var uid = random()
                 var ret = ''
                 for (var d of data) {
@@ -223,20 +223,20 @@ var rasti = function() {
         },
 
         multi : {
-            template : function(data) {
-                var ret = ''
+            template : function(data, $el) {
+                var ret = $el[0].hasAttribute('filter')
+                    ? `<div class="filter"><input field type="text" placeholder="${ $el.attr('filter') || 'type here to filter options' }"/></div>`
+                    : ''
                 for (var d of data) {
                     d = checkData(d)
-                    ret += `<option value="${d.value}">${d.label}</option>`
+                    ret += `<option value="${d.value}" alias="${d.alias}">${d.label}</option>`
                 }
                 return ret
             },
             init : function($el) {
                 var el = $el[0],
                     field = $el.attr('field'),
-                    fieldselector = '[field='+ field +']',
-                    optselector = '[options='+ field +']',
-                    $options = $el.closest('[page]').find(optselector),
+                    $options = $el.closest('[page]').find('[options='+ field +']'),
                     initialized = is.number(el.total)
                 
                 el.value = []
@@ -247,14 +247,16 @@ var rasti = function() {
                     // empty selected options (and remove full class in case it was full)
                     $el.find('[selected]').empty()
                     $el.removeClass('full')
-                    // then exit (skip all bindings)
+                    // then exit (skip structure and bindings)
                     return
                 }
-                else {
-                    // append add and selected divs
-                    $el.prepend('<div add>')
-                    $el.append('<div selected>')
-                }
+
+                // structure
+
+                $el.prepend('<div add>')
+                $el.append('<div selected>')
+
+                // bindings
 
                 $el.on('click', function(e) {
                     $options.siblings('[options]').hide() // hide other options
@@ -300,7 +302,8 @@ var rasti = function() {
                 $el.on('click', 'option', toggleOption)
 
                 $options.on('input', 'input', function(e) {
-                    $options.find('option').hide().filter('[value*='+ this.value +']').show()
+                    $options.find('option').hide()
+                        .filter('[alias*='+ this.value +']').show()
                 })
 
                 $el.change(function(e, params){
@@ -411,7 +414,7 @@ var rasti = function() {
         },
 
         select : {
-            template : function(data) {
+            template : function(data, $el) {
                 var ret = ''
                 for (var d of data) {
                     d = checkData(d)
@@ -898,11 +901,12 @@ var rasti = function() {
             if (!data) return error('Undefined data source "%s" in [data] attribute of element:', datakey, el)
         }
 
-        var $options
+        var $options, field, alias
 
+        // TODO: this should be in the block, not here
         if (type === 'multi') {
             var field = $el.attr('field')
-            if (!field) return error('Missing [field] attribute value in element:', type, el)
+            if (!field) return error('Missing [field] attribute value in element:', el)
             // check if options div already exists
             $options = $el.closest('[page]').find('[options='+ field +']')
             if (!$options.length) {
@@ -915,8 +919,12 @@ var rasti = function() {
             $options = $el
         }
 
+        is.function(data)
+            ? data(applyTemplate)
+            : applyTemplate(data)
+        
         function applyTemplate(data) {
-            $options.html( block.template(data) )
+            $options.html( block.template(data, $el) )
 
             if (invalidData) {
                 var field = $el.attr('field'),
@@ -926,9 +934,6 @@ var rasti = function() {
             }
         }
 
-        is.function(data)
-            ? data(applyTemplate)
-            : applyTemplate(data)
 
     }
 
@@ -1097,7 +1102,7 @@ var rasti = function() {
     function checkData(data) {
         switch (typeof data) {
         case 'string':
-            data = {value: data, label: data}
+            data = {value: data, label: data, alias: data}
             break
         case 'object':
             if (!data.value || !data.label) {
