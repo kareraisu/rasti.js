@@ -543,14 +543,6 @@ var rasti = function() {
                 if ( sameType(self.options[name], options[name]) ) self.options[name] = options[name]
             })
         }
-
-
-        // define root page (if not already defined)
-        if (!self.options.root) {
-            keys = Object.keys(self.pages)
-            if (keys.length) self.options.root = keys[0]
-            else return error('Root page is not defined')
-        }
         
 
         // define lang (if not already defined)
@@ -720,9 +712,9 @@ var rasti = function() {
         }
 
 
-        // nav to page in hash or to root
-        var page = location.hash.substring(1)
-        navTo(page && self.pages[page] ? page : self.options.root)
+        // nav to page in hash or to root or to first page container
+        var page = location.hash.substring(1) || self.options.root
+        navTo(page && self.pages[page] ? page : $('[page]').first().attr('page'))
 
 
         $(document).trigger('rasti-ready')
@@ -765,7 +757,6 @@ var rasti = function() {
         var page = self.pages[pagename],
             $page = $('[page='+ pagename +']')
 
-        if (!page) return error('Page [%s] not found', pagename)
         if (!$page) return error('Page [%s] container not found', pagename)
         
         self.activePage = $page

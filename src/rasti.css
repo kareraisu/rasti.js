@@ -183,6 +183,7 @@ input {
     align-items: center;
     flex: 1 1 auto;
     min-width: 50px;
+    max-width: 120px;
     padding: 5px;
     font-size: 1.2em;
     line-height: 1;
@@ -515,7 +516,7 @@ input[type="checkbox"]:checked + label:before {
     align-content: flex-start;
 }
 [columns-2]>*, .columns-2>* {
-    width: 48%;
+    width: 49%;
     margin-right: 2%;
 }
 [columns-2]>*:nth-child(2n),
@@ -547,9 +548,6 @@ input[type="checkbox"]:checked + label:before {
 
 /* fx */
 
-[fx=stack] {
-    padding-top: 0 !important;
-}
 [fx=stack]:not([paging]) > *,
 [fx=stack][paging] > .results > * {
     opacity: 0;

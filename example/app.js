@@ -42,10 +42,6 @@ app.config({
 
     pages : {
 
-        landing : {
-
-        },
-
         results : {
 
             url : 'results',
@@ -58,12 +54,10 @@ app.config({
             },
 
             nav : function(params) {
-
                 if (params) {
                     app.get('name=iam').html(params.iam)
                     app.set('field=guess', params.guess)
                 }
-
             },
 
         },
@@ -223,7 +217,9 @@ app.config({
             data : 'Data',
             get_results : 'SHOW RESULTS',
             results : 'RESULTS',
+            results_2 : 'AWESOME RESULTS',
             lang : 'Language',
+            filter_text : 'Start typing a name!',
             tips : 'Try adding some folks to the party and then click the big button (you might want to extend the max party size first)',
         },
         es : {
@@ -246,7 +242,9 @@ app.config({
             data : 'Datos',
             get_results : 'MOSTRAR RESULTADOS',
             results : 'RESULTADOS',
+            results_2 : 'RESULTADOS ASOMBROSOS',
             lang : 'Idioma',
+            filter_text : 'Empezá a escribir un nombre!',
             tips : 'Probá agregando gente al grupo y luego clickeá el botón grande (puede que quieras extender el tamaño del grupo antes)',
         },
     }
