@@ -97,17 +97,20 @@ app.config({
 
         doSomethingAndAlso : function(data) {
             if (app.utils.chatting) return
-                app.get('tab-label="1"').click()
+            
+            app.get('tab-label="1"').click()
+            console.group('chatting')
             app.utils.chatting = true
+
             var lines = [
                 'do sth besides rendering cards? ok, lets see...', '',
-                '    2 + 2 =', 2+2,
-                '    ... thats basic', '',
-                '    the value of pi is', Math.PI,
-                '    ... mmm i like pie', '',
-                '    typeof [] == "%s"', typeof [],
-                '    ... of course', '',
-                '    wait what?', `
+                '2 + 2 =', 2+2,
+                '... thats basic', '',
+                'the value of pi is', Math.PI,
+                '... mmm i like pie', '',
+                'typeof [] == "%s"', typeof [],
+                '... of course', '',
+                'wait what?', `
 
               ( |\\  //|
                \\|\\\\//\\|
@@ -116,13 +119,17 @@ app.config({
                  > "<  
             `
             ]
+
             function chat(){
                 console.log(lines.shift(), lines.shift())
                 if (lines.length) setTimeout(chat, 2000)
-                else app.utils.chatting = false
+                else {
+                    console.groupEnd('chatting')
+                    app.utils.chatting = false
+                }
             }
-            chat()
 
+            chat()
         },
 
     },

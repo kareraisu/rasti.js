@@ -152,16 +152,19 @@ input {
 }
 
 
-[template] .results {
+[template] > .results {
     max-height: calc(100% - 40px);
     margin: 0 -15px;
     padding: 0 15px;
 }
-[template] .controls {
+[template] > .controls {
     height: 60px;
     padding: 15px;
     color: #fff;
     text-align: center;
+}
+[template] > .stats {
+    font-size: 1.1em;
 }
 
 

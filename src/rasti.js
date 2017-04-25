@@ -22,10 +22,11 @@ var rasti = function() {
     // config objects
 
     this.options = {
-        log   : true,
         root  : '',
-        theme : 'base',
         lang  : '',
+        log   : true,
+        theme : 'base',
+        stats : '%n results in %t seconds',
     }
 
     this.pages = {}
@@ -627,7 +628,8 @@ var rasti = function() {
                 method = $el.attr('submit'),
                 callback = $el.attr('then'),
                 template = $el.attr('render'),
-                isValidCB = callback && is.function(self.utils[callback])
+                isValidCB = callback && is.function(self.utils[callback]),
+                start = window.performance.now(), end
 
             if (!method) return error('Plase provide an ajax method in [submit] attribute')
 
@@ -636,8 +638,13 @@ var rasti = function() {
             $el.addClass('loading').attr('disabled', true)
 
             submitAjax(method, function(resdata){
+                end = window.performance.now()
+                var time = Math.floor(end - start) / 1000
+                log('Ajax method [%s] took %s seconds', method, time)
+
                 if (isValidCB) self.utils[callback](resdata)
-                if (template) render(template, resdata, $el)
+                if (template) render(template, resdata, time)
+
                 $el.removeClass('loading').removeAttr('disabled')
             })
         })
@@ -784,7 +791,7 @@ var rasti = function() {
     }
 
 
-    function render(name, data) {
+    function render(name, data, time) {
         var template = self.templates[name]
         if (!template) return error('Template [%s] is not defined', name)
 
@@ -803,6 +810,11 @@ var rasti = function() {
 
         var paging = $el.attr('paging')
         paging ? initPager($el, data) : $el.html( template(data) )
+        if (el.hasAttribute('stats')) {
+            var stats = $('<div section class="stats">')
+            stats.html( app.options.stats.replace('%n', data.length).replace('%t', time) )
+            $el.prepend(stats)
+        }
 
         var fxkey = $el.attr('fx')
         if (fxkey) {
