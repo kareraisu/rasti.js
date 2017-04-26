@@ -952,9 +952,11 @@ var rasti = function() {
     // internal utils
 
     function createTabs($el) {
-        var $tabs = $el.children(':not(.page-options)'),
+        var el = $el[0],
+            $tabs = $el.children(':not(.page-options)'),
             $labels = $('<div class="tab-labels">'),
-            $tab, label
+            $bar = $('<div class="bar">'),
+            $tab, label, position
 
         $tabs.each(function(i, tab){
             $tab = $(tab)
@@ -964,7 +966,7 @@ var rasti = function() {
             $labels.append($(`<div tab-label=${i} text="${ label }">`))
         })
 
-        $labels.append('<div class="bar">').appendTo($el)
+        $labels.append($bar).appendTo($el)
 
         $labels.on('click', function(e){
             var $label = $(e.target),
@@ -972,24 +974,26 @@ var rasti = function() {
                 $tab = $tabs.filter(`[tab="${ tabnr }"]`)
 
             $tabs.removeClass('active')
-            $tab.addClass('active')
+            $tab.addClass('active')[0].scrollIntoView()
 
             $labels.children().removeClass('active')
             $label.addClass('active')
-
-            $labels.find('.bar').css({
-                width : $label.css('width'),
-                left : $label[0].getBoundingClientRect().left
-            })
+            
         })
 
-        $(document).on('rasti-ready', function(e){ 
-            $bar.css({ width : $el[0].offsetWidth / $tabs.length })
+        $el.on('scroll', function(e){
+            position = el.scrollLeft / el.scrollWidth
+            $bar.css({ left : position * el.offsetWidth })
+        })
+
+        $(document).on('rasti-ready', function(e){
+            $bar.css({ width : el.offsetWidth / $tabs.length })
             $labels.children().first().click()
         })
 
-        screen.addEventListener('orientationchange', function () {
-            $bar.css({ width : $el[0].offsetWidth / $tabs.length })
+        $(window).on('resize', function (e) {
+            $labels.find('.active').click()
+            $bar.css({ width : el.offsetWidth / $tabs.length })
         })
 
     }

@@ -23,6 +23,7 @@ input {
     position: relative;
     height: 100vh;
     width: 100vw;
+    margin-bottom: -5px;
 }
 [page]:not(.active) {
 	display: none !important;
@@ -170,10 +171,11 @@ input {
 
 [tabs] > .tab-labels {
     display: none;
+    justify-content: space-around;
+    white-space: nowrap;
     position: fixed;
     top: 0;
     min-width: 100vw;
-    white-space: nowrap;
     height: 40px;
     padding: 0;
     border-bottom: 1px solid rgba(0,0,0, 0.2);
@@ -197,6 +199,7 @@ input {
 [tabs] > .tab-labels > .bar {
     position: absolute;
     bottom: 0;
+    left: 0;
     height: 4px;
     transition: left 0.2s, width 0.2s;
 }
@@ -448,6 +451,11 @@ input[type="checkbox"]:checked + label:before {
     margin: auto !important;
 }
 
+[center-content] {
+    padding-left: 20%;
+    padding-right: 20%;
+}
+
 [left], .left,
 [left_]>*, .left_>* {
     position: absolute;
@@ -616,8 +624,9 @@ input[type="checkbox"]:checked + label:before {
 
     [page]{
         display: inline-block;
-        width: auto !important;
         white-space: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
     }
     [page][header] {
         padding-top: 80px;
@@ -639,11 +648,11 @@ input[type="checkbox"]:checked + label:before {
     [panel] {
         display: inline-block;
         position: relative;
-        height: 100vh;
-        width: 80vw;
-        margin-left: 10vw !important;
-        margin-right: 10vw;
+        width: 100vw;
         border-radius: 0;
+        margin-bottom: 0;
+        margin-left: auto !important;
+        margin-right: auto;
         vertical-align: top;
     }
 
@@ -651,12 +660,11 @@ input[type="checkbox"]:checked + label:before {
         display: flex;
     }
     [tabs=tablet] > [tab] {
-        display: none;
         height: calc(100% - 40px);
         margin-top: 40px !important;
     }
     [tabs=tablet] > .active {
-        display: block;
+        display: inline-block;
     }
 
 
@@ -668,8 +676,6 @@ input[type="checkbox"]:checked + label:before {
 
     [panel] {
         width: 100vw;
-        margin-left: 0 !important;
-        margin-right: 0;
     }
 
     [template] .controls .columns,
@@ -709,6 +715,11 @@ input[type="checkbox"]:checked + label:before {
     }
     [header][hide-header-phone]:before {
         display: none;
+    }
+
+    [center-content-phone] {
+        padding-left: 20%;
+        padding-right: 20%;
     }
 
 
