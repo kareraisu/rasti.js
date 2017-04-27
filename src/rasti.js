@@ -983,7 +983,15 @@ var rasti = function() {
             })
         })
 
-        $(document).on('rasti-ready', function(e){ $labels.children().first().click() })
+        $(document).on('rasti-ready', function(e){ 
+            $bar.css({ width : $el[0].offsetWidth / $tabs.length })
+            $labels.children().first().click()
+        })
+
+        screen.addEventListener('orientationchange', function () {
+            $bar.css({ width : $el[0].offsetWidth / $tabs.length })
+        })
+
     }
     
 
