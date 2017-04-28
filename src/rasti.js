@@ -725,6 +725,10 @@ var rasti = function() {
 
 
         $(document).trigger('rasti-ready')
+
+
+        if ( onMobile() && window.confirm('Go fullscreen?') ) toggleFullScreen()
+
     }
 
 
@@ -946,6 +950,17 @@ var rasti = function() {
         }
 
 
+    }
+
+
+    function toggleFullScreen() {
+      if (!document.mozFullscreenElement) {
+          document.documentElement.mozRequestFullScreen();
+      } else {
+        if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        }
+      }
     }
 
 
@@ -1346,6 +1361,7 @@ var rasti = function() {
         setLang : setLang,
         setTheme : setTheme,
         updateBlock : updateBlock,
+        toggleFullScreen : toggleFullScreen,
     }
 
 }
