@@ -727,7 +727,7 @@ var rasti = function() {
         $(document).trigger('rasti-ready')
 
 
-        if ( onMobile() && window.confirm('Go fullscreen?') ) toggleFullScreen()
+        if ( window.confirm('Go fullscreen?') ) toggleFullScreen()
 
     }
 
