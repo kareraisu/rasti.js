@@ -713,7 +713,7 @@ var rasti = function() {
         // bind nav handler to popstate event
         window.onpopstate = function(e) {
             var page = e.state || location.hash.substring(1)
-            page && self.pages[page]
+            page
                 ? e.state ? navTo(page, null, true) : navTo(page)
                 : navTo(self.options.root)
         }
@@ -726,8 +726,6 @@ var rasti = function() {
 
         $(document).trigger('rasti-ready')
 
-
-        if ( window.confirm('Go fullscreen?') ) toggleFullScreen()
 
     }
 
@@ -782,6 +780,8 @@ var rasti = function() {
 
         $('[page].active').removeClass('active')
         self.activePage.addClass('active')
+
+        $(document).trigger('rasti-nav')
 
         if (skipPushState) return
         if (page && page.url) {
@@ -953,14 +953,17 @@ var rasti = function() {
     }
 
 
-    function toggleFullScreen() {
-      if (!document.mozFullscreenElement) {
-          document.documentElement.mozRequestFullScreen();
-      } else {
-        if (document.mozCancelFullScreen) {
-          document.mozCancelFullScreen();
-        }
-      }
+    function toggleFullScreen(e) {
+        var prefixes = 'moz webkit'.split(' ')
+        prefixes.forEach(function(p){
+            if ( ! (p + 'FullscreenElement' in document) ) return
+            if ( !document[ p + 'FullscreenElement' ]) {
+                document.documentElement[ p + 'RequestFullScreen' ]();
+            }
+            else if (document[ p + 'CancelFullScreen' ]) {
+                document[ p + 'CancelFullScreen' ]();
+            }
+        })
     }
 
 
@@ -1001,15 +1004,22 @@ var rasti = function() {
             $bar.css({ left : position * el.offsetWidth })
         })
 
-        $(document).on('rasti-ready', function(e){
+        $(document).on('rasti-nav', function(e){
+            if (!isInActivePage($el)) return
             $bar.css({ width : el.offsetWidth / $tabs.length })
-            $labels.children().first().click()
+            if (!$labels.children('.active').length) $labels.children().first().click()
         })
 
         $(window).on('resize', function (e) {
+            if (!isInActivePage($el)) return
             $labels.find('.active').click()
             $bar.css({ width : el.offsetWidth / $tabs.length })
         })
+
+        function isInActivePage($el) {
+            return self.activePage.find($el).length
+                || self.activePage.attr('page') === $el.attr('page')
+        }
 
     }
     

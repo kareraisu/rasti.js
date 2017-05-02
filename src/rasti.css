@@ -556,6 +556,13 @@ input[type="checkbox"]:checked + label:before {
     font-size: large;
 }
 
+[icon], .icon {
+    border: 1px solid #000;
+    font-size: 2em;
+    line-height: 1;
+    z-index: 10;
+}
+
 
 /* fx */
 

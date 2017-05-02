@@ -2,8 +2,9 @@
 
 "name": "rasti.js example proyotype",
 "short_name": "rasti.js demo",
-"start_url": ".",
+"start_url": "/?pwa",
 "display": "fullscreen",
-"background_color": "#fff"
+"background_color": "#000",
+"theme_color": "#000"
 
 }
