@@ -1,0 +1,38 @@
+{
+  "engines": {
+    "node": "6.9.0"
+  },
+  "name": "rasti.js",
+  "version": "1.0.0",
+  "description": "a simple webapp prototyping framework",
+  "main": "server.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kareraisu/rasti.js.git"
+  },
+  "keywords": [
+    "simple",
+    "webapp",
+    "prototyping",
+    "framework"
+  ],
+  "author": "kareraisu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kareraisu/rasti.js/issues"
+  },
+  "homepage": "https://github.com/kareraisu/rasti.js#readme",
+  "dependencies": {
+    "express": "^4.15.2"
+  },
+  "devDependencies": {
+    "babili": "0.0.12",
+    "gulp": "^3.9.1"
+  }
+}
