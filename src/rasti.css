@@ -18,9 +18,12 @@ input {
     vertical-align: text-bottom;
 }
 
+[page], [panel], [section] {
+    position: relative;
+    overflow: hidden;    
+}
 
 [page] {
-    position: relative;
     height: 100vh;
     width: 100vw;
     margin-bottom: -5px;
@@ -31,7 +34,6 @@ input {
 
 
 [panel] {
-    position: relative;
     margin: 20px 15px;
     padding: 20px 15px;
     border-radius: 4px;
@@ -42,7 +44,6 @@ input {
 
 
 [section] {
-    position: relative;
     margin-bottom: 15px;
     padding: 10px;
     border-radius: 4px;
@@ -100,14 +101,14 @@ input {
 }
 [btn], .btn {
     height: 50px;
+    border: 1px solid rgba(0,0,0,0.1);
     font-size: 1.2em;
 	cursor: pointer;
 }
 [btn]:not(:disabled):hover, .btn:not(:disabled):hover {
     filter: contrast(1.5);
 }
-[btn][disabled], .btn[disabled],
-[rasti=buttons] div {
+[btn][disabled], .btn[disabled]{
     filter: contrast(0.5);
 }
 [btn][disabled], .btn[disabled] {
@@ -255,7 +256,6 @@ input {
     position: absolute;
     height: 20px;
     font-size: 1.2em;
-    color: #eee;
 }
 [label][field]:before {
     margin-top: -27px;

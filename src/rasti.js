@@ -51,13 +51,16 @@ var rasti = function() {
         base : {
             font : 'normal 14px sans-serif',
             palette : {
-                white  : '#fff',
-                light  : '#ddd',
-                mid    : '#999',
-                dark   : '#444',
-                darker : '#222',
-                detail : 'darkcyan',
-                alpha  : 'rgba(255,255,255,0.1)',
+                white   : '#fff',
+                lighter : '#ddd',
+                light   : '#bbb',
+                mid     : '#888',
+                dark    : '#444',
+                darker  : '#222',
+                black   : '#000',
+                detail  : 'darkcyan',
+                lighten : 'rgba(255,255,255,0.1)',
+                darken  : 'rgba(0,0,0,0.1)',
             },
         },
 
@@ -67,24 +70,24 @@ var rasti = function() {
     this.themeMaps = {
 
         dark : {
-            page    : 'darker detail',
-            panel   : 'dark alpha',
-            section : 'mid alpha',
-            field   : 'light dark',
-            btn     : 'detail dark',
-            header  : 'darker',
-            label   : 'darker',
-            text    : 'darker',
+            page    : 'darker lighten',   // bg, header bg
+            panel   : 'dark lighten', // bg, header bg
+            section : 'mid lighten',   // bg, header bg
+            field   : 'light darker',  // bg, text
+            btn     : 'detail darker', // bg, text
+            header  : 'darker',        // text
+            label   : 'darker',        // text
+            text    : 'darker',        // text
         },
 
         light : {
-            page    : 'white detail',
-            panel   : 'mid alpha',
-            section : 'light alpha',
-            field   : 'white dark',
+            page    : 'lighter darken',
+            panel   : 'mid lighten',
+            section : 'light darken',
+            field   : 'lighter dark',
             btn     : 'detail light',
-            header  : 'white',
-            label   : 'dark',
+            header  : 'dark',
+            label   : 'mid',
             text    : 'dark',
         },
         
@@ -130,13 +133,20 @@ var rasti = function() {
                 })
             },
             style : `
-                [rasti=buttons]>div {
+                [rasti=buttons] > div {
                     display: inline-block;
                     margin: 5px !important;
                     padding: 5px 10px;
                     border-radius: 6px;
-                    border-bottom: 2px solid gray;
+                    border: 2px outset rgba(255, 255, 255, 0.5);
+                    background-clip: padding-box;
                     cursor: pointer;
+                }
+                [rasti=buttons] > div.active {
+                    filter: contrast(1.5);
+                    border-style: inset;
+                    padding: 4px 11px 6px 9px;
+                    transform: translateY(-1px);
                 }
             `
         },
@@ -834,24 +844,40 @@ var rasti = function() {
         var themeName = themeString.split(' ')[0],
             theme = self.themes[themeName]
 
-        if (!theme) return log('Theme [%s] not found', themeName)
+        if (!theme) return error('Theme [%s] not found', themeName)
 
         var mapName = themeString.split(' ')[1] || ( is.object(theme.maps) && Object.keys(theme.maps)[0] ) || 'dark',
             themeMap = ( is.object(theme.maps) && theme.maps[mapName] ) || self.themeMaps[mapName]
+
+        if (!themeMap) return error('Theme map [%s] not found', mapName)
 
         log('Setting theme [%s:%s]', themeName, mapName)
         self.activeTheme = theme
         
         var values = {
-            font : theme.font,
-        }, colors, bg, text
+            font : theme.font || self.themes.base.font,
+        }, colorNames, colors, c1, c2, defaultColorName
+
         // map palette colors to attributes
         for (var attr of Object.keys(themeMap)) {
-            [bg, text] = themeMap[attr].split(' ')
-            colors = [theme.palette[ bg ], theme.palette[ text ]]
-            if (!bg) error('Mapping error in theme [%s]. Palette does not contain color [%s]', themeName, bg)
-            else values[attr] = colors
+            if (!self.themeMaps.dark[attr]) return error('Mapping error in theme [%s]. Incorrect theme map property [%s]', themeName, attr)
+
+            colorNames = [c1, c2] = themeMap[attr].split(' ')
+            colors = [theme.palette[ c1 ], theme.palette[ c2 ]]
+
+            for (var i in colors) {
+                defaultColorName = self.themeMaps.dark[attr].split(' ')[i]
+                if (defaultColorName && !colors[i]) {
+                    colors[i] = self.themes.base.palette[ colorNames[i] ]
+                    if (!colors[i]) {
+                        warn('Mapping error in theme [%s] for attribute [%s]. Color [%s] not found. Falling back to default color [%s].', themeName, attr, colorNames[i], defaultColorName)
+                        colors[i] = self.themes.base.palette[ defaultColorName ]
+                    }
+                }
+            }
+            values[attr] = colors
         }
+
         // generate theme style and apply it
         $('style[theme]').html( getThemeStyle(values) )
 
@@ -1198,13 +1224,13 @@ var rasti = function() {
                 color: ${ values.field[1] };
             }
 
-            [btn], .btn, [rasti=buttons] div.active {
+            [btn], .btn, [rasti=buttons] > div {
                 background-color: ${ values.btn[0] };
                 color: ${ values.btn[1] }; 
             }
 
             [header]:before { color: ${ values.header[0] }; }
-            [label]:before  { color: ${ values.label[0] }; }
+            [label]:not([header]):before  { color: ${ values.label[0] }; }
             `
     }
 
