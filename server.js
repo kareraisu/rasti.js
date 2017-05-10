@@ -6,7 +6,7 @@ const app = express()
 
 app.use('/', express.static(__dirname + '/example'))
 app.use('/lib', express.static(__dirname + '/lib'))
-app.use('/src', express.static(__dirname + '/src'))
+app.use('/dist', express.static(__dirname + '/dist'))
 
 app.get('/', function (req, res) {
   res.sendFile('index.html')
