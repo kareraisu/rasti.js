@@ -10,6 +10,7 @@
     "example": "example"
   },
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -32,10 +33,14 @@
     "express": "^4.15.2"
   },
   "devDependencies": {
-    "clean-tagged-string": "0.0.4",
+    "browserify": "^14.3.0",
     "gulp": "^3.9.1",
     "gulp-babili": "0.0.2",
     "gulp-clean-css": "^3.2.0",
-    "gulp-trimlines": "^1.0.1"
+    "gulp-rename": "^1.2.2",
+    "gulp-trimlines": "^1.0.1",
+    "gulp-util": "^3.0.8",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0"
   }
 }
