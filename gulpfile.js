@@ -3,8 +3,11 @@ const gutil = require('gulp-util')
 const rename = require('gulp-rename')
 
 const browserify = require('browserify')
+const exorcist = require('exorcist')
+
 const source = require('vinyl-source-stream')
 const buffer = require('vinyl-buffer')
+//const vinylize = require('vinyl-transform')
 
 const babili = require('gulp-babili')
 const cleanCSS = require('gulp-clean-css')
@@ -20,12 +23,16 @@ const p = gulp.parallel
 
 function bundle() {
     return browserify({
-      entries: ['src/rasti.js'],
-      standalone: 'rasti', // create var in global namespace (window)
-      debug: true,         // create inline sourcemaps
+        entries: ['src/rasti.js'],
+        standalone: 'rasti', // create an umd module (which, when loaded in a browser, registers in the global namespace (window))
+        debug: true,         // create inline sourcemaps
     })
     .bundle()
-    .on('error', gutil.log.bind(gutil, 'Browserify Error'))
+    .pipe(exorcist('dist/rasti.map'))
+    .on('error', function(err) {
+        gutil.log(err.stack)
+        this.emit('end') // end this stream here so gulp doesn't crash
+    })
     .pipe(source('rasti.js')) // turn browserify's text stream into gulp's vinyl stream
     .pipe(buffer())           // turn stream into buffer (expected by some gulp plugins, i.e. babili)
 }
@@ -39,6 +46,7 @@ gulp.task('bundle', () =>
 
 gulp.task('minify-js', () =>
     bundle()
+    //.pipe(vinylize(() => exorcist('dist/rasti.min.map')))
     // uglify
     .pipe(babili({
         mangle: { keepClassNames: true }
@@ -77,7 +85,7 @@ gulp.task('live-reload', (done) => {
 
 
 gulp.task('watch-src', (done) => {
-    gulp.watch('src/**/*.js', s('minify-js'))
+    gulp.watch('src/**/*.js', s('bundle'/*, 'minify-js'*/))
     gulp.watch('src/**/*.css', s('minify-css'))
     done()
 })
@@ -98,10 +106,12 @@ gulp.task('watch-app', (done) => {
 })
 
 
-gulp.task('watch', s('live-reload', p('watch-src', 'watch-dist', 'watch-app')))
+gulp.task('watch', p('watch-src', 'watch-dist', 'watch-app'))
 
 
-gulp.task('default', s('minify', 'watch'))
+gulp.task('default', s('live-reload', 'watch'))
+
+
 
 
 /* for AMD modules
