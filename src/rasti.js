@@ -25,7 +25,7 @@ module.exports = function rasti() {
     this.options = {
         root  : '',
         lang  : '',
-        log   : true,
+        log   : false,
         theme : 'base',
         stats : '%n results in %t seconds',
     }
@@ -71,14 +71,14 @@ module.exports = function rasti() {
     this.themeMaps = {
 
         dark : {
-            page    : 'darker lighten',   // bg, header bg
-            panel   : 'dark lighten', // bg, header bg
-            section : 'mid lighten',   // bg, header bg
-            field   : 'light darker',  // bg, text
-            btn     : 'detail darker', // bg, text
-            header  : 'darker',        // text
-            label   : 'darker',        // text
-            text    : 'darker',        // text
+            page    : 'darker lighten', // bg, header bg
+            panel   : 'dark lighten',   // bg, header bg
+            section : 'mid lighten',    // bg, header bg
+            field   : 'light darker',   // bg, text
+            btn     : 'detail darker',  // bg, text
+            header  : 'darker',         // text
+            label   : 'darker',         // text
+            text    : 'darker',         // text
         },
 
         light : {
