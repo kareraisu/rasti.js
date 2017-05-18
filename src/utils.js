@@ -40,6 +40,13 @@ function checkData(data) {
 }
 
 
+function rastiError(msg, ...args){
+    this.msg = msg
+    this.el = args.pop()
+    this.args = args
+}
+
+
 function random() {
     return (Math.random() * 6 | 0) + 1
 }
@@ -57,4 +64,5 @@ module.exports = {
 	checkData : checkData,
 	random : random,
 	onMobile : onMobile,
+    rastiError : rastiError,
 }

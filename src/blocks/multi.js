@@ -105,7 +105,7 @@ init : function($el) {
         if (isFull) {
             if (dif > 0) {
                 el.value = el.value.slice(0, qty)
-                throw warn('Dropped %s overflowed values in el:', dif, el)
+                rasti.warn('Dropped %s overflowed values in el:', dif, el)
             }
             $el.addClass('full')
             if ( utils.onMobile() ) $options.parent().removeClass('backdrop')

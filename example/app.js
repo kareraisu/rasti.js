@@ -1,5 +1,9 @@
 app.config({
 
+    state : {
+
+    },
+
     data : {
 
         iam : [
@@ -267,10 +271,11 @@ app.data.langs = Object.keys(app.langs)
 
 
 app.init({
-    //log : false,
+    log : true,
     //root : 'results',
     theme : 'Weltall',
     //lang : 'es',
+    state : true,
 })
 
 

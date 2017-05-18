@@ -109,7 +109,7 @@ gulp.task('watch-app', (done) => {
 gulp.task('watch', p('watch-src', 'watch-dist', 'watch-app'))
 
 
-gulp.task('default', s('live-reload', 'watch'))
+gulp.task('default', s('bundle', 'live-reload', 'watch'))
 
 
 
