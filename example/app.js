@@ -141,19 +141,17 @@ app.config({
 
     templates : {
         cards : function (results) {
-            var html = ''
-            for (var obj of results) {
-                html += `
+            return results.map(function(obj){ return `
                 <div class="card row" section="section">
                     <div class="photo col-2" style="background-image: url(http://shrines.rpgclassics.com/psx/xeno/images/${obj.img}"></div>
                     <div class="col-10">
                         <div class="name">${obj.name}</div>
                         <div class="row">
                             <div class="labels col-4">
-                                <em>Occupation:</em><br/>
-                                <em>Location:</em><br/>
-                                <em>Weapon:</em><br/>
-                                <em>Email:</em>
+                                <em text="occupation">:</em><br/>
+                                <em text="location">:</em><br/>
+                                <em text="weapon">:</em><br/>
+                                <em text="email">:</em>
                             </div>
                             <div class="values col-8">
                                 ${obj.occupation}<br/>
@@ -164,9 +162,7 @@ app.config({
                         </div>
                     </div>
                 </div>
-                `
-            }
-            return html
+                ` }).join()
         },
 
     },
@@ -232,8 +228,14 @@ app.config({
             lang : 'Language',
             filter_text : 'Start typing a name!',
             tips : 'Try adding some folks to the party and then click the big button (you might want to extend the max party size first)',
+            occupation : 'Occupation',
+            location : 'Location',
+            weapon : 'Weapon',
+            email : 'Email',
         },
         es : {
+            rasti_stats : '%n resultados en %t segundos',
+            rasti_noData : 'No se encontraron resultados',
             title : 'prototipo ejemplo de rasti.js',
             guess : 'Adiviná la referencia!',
             iam : 'Yo soy',
@@ -257,6 +259,10 @@ app.config({
             lang : 'Idioma',
             filter_text : 'Empezá a escribir un nombre!',
             tips : 'Probá agregando gente al grupo y luego clickeá el botón grande (puede que quieras extender el tamaño del grupo antes)',
+            occupation : 'Ocupación',
+            location : 'Ubicación',
+            weapon : 'Arma',
+            email : 'Email',
         },
     }
 

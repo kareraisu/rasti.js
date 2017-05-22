@@ -32,7 +32,11 @@ module.exports = function(name) {
         root  : '',
         theme : 'base',
         lang  : '',
+    }
+
+    this.defaults = {
         stats : '%n results in %t seconds',
+        noData : 'No data available',
     }
 
     this.state = {}
@@ -172,13 +176,19 @@ module.exports = function(name) {
 
     function init(options) {
 
-        // cache options (if applicable)
+        // cache options
         if ( !is.object(options) ) warn('Init options must be an object')
-        else Object.keys(self.options).forEach(function(name){
-            if (options[name]) {
-                if ( !sameType(self.options[name], options[name])  ) warn('Init option [%s] is invalid', name)
-                else self.options[name] = options[name]
+        else Object.keys(self.options).forEach(function(key){
+            if (options[key]) {
+                if ( !sameType(self.options[key], options[key])  ) warn('Init option [%s] is invalid', key)
+                else self.options[key] = options[key]
             }
+        })
+
+
+        // apply defaults
+        Object.keys(self.defaults).forEach(function(key){
+            if (!self.options[key]) self.options[key] = self.defaults[key]
         })
         
 
@@ -491,13 +501,13 @@ module.exports = function(name) {
             if (!data) return error('Undefined data source "%s" in [data] attribute of element:', datakey, el)
         }
 
-        if (!data.length) return $el.html('<div msg center textc>NO RESULTS</div>')
+        if (!data.length) return $el.html(`<div msg center textc>${ self.options.noData }</div>`)
 
         var paging = $el.attr('paging')
         paging ? initPager($el, data) : $el.html( template(data) )
         if (el.hasAttribute('stats')) {
             var stats = $('<div section class="stats">')
-            stats.html( app.options.stats.replace('%n', data.length).replace('%t', time) )
+            stats.html( self.options.stats.replace('%n', data.length).replace('%t', time) )
             $el.prepend(stats)
         }
 
@@ -593,6 +603,10 @@ module.exports = function(name) {
                     ? $el.text(string || keys[attr])
                     : string ? $el.attr(attr, string) : null
             }
+        })
+
+        Object.keys(self.defaults).forEach(function(key){
+            self.options[key] = lang['rasti_'+key] || self.defaults[key]
         })
     }
 
