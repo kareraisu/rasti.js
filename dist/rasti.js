@@ -951,8 +951,17 @@ module.exports = function(name) {
 
 
     function render(name, data, time) {
-        var template = self.templates[name]
+        var template = self.templates[name], html
         if (!template) return error('Template [%s] is not defined', name)
+
+        if (is.string(template)) {
+            html = template
+            template = function(data, lang) {
+                return data.map(function(obj){ return html }).join()
+            }
+        }
+
+        if (!is.function(template)) return error('Template [%s] must be a string or a function', name)
 
         var $el = $('[template='+ name +']')
         if (!$el.length) return error('No element bound to template [%s]. Please bind one via [template] attribute.', name)
@@ -968,7 +977,10 @@ module.exports = function(name) {
         if (!data.length) return $el.html(`<div msg center textc>${ self.options.noData }</div>`)
 
         var paging = $el.attr('paging')
-        paging ? initPager($el, data) : $el.html( template(data) )
+        var lang = self.langs && self.langs[self.active.lang]
+        paging
+            ? initPager($el, template, data, lang)
+            : $el.html( template(data, lang) )
         if (el.hasAttribute('stats')) {
             var stats = $('<div section class="stats">')
             stats.html( self.options.stats.replace('%n', data.length).replace('%t', time) )
@@ -1214,9 +1226,8 @@ module.exports = function(name) {
     }
 
 
-    function initPager($el, data) {
+    function initPager($el, template, data, lang) {
         var name = $el.attr('template'),
-            template = self.templates[name],
             fx = $el.attr('fx') && self.fx[$el.attr('fx')],
             page_size = parseInt($el.attr('paging')),
             pager = newPager(name, data, page_size),
@@ -1276,11 +1287,11 @@ module.exports = function(name) {
                 .addClass(this.value ? 'columns-' + this.value : '')
         })
 
-        $results.html(template( pager.next() ))
+        $results.html( template(pager.next(), lang) )
         $controls.find('.page').html(pager.page + '/' + pager.total)
 
         function update(data){
-            $results.html( template(data) )
+            $results.html( template(data, lang) )
             $controls.find('.page').html(pager.page + '/' + pager.total)
             if ( is.function(fx) ) fx($results)
         }

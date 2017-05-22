@@ -140,18 +140,18 @@ app.config({
 
 
     templates : {
-        cards : function (results) {
-            return results.map(function(obj){ return `
+        cards : function (data, lang) {
+            return data.map(function(obj){ return `
                 <div class="card row" section="section">
                     <div class="photo col-2" style="background-image: url(http://shrines.rpgclassics.com/psx/xeno/images/${obj.img}"></div>
                     <div class="col-10">
                         <div class="name">${obj.name}</div>
                         <div class="row">
                             <div class="labels col-4">
-                                <em text="occupation">:</em><br/>
-                                <em text="location">:</em><br/>
-                                <em text="weapon">:</em><br/>
-                                <em text="email">:</em>
+                                ${lang.occupation}:</em><br/>
+                                ${lang.location}:</em><br/>
+                                ${lang.weapon}:</em><br/>
+                                ${lang.email}:</em>
                             </div>
                             <div class="values col-8">
                                 ${obj.occupation}<br/>
