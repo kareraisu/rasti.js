@@ -20,6 +20,10 @@ const browserSync = require('browser-sync').create()
 const s = gulp.series
 const p = gulp.parallel
 
+const paths = {
+    app : 'demo',
+}
+
 
 function bundle() {
     return browserify({
@@ -68,16 +72,13 @@ gulp.task('minify-css', () =>
 )
 
 
-gulp.task('minify', p('minify-js', 'minify-css'))
-
-
 gulp.task('live-reload', (done) => {
     browserSync.init({
         server : true,
-        index  : 'example/index.html',
+        index  : paths.app + '/index.html',
         serveStatic: [{
             route : '',
-            dir   : 'example'
+            dir   : paths.app
         }],
     })
     done()
@@ -85,23 +86,20 @@ gulp.task('live-reload', (done) => {
 
 
 gulp.task('watch-src', (done) => {
-    gulp.watch('src/**/*.js', s('bundle'/*, 'minify-js'*/))
+    gulp.watch('src/**/*.js', s('bundle'))
     gulp.watch('src/**/*.css', s('minify-css'))
     done()
 })
 
 
 gulp.task('watch-dist', (done) => {
-    gulp.watch('dist/**/*.js').on('change', browserSync.reload)
-    gulp.watch('dist/**/*.css').on('change', browserSync.reload)
+    gulp.watch('dist/**/*.*').on('change', browserSync.reload)
     done()
 })
 
 
 gulp.task('watch-app', (done) => {
-    gulp.watch('example/**/*.js').on('change', browserSync.reload)
-    gulp.watch('example/**/*.css').on('change', browserSync.reload)
-    gulp.watch('example/**/*.html').on('change', browserSync.reload)
+    gulp.watch(paths.app + '/**/*.*').on('change', browserSync.reload)
     done()
 })
 
@@ -110,6 +108,9 @@ gulp.task('watch', p('watch-src', 'watch-dist', 'watch-app'))
 
 
 gulp.task('default', s('bundle', 'live-reload', 'watch'))
+
+
+gulp.task('prod', p('minify-js', 'minify-css'))
 
 
 

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>rasti.js demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <link rel="stylesheet" href="../dist/rasti.min.css">
+
+    <style>
+
+        /* card styles */
+
+        .card {
+            margin-bottom: 0;
+        }
+        .card .photo {
+            height: 100px;
+            width: 100px;
+            background-size: contain;
+            background-position-x: center;
+            background-repeat: no-repeat;
+        }
+        .card .name {
+            padding-bottom: 10px;
+            font-size: 1.5em;
+        }
+        .card .data {
+            max-width: 200px;
+        }
+        .card .values {
+            overflow-x: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* rasti styles overrides (try uncommenting this!) */
+        /*
+
+        [header]:before, [btn] {
+            text-transform: capitalize !important;
+        }
+
+        [label]:before {
+            text-transform: uppercase !important;
+        }
+
+        */
+
+    </style>
+
+</head>
+<body>
+
+    <div page="login" header="welcome" center-content>
+
+        <div panel inline>
+            <input type="text"
+                field="user"
+                label="username"
+                navparam="user"/>
+
+            <input type="password"
+                field="pass"
+                label="pass"/>
+
+            <button btn
+                nav="main" params
+                text="login"></button>
+        </div>
+
+    </div>
+
+
+
+    <div row page="main" header="main"
+        center-content
+        hide-header-phone>
+
+        <div col-4 panel header="filters"
+            ajax="getPeople"
+            state
+            scrolly
+            center-content-tablet>
+            <div section header="personal" inline>
+                <input type="text"
+                    field="name"
+                    label="name">
+            </div>
+
+            <div section header="work" inline>
+                <select field="skills"
+                    label="skills"
+                    data="skills"
+                    ></select>
+            </div>
+
+            <div section header="reqdata">
+                <textarea name="reqdata" field disabled
+                    style="height: 100px"></textarea>
+            </div>
+
+            <button btn
+                submit="getPeople"
+                render="cards"
+                text="search"></button>
+        </div>
+
+
+        <div col-8 panel header="results"
+            template="cards"
+            paging="4" columns stats
+            fx="stack">
+
+            <!-- here be cards! -->
+
+        </div>
+
+
+        <div section="user" fix top left></div>
+
+        <button btn nav="config" text="config"
+            ib small fix top right></button>
+
+    </div>
+
+
+
+    <div page="config"
+        center-content>
+
+        <div col-2 panel scrolly center-content-tablet>
+            <div section header="config">           
+                <div rasti="buttons"
+                    field="lang"
+                    data="langs"
+                    label="lang"
+                    onchange="app.setLang(this.value)"></div>
+
+                <div rasti="radios"
+                    field="theme"
+                    data="themes"
+                    label="theme"
+                    onchange="app.utils.applyTheme(this)"></div>
+
+                <div rasti="buttons"
+                    data="themeMaps"
+                    onchange="app.utils.applyTheme(this)"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <script src="../lib/zepto.min.js"></script>
+    <script src="../dist/rasti.js"></script>
+
+    <script>
+        var app = new rasti('demo')
+    </script>
+
+    <script src="extra/people.js"></script>
+    <script src="extra/utils.js"></script>
+    <script src="app.js"></script>
+
+    <script>
+        app.init({
+            log : 'DEBUG',
+            // root : 'main',
+            // state: true,
+        })
+    </script> 
+
+</body>
+</html>
