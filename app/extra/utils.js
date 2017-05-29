@@ -1,4 +1,6 @@
-app.config({
+var app = rasti.apps.demo
+
+props = {
 
 	themes : {
 
@@ -82,14 +84,11 @@ app.config({
 	    },
 
 	},
-})
 
-
-app.config({
 	data : {
 		langs : Object.keys(app.langs),
 		themes : Object.keys(app.themes),
 		themeMaps : Object.keys(app.themeMaps),
 	},
-})
+}
 

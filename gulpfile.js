@@ -21,7 +21,7 @@ const s = gulp.series
 const p = gulp.parallel
 
 const paths = {
-    app : 'demo',
+    app : 'app',
 }
 
 

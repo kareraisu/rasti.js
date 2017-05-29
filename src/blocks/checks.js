@@ -20,7 +20,7 @@ init : function($el) {
     $el.find('input').change(function(e) {
         var $el = $(this),
             val = $el.attr('value'),
-            values = $el.closest('[rasti=checks]')[0].value
+            values = $el.closest('[block=checks]')[0].value
         if ($el.prop('checked')) {
             values.push(val)
         }
@@ -43,7 +43,7 @@ init : function($el) {
 },
 
 style : `
-    [rasti=checks]>div {
+    [block=checks]>div {
         height: 24px;
         padding-top: 5px
     }

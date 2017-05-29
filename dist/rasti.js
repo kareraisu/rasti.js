@@ -35,7 +35,7 @@ init : function($el) {
 },
 
 style : `
-    [rasti=buttons] > div {
+    [block=buttons] > div {
         display: inline-block;
         margin: 5px !important;
         padding: 5px 10px;
@@ -44,7 +44,7 @@ style : `
         background-clip: padding-box;
         cursor: pointer;
     }
-    [rasti=buttons] > div.active {
+    [block=buttons] > div.active {
         filter: contrast(1.5);
         border-style: inset;
         padding: 4px 11px 6px 9px;
@@ -77,7 +77,7 @@ init : function($el) {
     $el.find('input').change(function(e) {
         var $el = $(this),
             val = $el.attr('value'),
-            values = $el.closest('[rasti=checks]')[0].value
+            values = $el.closest('[block=checks]')[0].value
         if ($el.prop('checked')) {
             values.push(val)
         }
@@ -100,7 +100,7 @@ init : function($el) {
 },
 
 style : `
-    [rasti=checks]>div {
+    [block=checks]>div {
         height: 24px;
         padding-top: 5px
     }
@@ -230,14 +230,14 @@ init : function($el) {
 },
 
 style : `
-    [rasti=multi] {
+    [block=multi] {
         position: relative;
         min-height: 35px;
         padding-right: 20px;
         text-shadow: 0 0 0 #000;
         cursor: pointer;
     }
-    [rasti=multi] [add] {
+    [block=multi] [add] {
         display: flex;
         align-items: center;
         position: absolute;
@@ -247,24 +247,24 @@ style : `
         width: 20px;
         border-left: 1px solid rgba(0,0,0,0.2);
     }
-    [rasti=multi] [add]:before {
+    [block=multi] [add]:before {
         content: '〉';
         padding-top: 2px;
         padding-left: 6px;
     }
-    [rasti=multi].open [add] {
+    [block=multi].open [add] {
         box-shadow: inset 0 0 2px #000;
     }
-    [rasti=multi].full {
+    [block=multi].full {
         padding-right: 5px;
     }
-    [rasti=multi].full [add] {
+    [block=multi].full [add] {
         display: none;
     }
-    [rasti=multi] option {
+    [block=multi] option {
         padding: 2px 0;
     }
-    [rasti=multi] option:before {
+    [block=multi] option:before {
         content: '✕';
         display: inline-block;
         box-sizing: border-box;
@@ -275,15 +275,15 @@ style : `
         text-align: center;
         line-height: 1.5;
     }
-    [rasti=multi] [selected] {
+    [block=multi] [selected] {
         max-height: 100px;
         overflow-y: auto;
     }
-    [rasti=multi] [selected]>option:hover:before {
+    [block=multi] [selected]>option:hover:before {
         color: #d90000;
         background-color: rgba(255, 0, 0, 0.5);
     }
-    [rasti=multi][options] {
+    [block=multi][options] {
         display: none;
         position: absolute;
         top: 0;
@@ -294,14 +294,14 @@ style : `
         z-index: 10;
         overflow-y: auto;
     }
-    [rasti=multi][options]>option:before {
+    [block=multi][options]>option:before {
         transform: rotate(45deg);
     }
-    [rasti=multi][options]>option:hover:before {
+    [block=multi][options]>option:hover:before {
         color: #008000;
         background-color: rgba(0, 128, 0, 0.5);
     }
-    [rasti=multi][options] input {
+    [block=multi][options] input {
         border: 1px solid #000;
         margin: 10px 0;
     }
@@ -330,7 +330,7 @@ template : function(data, $el) {
 init : function($el) {
     $el.find('input').change(function(e) {
         var $el = $(this)
-        $el.closest('[rasti=radios]').val($el.attr('value'))
+        $el.closest('[block=radios]').val($el.attr('value'))
     })
     $el.find('input +label').click(function(e) {
         var $el = $(this)
@@ -343,7 +343,7 @@ init : function($el) {
 },
 
 style : `
-    [rasti=radios]>div {
+    [block=radios]>div {
         height: 24px;
         padding-top: 5px
     }
@@ -462,22 +462,51 @@ style : `
 }
 
 },{"../utils":8}],7:[function(require,module,exports){
-var utils = require('./utils')
-var is = utils.is,
+(function (global){
+var utils = require('./utils'),
+    is = utils.is,
     type = utils.type,
     sameType = utils.sameType
 
+var options = {
+    persist : false,
+    history : false,
+    root    : '',
+    theme   : 'base',
+    lang    : '',
+    stats   : '%n results in %t seconds',
+    noData  : 'No data available',
+}
 
-module.exports = function(name) {
+var log = function (...params) {
+        if (rasti.options.log.search(/debug/i) != -1) console.log.call(this, ...params)
+    },
+    warn = function (...params) {
+        if (rasti.options.log.search(/(warn)|(debug)/i) != -1) console.warn.call(this, ...params)
+    },
+    error = function (...params) {
+        console.error.call(this, ...params)
+    }
 
+
+var rasti = function(name, container) {
+
+    this.name = name.replace(' ', '')
+
+    if ( !container ) {
+        container = $('body').attr('rasti', this.name)
+    }
+    else if ( !(container instanceof $) ) {
+        if ( is.string(container) || ('BODY DIV'.search(container.tagName) != -1) ) container = $(container)
+        else return error('Cannot create rasti app: app container is invalid. Please provide a selector string, a jQuery object ref or a DOM element ref')
+    }
+    
     var self = this
 
     var invalidData = 0
 
 
-    // internal properties
-
-    this.name = 'rasti.' + name.replace(' ', '')
+    // private properties  
 
     this.active = {
         page  : null,
@@ -488,19 +517,13 @@ module.exports = function(name) {
     this.pagers = new Map()
 
 
-    // config objects
+    // public properties
 
-    this.options = {
-        log   : false,
-        state : false,
-        root  : '',
-        theme : 'base',
-        lang  : '',
-    }
+    this.options = Object.assign({}, options)
 
     this.defaults = {
-        stats : '%n results in %t seconds',
-        noData : 'No data available',
+        stats : self.options.stats,
+        noData : self.options.noData,
     }
 
     this.state = {}
@@ -509,13 +532,13 @@ module.exports = function(name) {
         theme : { get : function() { return self.active.theme }, enumerable : true },
         lang  : { get : function() { return self.active.lang }, enumerable : true },
         save : { value : function() {
-            localStorage.setItem(self.name, JSON.stringify(self.state))
+            localStorage.setItem('rasti.' + self.name, JSON.stringify(self.state))
             log('State saved')
         } },
         get : { value : function() {
             var state
             try {
-                state = JSON.parse( localStorage.getItem(self.name) )
+                state = JSON.parse( localStorage.getItem('rasti.' + self.name) )
                 if ( !state ) log('No saved state found for app [%s]', self.name)
                 else if ( !is.object(state) ) invalid()
                 else return state
@@ -536,13 +559,13 @@ module.exports = function(name) {
                 }
                 if (state.theme) setTheme(state.theme)
                 if (state.lang) setLang(state.lang)
-                navTo(self.state.page)
+                navTo(state.page)
                 log('State restored')
             }
             return state
         } },
         clear : { value : function() {
-            localStorage.removeItem(self.name)
+            localStorage.removeItem('rasti.' + self.name)
         } },
     })
 
@@ -610,30 +633,13 @@ module.exports = function(name) {
         
     }
 
-
-    this.fx = {
-
-        stack : function($el) {
-            $el.children().each(function(i, el){
-                setTimeout(function(){
-                    el.style.opacity = 1
-                    el.style.marginTop = '15px'
-                }, i * 50);
-            })
-        },
-
-    }
-
-
-    this.blocks = require('./blocks/all')
-
-
     // methods
 
-    function config(config) {
+    function extend(props) {
+        if (!props || !is.object(props)) return warn('Cannot extend app: no properties found')
         for (var key in self) {
-            if ($.type(self[key]) === 'object' && $.type(config[key]) === 'object')
-                Object.assign(self[key], config[key])
+            if ($.type(self[key]) === 'object' && $.type(props[key]) === 'object')
+                Object.assign(self[key], props[key])
         }
     }
 
@@ -641,13 +647,15 @@ module.exports = function(name) {
     function init(options) {
 
         // cache options
-        if ( !is.object(options) ) warn('Init options must be an object')
-        else Object.keys(self.options).forEach(function(key){
-            if (options[key]) {
-                if ( !sameType(self.options[key], options[key])  ) warn('Init option [%s] is invalid', key)
-                else self.options[key] = options[key]
-            }
-        })
+        if (options) {
+            if ( !is.object(options) ) warn('Init options must be an object!')
+            else Object.keys(self.options).forEach(function(key){
+                if (options[key]) {
+                    if ( !sameType(self.options[key], options[key])  ) warn('Init option [%s] is invalid', key)
+                    else self.options[key] = options[key]
+                }
+            })
+        }
 
 
         // apply defaults
@@ -665,43 +673,43 @@ module.exports = function(name) {
 
         // append blocks styles
         var styles = '<style blocks>'
-        for (var key in self.blocks) {
-            styles += self.blocks[key].style
+        for (var key in rasti.blocks) {
+            styles += rasti.blocks[key].style
         }
         styles += '</style>'
         $('body').append(styles)
 
 
         // append theme style container
-        $('body').append('<style theme>')
+        container.append('<style theme>')
 
 
         // append page-options containers
-        $('[page]').each(function(i, el) {
+        container.find('[page]').each(function(i, el) {
             $(el).append('<div class="page-options">')
         })
 
 
         // init rasti blocks
-        $('[rasti]').each(function(i, el) {
+        container.find('[block]').each(function(i, el) {
             initBlock($(el))
         })
 
 
         // create options for selects with data source
-        $('select[data]').each(function(i, el) {
+        container.find('select[data]').each(function(i, el) {
             updateBlock($(el))
         })
 
 
         // create tabs
-        $('[tabs]').each(function(i, el) {
+        container.find('[tabs]').each(function(i, el) {
             createTabs($(el))
         })
 
 
         // init nav
-        $('[nav]').click(function(e) {
+        container.find('[nav]').click(function(e) {
             var $el = $(this),
                 page = $el.attr('nav'),
                 params = {}
@@ -733,7 +741,7 @@ module.exports = function(name) {
 
 
         // init submit
-        $('[submit]').click(function(e) {
+        container.find('[submit]').click(function(e) {
             var $el = $(this),
                 method = $el.attr('submit'),
                 callback = $el.attr('then'),
@@ -741,9 +749,9 @@ module.exports = function(name) {
                 isValidCB = callback && is.function(self.utils[callback]),
                 start = window.performance.now(), end
 
-            if (!method) return error('Plase provide an ajax method in [submit] attribute')
+            if (!method) return error('Plase provide an ajax method in [submit] attribute of el', this)
 
-            if (callback && !isValidCB) error('Utility method [%s] provided in [then] attribute is not defined', callback)
+            if (callback && !isValidCB) error('Undefined utility method [%s] declared in [then] attribute of el', callback, this)
             
             $el.addClass('loading').attr('disabled', true)
 
@@ -761,7 +769,7 @@ module.exports = function(name) {
 
 
         // init render
-        $('[render]').not('[submit]').click(function(e) {
+        container.find('[render]').not('[submit]').click(function(e) {
             var $el = $(this),
                 template = $el.attr('render')
             if (!template) return error('Please provide a template name in [render] attribute of element:', el)
@@ -771,7 +779,7 @@ module.exports = function(name) {
 
         // init actions
         for (var action of 'click change'.split(' ')) {
-            $('['+ action +']').each(function(i, el){
+            container.find('['+ action +']').each(function(i, el){
                 var $el = $(el),
                     method = $el.attr( action )
                 if ( !app.utils[ method ] ) return error('Undefined utility method "%s" declared in [%s] attribute of element:', method, action, el)
@@ -784,11 +792,11 @@ module.exports = function(name) {
         var page, $page
         for (var name in self.pages) {
             page = self.pages[name]
-            if ( !is.object(page) ) return error('Page [%s] must be an object!', name)
-            $page = $('[page='+ name +']')
-            if ( !$page.length ) return error('No container element bound to page [%s]. Please bind one via [page] attribute', name)
+            if ( !is.object(page) ) return error('pages.%s must be an object!', name)
+            $page = container.find('[page='+ name +']')
+            if ( !$page.length ) return error('No container found for page "%s". Please bind one via [page] attribute', name)
             if (page.init) {
-                if ( !is.function(page.init) ) return error('Page [%s] init property must be a function!', name)
+                if ( !is.function(page.init) ) return error('pages.%s.init must be a function!', name)
                 else {
                     log('Initializing page [%s]', name)
                     self.active.page = $page
@@ -800,7 +808,7 @@ module.exports = function(name) {
 
         // fix labels
         'input select textarea'.split(' ').forEach(function(tag){
-            $(tag + '[label]').each(function(i, el) {
+            container.find(tag + '[label]').each(function(i, el) {
                 fixLabel($(el))
             })
         })
@@ -815,20 +823,24 @@ module.exports = function(name) {
         }
 
 
+        // init history (if applicable)
+        if (self.options.history) initHistory()
+
+
         // restore and persist state (if applicable)
         var restored
-        if (self.options.state) {
+        if (self.options.persist) {
             restored = self.state.restore()
             $(window).on('beforeunload', function(e){ self.state.save() })
         }
 
-        if ( !self.options.state || !restored ) {
+        if ( !self.options.persist || !restored ) {
 
             // set lang (if applicable and not already set)
             if ( self.options.lang && !self.active.lang ) setLang(self.options.lang)
             // if no lang, generate texts
             if ( !self.options.lang ) {
-                $('[text]').each(function(i, el) {
+                container.find('[text]').each(function(i, el) {
                     $(el).text( $(el).attr('text') )
                 })
             }
@@ -838,12 +850,12 @@ module.exports = function(name) {
 
             // nav to page in hash or to root or to first page container
             var page = location.hash.substring(1) || self.options.root
-            navTo(page && self.pages[page] ? page : $('[page]').first().attr('page'))
+            navTo(page && self.pages[page] ? page : container.find('[page]').first().attr('page'))
         }
 
 
         // init state elements
-        $('[state]').each(function(i, el){
+        container.find('[state]').each(function(i, el){
             var $el = $(el)
             var prop = $el.attr('state')
 
@@ -870,7 +882,7 @@ module.exports = function(name) {
                 }
                 if ( root[prop] ) {
                     $el.val( root[prop] )
-                    if ( $el.attr('rasti') ) $el.trigger('change')
+                    if ( $el.attr('block') ) $el.trigger('change')
                 }
                 else root[prop] = ''
                 $el.on('change', function(e){
@@ -880,7 +892,7 @@ module.exports = function(name) {
         })
 
 
-        $(document).trigger('rasti-ready')
+        container.trigger('rasti-ready')
 
     }
 
@@ -918,30 +930,32 @@ module.exports = function(name) {
 
     function navTo(pagename, params, skipPushState) {
 
-        var page = self.pages[pagename],
-            $page = $('[page='+ pagename +']')
+        if (!pagename) return error('Cannot navigate, page undefined')
 
-        if (!$page) return error('Page [%s] container not found', pagename)
+        var page = self.pages[pagename],
+            $page = container.find('[page='+ pagename +']')
+
+        if (!$page.length) return error('Cannot nav to page [%s]: page container not found', pagename)
         
         self.active.page = $page
 
-        if ( params && !is.object(params) ) error('Page [%s] nav params must be an object!', pagename)
+        if ( params && !is.object(params) ) warn('Page [%s] nav params must be an object!', pagename)
             
         if (page && page.nav) {
             !is.function(page.nav)
-                ? error('Page [%s] nav property must be a function!', pagename)
+                ? warn('Page [%s] nav property must be a function!', pagename)
                 : page.nav(params)
         }
 
-        $('[page].active').removeClass('active')
+        container.find('[page].active').removeClass('active')
         self.active.page.addClass('active')
 
-        $(document).trigger('rasti-nav')
+        container.trigger('rasti-nav')
 
         if (skipPushState) return
         if (page && page.url) {
             !is.string(page.url)
-                ? log('Page [%s] url property must be a string!', pagename)
+                ? warn('Page [%s] url property must be a string!', pagename)
                 : window.history.pushState(pagename, null, '#'+page.url)
         }
         else {
@@ -951,8 +965,9 @@ module.exports = function(name) {
 
 
     function render(name, data, time) {
-        var template = self.templates[name], html
-        if (!template) return error('Template [%s] is not defined', name)
+        var template = self.templates[name], html,
+            errPrefix = 'Cannot render template [%s]: '
+        if (!template) return error(errPrefix + 'template is not defined', name)
 
         if (is.string(template)) {
             html = template
@@ -961,17 +976,17 @@ module.exports = function(name) {
             }
         }
 
-        if (!is.function(template)) return error('Template [%s] must be a string or a function', name)
+        if (!is.function(template)) return error(errPrefix + 'template must be a string or a function', name)
 
-        var $el = $('[template='+ name +']')
-        if (!$el.length) return error('No element bound to template [%s]. Please bind one via [template] attribute.', name)
+        var $el = container.find('[template='+ name +']')
+        if (!$el.length) return error(errPrefix + 'no element bound to template. Please bind one via [template] attribute.', name)
         var el = $el[0]
 
         if (!data) {
             var datakey = $el.attr('data')
-            if (!datakey) return error('No data found for template [%s]. Please provide in ajax response or via [data] attribute in element:', name, el)
+            if (!datakey) return error(errPrefix + 'no data found for template. Please provide in ajax response or via [data] attribute in element:', name, el)
             data = self.data[datakey]
-            if (!data) return error('Undefined data source "%s" in [data] attribute of element:', datakey, el)
+            if (!data) return error(errPrefix + 'undefined data source "%s" in [data] attribute of element:', name, datakey, el)
         }
 
         if (!data.length) return $el.html(`<div msg center textc>${ self.options.noData }</div>`)
@@ -989,8 +1004,8 @@ module.exports = function(name) {
 
         var fxkey = $el.attr('fx')
         if (fxkey) {
-            var fx = self.fx[fxkey]
-            if (!fx) return error('Undefined fx "%s" in [fx] attribute of element', fxkey, el)
+            var fx = rasti.fx[fxkey]
+            if (!fx) return warn('Undefined fx "%s" in [fx] attribute of element', fxkey, el)
             paging ? fx($el.find('.results')) : fx($el)
         }
 
@@ -1001,7 +1016,7 @@ module.exports = function(name) {
         var themeName = themeString.split(' ')[0],
             theme = self.themes[themeName]
 
-        if (!theme) return error('Theme [%s] not found', themeName)
+        if (!theme) return error('Cannot set theme [%s]: theme not found', themeName)
 
         var mapName = themeString.split(' ')[1] || ( is.object(theme.maps) && Object.keys(theme.maps)[0] ) || 'dark',
             themeMap = ( is.object(theme.maps) && theme.maps[mapName] ) || self.themeMaps[mapName]
@@ -1036,20 +1051,23 @@ module.exports = function(name) {
         }
 
         // generate theme style and apply it
-        $('style[theme]').html( getThemeStyle(values) )
+        container.find('style[theme]').html( getThemeStyle(values) )
 
         // apply any styles defined by class
         for (var key of Object.keys(theme.palette)) {
             var color = theme.palette[key]
-            $('.' + key).css('background-color', color)
+            container.find('.' + key).css('background-color', color)
         }
     }
 
 
     function setLang(langName) {
-        var lang = self.langs[ langName ]
-        if (!lang) return error('Lang [%s] not found', langName)
-        if ( !is.object(lang) ) return error('Lang [%s] must be an object!', langName)
+        var lang = self.langs[ langName ],
+            errPrefix = 'Cannot set lang [%s]: '
+
+        if (!lang) return error(errPrefix + 'lang not found', langName)
+        if ( !is.object(lang) ) return error(errPrefix + 'lang must be an object!', langName)
+
         log('Setting lang [%s]', langName)
         self.active.lang = langName
 
@@ -1089,11 +1107,11 @@ module.exports = function(name) {
 
     function updateBlock($el, data) {
         var el = $el[0]
-        var type = el.nodeName == 'SELECT' ? 'select' : $el.attr('rasti')
-        if (!type) return error('Missing block type, please provide via [rasti] attribute in element:', el)
+        var type = el.nodeName == 'SELECT' ? 'select' : $el.attr('block')
+        if (!type) return error('Missing block type, please provide via [block] attribute in element:', el)
         
-        var block = self.blocks[type]
-        if (!block) return error('Undefined block type "%s" in [rasti] attribute of element:', type, el)
+        var block = rasti.blocks[type]
+        if (!block) return error('Undefined block type "%s" in [block] attribute of element:', type, el)
         
         if (!data) {
             var datakey = $el.attr('data')
@@ -1113,7 +1131,7 @@ module.exports = function(name) {
             $options = $el.closest('[page]').find('[options='+ field +']')
             if (!$options.length) {
                 // if not create it and append it to page
-                $options = $('<div field rasti='+ type +' options='+ field +'>')
+                $options = $('<div field block='+ type +' options='+ field +'>')
                 $el.closest('[page]').children('.page-options').append($options)
             }   
         }
@@ -1191,7 +1209,7 @@ module.exports = function(name) {
             $bar.css({ left : position * el.offsetWidth })
         })
 
-        $(document).on('rasti-nav', function(e){
+        container.on('rasti-nav', function(e){
             if (!isInActivePage($el)) return
             $bar.css({ width : el.offsetWidth / $tabs.length })
             if (!$labels.children('.active').length) $labels.children().first().click()
@@ -1213,11 +1231,11 @@ module.exports = function(name) {
 
     function initBlock($el) {
         var el = $el[0]
-        var type = el.nodeName == 'SELECT' ? 'select' : $el.attr('rasti')
-        if (!type) return error('Missing block type, please provide via [rasti] attribute in element:', el)
+        var type = el.nodeName == 'SELECT' ? 'select' : $el.attr('block')
+        if (!type) return error('Missing block type, please provide via [block] attribute in element:', el)
         
-        var block = self.blocks[type]
-        if (!block) return error('Undefined block type "%s" in [rasti] attribute of element:', type, el)
+        var block = rasti.blocks[type]
+        if (!block) return error('Undefined block type "%s" in [block] attribute of element:', type, el)
 
         // if applicable, create options from data source
         if ($el.attr('data')) updateBlock($el)
@@ -1226,9 +1244,22 @@ module.exports = function(name) {
     }
 
 
+    function initHistory() {
+        self._history = new History()
+
+        Object.defineProperty(self, 'history', { get: function(){
+            return self._history.content
+        } })
+        Object.defineProperties(self.history, {
+            back : { value : self._history.back },
+            forth : { value : self._history.forth },
+        })
+    }
+
+
     function initPager($el, template, data, lang) {
         var name = $el.attr('template'),
-            fx = $el.attr('fx') && self.fx[$el.attr('fx')],
+            fx = $el.attr('fx') && rasti.fx[$el.attr('fx')],
             page_size = parseInt($el.attr('paging')),
             pager = newPager(name, data, page_size),
             paging, columns, sizes
@@ -1317,7 +1348,7 @@ module.exports = function(name) {
         var ajax = self.ajax[ method ]
         if ( !is.function(ajax) ) return error('Ajax method ['+ method +'] is not defined')
 
-        var $form = $('[ajax='+ method +']')
+        var $form = container.find('[ajax='+ method +']')
         if (!$form.length) return error('No container element bound to ajax method [%s]. Please bind one via [ajax] attribute', method)
 
         var reqdata = {}, field
@@ -1334,34 +1365,35 @@ module.exports = function(name) {
 
 
     function getThemeStyle(values) {
+        var ns = `[rasti=${ self.name }]`
         return `
-            body {
+            ${ns} {
                 font: ${ values.font };
                 color: ${ values.text[0] };
             }
-            [page]    { background-color: ${ values.page[0] }; }
-            [panel]   { background-color: ${ values.panel[0] }; }
-            [section] { background-color: ${ values.section[0] }; }
+            ${ns} [page]    { background-color: ${ values.page[0] }; }
+            ${ns} [panel]   { background-color: ${ values.panel[0] }; }
+            ${ns} [section] { background-color: ${ values.section[0] }; }
 
-            [page][header]:before    { background-color: ${ values.page[1] }; }
-            [panel][header]:before   { background-color: ${ values.panel[1] }; }
-            [section][header]:before { background-color: ${ values.section[1] }; }
+            ${ns} [page][header]:before    { background-color: ${ values.page[1] }; }
+            ${ns} [panel][header]:before   { background-color: ${ values.panel[1] }; }
+            ${ns} [section][header]:before { background-color: ${ values.section[1] }; }
 
-            [tabs] > .tab-labels        { background-color: ${ values.panel[0] }; }
-            [tabs] > .tab-labels > .bar { background-color: ${ values.btn[0] }; }
+            ${ns} [tabs] > .tab-labels        { background-color: ${ values.panel[0] }; }
+            ${ns} [tabs] > .tab-labels > .bar { background-color: ${ values.btn[0] }; }
 
-            [field] {
+            ${ns} [field] {
                 background-color: ${ values.field[0] };
                 color: ${ values.field[1] };
             }
 
-            [btn], .btn, [rasti=buttons] > div {
+            ${ns} [btn], .btn, [block=buttons] > div {
                 background-color: ${ values.btn[0] };
                 color: ${ values.btn[1] }; 
             }
 
-            [header]:before { color: ${ values.header[0] }; }
-            [label]:not([header]):before  { color: ${ values.label[0] }; }
+            ${ns} [header]:before { color: ${ values.header[0] }; }
+            ${ns} [label]:not([header]):before  { color: ${ values.label[0] }; }
             `
     }
 
@@ -1389,14 +1421,25 @@ module.exports = function(name) {
     }
 
 
-    function log(...params) {
-        if (self.options.log == 'DEBUG') console.log.call(this, ...params)
-    }
-    function warn(...params) {
-        if (self.options.log) console.warn.call(this, ...params)
-    }
-    function error(...params) {
-        console.error.call(this, ...params)
+    // internal classes
+
+    class History {
+
+        constructor() {
+            this.i = 0
+            this.content = []
+        }
+        
+        back() {
+            if (this.i > 0) navTo(this.content[--(this.i)])
+        }
+        forth() {
+            if (this.i < this.content.length) navTo(this.content[++(this.i)])
+        }
+        push(page) {
+            this.content.splice(this.i, null, page)
+            this.i++
+        }
     }
 
 
@@ -1477,18 +1520,13 @@ module.exports = function(name) {
     })()
 
 
-    // static logger methods
-
-    module.exports.log = log
-    module.exports.warn = warn
-    module.exports.error = error
-
-
     // api
 
     return Object.freeze({
 
         // objects
+        options : this.options,
+        history : this.history,
         state : this.state,
         pages : this.pages,
         data : this.data,
@@ -1497,13 +1535,10 @@ module.exports = function(name) {
         langs : this.langs,
         themes : this.themes,
         themeMaps : this.themeMaps,
-        blocks : this.blocks,
         templates : this.templates,
-        fx : this.fx,
-        options : this.options,
 
         // methods
-        config : config,
+        extend : extend,
         init : init,
         get : get,
         set : set,
@@ -1517,6 +1552,60 @@ module.exports = function(name) {
     })
 
 }
+
+
+// static properties and methods
+
+rasti.log = log
+rasti.warn = warn
+rasti.error = error
+
+rasti.apps = {}
+rasti.blocks = require('./blocks/all')
+rasti.fx = {
+
+    stack : function($el) {
+        $el.children().each(function(i, el){
+            setTimeout(function(){
+                el.style.opacity = 1
+                el.style.marginTop = '15px'
+            }, i * 50);
+        })
+    },
+
+}
+rasti.options = {log : 'warn'}
+
+
+// bootstrap any apps defined via rasti attribute
+
+var appContainers = $(document).find('[rasti]'),
+    appName, app, extendProps
+
+if (appContainers.length) appContainers.forEach(function(el){
+    appName = el.getAttribute('rasti')
+    if (!appName) error('Please define an app name in [rasti] attribute of app container', el)
+    else if (rasti.apps[appName]) error('App [%s] already defined, please choose another name for app in container', appName, el)
+    else {
+        rasti.apps[appName] = app = new rasti(appName, el)
+        Object.keys(app.options).forEach(function(key) {
+            if (el.hasAttribute(key)) {
+                app.options[key] = el.getAttribute(key)
+                // non-value boolean attributes are true
+                if (is.boolean(options[key]) && !app.options[key]) app.options[key] = true
+            }
+        })
+        extendProps = el.getAttribute('extend')
+        if (extendProps) app.extend(global[extendProps])
+        if (el.hasAttribute('init')) app.init()
+    }
+})
+
+
+module.exports = rasti
+
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
 },{"./blocks/all":1,"./utils":8}],8:[function(require,module,exports){
 const is = {}

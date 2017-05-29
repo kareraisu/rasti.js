@@ -26,7 +26,7 @@ init : function($el) {
 },
 
 style : `
-    [rasti=buttons] > div {
+    [block=buttons] > div {
         display: inline-block;
         margin: 5px !important;
         padding: 5px 10px;
@@ -35,7 +35,7 @@ style : `
         background-clip: padding-box;
         cursor: pointer;
     }
-    [rasti=buttons] > div.active {
+    [block=buttons] > div.active {
         filter: contrast(1.5);
         border-style: inset;
         padding: 4px 11px 6px 9px;

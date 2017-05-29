@@ -18,7 +18,7 @@ template : function(data, $el) {
 init : function($el) {
     $el.find('input').change(function(e) {
         var $el = $(this)
-        $el.closest('[rasti=radios]').val($el.attr('value'))
+        $el.closest('[block=radios]').val($el.attr('value'))
     })
     $el.find('input +label').click(function(e) {
         var $el = $(this)
@@ -31,7 +31,7 @@ init : function($el) {
 },
 
 style : `
-    [rasti=radios]>div {
+    [block=radios]>div {
         height: 24px;
         padding-top: 5px
     }

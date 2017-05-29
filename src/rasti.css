@@ -282,12 +282,6 @@ input {
     margin-top: 0;
     margin-left: -40%;
 }
-/*
-[label][rasti=buttons]:before, [label][rasti=radios]:before {
-    margin-top: -20px;
-    margin-left: 5px;
-}
-*/
 
 
 select[field] {

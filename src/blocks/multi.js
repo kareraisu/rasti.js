@@ -120,14 +120,14 @@ init : function($el) {
 },
 
 style : `
-    [rasti=multi] {
+    [block=multi] {
         position: relative;
         min-height: 35px;
         padding-right: 20px;
         text-shadow: 0 0 0 #000;
         cursor: pointer;
     }
-    [rasti=multi] [add] {
+    [block=multi] [add] {
         display: flex;
         align-items: center;
         position: absolute;
@@ -137,24 +137,24 @@ style : `
         width: 20px;
         border-left: 1px solid rgba(0,0,0,0.2);
     }
-    [rasti=multi] [add]:before {
+    [block=multi] [add]:before {
         content: '〉';
         padding-top: 2px;
         padding-left: 6px;
     }
-    [rasti=multi].open [add] {
+    [block=multi].open [add] {
         box-shadow: inset 0 0 2px #000;
     }
-    [rasti=multi].full {
+    [block=multi].full {
         padding-right: 5px;
     }
-    [rasti=multi].full [add] {
+    [block=multi].full [add] {
         display: none;
     }
-    [rasti=multi] option {
+    [block=multi] option {
         padding: 2px 0;
     }
-    [rasti=multi] option:before {
+    [block=multi] option:before {
         content: '✕';
         display: inline-block;
         box-sizing: border-box;
@@ -165,15 +165,15 @@ style : `
         text-align: center;
         line-height: 1.5;
     }
-    [rasti=multi] [selected] {
+    [block=multi] [selected] {
         max-height: 100px;
         overflow-y: auto;
     }
-    [rasti=multi] [selected]>option:hover:before {
+    [block=multi] [selected]>option:hover:before {
         color: #d90000;
         background-color: rgba(255, 0, 0, 0.5);
     }
-    [rasti=multi][options] {
+    [block=multi][options] {
         display: none;
         position: absolute;
         top: 0;
@@ -184,14 +184,14 @@ style : `
         z-index: 10;
         overflow-y: auto;
     }
-    [rasti=multi][options]>option:before {
+    [block=multi][options]>option:before {
         transform: rotate(45deg);
     }
-    [rasti=multi][options]>option:hover:before {
+    [block=multi][options]>option:hover:before {
         color: #008000;
         background-color: rgba(0, 128, 0, 0.5);
     }
-    [rasti=multi][options] input {
+    [block=multi][options] input {
         border: 1px solid #000;
         margin: 10px 0;
     }

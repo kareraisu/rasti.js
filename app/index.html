@@ -49,19 +49,18 @@
     </style>
 
 </head>
-<body>
+<body rasti="demo" extend="props" log='debug' history init >
 
-    <div page="login" header="welcome" center-content>
+    <div page="login" header="welcome"
+        center-content>
 
         <div panel inline>
-            <input type="text"
-                field="user"
-                label="username"
-                navparam="user"/>
+            <input field="user" navparam
+                label="username"/>
 
             <input type="password"
                 field="pass"
-                label="pass"/>
+                label/>
 
             <button btn
                 nav="main" params
@@ -72,29 +71,25 @@
 
 
 
-    <div row page="main" header="main"
+    <div row page="main" header
         center-content
         hide-header-phone>
 
-        <div col-4 panel header="filters"
+        <div col-4 panel="filters" header
             ajax="getPeople"
             state
             scrolly
             center-content-tablet>
-            <div section header="personal" inline>
-                <input type="text"
-                    field="name"
-                    label="name">
+
+            <div section="personal" header inline>
+                <input field="name" label>
             </div>
 
-            <div section header="work" inline>
-                <select field="skills"
-                    label="skills"
-                    data="skills"
-                    ></select>
+            <div section="work" header inline>
+                <select field="skills" label data></select>
             </div>
 
-            <div section header="reqdata">
+            <div section="reqdata" header>
                 <textarea name="reqdata" field disabled
                     style="height: 100px"></textarea>
             </div>
@@ -106,7 +101,7 @@
         </div>
 
 
-        <div col-8 panel header="results"
+        <div col-8 panel="results" header
             template="cards"
             paging="4" columns stats
             fx="stack">
@@ -125,24 +120,24 @@
 
 
 
-    <div page="config"
+    <div page="config" header
         center-content>
 
         <div col-2 panel scrolly center-content-tablet>
-            <div section header="config">           
-                <div rasti="buttons"
+            <div section>           
+                <div block="buttons"
                     field="lang"
                     data="langs"
-                    label="lang"
+                    label
                     onchange="app.setLang(this.value)"></div>
 
-                <div rasti="radios"
+                <div block="radios"
                     field="theme"
                     data="themes"
-                    label="theme"
+                    label
                     onchange="app.utils.applyTheme(this)"></div>
 
-                <div rasti="buttons"
+                <div block="buttons"
                     data="themeMaps"
                     onchange="app.utils.applyTheme(this)"></div>
             </div>
@@ -157,20 +152,12 @@
     <script src="../dist/rasti.js"></script>
 
     <script>
-        var app = new rasti('demo')
-    </script>
+        var app = rasti.apps.demo
+    </script> 
 
     <script src="extra/people.js"></script>
     <script src="extra/utils.js"></script>
     <script src="app.js"></script>
-
-    <script>
-        app.init({
-            log : 'DEBUG',
-            // root : 'main',
-            // state: true,
-        })
-    </script> 
 
 </body>
 </html>
