@@ -1,11 +1,10 @@
 app.pages.main = {
 
-    url : 'you-are-in-the-main-page',
+    url : 'the-main-page',
 
     nav : function(params) {
-
-        if (params) app.get('section=user').text(params.user)
-
+        if (!params) return
+        app.get('section=user').text(params.user)
     }
     
 }
@@ -37,7 +36,7 @@ app.templates.cards = function(data) {
                     </div>
                 </div>
             </div>
-        </div>` //ES6 interpolated string
+        </div>`
 
     }).join('')
 
@@ -55,6 +54,7 @@ app.ajax.getPeople = function(reqdata, render) {
 }
 
 
+app.init()
 
 
 

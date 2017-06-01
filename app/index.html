@@ -49,10 +49,15 @@
     </style>
 
 </head>
-<body rasti="demo" extend="props" log='debug' history init >
+<body rasti="app">
+<!-- 
+the [rasti="X"] declaration does 3 things:
+    1. creates a rasti instance named "X"
+    2. binds it to the container (in this case the <body>, but could be any <div> as well)
+    3. creates an "X" global var to access the instance (window.X = instance)
+-->
 
-    <div page="login" header="welcome"
-        center-content>
+    <div page="login" header="welcome" cc-s>
 
         <div panel inline>
             <input field="user" navparam
@@ -72,14 +77,13 @@
 
 
     <div row page="main" header
-        center-content
-        hide-header-phone>
+        cc-l hh-phone>
 
         <div col-4 panel="filters" header
             ajax="getPeople"
             state
             scrolly
-            center-content-tablet>
+            cc-tablet>
 
             <div section="personal" header inline>
                 <input field="name" label>
@@ -120,11 +124,10 @@
 
 
 
-    <div page="config" header
-        center-content>
+    <div page="config" cc-s>
 
-        <div col-2 panel scrolly center-content-tablet>
-            <div section>           
+        <div col-2 panel scrolly cc-s-tablet>
+            <div section="config" header>           
                 <div block="buttons"
                     field="lang"
                     data="langs"
@@ -151,9 +154,15 @@
     <script src="../lib/zepto.min.js"></script>
     <script src="../dist/rasti.js"></script>
 
+    <!--
+    alternative to using the [rasti] attribute in the <body>;
+    the only difference is that the name of the app can be
+    different from the name of the variable that holds it
+
     <script>
-        var app = rasti.apps.demo
-    </script> 
+        var app = new rasti('some_name', 'body')
+    </script>
+    -->
 
     <script src="extra/people.js"></script>
     <script src="extra/utils.js"></script>

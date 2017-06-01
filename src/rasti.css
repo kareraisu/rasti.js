@@ -57,7 +57,7 @@ input {
 
 
 [page][header] {
-    padding-top: 95px;
+    padding-top: 70px;
 }
 [panel][header] {
     padding-top: 65px;
@@ -72,7 +72,7 @@ input {
     position: absolute;
     top: 0;
     left: 0;
-    height: 80px;
+    height: 70px;
     width: 100%;
     padding: 20px 0;
     font-size: 2.5em;
@@ -161,6 +161,9 @@ input {
     margin: 0 -15px;
     padding: 0 15px;
 }
+[template][stats] > .results {
+    max-height: calc(100% - 95px);
+}
 [template] > .controls {
     height: 60px;
     padding: 15px;
@@ -168,6 +171,7 @@ input {
     text-align: center;
 }
 [template] > .stats {
+    height: 40px;
     font-size: 1.1em;
 }
 
@@ -449,11 +453,6 @@ input[type="checkbox"]:checked + label:before {
     margin: auto !important;
 }
 
-[center-content] {
-    padding-left: 20%;
-    padding-right: 20%;
-}
-
 [left], .left,
 [left_]>*, .left_>* {
     position: absolute;
@@ -598,9 +597,27 @@ input[type="checkbox"]:checked + label:before {
 }
 
 
-/* media queries */
+/*** MEDIA QUERIES ***/
 
-/* tablet */
+
+/* desktop only */
+@media only screen and (min-width: 800px) {
+    [cc] {
+    padding-left: 20%;
+    padding-right: 20%;
+    }
+    [cc-s] {
+        padding-left: 30%;
+        padding-right: 30%;
+    }
+    [cc-l] {
+        padding-left: 10%;
+        padding-right: 10%;
+    }
+}
+
+
+/* tablet only */
 @media only screen and (min-width: 500px) and (max-width: 800px) {
     .hide-tablet {
         display: none;
@@ -609,16 +626,24 @@ input[type="checkbox"]:checked + label:before {
         display: block;
     }
 
-    [header][hide-header-tablet] {
+    [header][hh-tablet] {
         padding-top: 0;
     }
-    [header][hide-header-tablet]:before {
+    [header][hh-tablet]:before {
         display: none;
     }
 
-    [center-content-tablet] {
+    [cc-tablet] {
         padding-left: 20%;
         padding-right: 20%;
+    }
+    [cc-s-tablet] {
+        padding-left: 30%;
+        padding-right: 30%;
+    }
+    [cc-l-tablet] {
+        padding-left: 10%;
+        padding-right: 10%;
     }
 
 }
@@ -633,9 +658,6 @@ input[type="checkbox"]:checked + label:before {
         overflow-x: auto;
         overflow-y: hidden;
     }
-    [page][header] {
-        padding-top: 80px;
-    }
     [page][header]:before {
         position: fixed;
         top: 0;
@@ -645,10 +667,6 @@ input[type="checkbox"]:checked + label:before {
         line-height: 0.8;
         white-space: normal;
     }
-    [page][center-content] {
-        padding-left: 0;
-        padding-right: 0;
-    }
     [page] * {
         white-space: normal;
     }
@@ -656,6 +674,7 @@ input[type="checkbox"]:checked + label:before {
     [panel] {
         display: inline-block;
         position: relative;
+        height: 100%;
         width: 100vw;
         border-radius: 0;
         margin-bottom: 0;
@@ -679,7 +698,7 @@ input[type="checkbox"]:checked + label:before {
 }
 
 
-/* phone */
+/* phone only */
 @media only screen and (max-width: 500px) {
 
     [panel] {
@@ -719,16 +738,24 @@ input[type="checkbox"]:checked + label:before {
         display: block;
     }
 
-    [header][hide-header-phone] {
+    [header][hh-phone] {
         padding-top: 0;
     }
-    [header][hide-header-phone]:before {
+    [header][hh-phone]:before {
         display: none;
     }
 
-    [center-content-phone] {
+    [cc-phone] {
         padding-left: 20%;
         padding-right: 20%;
+    }
+    [cc-s-phone] {
+        padding-left: 30%;
+        padding-right: 30%;
+    }
+    [cc-l-phone] {
+        padding-left: 10%;
+        padding-right: 10%;
     }
 
 

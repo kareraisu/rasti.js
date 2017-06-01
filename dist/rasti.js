@@ -491,15 +491,20 @@ var log = function (...params) {
 
 var rasti = function(name, container) {
 
+    var errPrefix = 'Cannot create rasti app: '
+
+    if ( !is.string(name) ) return error(errPrefix + 'app must have a name!')
+
     this.name = name.replace(' ', '')
 
     if ( !container ) {
-        container = $('body').attr('rasti', this.name)
+        container = $('body')
     }
-    else if ( !(container instanceof $) ) {
-        if ( is.string(container) || ('BODY DIV'.search(container.tagName) != -1) ) container = $(container)
-        else return error('Cannot create rasti app: app container is invalid. Please provide a selector string, a jQuery object ref or a DOM element ref')
+    else if ( !(container.selector) ) {
+        if ( is.string(container) || (container.tagName && 'BODY DIV'.search(container.tagName) != -1) ) container = $(container)
+        else return error(errPrefix + 'app container is invalid. Please provide a selector string, a jQuery object ref or a DOM element ref')
     }
+    container.attr('rasti', this.name)
     
     var self = this
 
@@ -554,6 +559,7 @@ var rasti = function(name, container) {
         restore : { value : function() {
             var state = self.state.get()
             if (state) {
+                log('Restoring state...')
                 for (let prop in state) {
                     self.state[prop] = state[prop]
                 }
@@ -636,7 +642,7 @@ var rasti = function(name, container) {
     // methods
 
     function extend(props) {
-        if (!props || !is.object(props)) return warn('Cannot extend app: no properties found')
+        if (!props || !is.object(props)) return error('Cannot extend app: no properties found')
         for (var key in self) {
             if ($.type(self[key]) === 'object' && $.type(props[key]) === 'object')
                 Object.assign(self[key], props[key])
@@ -714,25 +720,27 @@ var rasti = function(name, container) {
                 page = $el.attr('nav'),
                 params = {}
 
-            if (!page) return error('Please provide a page name in [nav] attribute of element:', el)
+            if (!page) return error('Missing page name in [nav] attribute of element:', el)
 
             if (this.hasAttribute('params')) {
-                var $page = self.active.page
-                var paramkeys = $el.attr('params')
+                var $page = self.active.page,
+                    paramkeys = $el.attr('params'),
+                    $paramEl
                 if (paramkeys) {
                     // get specified params
                     paramkeys = paramkeys.split(' ')
                     paramkeys.forEach(function(key) {
-                        params[key] = $page.find('[navparam='+ key +']').val()
+                        $paramEl = $page.find('[navparam='+ key +']')
+                        if ($paramEl.length) params[key] = $paramEl.val()
+                        else warn('Could not find navparam element [%s]', key)
                     })
                 }
                 else {
                     // get all params
                     $page.find('[navparam]').each(function(i, el){
                         $el = $(el)
-                        key = $el.attr('navparam')
-                        if (!key) return error('Please provide a param name in [navparam] attribute of element:', el)
-                        params[key] = $el.val()
+                        key = resolveAttr($el, 'navparam')
+                        if (key) params[key] = $el.val()
                     })
                 }
             }
@@ -749,9 +757,9 @@ var rasti = function(name, container) {
                 isValidCB = callback && is.function(self.utils[callback]),
                 start = window.performance.now(), end
 
-            if (!method) return error('Plase provide an ajax method in [submit] attribute of el', this)
+            if (!method) return error('Missing ajax method in [submit] attribute of el:', this)
 
-            if (callback && !isValidCB) error('Undefined utility method [%s] declared in [then] attribute of el', callback, this)
+            if (callback && !isValidCB) error('Undefined utility method [%s] declared in [then] attribute of el:', callback, this)
             
             $el.addClass('loading').attr('disabled', true)
 
@@ -772,7 +780,7 @@ var rasti = function(name, container) {
         container.find('[render]').not('[submit]').click(function(e) {
             var $el = $(this),
                 template = $el.attr('render')
-            if (!template) return error('Please provide a template name in [render] attribute of element:', el)
+            if (!template) return error('Missing template name in [render] attribute of element:', el)
             render(template)
         })
 
@@ -782,8 +790,8 @@ var rasti = function(name, container) {
             container.find('['+ action +']').each(function(i, el){
                 var $el = $(el),
                     method = $el.attr( action )
-                if ( !app.utils[ method ] ) return error('Undefined utility method "%s" declared in [%s] attribute of element:', method, action, el)
-                $(this).on( action , app.utils[ method ] )
+                if ( !self.utils[ method ] ) return error('Undefined utility method "%s" declared in [%s] attribute of element:', method, action, el)
+                $(this).on( action , self.utils[ method ] )
             })
         }
 
@@ -804,6 +812,16 @@ var rasti = function(name, container) {
                 }
             }
         }
+
+
+        // resolve empty headers and labels
+        'header label'.split(' ').forEach(function(attr){
+            var $el
+            container.find('['+attr+']').each(function(i, el) {
+                $el = $(el)
+                if (!$el.attr(attr)) $el.attr( attr, resolveAttr($el, attr) )
+            })
+        })
 
 
         // fix labels
@@ -857,9 +875,9 @@ var rasti = function(name, container) {
         // init state elements
         container.find('[state]').each(function(i, el){
             var $el = $(el)
-            var prop = $el.attr('state')
+            var prop = resolveAttr($el, 'state')
 
-            if (!prop) return warn('Missing state prop in [state] attribute of element', el)
+            if (!prop) return
 
             if (el.value !== undefined) {
                 // it's an element
@@ -1108,17 +1126,17 @@ var rasti = function(name, container) {
     function updateBlock($el, data) {
         var el = $el[0]
         var type = el.nodeName == 'SELECT' ? 'select' : $el.attr('block')
-        if (!type) return error('Missing block type, please provide via [block] attribute in element:', el)
+        if (!type) return error('Missing block type in [block] attribute in element:', el)
         
         var block = rasti.blocks[type]
-        if (!block) return error('Undefined block type "%s" in [block] attribute of element:', type, el)
+        if (!block) return error('Undefined block type "%s" declared in [block] attribute of element:', type, el)
         
         if (!data) {
-            var datakey = $el.attr('data')
-            if (!datakey) return error('Missing datakey, please provide via [data] attribute in element:', el)
+            var datakey = resolveAttr($el, 'data')
+            if (!datakey) return
 
             data = self.data[datakey]
-            if (!data) return error('Undefined data source "%s" in [data] attribute of element:', datakey, el)
+            if (!data) return error('Undefined data source "%s" resolved for element:', datakey, el)
         }
 
         var $options, field, alias
@@ -1126,7 +1144,7 @@ var rasti = function(name, container) {
         // TODO: this should be in the block, not here
         if (type === 'multi') {
             var field = $el.attr('field')
-            if (!field) return error('Missing [field] attribute value in element:', el)
+            if (!field) return error('Missing field name in [field] attribute of element:', el)
             // check if options div already exists
             $options = $el.closest('[page]').find('[options='+ field +']')
             if (!$options.length) {
@@ -1232,13 +1250,13 @@ var rasti = function(name, container) {
     function initBlock($el) {
         var el = $el[0]
         var type = el.nodeName == 'SELECT' ? 'select' : $el.attr('block')
-        if (!type) return error('Missing block type, please provide via [block] attribute in element:', el)
+        if (!type) return error('Missing block type in [block] attribute in element:', el)
         
         var block = rasti.blocks[type]
-        if (!block) return error('Undefined block type "%s" in [block] attribute of element:', type, el)
+        if (!block) return error('Undefined block type "%s" declared in [block] attribute of element:', type, el)
 
         // if applicable, create options from data source
-        if ($el.attr('data')) updateBlock($el)
+        if (el.hasAttribute('data')) updateBlock($el)
 
         block.init($el)
     }
@@ -1330,7 +1348,7 @@ var rasti = function(name, container) {
 
     function getPager(id) {
         let pager = self.pagers.get(id)
-        if (!pager) error('No pager for template [%s]', id)
+        if (!pager) error('No pager found for template [%s]', id)
         return pager
     }
     function newPager(id, results, page_size) {
@@ -1406,6 +1424,13 @@ var rasti = function(name, container) {
         var string = self.langs[lang][key]
         if ( !is.string(string) ) warn('Lang [%s] does not contain key [%s]', lang, key)
         else return string
+    }
+
+
+    function resolveAttr($el, name) {
+        var value = $el.attr(name) || $el.attr('field') || $el.attr('section') || $el.attr('panel') || $el.attr('page')
+        if (!value) warn('Could not resolve value of [%s] attribute in el:', name, $el[0])
+        return value
     }
 
 
@@ -1560,7 +1585,6 @@ rasti.log = log
 rasti.warn = warn
 rasti.error = error
 
-rasti.apps = {}
 rasti.blocks = require('./blocks/all')
 rasti.fx = {
 
@@ -1584,10 +1608,10 @@ var appContainers = $(document).find('[rasti]'),
 
 if (appContainers.length) appContainers.forEach(function(el){
     appName = el.getAttribute('rasti')
-    if (!appName) error('Please define an app name in [rasti] attribute of app container', el)
-    else if (rasti.apps[appName]) error('App [%s] already defined, please choose another name for app in container', appName, el)
+    if (!appName) error('Missing app name in [rasti] attribute of app container:', el)
+    else if (global[appName]) error('Name [%s] already taken, please choose another name for app in container:', appName, el)
     else {
-        rasti.apps[appName] = app = new rasti(appName, el)
+        global[appName] = app = new rasti(appName, el)
         Object.keys(app.options).forEach(function(key) {
             if (el.hasAttribute(key)) {
                 app.options[key] = el.getAttribute(key)
@@ -1595,9 +1619,6 @@ if (appContainers.length) appContainers.forEach(function(el){
                 if (is.boolean(options[key]) && !app.options[key]) app.options[key] = true
             }
         })
-        extendProps = el.getAttribute('extend')
-        if (extendProps) app.extend(global[extendProps])
-        if (el.hasAttribute('init')) app.init()
     }
 })
 

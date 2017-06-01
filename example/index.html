@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>rasti.js example prototype</title>
+    <title>block.js example prototype</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -44,15 +44,12 @@
 
             <div section style>
 
-                <div rasti="buttons"
-                    field="iam"
-                    navparam="iam"
-                    data="iam"
-                    label="iam"></div>
+                <div block="buttons"
+                    field="iam" navparam
+                    data label></div>
 
                 <input type="text"
-                    field="guess"
-                    navparam="guess"
+                    field="guess" navparam
                     label="urguess"
                     placeholder="ph1">
 
@@ -66,7 +63,8 @@
 
         <div col-3 scrolly
             panel="filter"
-            header="fields" hide-header-tablet center-content-tablet>
+            header="fields"
+            hh-tablet cc-tablet>
 
             <div section header="previous">
 
@@ -79,12 +77,11 @@
                     placeholder="ph2">
             </div>
 
-            <div section state="hints" header="hints">
+            <div section="hints" state header>
 
-                <div rasti="multi" max=0 filter="filter_text"
+                <div block="multi" max=0 filter="filter_text"
                     field="party"
-                    data="party"
-                    label="party"></div>
+                    data label></div>
 
                 <div label="size" inline>   
                     <output ib style="width: 15%"
@@ -95,14 +92,11 @@
                         onchange="partyMax.value = this.value">
                 </div>
 
-                <div rasti="checks"
+                <div block="checks"
                     field="meta"
-                    data="meta"
-                    label="meta"></div>
+                    data label></div>
 
-                <select field="loc"
-                    data="locations"
-                    label="location"></select>
+                <select field="loc" data label></select>
                 
             </div>
 
@@ -114,8 +108,7 @@
         </div>
 
         <div col-7
-            panel="results"
-            header="results" hide-header-tablet
+            panel="results" header hh-tablet
             label="results_2"
             template="cards" stats
             paging="3" columns
@@ -126,26 +119,26 @@
 
         </div>
 
-        <div col-2 panel scrolly center-content-tablet>
-            <div section header="Config">           
-                <div rasti="buttons"
+        <div col-2 panel scrolly cc-tablet>
+            <div section="config" header>           
+                <div block="buttons"
                     field="lang"
                     data="langs"
-                    label="lang"
+                    label
                     change="applyLang"></div>
 
-                <div rasti="radios"
+                <div block="radios"
                     field="theme"
                     data="themes"
-                    label="theme"
+                    label
                     change="applyTheme"></div>
 
-                <div rasti="buttons"
+                <div block="buttons"
                     data="themeMaps"
                     change="applyTheme"></div>
             </div>
 
-            <div section header="data">
+            <div section="data" header>
                 <textarea name="data" field disabled
                     style="height: 200px"></textarea>
             </div>
@@ -158,6 +151,7 @@
     <script src="../dist/rasti.js"></script>
 
     <script>
+        rasti.options.log = 'debug'
         var app = new rasti('demo')
     </script>
 

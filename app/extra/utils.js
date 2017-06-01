@@ -1,6 +1,4 @@
-var app = rasti.apps.demo
-
-props = {
+app.extend({
 
 	themes : {
 
@@ -43,6 +41,7 @@ props = {
 			username : 'user name',
 			pass : 'password',
 			login : 'log in',
+			main : 'main page',
 			filters : 'filters',
 			personal : 'personal',
 			name : 'name',
@@ -61,6 +60,7 @@ props = {
 			username : 'usuario',
 			pass : 'contraseña',
 			login : 'acceder',
+			main : 'página principal',
 			filters : 'filtros',
 			personal : 'personal',
 			name : 'nombre',
@@ -68,6 +68,7 @@ props = {
 			skills : 'habilidades',
 			reqdata : 'datos de solicitud',
 			search : 'buscar',
+			results : 'resultados',
 			config : 'config',
 			lang : 'idioma',
 			theme : 'tema',
@@ -84,11 +85,14 @@ props = {
 	    },
 
 	},
+})
 
+
+app.extend({
 	data : {
 		langs : Object.keys(app.langs),
 		themes : Object.keys(app.themes),
 		themeMaps : Object.keys(app.themeMaps),
 	},
-}
+})
 

@@ -1,4 +1,4 @@
-app.config({
+app.extend({
 
     state : {
 
@@ -20,7 +20,7 @@ app.config({
             {label: 'Genre',     value: 'RPG'},
         ],
 
-        locations : [
+        loc : [
             'Lahan',
             'Aveh',
             'Kislev',
@@ -140,6 +140,7 @@ app.config({
 
 
     templates : {
+
         cards : function (data, lang) {
             return data.map(function(obj){ return `
                 <div class="card row" section="section">
@@ -218,7 +219,7 @@ app.config({
             hints : 'Here are some more hints',
             theme : 'Theme',
             meta : 'Meta data',
-            location : 'Location',
+            loc : 'Location',
             party : 'Party',
             size : 'Max size:',
             data : 'Data',
@@ -249,7 +250,7 @@ app.config({
             hints : 'Acá tenés más pistas',
             theme : 'Tema',
             meta : 'Meta datos',
-            location : 'Ubicación',
+            loc : 'Ubicación',
             party : 'Grupo',
             size : 'Tamaño máx:',
             data : 'Datos',
@@ -277,11 +278,10 @@ app.data.langs = Object.keys(app.langs)
 
 
 app.init({
-    log : true,
     //root : 'results',
     theme : 'Weltall',
     //lang : 'es',
-    state : true,
+    persist : true,
 })
 
 
