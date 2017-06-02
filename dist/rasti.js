@@ -478,6 +478,15 @@ var options = {
     noData  : 'No data available',
 }
 
+var breakpoints = {
+    phone : 500,
+    tablet : 800,
+}
+var media = {}
+for (var device in breakpoints) {
+    media[device] = window.matchMedia(`(max-width: ${ breakpoints[device] }px)`).matches
+}
+
 var log = function (...params) {
         if (rasti.options.log.search(/debug/i) != -1) console.log.call(this, ...params)
     },
@@ -710,6 +719,12 @@ var rasti = function(name, container) {
 
         // create tabs
         container.find('[tabs]').each(function(i, el) {
+            createTabs($(el))
+        })
+        if (media.tablet || media.phone) container.find('[tabs-tablet]').each(function(i, el) {
+            createTabs($(el))
+        })
+        if (media.phone) container.find('[tabs-phone]').each(function(i, el) {
             createTabs($(el))
         })
 
@@ -1194,20 +1209,27 @@ var rasti = function(name, container) {
 
     function createTabs($el) {
         var el = $el[0],
-            $tabs = $el.children(':not(.page-options)'),
-            $labels = $('<div class="tab-labels">'),
+            $tabs = el.hasAttribute('page')
+                ? $el.children('[panel]')
+                : el.hasAttribute('panel')
+                    ? $el.children('[section]')
+                    : undefined
+        if (!$tabs) return error('[tabs] attribute can only be used in pages or panels, was found in element:', el)
+
+        var $labels = $('<div class="tab-labels">'),
             $bar = $('<div class="bar">'),
             $tab, label, position
 
         $tabs.each(function(i, tab){
             $tab = $(tab)
             $tab.attr('tab', i)
-            label = $tab.attr('label') || $tab.attr('header') || $tab.attr('name') || 'TAB ' + (i+1)
+            label = resolveAttr($tab, 'tab-label') || 'TAB ' + (i+1)
 
             $labels.append($(`<div tab-label=${i} text="${ label }">`))
         })
 
-        $labels.append($bar).appendTo($el)
+        $labels.append($bar).prependTo($el)
+        var $flow = $tabs.wrapAll('<div h-flow>').parent()
 
         $labels.on('click', function(e){
             var $label = $(e.target),
@@ -1222,21 +1244,21 @@ var rasti = function(name, container) {
             
         })
 
-        $el.on('scroll', function(e){
-            position = el.scrollLeft / el.scrollWidth
-            $bar.css({ left : position * el.offsetWidth })
+        $flow.on('scroll', function(e){
+            position = this.scrollLeft / this.scrollWidth
+            $bar.css({ left : position * this.offsetWidth })
         })
 
         container.on('rasti-nav', function(e){
             if (!isInActivePage($el)) return
-            $bar.css({ width : el.offsetWidth / $tabs.length })
+            $bar.css({ width : $flow[0].offsetWidth / $tabs.length })
             if (!$labels.children('.active').length) $labels.children().first().click()
         })
 
         $(window).on('resize', function (e) {
             if (!isInActivePage($el)) return
             $labels.find('.active').click()
-            $bar.css({ width : el.offsetWidth / $tabs.length })
+            $bar.css({ width : $flow[0].offsetWidth / $tabs.length })
         })
 
         function isInActivePage($el) {
@@ -1290,7 +1312,7 @@ var rasti = function(name, container) {
                 <button btn value=3>3</button>
             </div>`
 
-        if (pager.total > 1) paging = `<div class="paging ib_">
+        if (pager.total > 1) paging = `<div class="paging ib ib_">
                 <button class="btn prev">&lt;</button>
                 <span class="page"></span>
                 <button class="btn next">&gt;</button>
@@ -1393,12 +1415,13 @@ var rasti = function(name, container) {
             ${ns} [panel]   { background-color: ${ values.panel[0] }; }
             ${ns} [section] { background-color: ${ values.section[0] }; }
 
-            ${ns} [page][header]:before    { background-color: ${ values.page[1] }; }
+            ${ns} [page][header]:before,
+                  [page][footer]:after     { background-color: ${ values.page[1] }; }
             ${ns} [panel][header]:before   { background-color: ${ values.panel[1] }; }
             ${ns} [section][header]:before { background-color: ${ values.section[1] }; }
 
-            ${ns} [tabs] > .tab-labels        { background-color: ${ values.panel[0] }; }
-            ${ns} [tabs] > .tab-labels > .bar { background-color: ${ values.btn[0] }; }
+            ${ns} .tab-labels        { background-color: ${ values.panel[0] }; }
+            ${ns} .tab-labels > .bar { background-color: ${ values.btn[0] }; }
 
             ${ns} [field] {
                 background-color: ${ values.field[0] };

@@ -49,17 +49,20 @@
     </style>
 
 </head>
-<body rasti="app">
+
+
 <!-- 
 the [rasti="X"] declaration does 3 things:
     1. creates a rasti instance named "X"
     2. binds it to the container (in this case the <body>, but could be any <div> as well)
     3. creates an "X" global var to access the instance (window.X = instance)
 -->
+<body rasti="app">
 
-    <div page="login" header="welcome" cc-s>
+    <div row page="login" header="welcome"
+        fix-header>
 
-        <div panel inline>
+        <div panel autom inline>
             <input field="user" navparam
                 label="username"/>
 
@@ -77,13 +80,12 @@ the [rasti="X"] declaration does 3 things:
 
 
     <div row page="main" header
-        cc-l hh-phone>
+        tabs-tablet hh-phone>
 
         <div col-4 panel="filters" header
             ajax="getPeople"
             state
-            scrolly
-            cc-tablet>
+            scrolly fullh hh-phone>
 
             <div section="personal" header inline>
                 <input field="name" label>
@@ -108,7 +110,8 @@ the [rasti="X"] declaration does 3 things:
         <div col-8 panel="results" header
             template="cards"
             paging="4" columns stats
-            fx="stack">
+            fx="stack"
+            fullh hh-phone>
 
             <!-- here be cards! -->
 
@@ -124,9 +127,10 @@ the [rasti="X"] declaration does 3 things:
 
 
 
-    <div page="config" cc-s>
+    <div row page="config" footer="this is a footer"
+        fix-footer>
 
-        <div col-2 panel scrolly cc-s-tablet>
+        <div panel autom>
             <div section="config" header>           
                 <div block="buttons"
                     field="lang"

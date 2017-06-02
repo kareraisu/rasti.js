@@ -18,6 +18,7 @@ input {
     vertical-align: text-bottom;
 }
 
+
 [page], [panel], [section] {
     position: relative;
     overflow: hidden;    
@@ -26,6 +27,7 @@ input {
 [page] {
     height: 100vh;
     width: 100vw;
+    padding-bottom: 15px;
     margin-bottom: -5px;
 }
 [page]:not(.active) {
@@ -34,12 +36,8 @@ input {
 
 
 [panel] {
-    margin: 20px 15px;
     padding: 20px 15px;
     border-radius: 4px;
-}
-[row]>[panel]:not(:first-of-type) {
-    margin-left: 0;
 }
 
 
@@ -56,22 +54,18 @@ input {
 }
 
 
-[page][header] {
-    padding-top: 70px;
-}
-[panel][header] {
+[header][panel] {
     padding-top: 65px;
 }
-[section][header] {
+[header][section] {
     padding-top: 55px;
 }
-[page][header]:before,
-[panel][header]:before,
-[section][header]:before {
+[header][page]:before,
+[header][panel]:before,
+[header][section]:before,
+[footer][page]:after {
     content: attr(header);
-    position: absolute;
-    top: 0;
-    left: 0;
+    display: block;
     height: 70px;
     width: 100%;
     padding: 20px 0;
@@ -79,15 +73,36 @@ input {
     text-align: center;
     text-transform: uppercase;
 }
-[panel][header]:before {
+[header][page]:before {
+    margin-bottom: 15px;
+}
+[header][panel]:before,
+[header][section]:before {
+    position: absolute;
+    top: 0; left: 0;
+}
+[header][panel]:before {
     height: 50px;
     padding: 10px 0;
     font-size: 2em;
 }
-[section][header]:before {
+[header][section]:before {
     height: 40px;
     padding: 5px 0;
     font-size: 1.5em;
+}
+
+[footer][page]:after {
+    content: attr(footer);
+}
+
+[page][header][fix-header]:before {
+    position: fixed;
+    top: 0;
+}
+[page][footer][fix-footer]:after {
+    position: fixed;
+    bottom: 0;
 }
 
 
@@ -176,12 +191,35 @@ input {
 }
 
 
-[tabs] > .tab-labels {
-    display: none;
+[h-flow] {
+    display: inline-block !important;
+    white-space: nowrap;
+    height: 100%;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+.tab-labels + [h-flow] {
+    height: calc(100% - 40px);
+}
+[h-flow] > * {
+    display: inline-block;
+    white-space: normal;
+    height: 100%;
+    min-width: 100%;
+    border-radius: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: auto !important;
+    margin-right: auto;
+    vertical-align: top;
+}
+
+.tab-labels {
+    display: flex;
+    position: relative;
     justify-content: space-around;
     white-space: nowrap;
-    position: fixed;
-    top: 0;
     min-width: 100vw;
     height: 40px;
     padding: 0;
@@ -190,7 +228,13 @@ input {
     text-transform: uppercase;
     z-index: 1;
 }
-[tabs] [tab-label] {
+.tab-labels > .bar {
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 4px;
+    transition: left 0.2s, width 0.2s;
+}
+[tab-label] {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -204,27 +248,8 @@ input {
     text-shadow: 0 0 0 #000;
     cursor: pointer;
 }
-[tabs] > .tab-labels > .bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 4px;
-    transition: left 0.2s, width 0.2s;
-}
-[tabs] > .tab-labels > .active {
+[tab-label].active {
     filter: contrast(1.5);
-}
-
-[tabs]:not([tabs="phone"]):not([tabs="tablet"]) > .tab-labels {
-    display: flex;
-}
-[tabs]:not([tabs="phone"]):not([tabs="tablet"]) > [tab] {
-    display: none;
-    height: calc(100% - 40px);
-    margin-top: 40px !important;
-}
-[tabs]:not([tabs="phone"]):not([tabs="tablet"]) > .active {
-    display: block;
 }
 
 
@@ -234,7 +259,6 @@ input {
     max-height: 500px;
     max-width: 500px;
 }
-
 [backdrop]:before, .backdrop:before {
     content: '';
     position: fixed;
@@ -351,22 +375,22 @@ input[type="checkbox"]:checked + label:before {
 
 .row, [row] {
     display: flex;
+    flex-flow: row wrap;
     width: 100%;
 }
-.row>div, [row]>div { flex-basis: 100% }
-.row>.col-1, [row]>[col-1] { flex-basis: 8.33% }
-.row>.col-2, [row]>[col-2] { flex-basis: 16.66% }
-.row>.col-3, [row]>[col-3] { flex-basis: 25% }
-.row>.col-4, [row]>[col-4] { flex-basis: 33.33% }
-.row>.col-5, [row]>[col-5] { flex-basis: 41.66% }
-.row>.col-6, [row]>[col-6] { flex-basis: 50%; }
-.row>.col-7, [row]>[col-7] { flex-basis: 58.33% }
-.row>.col-8, [row]>[col-8] { flex-basis: 66.66% }
-.row>.col-9, [row]>[col-9] { flex-basis: 75% }
-.row>.col-10, [row]>[col-10] { flex-basis: 83.33% }
-.row>.col-11, [row]>[col-11] { flex-basis: 91.66% }
+.row > .col-1,  [row] > [col-1]  { flex-basis: calc(08.33% - 15px); }
+.row > .col-2,  [row] > [col-2]  { flex-basis: calc(16.66% - 15px); }
+.row > .col-3,  [row] > [col-3]  { flex-basis: calc(25.00% - 15px); }
+.row > .col-4,  [row] > [col-4]  { flex-basis: calc(33.33% - 15px); }
+.row > .col-5,  [row] > [col-5]  { flex-basis: calc(41.66% - 15px); }
+.row > .col-6,  [row] > [col-6]  { flex-basis: calc(50.00% - 15px); }
+.row > .col-7,  [row] > [col-7]  { flex-basis: calc(58.33% - 15px); }
+.row > .col-8,  [row] > [col-8]  { flex-basis: calc(66.66% - 15px); }
+.row > .col-9,  [row] > [col-9]  { flex-basis: calc(75.00% - 15px); }
+.row > .col-10, [row] > [col-10] { flex-basis: calc(83.33% - 15px); }
+.row > .col-11, [row] > [col-11] { flex-basis: calc(91.66% - 15px); }
 
-.row [class*=col]:not(:first-child),
+.row [class*=col-]:not(:first-child),
 [row] [col-1]:not(:first-child),
 [row] [col-2]:not(:first-child),
 [row] [col-3]:not(:first-child),
@@ -626,12 +650,19 @@ input[type="checkbox"]:checked + label:before {
         display: block;
     }
 
-    [header][hh-tablet] {
-        padding-top: 0;
-    }
     [header][hh-tablet]:before {
         display: none;
     }
+    [header][hh-tablet][page] {
+        padding-top: 0;
+    }
+    [header][hh-tablet][panel] {
+        padding-top: 20px;
+    }
+    [header][hh-tablet][section] {
+        padding-top: 15px;
+    }
+    
 
     [cc-tablet] {
         padding-left: 20%;
@@ -652,46 +683,9 @@ input[type="checkbox"]:checked + label:before {
 /* tablet and phone */
 @media only screen and (max-width: 800px) {
 
-    [page]{
-        display: inline-block;
-        white-space: nowrap;
-        overflow-x: auto;
-        overflow-y: hidden;
-    }
     [page][header]:before {
-        position: fixed;
-        top: 0;
-        max-height: 80px;
-        width: 100vw;
         padding: 10px;
         line-height: 0.8;
-        white-space: normal;
-    }
-    [page] * {
-        white-space: normal;
-    }
-
-    [panel] {
-        display: inline-block;
-        position: relative;
-        height: 100%;
-        width: 100vw;
-        border-radius: 0;
-        margin-bottom: 0;
-        margin-left: auto !important;
-        margin-right: auto;
-        vertical-align: top;
-    }
-
-    [tabs=tablet] > .tab-labels {
-        display: flex;
-    }
-    [tabs=tablet] > [tab] {
-        height: calc(100% - 40px);
-        margin-top: 40px !important;
-    }
-    [tabs=tablet] > .active {
-        display: inline-block;
     }
 
 
@@ -701,26 +695,24 @@ input[type="checkbox"]:checked + label:before {
 /* phone only */
 @media only screen and (max-width: 500px) {
 
-    [panel] {
-        height: 100%;
-        margin-top: 0;
+    [page] {
+        padding-bottom: 0;
+        overflow-y: auto;
     }
 
-    [template] .controls .columns,
-    [template] .controls .sizes {
-        display: none;
+    [class*=col-],
+    [col-1], [col-2], [col-3],
+    [col-4], [col-5], [col-6],
+    [col-7], [col-8], [col-9],
+    [col-10], [col-11]  {
+        min-width: 100%;
+        margin-left: 0;
+        margin-bottom: 15px;
     }
 
-    [tabs=phone] > .tab-labels {
-        display: flex;
-    }
-    [tabs=phone] > [tab] {
+    [template] > .controls > .columns > label,
+    [template] > .controls > .sizes > label {
         display: none;
-        height: calc(100% - 40px);
-        margin-top: 40px !important;
-    }
-    [tabs=phone] > .active {
-        display: block;
     }
 
     [options] {
@@ -738,11 +730,17 @@ input[type="checkbox"]:checked + label:before {
         display: block;
     }
 
-    [header][hh-phone] {
-        padding-top: 0;
-    }
     [header][hh-phone]:before {
         display: none;
+    }
+    [header][hh-phone][page] {
+        padding-top: 0;
+    }
+    [header][hh-phone][panel] {
+        padding-top: 20px;
+    }
+    [header][hh-phone][section] {
+        padding-top: 15px;
     }
 
     [cc-phone] {
