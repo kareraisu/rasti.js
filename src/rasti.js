@@ -1,3 +1,5 @@
+/** zepto */
+
 var utils = require('./utils'),
     is = utils.is,
     type = utils.type,
@@ -219,15 +221,6 @@ var rasti = function(name, container) {
             keys = Object.keys(self.langs)
             if (keys.length) self.options.lang = keys[0]
         }
-
-
-        // append blocks styles
-        var styles = '<style blocks>'
-        for (var key in rasti.blocks) {
-            styles += rasti.blocks[key].style
-        }
-        styles += '</style>'
-        $('body').append(styles)
 
 
         // append theme style container
@@ -1158,28 +1151,47 @@ rasti.fx = {
 }
 rasti.options = {log : 'warn'}
 
+module.exports = Object.freeze(rasti)
+
 
 // bootstrap any apps defined via rasti attribute
+function bootstrap() {
+    var appContainers = $(document).find('[rasti]'),
+        appName, app, extendProps
 
-var appContainers = $(document).find('[rasti]'),
-    appName, app, extendProps
+    if (appContainers.length) appContainers.forEach(function(el){
+        appName = el.getAttribute('rasti')
+        if (!appName) error('Missing app name in [rasti] attribute of app container:', el)
+        else if (global[appName]) error('Name [%s] already taken, please choose another name for app in container:', appName, el)
+        else {
+            global[appName] = app = new rasti(appName, el)
+            Object.keys(app.options).forEach(function(key) {
+                if (el.hasAttribute(key)) {
+                    app.options[key] = el.getAttribute(key)
+                    // non-value boolean attributes are true
+                    if (is.boolean(options[key]) && !app.options[key]) app.options[key] = true
+                }
+            })
+        }
+    })
+}
 
-if (appContainers.length) appContainers.forEach(function(el){
-    appName = el.getAttribute('rasti')
-    if (!appName) error('Missing app name in [rasti] attribute of app container:', el)
-    else if (global[appName]) error('Name [%s] already taken, please choose another name for app in container:', appName, el)
-    else {
-        global[appName] = app = new rasti(appName, el)
-        Object.keys(app.options).forEach(function(key) {
-            if (el.hasAttribute(key)) {
-                app.options[key] = el.getAttribute(key)
-                // non-value boolean attributes are true
-                if (is.boolean(options[key]) && !app.options[key]) app.options[key] = true
-            }
-        })
+
+function genBlockStyles() {
+    var styles = '<style blocks>'
+    for (var key in rasti.blocks) {
+        styles += rasti.blocks[key].style
     }
-})
+    styles += '</style>'
+    $('body').append(styles)
+}
 
 
-module.exports = rasti
+var rastiCSS
 
+/* rasti CSS */
+
+
+if (rastiCSS) $('body').append('<style>' + rastiCSS + '</style>')
+genBlockStyles()
+bootstrap()

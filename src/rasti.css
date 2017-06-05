@@ -343,9 +343,9 @@ input[type=checkbox] + label {
     text-overflow: ellipsis;
     cursor: pointer;
 }
-input[type="radio"] + label:before,
-input[type="checkbox"] + label:before {
-    content: "\2713";
+input[type=radio] + label:before,
+input[type=checkbox] + label:before {
+    content: '\\2713';
     position: absolute;
     height: 16px;
     width: 16px;
@@ -357,14 +357,14 @@ input[type="checkbox"] + label:before {
     font: 16px/1em sans-serif;
     text-align: center;
 }
-input[type="radio"] + label:before {
-    content: "\25cf";
+input[type=radio] + label:before {
+    content: '\\25cf';
     border-radius: 50%;
     font-size: 1.3em;
     line-height: 0.6;
 }
-input[type="radio"]:checked + label:before,
-input[type="checkbox"]:checked + label:before {
+input[type=radio]:checked + label:before,
+input[type=checkbox]:checked + label:before {
     color: #222;
     animation: stamp 0.4s ease-out;
 }
