@@ -1,0 +1,44 @@
+/* card styles */
+
+.card {
+    margin-bottom: 0;
+}
+.card .photo {
+    height: 100px;
+    width: 100px;
+    background-size: contain;
+    background-position-x: center;
+    background-repeat: no-repeat;
+}
+.card .name {
+    padding-bottom: 10px;
+    font-size: 1.5em;
+}
+.card .data {
+    max-width: 200px;
+}
+.card .values {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+}
+
+/* phone-specific styles */
+
+@media only screen and (max-width: 500px) {
+    [btn=config] {
+        bottom: 0;
+    }
+}
+
+/* rasti styles overrides (try uncommenting this!) */
+/*
+
+[header]:before, [btn] {
+    text-transform: capitalize !important;
+}
+
+[label]:before {
+    text-transform: uppercase !important;
+}
+
+*/

@@ -68,7 +68,7 @@ input {
     display: block;
     height: 70px;
     width: 100%;
-    padding: 20px 0;
+    padding: 20px;
     font-size: 2.5em;
     text-align: center;
     text-transform: uppercase;
@@ -83,12 +83,12 @@ input {
 }
 [header][panel]:before {
     height: 50px;
-    padding: 10px 0;
+    padding: 10px 20px;
     font-size: 2em;
 }
 [header][section]:before {
     height: 40px;
-    padding: 5px 0;
+    padding: 10px;
     font-size: 1.5em;
 }
 
@@ -111,12 +111,14 @@ input {
     padding: 5px 10px;
     border: 0;
     border-radius: 2px;
+    outline: none;
     font-family: inherit !important;
     font-size: inherit;
     color: #222;
 }
 [btn], .btn {
     height: 50px;
+    min-width: 50px;
     border: 1px solid rgba(0,0,0,0.1);
     font-size: 1.2em;
     text-transform: uppercase;
@@ -254,11 +256,20 @@ input {
 
 
 [modal] {
+    display: none;
+    position: fixed;
+    left: 0; right: 0; top: 0; bottom: 0;
+    margin: auto !important;
     height: 100%;
     width: 100%;
     max-height: 500px;
     max-width: 500px;
+    overflow-y: auto;
+    animation: zoomIn .4s, fadeIn .4s;
+    z-index: 2;
 }
+
+
 [backdrop]:before, .backdrop:before {
     content: '';
     position: fixed;
@@ -266,7 +277,9 @@ input {
     left: 0;
     height: 100vh;
     width: 100vw;
-    background-color: rgba(0,0,0,0.5)
+    background: rgba(0,0,0,.7);
+    animation: fadeIn .4s;
+    z-index: 1;
 }
 
 
@@ -301,6 +314,7 @@ input {
     margin-left: 0;
 }
 [inline][label], [inline]>[label] {
+    width: auto;
     margin-top: 0;
     margin-bottom: 30px;
     margin-left: calc(40% + 10px);
@@ -411,6 +425,16 @@ input[type=checkbox]:checked + label:before {
 
 /* utils */
 
+[move] {
+    user-select: none;
+    cursor: move;
+}
+
+[resize] {
+    resize: both;
+    overflow: hidden;
+}
+
 .loading {
     color: transparent !important;
     position: relative;
@@ -426,9 +450,49 @@ input[type=checkbox]:checked + label:before {
     border-top-color: white;
     animation: spin 1s infinite linear;
 }
+.big.loading:after {
+    position: fixed;
+    width: 100px; height: 100px;
+    z-index: 1;
+}
+
+.loading2 {
+  perspective: 120px;
+}
+.loading2:after {
+  content: "";
+  position: absolute;
+  left: 25px; top: 25px;
+  width: 50px; height: 50px;
+  background-color: #3498db;
+  animation: flip 1s infinite linear;
+}
+
+
 @keyframes spin {
-  0%   { transform: rotate(0deg); }
+  0%   { transform: rotate(0); }
   100% { transform: rotate(360deg); }
+}
+@keyframes flip {
+  0%   { transform: rotate(0); }
+  50%  { transform: rotateY(180deg); }
+  100% { transform: rotateY(180deg) rotateX(180deg); }
+}
+@keyframes zoomIn {
+  0%   { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+@keyframes zoomOut {
+  0%   { transform: scale(1); }
+  100% { transform: scale(0); }
+}
+@keyframes fadeIn {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes fadeOut {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 
@@ -469,7 +533,6 @@ input[type=checkbox]:checked + label:before {
     margin: auto !important;
 }
 
-[modal],
 [center], .center,
 [center_]>*, .center_>* {
     position: absolute;
@@ -581,7 +644,27 @@ input[type=checkbox]:checked + label:before {
     border: 1px solid #000;
     font-size: 2em;
     line-height: 1;
-    z-index: 10;
+}
+
+[round], .round {
+    border-radius: 50%;
+}
+
+[fab][btn], .fab.btn {
+    position: fixed;
+    width: 50px;
+    margin: 20px;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+[close][btn], .close.btn {
+    position: absolute;
+    top: 0; right: 0;
+    width: 50px;
+    background-color: transparent !important;
+    border: none;
+    font-size: 1.5em
 }
 
 
@@ -710,8 +793,8 @@ input[type=checkbox]:checked + label:before {
         margin-bottom: 15px;
     }
 
-    [template] > .controls > .columns > label,
-    [template] > .controls > .sizes > label {
+    [template] > .controls > .columns,
+    [template] > .controls > .sizes {
         display: none;
     }
 

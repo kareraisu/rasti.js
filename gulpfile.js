@@ -45,16 +45,15 @@ function bundle() {
     })
     // turn browserify's text stream into gulp's vinyl stream
     .pipe(source('rasti.js'))
+    // then turn stream into buffer (expected by some gulp plugins, i.e. babili, concat)
+    .pipe(buffer())
     // inject rasti css
     .pipe( replace('/* rasti CSS */', 'rastiCSS = `' + fs.readFileSync('src/rasti.css') + '`') )
-    // turn stream into buffer (expected by some gulp plugins, i.e. babili)
-    .pipe(buffer())
     .pipe(gulp.dest('dist'))
 }
 
 
 function babilize(buffer) {
-    //return src.pipe(vinylize(() => exorcist('dist/rasti.min.map')))
     return buffer.pipe(babili({
         mangle: { keepClassNames: true }
     }))

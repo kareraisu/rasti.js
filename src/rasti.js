@@ -1,4 +1,4 @@
-/** zepto */
+/* zepto */
 
 var utils = require('./utils'),
     is = utils.is,
@@ -197,6 +197,10 @@ var rasti = function(name, container) {
 
 
     function init(options) {
+        var initStart = window.performance.now()
+        log('Initializing app [%s]...', self.name)
+
+        container.addClass('big loading backdrop')
 
         // cache options
         if (options) {
@@ -257,6 +261,17 @@ var rasti = function(name, container) {
         })
 
 
+        // add close btn to modals
+        container.find('[modal]').each(function(i, el) {
+            $('<button close btn>✕</button>')
+            .on('click', function(e){
+                $(this).parent().hide()
+                self.active.page.find('.backdrop').removeClass('backdrop')
+            })
+            .appendTo(el)
+        })
+
+
         // init nav
         container.find('[nav]').click(function(e) {
             var $el = $(this),
@@ -306,9 +321,8 @@ var rasti = function(name, container) {
             
             $el.addClass('loading').attr('disabled', true)
 
-            submitAjax(method, function(resdata){
-                end = window.performance.now()
-                var time = Math.floor(end - start) / 1000
+            submitAjax(method, function(resdata){ 
+                var time = Math.floor(window.performance.now() - start) / 1000
                 log('Ajax method [%s] took %s seconds', method, time)
 
                 if (isValidCB) self.utils[callback](resdata)
@@ -329,12 +343,30 @@ var rasti = function(name, container) {
 
 
         // init actions
-        for (var action of 'click change'.split(' ')) {
+        for (var action of 'click change hover load'.split(' ')) {
+            container.find('[on-'+ action +']').each(function(i, el){
+                var $el = $(el),
+                    methodName = $el.attr('on-' + action)
+                if ( !methodName ) return error('Missing utility method in [%s] attribute of element:', action, el)
+                var method = self.utils[methodName]
+                if ( !method ) return error('Undefined utility method "%s" declared in [on-%s] attribute of element:', methodName, action, el)
+                $el.on(action, method)
+                   .removeAttr('on-' + action)
+            })
+        }
+        for (var action of 'show hide toggle'.split(' ')) {
             container.find('['+ action +']').each(function(i, el){
                 var $el = $(el),
-                    method = $el.attr( action )
-                if ( !self.utils[ method ] ) return error('Undefined utility method "%s" declared in [%s] attribute of element:', method, action, el)
-                $(this).on( action , self.utils[ method ] )
+                    $page = $el.closest('[page]'),
+                    targetSelector = $el.attr(action)
+                if ( !targetSelector ) return error('Missing target selector in [%s] attribute of element:', action, el)
+                var $target = $page.find('['+targetSelector+']')
+                if ( !$target.length ) return error('Could not find target [%s] declared in [%s] attribute of element:', targetSelector, action, el)
+                $el.on('click', function(e){
+                        if ($target[0].hasAttribute('modal')) $page.find('.page-options').addClass('backdrop')
+                        $target[action]()
+                    })
+                    .removeAttr(action)
             })
         }
 
@@ -453,7 +485,15 @@ var rasti = function(name, container) {
         })
 
 
-        container.trigger('rasti-ready')
+        container
+            .on('click', '.backdrop', function(e){
+                $(e.target).removeClass('backdrop')
+                self.active.page.find('[modal]').hide()
+            })
+            .removeClass('big loading backdrop')
+
+        var initTime = Math.floor(window.performance.now() - initStart) / 1000
+        log('App [%s] initialized in %ss', self.name, initTime)
 
     }
 
@@ -738,9 +778,9 @@ var rasti = function(name, container) {
     function createTabs($el) {
         var el = $el[0],
             $tabs = el.hasAttribute('page')
-                ? $el.children('[panel]')
+                ? $el.children('[panel]:not([modal])')
                 : el.hasAttribute('panel')
-                    ? $el.children('[section]')
+                    ? $el.children('[section]:not([modal])')
                     : undefined
         if (!$tabs) return error('[tabs] attribute can only be used in pages or panels, was found in element:', el)
 
@@ -963,7 +1003,7 @@ var rasti = function(name, container) {
 
             ${ns} [header]:before { color: ${ values.header[0] }; }
             ${ns} [label]:not([header]):before  { color: ${ values.label[0] }; }
-            `
+        `
     }
 
 
@@ -1080,21 +1120,6 @@ var rasti = function(name, container) {
     }
 
 
-    // prototype extensions
-
-    (function(){
-
-        Array.prototype.remove = function(el) {
-            var i = this.indexOf(el);
-            if (i >= 0) this.splice(i, 1);
-        }
-
-        String.prototype.capitalize = function() {
-            return this.length && this[0].toUpperCase() + this.slice(1).toLowerCase()
-        }
-
-    })()
-
 
     // api
 
@@ -1131,11 +1156,9 @@ var rasti = function(name, container) {
 
 
 // static properties and methods
-
 rasti.log = log
 rasti.warn = warn
 rasti.error = error
-
 rasti.blocks = require('./blocks/all')
 rasti.fx = {
 
@@ -1149,9 +1172,19 @@ rasti.fx = {
     },
 
 }
-rasti.options = {log : 'warn'}
+rasti.options = {log : 'debug'}
 
 module.exports = Object.freeze(rasti)
+
+
+// prototype extensions
+Array.prototype.remove = function(el) {
+    var i = this.indexOf(el);
+    if (i >= 0) this.splice(i, 1);
+}
+String.prototype.capitalize = function() {
+    return this.length && this[0].toUpperCase() + this.slice(1).toLowerCase()
+}
 
 
 // bootstrap any apps defined via rasti attribute
@@ -1172,6 +1205,7 @@ function bootstrap() {
                     if (is.boolean(options[key]) && !app.options[key]) app.options[key] = true
                 }
             })
+            log('Created rasti app [%s]', appName)
         }
     })
 }
@@ -1183,7 +1217,7 @@ function genBlockStyles() {
         styles += rasti.blocks[key].style
     }
     styles += '</style>'
-    $('body').append(styles)
+    $('head').append(styles)
 }
 
 
@@ -1191,7 +1225,8 @@ var rastiCSS
 
 /* rasti CSS */
 
+if (rastiCSS) $('head').append('<style>' + rastiCSS + '</style>')
 
-if (rastiCSS) $('body').append('<style>' + rastiCSS + '</style>')
 genBlockStyles()
+
 bootstrap()

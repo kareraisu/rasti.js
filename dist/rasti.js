@@ -463,7 +463,7 @@ style : `
 
 },{"../utils":8}],7:[function(require,module,exports){
 (function (global){
-/** zepto */
+/* zepto */
 
 var utils = require('./utils'),
     is = utils.is,
@@ -662,6 +662,10 @@ var rasti = function(name, container) {
 
 
     function init(options) {
+        var initStart = window.performance.now()
+        log('Initializing app [%s]...', self.name)
+
+        container.addClass('big loading backdrop')
 
         // cache options
         if (options) {
@@ -722,6 +726,17 @@ var rasti = function(name, container) {
         })
 
 
+        // add close btn to modals
+        container.find('[modal]').each(function(i, el) {
+            $('<button close btn>✕</button>')
+            .on('click', function(e){
+                $(this).parent().hide()
+                self.active.page.find('.backdrop').removeClass('backdrop')
+            })
+            .appendTo(el)
+        })
+
+
         // init nav
         container.find('[nav]').click(function(e) {
             var $el = $(this),
@@ -771,9 +786,8 @@ var rasti = function(name, container) {
             
             $el.addClass('loading').attr('disabled', true)
 
-            submitAjax(method, function(resdata){
-                end = window.performance.now()
-                var time = Math.floor(end - start) / 1000
+            submitAjax(method, function(resdata){ 
+                var time = Math.floor(window.performance.now() - start) / 1000
                 log('Ajax method [%s] took %s seconds', method, time)
 
                 if (isValidCB) self.utils[callback](resdata)
@@ -794,12 +808,30 @@ var rasti = function(name, container) {
 
 
         // init actions
-        for (var action of 'click change'.split(' ')) {
+        for (var action of 'click change hover load'.split(' ')) {
+            container.find('[on-'+ action +']').each(function(i, el){
+                var $el = $(el),
+                    methodName = $el.attr('on-' + action)
+                if ( !methodName ) return error('Missing utility method in [%s] attribute of element:', action, el)
+                var method = self.utils[methodName]
+                if ( !method ) return error('Undefined utility method "%s" declared in [on-%s] attribute of element:', methodName, action, el)
+                $el.on(action, method)
+                   .removeAttr('on-' + action)
+            })
+        }
+        for (var action of 'show hide toggle'.split(' ')) {
             container.find('['+ action +']').each(function(i, el){
                 var $el = $(el),
-                    method = $el.attr( action )
-                if ( !self.utils[ method ] ) return error('Undefined utility method "%s" declared in [%s] attribute of element:', method, action, el)
-                $(this).on( action , self.utils[ method ] )
+                    $page = $el.closest('[page]'),
+                    targetSelector = $el.attr(action)
+                if ( !targetSelector ) return error('Missing target selector in [%s] attribute of element:', action, el)
+                var $target = $page.find('['+targetSelector+']')
+                if ( !$target.length ) return error('Could not find target [%s] declared in [%s] attribute of element:', targetSelector, action, el)
+                $el.on('click', function(e){
+                        if ($target[0].hasAttribute('modal')) $page.find('.page-options').addClass('backdrop')
+                        $target[action]()
+                    })
+                    .removeAttr(action)
             })
         }
 
@@ -918,7 +950,15 @@ var rasti = function(name, container) {
         })
 
 
-        container.trigger('rasti-ready')
+        container
+            .on('click', '.backdrop', function(e){
+                $(e.target).removeClass('backdrop')
+                self.active.page.find('[modal]').hide()
+            })
+            .removeClass('big loading backdrop')
+
+        var initTime = Math.floor(window.performance.now() - initStart) / 1000
+        log('App [%s] initialized in %ss', self.name, initTime)
 
     }
 
@@ -1203,9 +1243,9 @@ var rasti = function(name, container) {
     function createTabs($el) {
         var el = $el[0],
             $tabs = el.hasAttribute('page')
-                ? $el.children('[panel]')
+                ? $el.children('[panel]:not([modal])')
                 : el.hasAttribute('panel')
-                    ? $el.children('[section]')
+                    ? $el.children('[section]:not([modal])')
                     : undefined
         if (!$tabs) return error('[tabs] attribute can only be used in pages or panels, was found in element:', el)
 
@@ -1428,7 +1468,7 @@ var rasti = function(name, container) {
 
             ${ns} [header]:before { color: ${ values.header[0] }; }
             ${ns} [label]:not([header]):before  { color: ${ values.label[0] }; }
-            `
+        `
     }
 
 
@@ -1545,21 +1585,6 @@ var rasti = function(name, container) {
     }
 
 
-    // prototype extensions
-
-    (function(){
-
-        Array.prototype.remove = function(el) {
-            var i = this.indexOf(el);
-            if (i >= 0) this.splice(i, 1);
-        }
-
-        String.prototype.capitalize = function() {
-            return this.length && this[0].toUpperCase() + this.slice(1).toLowerCase()
-        }
-
-    })()
-
 
     // api
 
@@ -1596,11 +1621,9 @@ var rasti = function(name, container) {
 
 
 // static properties and methods
-
 rasti.log = log
 rasti.warn = warn
 rasti.error = error
-
 rasti.blocks = require('./blocks/all')
 rasti.fx = {
 
@@ -1614,9 +1637,19 @@ rasti.fx = {
     },
 
 }
-rasti.options = {log : 'warn'}
+rasti.options = {log : 'debug'}
 
 module.exports = Object.freeze(rasti)
+
+
+// prototype extensions
+Array.prototype.remove = function(el) {
+    var i = this.indexOf(el);
+    if (i >= 0) this.splice(i, 1);
+}
+String.prototype.capitalize = function() {
+    return this.length && this[0].toUpperCase() + this.slice(1).toLowerCase()
+}
 
 
 // bootstrap any apps defined via rasti attribute
@@ -1637,6 +1670,7 @@ function bootstrap() {
                     if (is.boolean(options[key]) && !app.options[key]) app.options[key] = true
                 }
             })
+            log('Created rasti app [%s]', appName)
         }
     })
 }
@@ -1648,7 +1682,7 @@ function genBlockStyles() {
         styles += rasti.blocks[key].style
     }
     styles += '</style>'
-    $('body').append(styles)
+    $('head').append(styles)
 }
 
 
@@ -1724,7 +1758,7 @@ input {
     display: block;
     height: 70px;
     width: 100%;
-    padding: 20px 0;
+    padding: 20px;
     font-size: 2.5em;
     text-align: center;
     text-transform: uppercase;
@@ -1739,12 +1773,12 @@ input {
 }
 [header][panel]:before {
     height: 50px;
-    padding: 10px 0;
+    padding: 10px 20px;
     font-size: 2em;
 }
 [header][section]:before {
     height: 40px;
-    padding: 5px 0;
+    padding: 10px;
     font-size: 1.5em;
 }
 
@@ -1767,12 +1801,14 @@ input {
     padding: 5px 10px;
     border: 0;
     border-radius: 2px;
+    outline: none;
     font-family: inherit !important;
     font-size: inherit;
     color: #222;
 }
 [btn], .btn {
     height: 50px;
+    min-width: 50px;
     border: 1px solid rgba(0,0,0,0.1);
     font-size: 1.2em;
     text-transform: uppercase;
@@ -1910,11 +1946,20 @@ input {
 
 
 [modal] {
+    display: none;
+    position: fixed;
+    left: 0; right: 0; top: 0; bottom: 0;
+    margin: auto !important;
     height: 100%;
     width: 100%;
     max-height: 500px;
     max-width: 500px;
+    overflow-y: auto;
+    animation: zoomIn .4s, fadeIn .4s;
+    z-index: 2;
 }
+
+
 [backdrop]:before, .backdrop:before {
     content: '';
     position: fixed;
@@ -1922,7 +1967,9 @@ input {
     left: 0;
     height: 100vh;
     width: 100vw;
-    background-color: rgba(0,0,0,0.5)
+    background: rgba(0,0,0,.7);
+    animation: fadeIn .4s;
+    z-index: 1;
 }
 
 
@@ -1957,6 +2004,7 @@ input {
     margin-left: 0;
 }
 [inline][label], [inline]>[label] {
+    width: auto;
     margin-top: 0;
     margin-bottom: 30px;
     margin-left: calc(40% + 10px);
@@ -2067,6 +2115,16 @@ input[type=checkbox]:checked + label:before {
 
 /* utils */
 
+[move] {
+    user-select: none;
+    cursor: move;
+}
+
+[resize] {
+    resize: both;
+    overflow: hidden;
+}
+
 .loading {
     color: transparent !important;
     position: relative;
@@ -2082,9 +2140,49 @@ input[type=checkbox]:checked + label:before {
     border-top-color: white;
     animation: spin 1s infinite linear;
 }
+.big.loading:after {
+    position: fixed;
+    width: 100px; height: 100px;
+    z-index: 1;
+}
+
+.loading2 {
+  perspective: 120px;
+}
+.loading2:after {
+  content: "";
+  position: absolute;
+  left: 25px; top: 25px;
+  width: 50px; height: 50px;
+  background-color: #3498db;
+  animation: flip 1s infinite linear;
+}
+
+
 @keyframes spin {
-  0%   { transform: rotate(0deg); }
+  0%   { transform: rotate(0); }
   100% { transform: rotate(360deg); }
+}
+@keyframes flip {
+  0%   { transform: rotate(0); }
+  50%  { transform: rotateY(180deg); }
+  100% { transform: rotateY(180deg) rotateX(180deg); }
+}
+@keyframes zoomIn {
+  0%   { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+@keyframes zoomOut {
+  0%   { transform: scale(1); }
+  100% { transform: scale(0); }
+}
+@keyframes fadeIn {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes fadeOut {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 
@@ -2125,7 +2223,6 @@ input[type=checkbox]:checked + label:before {
     margin: auto !important;
 }
 
-[modal],
 [center], .center,
 [center_]>*, .center_>* {
     position: absolute;
@@ -2237,7 +2334,27 @@ input[type=checkbox]:checked + label:before {
     border: 1px solid #000;
     font-size: 2em;
     line-height: 1;
-    z-index: 10;
+}
+
+[round], .round {
+    border-radius: 50%;
+}
+
+[fab][btn], .fab.btn {
+    position: fixed;
+    width: 50px;
+    margin: 20px;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+[close][btn], .close.btn {
+    position: absolute;
+    top: 0; right: 0;
+    width: 50px;
+    background-color: transparent !important;
+    border: none;
+    font-size: 1.5em
 }
 
 
@@ -2366,8 +2483,8 @@ input[type=checkbox]:checked + label:before {
         margin-bottom: 15px;
     }
 
-    [template] > .controls > .columns > label,
-    [template] > .controls > .sizes > label {
+    [template] > .controls > .columns,
+    [template] > .controls > .sizes {
         display: none;
     }
 
@@ -2417,9 +2534,10 @@ input[type=checkbox]:checked + label:before {
 
 `
 
+if (rastiCSS) $('head').append('<style>' + rastiCSS + '</style>')
 
-if (rastiCSS) $('body').append('<style>' + rastiCSS + '</style>')
 genBlockStyles()
+
 bootstrap()
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})

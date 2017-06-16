@@ -6,46 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="manifest" href="manifest.json">
 
-    <style>
-
-        /* card styles */
-
-        .card {
-            margin-bottom: 0;
-        }
-        .card .photo {
-            height: 100px;
-            width: 100px;
-            background-size: contain;
-            background-position-x: center;
-            background-repeat: no-repeat;
-        }
-        .card .name {
-            padding-bottom: 10px;
-            font-size: 1.5em;
-        }
-        .card .data {
-            max-width: 200px;
-        }
-        .card .values {
-            overflow-x: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* rasti styles overrides (try uncommenting this!) */
-        /*
-
-        [header]:before, [btn] {
-            text-transform: capitalize !important;
-        }
-
-        [label]:before {
-            text-transform: uppercase !important;
-        }
-
-        */
-
-    </style>
+    <link rel="stylesheet" href="app.css">
 
 </head>
 
@@ -53,7 +14,7 @@
 <!-- 
 the [rasti="X"] declaration does 3 things:
     1. creates a rasti instance named "X"
-    2. binds it to the container (in this case the <body>, but could be any <div> as well)
+    2. binds it to the container (in this case the body, but could be any div as well)
     3. creates an "X" global var to access the instance (window.X = instance)
 -->
 <body rasti="app" persist>
@@ -84,7 +45,7 @@ the [rasti="X"] declaration does 3 things:
         <div col-4 panel="filters" header
             ajax="getPeople"
             state
-            scrolly fullh hh-phone>
+            scrolly hh-phone cc-tablet>
 
             <div section="personal" header inline>
                 <input field="name" label>
@@ -110,7 +71,7 @@ the [rasti="X"] declaration does 3 things:
             template="cards"
             paging="4" columns stats
             fx="stack"
-            fullh hh-phone>
+            hh-phone>
 
             <!-- here be cards! -->
 
@@ -119,51 +80,33 @@ the [rasti="X"] declaration does 3 things:
 
         <div section="user" fix top left></div>
 
-        <button btn nav="config" text="config"
-            ib small fix top right></button>
-
-    </div>
+        <button fab btn=config right
+            show="panel=config">☰</button>
 
 
+        <div modal panel="config" header inline cc-l>           
+            <div block="buttons"
+                field="lang"
+                data="langs"
+                label
+                onchange="app.setLang(this.value)"></div>
 
-    <div row page="config" footer="this is a footer"
-        fix-footer>
+            <div block="radios"
+                field="theme"
+                data="themes"
+                label
+                onchange="app.utils.applyTheme(this)"></div>
 
-        <div panel autom>
-            <div section="config" header>           
-                <div block="buttons"
-                    field="lang"
-                    data="langs"
-                    label
-                    onchange="app.setLang(this.value)"></div>
-
-                <div block="radios"
-                    field="theme"
-                    data="themes"
-                    label
-                    onchange="app.utils.applyTheme(this)"></div>
-
-                <div block="buttons"
-                    data="themeMaps"
-                    onchange="app.utils.applyTheme(this)"></div>
-            </div>
-
+            <div block="buttons"
+                field
+                data="themeMaps"
+                label="variante"
+                onchange="app.utils.applyTheme(this)"></div>
         </div>
 
     </div>
 
-
-    <script src="../dist/rasti+zepto.min.js"></script>
-
-    <!--
-    alternative to using the [rasti] attribute in the <body>;
-    the only difference is that the name of the app can be
-    different from the name of the variable that holds it
-
-    <script>
-        var app = new rasti('some_name', 'body')
-    </script>
-    -->
+    <script src="../dist/rasti+zepto.js"></script>
 
     <script src="extra/people.js"></script>
     <script src="extra/config.js"></script>
