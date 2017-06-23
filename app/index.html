@@ -2,75 +2,75 @@
 <html>
 <head>
     <title>rasti.js demo</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="manifest" href="manifest.json">
+    <meta charset=utf-8>
+    <meta name=viewport content=width=device-width, initial-scale=1 maximum-scale=1>
+    <link rel=manifest href=manifest.json>
 
-    <link rel="stylesheet" href="app.css">
+    <link rel=stylesheet href=app.css>
 
 </head>
 
 
 <!-- 
-the [rasti="X"] declaration does 3 things:
-    1. creates a rasti instance named "X"
+the [rasti=X] declaration does 3 things:
+    1. creates a rasti instance named X
     2. binds it to the container (in this case the body, but could be any div as well)
-    3. creates an "X" global var to access the instance (window.X = instance)
+    3. creates an X global var to access the instance (window.X = instance)
 -->
-<body rasti="app" persist>
+<body rasti=app>
 
-    <div row page="login" header="welcome"
+    <div row page=login header=welcome
         fix-header>
 
         <div panel autom inline>
-            <input field="user" navparam
-                label="username"/>
+            <input field=user navparam
+                label=username/>
 
-            <input type="password"
-                field="pass"
+            <input type=password
+                field=pass
                 label/>
 
             <button btn
-                nav="main" params
-                text="login"></button>
+                nav=main params
+                text=login></button>
         </div>
 
     </div>
 
 
 
-    <div row page="main" header
+    <div row page=main header
         tabs-tablet hh-phone>
 
-        <div col-4 panel="filters" header
-            ajax="getPeople"
+        <div col-4 panel=filters header
+            ajax=getPeople
             state
             scrolly hh-phone cc-tablet>
 
-            <div section="personal" header inline>
-                <input field="name" label>
+            <div section=personal header inline>
+                <input field=name label>
             </div>
 
-            <div section="work" header inline>
-                <select field="skills" label data></select>
+            <div section=work header inline>
+                <select field=skills label data></select>
             </div>
 
-            <div section="reqdata" header>
-                <textarea name="reqdata" field disabled
-                    style="height: 100px"></textarea>
+            <div section=reqdata header>
+                <textarea name=reqdata field disabled
+                    style=height:100px></textarea>
             </div>
 
             <button btn
-                submit="getPeople"
-                render="cards"
-                text="search"></button>
+                submit=getPeople
+                render=cards
+                text=search></button>
         </div>
 
 
-        <div col-8 panel="results" header
-            template="cards"
-            paging="4" columns stats
-            fx="stack"
+        <div col-8 panel=results header
+            template=cards
+            paging=4 columns stats
+            fx=stack
             hh-phone>
 
             <!-- here be cards! -->
@@ -78,39 +78,40 @@ the [rasti="X"] declaration does 3 things:
         </div>
 
 
-        <div section="user" fix top left></div>
+        <div section=user fix top left></div>
 
-        <button fab btn=config right
-            show="panel=config">☰</button>
+        <button fab btn=config
+            show=panel=config
+            right move>☰</button>
 
 
-        <div modal panel="config" header inline cc-l>           
-            <div block="buttons"
-                field="lang"
-                data="langs"
+        <div modal panel=config header inline cc-l>           
+            <div block=buttons
+                field=lang
+                data=langs
                 label
-                onchange="app.setLang(this.value)"></div>
+                onchange=app.setLang(this.value)></div>
 
-            <div block="radios"
-                field="theme"
-                data="themes"
+            <div block=radios
+                field=theme
+                data=themes
                 label
-                onchange="app.utils.applyTheme(this)"></div>
+                change=applyTheme></div>
 
-            <div block="buttons"
+            <div block=buttons
                 field
-                data="themeMaps"
-                label="variante"
-                onchange="app.utils.applyTheme(this)"></div>
+                data=themeMaps
+                label=variante
+                change=applyTheme></div>
         </div>
 
     </div>
 
-    <script src="../dist/rasti+zepto.js"></script>
+    <script src=../dist/rasti+zepto.js></script>
 
-    <script src="extra/people.js"></script>
-    <script src="extra/config.js"></script>
-    <script src="app.js"></script>
+    <script src=extra/people.js></script>
+    <script src=extra/config.js></script>
+    <script src=app.js></script>
 
 </body>
 </html>
