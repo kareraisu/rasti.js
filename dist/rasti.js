@@ -737,6 +737,24 @@ var rasti = function(name, container) {
         })
 
 
+        // init field validations
+        container.find('[validate]').on('click', function (e) {
+            var $container = $(this).parent().removeClass('invalid')
+            var invalid
+            $container.find('[field][required]').each(function(i, el){
+                invalid = el.validity && !el.validity.valid
+                el.classList.toggle('error', invalid)
+                if (invalid) $container.addClass('invalid')
+            })
+            if ($container.hasClass('invalid')) {
+                // prevent any default actions
+                e.preventDefault()
+                // and any custom actions (such as nav)
+                e.stopImmediatePropagation()
+            }
+        })
+
+
         // init nav
         container.find('[nav]').click(function(e) {
             var $el = $(this),
@@ -843,10 +861,8 @@ var rasti = function(name, container) {
 
 
         // init collapse
-        container.find('[collapse]').each(function(i, el){
-            $(el).on('click', function(e){
-                this.classList.toggle('folded')
-            })
+        container.find('[collapse]').on('click', function(e){
+            this.classList.toggle('folded')
         })
 
 
@@ -1777,6 +1793,13 @@ input {
     margin: 0;
     vertical-align: text-bottom;
 }
+input:invalid{
+    outline: 1px solid red;
+}
+
+input:focus:invalid {
+    outline: none;
+}
 
 
 [page], [panel], [section] {
@@ -2058,6 +2081,7 @@ input {
 [label]:not([panel]):not([section]):before {
     content: attr(label);
     position: absolute;
+    left: 0;
     height: 20px;
     font-size: 1.2em;
     text-transform: capitalize;
@@ -2080,9 +2104,9 @@ input {
     margin-left: calc(40% + 10px);
 }
 [inline][label]:before, [inline]>[label]:before {
-    max-width: 40%;
+    width: 40%;
     margin-top: 0;
-    margin-left: -40%;
+    text-align: right;
 }
 
 
@@ -2428,6 +2452,19 @@ input[type=checkbox]:checked + label:before {
     margin-right: 0;
 }
 
+[pad-s] {
+    padding-left: 5%;
+    padding-right: 5%;
+}
+[pad] {
+    padding-left: 10%;
+    padding-right: 10%;
+}
+[pad-l] {
+    padding-left: 15%;
+    padding-right: 15%;
+}
+
 [msg], .msg {
     height: 60%;
     width: 60%;
@@ -2460,6 +2497,10 @@ input[type=checkbox]:checked + label:before {
     background-color: transparent !important;
     border: none;
     font-size: 1.5em
+}
+
+.error {
+  box-shadow: 0px 0px 16px 2px red;
 }
 
 
@@ -2504,23 +2545,24 @@ input[type=checkbox]:checked + label:before {
 
 /* desktop only */
 @media only screen and (min-width: 800px) {
-    [cc] {
-    padding-left: 20%;
-    padding-right: 20%;
+    [pad-s-desktop] {
+        padding-left: 5%;
+        padding-right: 5%;
     }
-    [cc-s] {
-        padding-left: 30%;
-        padding-right: 30%;
-    }
-    [cc-l] {
+    [pad-desktop] {
         padding-left: 10%;
         padding-right: 10%;
+    }
+    [pad-l-desktop] {
+        padding-left: 15%;
+        padding-right: 15%;
     }
 }
 
 
 /* tablet only */
 @media only screen and (min-width: 500px) and (max-width: 800px) {
+
     .hide-tablet {
         display: none;
     }
@@ -2541,18 +2583,17 @@ input[type=checkbox]:checked + label:before {
         padding-top: 15px;
     }
     
-
-    [cc-tablet] {
-        padding-left: 20%;
-        padding-right: 20%;
+    [pad-s-tablet] {
+        padding-left: 5%;
+        padding-right: 5%;
     }
-    [cc-s-tablet] {
-        padding-left: 30%;
-        padding-right: 30%;
-    }
-    [cc-l-tablet] {
+    [pad-tablet] {
         padding-left: 10%;
         padding-right: 10%;
+    }
+    [pad-l-tablet] {
+        padding-left: 15%;
+        padding-right: 15%;
     }
 
 }
@@ -2565,7 +2606,6 @@ input[type=checkbox]:checked + label:before {
         padding: 10px;
         line-height: 0.8;
     }
-
 
 }
 
@@ -2621,18 +2661,19 @@ input[type=checkbox]:checked + label:before {
         padding-top: 15px;
     }
 
-    [cc-phone] {
-        padding-left: 20%;
-        padding-right: 20%;
+    [pad-s-phone] {
+        padding-left: 5%;
+        padding-right: 5%;
     }
-    [cc-s-phone] {
-        padding-left: 30%;
-        padding-right: 30%;
-    }
-    [cc-l-phone] {
+    [pad-phone] {
         padding-left: 10%;
         padding-right: 10%;
     }
+    [pad-l-phone] {
+        padding-left: 15%;
+        padding-right: 15%;
+    }
+    
 
 
 }

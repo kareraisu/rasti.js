@@ -90,8 +90,8 @@ app.extend({
 
 app.extend({
 	data : {
-		langs : Object.keys(app.langs),
-		themes : Object.keys(app.themes),
+		lang : Object.keys(app.langs),
+		theme : Object.keys(app.themes),
 		themeMaps : Object.keys(app.themeMaps),
 	},
 })

@@ -22,17 +22,20 @@ the [rasti=X] declaration does 3 things:
     <div row page=login header=welcome
         fix-header>
 
-        <div panel autom inline>
+        <div panel autom inline pad10>
             <input field=user navparam
-                label=username/>
+                label=username
+                required />
 
             <input type=password
                 field=pass
-                label/>
+                label
+                required />
 
             <button btn
                 nav=main params
-                text=login></button>
+                text=login
+                validate></button>
         </div>
 
     </div>
@@ -45,15 +48,15 @@ the [rasti=X] declaration does 3 things:
         <div col-4 panel=filters header
             ajax=getPeople
             state
-            scrolly hh-phone cc-tablet>
+            scrolly hh-phone pad pad-s-desktop>
 
-            <div section=personal header inline
-                collapse>
+            <div section=personal header
+                inline collapse>
                 <input field=name label>
             </div>
 
-            <div section=work header inline
-                collapse>
+            <div section=work header
+                inline collapse>
                 <select field=skills label data></select>
             </div>
 
@@ -88,17 +91,14 @@ the [rasti=X] declaration does 3 things:
             right>☰</button>
 
 
-        <div modal panel=config header inline cc-l>           
+        <div modal panel=config header
+            inline pad pad-s-desktop>           
             <div block=buttons
-                field=lang
-                data=langs
-                label
+                field=lang data label
                 onchange=app.setLang(this.value)></div>
 
             <div block=radios
-                field=theme
-                data=themes
-                label
+                field=theme data label
                 on-change=applyTheme></div>
 
             <div block=buttons

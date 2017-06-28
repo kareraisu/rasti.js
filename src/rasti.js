@@ -272,6 +272,24 @@ var rasti = function(name, container) {
         })
 
 
+        // init field validations
+        container.find('[validate]').on('click', function (e) {
+            var $container = $(this).parent().removeClass('invalid')
+            var invalid
+            $container.find('[field][required]').each(function(i, el){
+                invalid = el.validity && !el.validity.valid
+                el.classList.toggle('error', invalid)
+                if (invalid) $container.addClass('invalid')
+            })
+            if ($container.hasClass('invalid')) {
+                // prevent any default actions
+                e.preventDefault()
+                // and any custom actions (such as nav)
+                e.stopImmediatePropagation()
+            }
+        })
+
+
         // init nav
         container.find('[nav]').click(function(e) {
             var $el = $(this),
@@ -378,10 +396,8 @@ var rasti = function(name, container) {
 
 
         // init collapse
-        container.find('[collapse]').each(function(i, el){
-            $(el).on('click', function(e){
-                this.classList.toggle('folded')
-            })
+        container.find('[collapse]').on('click', function(e){
+            this.classList.toggle('folded')
         })
 
 
