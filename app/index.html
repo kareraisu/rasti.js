@@ -47,15 +47,18 @@ the [rasti=X] declaration does 3 things:
             state
             scrolly hh-phone cc-tablet>
 
-            <div section=personal header inline>
+            <div section=personal header inline
+                collapse>
                 <input field=name label>
             </div>
 
-            <div section=work header inline>
+            <div section=work header inline
+                collapse>
                 <select field=skills label data></select>
             </div>
 
-            <div section=reqdata header>
+            <div section=reqdata header
+                collapse>
                 <textarea name=reqdata field disabled
                     style=height:100px></textarea>
             </div>
@@ -82,7 +85,7 @@ the [rasti=X] declaration does 3 things:
 
         <button fab btn=config
             show=panel=config
-            right move>☰</button>
+            right>☰</button>
 
 
         <div modal panel=config header inline cc-l>           
@@ -96,13 +99,13 @@ the [rasti=X] declaration does 3 things:
                 field=theme
                 data=themes
                 label
-                change=applyTheme></div>
+                on-change=applyTheme></div>
 
             <div block=buttons
                 field
                 data=themeMaps
                 label=variante
-                change=applyTheme></div>
+                on-change=applyTheme></div>
         </div>
 
     </div>

@@ -370,10 +370,20 @@ var rasti = function(name, container) {
             })
         }
 
+
         // init move
         container.find('[move]').each(function(i, el){
             $(el).move()
         })
+
+
+        // init collapse
+        container.find('[collapse]').each(function(i, el){
+            $(el).on('click', function(e){
+                this.classList.toggle('folded')
+            })
+        })
+
 
         // init pages
         var page, $page

@@ -835,10 +835,20 @@ var rasti = function(name, container) {
             })
         }
 
+
         // init move
         container.find('[move]').each(function(i, el){
             $(el).move()
         })
+
+
+        // init collapse
+        container.find('[collapse]').each(function(i, el){
+            $(el).on('click', function(e){
+                this.classList.toggle('folded')
+            })
+        })
+
 
         // init pages
         var page, $page
@@ -2184,6 +2194,15 @@ input[type=checkbox]:checked + label:before {
     resize: both;
     overflow: hidden;
 }
+[collapse] {
+    animation: foldOut 0.5s;
+}
+[section][collapse].folded {
+    animation: foldIn 0.5s;
+    height: 0;
+    padding-bottom: 0;
+    padding-top: 40px;
+}
 
 .loading {
     color: transparent !important;
@@ -2207,43 +2226,69 @@ input[type=checkbox]:checked + label:before {
 }
 
 .loading2 {
-  perspective: 120px;
+    perspective: 120px;
 }
 .loading2:after {
-  content: "";
-  position: absolute;
-  left: 25px; top: 25px;
-  width: 50px; height: 50px;
-  background-color: #3498db;
-  animation: flip 1s infinite linear;
+    content: "";
+    position: absolute;
+    left: 25px; top: 25px;
+    width: 50px; height: 50px;
+    background-color: #3498db;
+    animation: flip 1s infinite linear;
 }
 
 
 @keyframes spin {
-  0%   { transform: rotate(0); }
-  100% { transform: rotate(360deg); }
+    0%   { transform: rotate(0); }
+    100% { transform: rotate(360deg); }
 }
 @keyframes flip {
-  0%   { transform: rotate(0); }
-  50%  { transform: rotateY(180deg); }
-  100% { transform: rotateY(180deg) rotateX(180deg); }
+    0%   { transform: rotate(0); }
+    50%  { transform: rotateY(180deg); }
+    100% { transform: rotateY(180deg) rotateX(180deg); }
 }
 @keyframes zoomIn {
-  0%   { transform: scale(0); }
-  100% { transform: scale(1); }
+    0%   { transform: scale(0); }
+    100% { transform: scale(1); }
 }
 @keyframes zoomOut {
-  0%   { transform: scale(1); }
-  100% { transform: scale(0); }
+    0%   { transform: scale(1); }
+    100% { transform: scale(0); }
 }
 @keyframes fadeIn {
-  0%   { opacity: 0; }
-  100% { opacity: 1; }
+    0%   { opacity: 0; }
+    100% { opacity: 1; }
 }
 @keyframes fadeOut {
-  0%   { opacity: 1; }
-  100% { opacity: 0; }
+    0%   { opacity: 1; }
+    100% { opacity: 0; }
 }
+@keyframes foldIn {
+    0% { 
+        height: auto;
+        padding-top: 55px;
+        padding-bottom: 10px;
+    }
+    100% { 
+        height: 0;
+        padding-top: 40px;
+        padding-bottom: 0;
+    }
+}
+@keyframes foldOut {
+    0% { 
+        height: 0;
+        padding-top: 40px;
+        padding-bottom: 0;
+    }
+    100% { 
+        height: auto;
+        padding-top: 55px;
+        padding-bottom: 10px;
+    }
+}
+
+
 
 
 [ib], .ib,
