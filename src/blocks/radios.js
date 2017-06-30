@@ -8,7 +8,7 @@ template : function(data, $el) {
     for (var d of data) {
         d = utils.checkData(d)
         ret += `<div>
-            <input type="radio" name="${uid}[]" value="${d.value}">
+            <input type="radio" name="${uid}" value="${d.value}">
             <label>${d.label}</label>
         </div>`
     }
@@ -16,24 +16,34 @@ template : function(data, $el) {
 },
 
 init : function($el) {
-    $el.find('input').change(function(e) {
-        var $el = $(this)
-        $el.closest('[block=radios]').val($el.attr('value'))
+    $el.find('div').click(function(e) {
+        // forward clicks to hidden input
+        $(e.currentTarget).find('input').click()
     })
-    $el.find('input +label').click(function(e) {
-        var $el = $(this)
-        $el.prev().click()
+    $el.find('input').click(function(e) {
+        // prevent event loop (due to click bubbling up to div)
+        e.stopPropagation()
+    })
+    $el.find('input').change(function(e) {
+        // update component value
+        $el.val( $(e.currentTarget).attr('value') )
     })
     $el.change(function(e) {
-        var $el = $(this)
+        // update component ui
         $el.find('[value="'+ $el.val() +'"]').prop('checked', true)
     })
 },
 
 style : `
-    [block=radios]>div {
-        height: 24px;
-        padding-top: 5px
+    [block=radios] label {
+        height: 40px;
+        padding: 12px 0;
+    }
+    [block=radios] div {
+        cursor: pointer;
+    }
+    [block=radios] div:hover label {
+        font-weight: 600;
     }
 `
 

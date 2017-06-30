@@ -16,36 +16,44 @@ template : function(data, $el) {
 },
 
 init : function($el) {
-    $el[0].value = []
-    $el.find('input').change(function(e) {
-        var $el = $(this),
-            val = $el.attr('value'),
-            values = $el.closest('[block=checks]')[0].value
-        if ($el.prop('checked')) {
-            values.push(val)
-        }
-        else {
-            values.remove(val)
-        }
+    var values = $el[0].value = []
+    $el.find('div').click(function(e) {
+        // forward clicks to hidden input
+        $(e.currentTarget).find('input').click()
     })
-    $el.find('input +label').click(function(e) {
-        var $el = $(this)
-        $el.prev().click()
+    $el.find('input').click(function(e) {
+        // prevent event loop (due to click bubbling up to div)
+        e.stopPropagation()
+    })
+    $el.find('input').change(function(e) {
+        // update component value
+        var $input = $(e.currentTarget),
+            val = $input.attr('value')
+        $input.prop('checked')
+            ? values.push(val)
+            : values.remove(val)
     })
     $el.change(function(e) {
-        var $el = $(this), $input, checked
+        // update component ui
+        var $input, checked
         $el.find('input').each(function(i, input){
             $input = $(input)
-            checked = $el[0].value.includes($input.attr('value'))
+            checked = values.includes( $input.attr('value') )
             $input.prop('checked', checked)
         })
     })
 },
 
 style : `
-    [block=checks]>div {
-        height: 24px;
-        padding-top: 5px
+    [block=checks] label {
+        height: 40px;
+        padding: 12px 0;
+    }
+    [block=checks] div {
+        cursor: pointer;
+    }
+    [block=checks] div:hover label {
+        font-weight: 600;
     }
 `
 

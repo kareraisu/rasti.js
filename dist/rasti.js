@@ -73,36 +73,44 @@ template : function(data, $el) {
 },
 
 init : function($el) {
-    $el[0].value = []
-    $el.find('input').change(function(e) {
-        var $el = $(this),
-            val = $el.attr('value'),
-            values = $el.closest('[block=checks]')[0].value
-        if ($el.prop('checked')) {
-            values.push(val)
-        }
-        else {
-            values.remove(val)
-        }
+    var values = $el[0].value = []
+    $el.find('div').click(function(e) {
+        // forward clicks to hidden input
+        $(e.currentTarget).find('input').click()
     })
-    $el.find('input +label').click(function(e) {
-        var $el = $(this)
-        $el.prev().click()
+    $el.find('input').click(function(e) {
+        // prevent event loop (due to click bubbling up to div)
+        e.stopPropagation()
+    })
+    $el.find('input').change(function(e) {
+        // update component value
+        var $input = $(e.currentTarget),
+            val = $input.attr('value')
+        $input.prop('checked')
+            ? values.push(val)
+            : values.remove(val)
     })
     $el.change(function(e) {
-        var $el = $(this), $input, checked
+        // update component ui
+        var $input, checked
         $el.find('input').each(function(i, input){
             $input = $(input)
-            checked = $el[0].value.includes($input.attr('value'))
+            checked = values.includes( $input.attr('value') )
             $input.prop('checked', checked)
         })
     })
 },
 
 style : `
-    [block=checks]>div {
-        height: 24px;
-        padding-top: 5px
+    [block=checks] label {
+        height: 40px;
+        padding: 12px 0;
+    }
+    [block=checks] div {
+        cursor: pointer;
+    }
+    [block=checks] div:hover label {
+        font-weight: 600;
     }
 `
 
@@ -320,7 +328,7 @@ template : function(data, $el) {
     for (var d of data) {
         d = utils.checkData(d)
         ret += `<div>
-            <input type="radio" name="${uid}[]" value="${d.value}">
+            <input type="radio" name="${uid}" value="${d.value}">
             <label>${d.label}</label>
         </div>`
     }
@@ -328,24 +336,34 @@ template : function(data, $el) {
 },
 
 init : function($el) {
-    $el.find('input').change(function(e) {
-        var $el = $(this)
-        $el.closest('[block=radios]').val($el.attr('value'))
+    $el.find('div').click(function(e) {
+        // forward clicks to hidden input
+        $(e.currentTarget).find('input').click()
     })
-    $el.find('input +label').click(function(e) {
-        var $el = $(this)
-        $el.prev().click()
+    $el.find('input').click(function(e) {
+        // prevent event loop (due to click bubbling up to div)
+        e.stopPropagation()
+    })
+    $el.find('input').change(function(e) {
+        // update component value
+        $el.val( $(e.currentTarget).attr('value') )
     })
     $el.change(function(e) {
-        var $el = $(this)
+        // update component ui
         $el.find('[value="'+ $el.val() +'"]').prop('checked', true)
     })
 },
 
 style : `
-    [block=radios]>div {
-        height: 24px;
-        padding-top: 5px
+    [block=radios] label {
+        height: 40px;
+        padding: 12px 0;
+    }
+    [block=radios] div {
+        cursor: pointer;
+    }
+    [block=radios] div:hover label {
+        font-weight: 600;
     }
 `
 
@@ -2136,7 +2154,7 @@ input[type=radio] + label,
 input[type=checkbox] + label {
     display: inline-block;
     max-width: 90%;
-    margin-left: 20px;
+    margin-left: 40px;
     overflow: hidden;
     text-overflow: ellipsis;
     cursor: pointer;
@@ -2145,21 +2163,21 @@ input[type=radio] + label:before,
 input[type=checkbox] + label:before {
     content: '\\2713';
     position: absolute;
-    height: 16px;
-    width: 16px;
-    margin-left: -22px;
-    padding: 0;
+    height: 32px;
+    width: 32px;
+    margin-top: -8px;
+    margin-left: -36px;
     border: 1px solid #999;
     color: transparent;
     background-color: #fff;
-    font: 16px/1em sans-serif;
+    font-size: 2.3em;
+    line-height: 1;
     text-align: center;
 }
 input[type=radio] + label:before {
     content: '\\25cf';
     border-radius: 50%;
-    font-size: 1.3em;
-    line-height: 0.6;
+    line-height: 0.8;
 }
 input[type=radio]:checked + label:before,
 input[type=checkbox]:checked + label:before {
