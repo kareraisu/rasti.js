@@ -3,7 +3,7 @@
 <head>
     <title>rasti.js demo</title>
     <meta charset=utf-8>
-    <meta name=viewport content=width=device-width, initial-scale=1 maximum-scale=1>
+    <meta name=viewport content="width=device-width, initial-scale=1 maximum-scale=1">
     <link rel=manifest href=manifest.json>
 
     <link rel=stylesheet href=app.css>
@@ -17,7 +17,7 @@ the [rasti=X] declaration does 3 things:
     2. binds it to the container (in this case the body, but could be any div as well)
     3. creates an X global var to access the instance (window.X = instance)
 -->
-<body rasti=app>
+<body rasti=app persist>
 
     <div row page=login header=welcome
         fix-header>
@@ -87,7 +87,7 @@ the [rasti=X] declaration does 3 things:
         <div section=user fix top left></div>
 
         <button fab btn=config
-            show=panel=config
+            show="panel=config"
             right>☰</button>
 
 

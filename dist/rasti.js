@@ -2540,6 +2540,46 @@ input[type=checkbox]:checked + label:before {
 }
 
 
+/* scrollbar */
+
+/* webkit */
+::-webkit-scrollbar {
+    width: 16px;
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.3);
+    background-clip: content-box;
+    border-right: solid transparent 8px;
+    border-radius: 10px 23px 23px 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* mozilla (NOT WORKING) */
+@-moz-document url-prefix(http://), url-prefix(https://) {
+    scrollbar {
+        -moz-appearance: none !important;
+        background: rgb(0,255,0) !important;
+    }
+    thumb, scrollbarbutton {
+        -moz-appearance: none !important;
+        background-color: rgb(0,0,255) !important;
+    }
+    thumb:hover, scrollbarbutton:hover {
+        -moz-appearance: none !important;
+        background-color: rgb(255,0,0) !important;
+    }
+    scrollbarbutton {
+        display: none !important;
+    }
+    scrollbar[orient="vertical"] {
+        min-width: 15px !important;
+    }
+}
+
+
 /*** MEDIA QUERIES ***/
 
 
