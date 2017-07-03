@@ -1046,30 +1046,46 @@ var rasti = function(name, container) {
 
         if (!pagename) return error('Cannot navigate, page undefined')
 
+        var $prevPage = self.active.page,
+            prevPagename = $prevPage && $prevPage.attr('page'),
+            prevPage = prevPagename && self.pages[prevPagename]
+        
+        if (pagename == prevPagename) return
+
         var page = self.pages[pagename],
             $page = container.find('[page='+ pagename +']')
 
-        if (!$page.length) return error('Cannot nav to page [%s]: page container not found', pagename)
-        
+        if (!$page.length) return error('Cannot navigate to page [%s]: page container not found', pagename)
+
+        if ($prevPage) $prevPage.removeClass('active')
+
+        if (prevPage && prevPage.out) {
+            !is.function(prevPage.out)
+                ? warn('Page [%s] {out} property must be a function!', prevPagename)
+                : prevPage.out()
+        }
+
         self.active.page = $page
 
         if ( params && !is.object(params) ) warn('Page [%s] nav params must be an object!', pagename)
-            
-        if (page && page.nav) {
-            !is.function(page.nav)
-                ? warn('Page [%s] nav property must be a function!', pagename)
-                : page.nav(params)
+        if (page && page.in) {
+            !is.function(page.in)
+                ? warn('Page [%s] {in} property must be a function!', pagename)
+                : page.in(params)
         }
 
-        container.find('[page].active').removeClass('active')
-        self.active.page.addClass('active')
+        $page.addClass('active')
+
+        container
+            .find('nav [nav]').removeClass('active')
+            .filter('[nav='+ pagename +']').addClass('active')
 
         container.trigger('rasti-nav')
 
         if (skipPushState) return
         if (page && page.url) {
             !is.string(page.url)
-                ? warn('Page [%s] url property must be a string!', pagename)
+                ? warn('Page [%s] {url} property must be a string!', pagename)
                 : window.history.pushState(pagename, null, '#'+page.url)
         }
         else {
@@ -1491,13 +1507,14 @@ var rasti = function(name, container) {
             ${ns} {
                 font: ${ values.font };
                 color: ${ values.text[0] };
+                background-color: ${ values.page[0] };
             }
             ${ns} [page]    { background-color: ${ values.page[0] }; }
             ${ns} [panel]   { background-color: ${ values.panel[0] }; }
             ${ns} [section] { background-color: ${ values.section[0] }; }
 
             ${ns} [page][header]:before,
-                  [page][footer]:after     { background-color: ${ values.page[1] }; }
+            ${ns} [page][footer]:after     { background-color: ${ values.page[1] }; }
             ${ns} [panel][header]:before   { background-color: ${ values.panel[1] }; }
             ${ns} [section][header]:before { background-color: ${ values.section[1] }; }
 
@@ -1509,7 +1526,10 @@ var rasti = function(name, container) {
                 color: ${ values.field[1] };
             }
 
-            ${ns} [btn], .btn, [block=buttons] > div {
+            ${ns} [btn],
+            ${ns} .btn,
+            ${ns} [block=buttons] > div,
+            ${ns} nav > div.active {
                 background-color: ${ values.btn[0] };
                 color: ${ values.btn[1] }; 
             }
@@ -1806,6 +1826,10 @@ rastiCSS = `body {
     transition: background-color 0.2s,
                 font 0.2s;
 }
+nav {
+    height: 50px;
+    width: 100vw;
+}
 input {
     width: 100%;
     margin: 0;
@@ -1826,15 +1850,19 @@ input:focus:invalid {
 }
 
 [page] {
-    height: 100vh;
-    width: 100vw;
+    min-height: 100vh;
+    width: 100vw !important;
     padding-bottom: 15px;
     margin-bottom: -5px;
+    overflow-y: auto;
 }
 [page]:not(.active) {
 	display: none !important;
 }
-
+nav ~ [page] {
+    min-height: calc(100vh - 50px);
+    max-height: calc(100vh - 50px);
+}
 
 [panel] {
     padding: 20px 15px;
@@ -1915,13 +1943,16 @@ input:focus:invalid {
     outline: none;
     font-family: inherit !important;
     font-size: inherit;
-    color: #222;
 }
 [btn], .btn {
+    display: inline-block;
     height: 50px;
+    width: auto;
     min-width: 50px;
     border: 1px solid rgba(0,0,0,0.1);
     font-size: 1.2em;
+    text-align: center;
+    text-decoration: none;
     text-transform: uppercase;
 	cursor: pointer;
 }
@@ -1940,11 +1971,7 @@ input:focus:invalid {
 [section] .field, [section] .btn {
     margin-bottom: 15px;
 }
-[btn][ib], [btn].ib, .btn[ib], .btn.ib,
-[ib_]>[btn], [ib_]>.btn, .ib_>[btn], .ib_>.btn {
-    margin-top: 0;
-    margin-bottom: 0;
-}
+
 
 [big][field], [big][btn], .big.field , .big.btn,
 [big].field, [big].btn, .big[field] , .big[btn],
@@ -2002,9 +2029,6 @@ input:focus:invalid {
     overflow-x: auto;
     overflow-y: hidden;
 }
-.tab-labels + [h-flow] {
-    height: calc(100% - 40px);
-}
 [h-flow] > * {
     display: inline-block;
     white-space: normal;
@@ -2017,11 +2041,16 @@ input:focus:invalid {
     margin-right: auto;
     vertical-align: top;
 }
+.tab-labels + [h-flow] {
+    height: calc(100vh - 40px);
+}
+nav ~ [page] > .tab-labels + [h-flow] {
+    height: calc(100vh - 80px);
+}
 
-.tab-labels {
+nav, .tab-labels {
     display: flex;
     position: relative;
-    justify-content: space-around;
     white-space: nowrap;
     min-width: 100vw;
     height: 40px;
@@ -2031,13 +2060,16 @@ input:focus:invalid {
     text-transform: uppercase;
     z-index: 1;
 }
+.tab-labels {
+    justify-content: space-around;
+}
 .tab-labels > .bar {
     position: absolute;
     bottom: 0; left: 0;
     height: 4px;
     transition: left 0.2s, width 0.2s;
 }
-[tab-label] {
+nav > div, [tab-label] {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2046,8 +2078,6 @@ input:focus:invalid {
     max-width: 120px;
     padding: 5px;
     font-size: 1.2em;
-    line-height: 1;
-    text-align: center;
     text-shadow: 0 0 0 #000;
     cursor: pointer;
 }
@@ -2192,6 +2222,7 @@ input[type=checkbox]:checked + label:before {
 .row, [row] {
     display: flex;
     flex-flow: row wrap;
+    align-content: flex-start;
     width: 100%;
 }
 .row > .col-1,  [row] > [col-1]  { flex-basis: calc(08.33% - 15px); }
@@ -2331,12 +2362,16 @@ input[type=checkbox]:checked + label:before {
 }
 
 
-
+[hidden], .hidden {
+    display: none !important;
+}
 
 [ib], .ib,
 [ib_]>*, .ib_>* {
     display: inline-block;
     width: auto;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 [floatl], .floatl {
@@ -2671,9 +2706,17 @@ input[type=checkbox]:checked + label:before {
 /* phone only */
 @media only screen and (max-width: 500px) {
 
+    nav {
+        height: 40px;
+    }
+
     [page] {
         padding-bottom: 0;
         overflow-y: auto;
+    }
+    nav ~ [page] {
+        min-height: calc(100vh - 40px);
+        max-height: calc(100vh - 40px);
     }
 
     [class*=col-],

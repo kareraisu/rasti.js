@@ -563,30 +563,46 @@ var rasti = function(name, container) {
 
         if (!pagename) return error('Cannot navigate, page undefined')
 
+        var $prevPage = self.active.page,
+            prevPagename = $prevPage && $prevPage.attr('page'),
+            prevPage = prevPagename && self.pages[prevPagename]
+        
+        if (pagename == prevPagename) return
+
         var page = self.pages[pagename],
             $page = container.find('[page='+ pagename +']')
 
-        if (!$page.length) return error('Cannot nav to page [%s]: page container not found', pagename)
-        
+        if (!$page.length) return error('Cannot navigate to page [%s]: page container not found', pagename)
+
+        if ($prevPage) $prevPage.removeClass('active')
+
+        if (prevPage && prevPage.out) {
+            !is.function(prevPage.out)
+                ? warn('Page [%s] {out} property must be a function!', prevPagename)
+                : prevPage.out()
+        }
+
         self.active.page = $page
 
         if ( params && !is.object(params) ) warn('Page [%s] nav params must be an object!', pagename)
-            
-        if (page && page.nav) {
-            !is.function(page.nav)
-                ? warn('Page [%s] nav property must be a function!', pagename)
-                : page.nav(params)
+        if (page && page.in) {
+            !is.function(page.in)
+                ? warn('Page [%s] {in} property must be a function!', pagename)
+                : page.in(params)
         }
 
-        container.find('[page].active').removeClass('active')
-        self.active.page.addClass('active')
+        $page.addClass('active')
+
+        container
+            .find('nav [nav]').removeClass('active')
+            .filter('[nav='+ pagename +']').addClass('active')
 
         container.trigger('rasti-nav')
 
         if (skipPushState) return
         if (page && page.url) {
             !is.string(page.url)
-                ? warn('Page [%s] url property must be a string!', pagename)
+                ? warn('Page [%s] {url} property must be a string!', pagename)
                 : window.history.pushState(pagename, null, '#'+page.url)
         }
         else {
@@ -1008,13 +1024,14 @@ var rasti = function(name, container) {
             ${ns} {
                 font: ${ values.font };
                 color: ${ values.text[0] };
+                background-color: ${ values.page[0] };
             }
             ${ns} [page]    { background-color: ${ values.page[0] }; }
             ${ns} [panel]   { background-color: ${ values.panel[0] }; }
             ${ns} [section] { background-color: ${ values.section[0] }; }
 
             ${ns} [page][header]:before,
-                  [page][footer]:after     { background-color: ${ values.page[1] }; }
+            ${ns} [page][footer]:after     { background-color: ${ values.page[1] }; }
             ${ns} [panel][header]:before   { background-color: ${ values.panel[1] }; }
             ${ns} [section][header]:before { background-color: ${ values.section[1] }; }
 
@@ -1026,7 +1043,10 @@ var rasti = function(name, container) {
                 color: ${ values.field[1] };
             }
 
-            ${ns} [btn], .btn, [block=buttons] > div {
+            ${ns} [btn],
+            ${ns} .btn,
+            ${ns} [block=buttons] > div,
+            ${ns} nav > div.active {
                 background-color: ${ values.btn[0] };
                 color: ${ values.btn[1] }; 
             }

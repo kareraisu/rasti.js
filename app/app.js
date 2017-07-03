@@ -1,12 +1,24 @@
+app.pages.login = {
+
+    in : function(params) {
+        $('nav').hide()
+    },
+
+    out : function(params) {
+        $('nav').show()
+
+    },
+}
+
+
 app.pages.main = {
 
     url : 'the-main-page',
 
-    nav : function(params) {
+    in : function(params) {
         if (!params) return
         app.get('section=user').text(params.user)
-    }
-    
+    },
 }
 
 

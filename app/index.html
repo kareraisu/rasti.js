@@ -17,10 +17,16 @@ the [rasti=X] declaration does 3 things:
     2. binds it to the container (in this case the body, but could be any div as well)
     3. creates an X global var to access the instance (window.X = instance)
 -->
-<body rasti=app persist>
+<body rasti=app >
 
-    <div row page=login header=welcome
-        fix-header>
+    <nav class=dark>
+        <div nav=login text=logout></div>
+        <div nav=main text=main></div>
+        <div nav=about text=about></div>
+    </nav>
+
+
+    <div row page=login header=welcome>
 
         <div panel autom inline pad10>
             <input field=user navparam
@@ -32,14 +38,13 @@ the [rasti=X] declaration does 3 things:
                 label
                 required />
 
-            <button btn
+            <button fullw btn
                 nav=main params
                 text=login
                 validate></button>
         </div>
 
     </div>
-
 
 
     <div row page=main header
@@ -66,7 +71,7 @@ the [rasti=X] declaration does 3 things:
                     style=height:100px></textarea>
             </div>
 
-            <button btn
+            <button fullw btn
                 submit=getPeople
                 render=cards
                 text=search></button>
