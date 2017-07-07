@@ -5,6 +5,11 @@
 "start_url": "/?pwa",
 "display": "standalone",
 "background_color": "#000",
-"theme_color": "#000"
+"theme_color": "#000",
+"icons": [{
+    "src": "rasti-192x192.png",
+    "sizes": "192x192",
+    "type": "image/png"
+}]
 
 }
