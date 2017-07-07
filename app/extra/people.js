@@ -1,45 +1,39 @@
 app.data.people = [{
     name     : 'Agustín Cuesta',
-    img      : 'acuesta.jpg',
+    id       : 'acuesta',
     area     : 'I+D',
     position : 'Web/mobile dev',
     skills   : 'CSS, HTML, Javascript, Angular, Node, Cordoba',
-    email    : 'acuesta@cdt.com.ar',
 },{
     name     : 'Julio Incarbone',
-    img      : 'jincarbone.jpg',
+    id       : 'jincarbone',
     area     : 'I+D',
     position : 'Project manager',
     skills   : 'Resource management, Innovation, Good vibes',
-    email    : 'jincarbone@cdt.com.ar',
 },{
     name     : 'Alejandro Solari',
-    img      : 'asolari.jpg',
+    id       : 'asolari',
     area     : 'I+D',
     position : 'Web/mobile dev',
     skills   : 'CSS, HTML, Javascript, Backbone, Git, Angular, Node, Cordoba',
-    email    : 'asolari@cdt.com.ar',
 },{
     name     : 'Jairo Jovanovich',
-    img      : 'jjovanovich.jpg',
+    id       : 'jjovanovich',
     area     : 'SDA',
     position : 'DevOps',
     skills   : 'Networking, Security, PaaS, Docker, Bash',
-    email    : 'jjovanovich@cdt.com.ar',
 },{
     name     : 'Mario Giménez',
-    img      : 'mgimenez.jpg',
+    id       : 'mgimenez',
     area     : 'SDA',
     position : 'Full-stack dev',
     skills   : 'Java, SQL, Angular, Node, Cordoba',
-    email    : 'mgimenez@cdt.com.ar',
 },{
     name     : 'Carina Monteiro',
-    img      : 'cmonteiro.jpg',
+    id       : 'cmonteiro',
     area     : 'SDA',
     position : 'Java dev',
     skills   : 'Java, SQL, Git',
-    email    : 'cmonteiro@cdt.com.ar',   
 }]
 
 

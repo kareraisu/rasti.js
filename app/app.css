@@ -2,32 +2,52 @@
 
 .card {
     margin-bottom: 0;
+    cursor: pointer;
 }
-.card .photo {
-    height: 100px;
-    width: 100px;
-    background-size: contain;
-    background-position-x: center;
-    background-repeat: no-repeat;
+.card .photo img {
+    width: 100%;
+    border-radius: 4px;
 }
 .card .name {
     padding-bottom: 10px;
     font-size: 1.5em;
 }
-.card .data {
-    max-width: 200px;
+.card .labels {
+    max-width: 50px;
 }
 .card .values {
     overflow-x: hidden;
     text-overflow: ellipsis;
 }
 
+.card.modal {
+    justify-content: center;
+    padding: 20px;
+}
+.card.modal .photo {
+    position: static;
+    margin-bottom: 20px;
+}
+.card.modal .photo,
+.card.modal .data {
+    flex-basis: 100%;
+    max-width: 320px;
+}
+
 /* phone-specific styles */
 
 @media only screen and (max-width: 500px) {
+
     [btn=config] {
         bottom: 0;
     }
+
+    .card .photo {
+        position: absolute;
+        top: 10px; right: 10px;
+        width: 75px;
+    }
+
 }
 
 /* rasti styles overrides (try uncommenting this!) */

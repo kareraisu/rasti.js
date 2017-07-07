@@ -4,7 +4,7 @@ app.pages.login = {
         $('nav').hide()
     },
 
-    out : function(params) {
+    out : function() {
         $('nav').show()
 
     },
@@ -19,6 +19,12 @@ app.pages.main = {
         if (!params) return
         app.get('section=user').text(params.user)
     },
+
+    init : function() {
+        app.get('panel=results').on('click', '.card', function(e){
+            e.currentTarget.classList.toggle('modal')
+        })
+    }
 }
 
 
@@ -30,21 +36,21 @@ app.templates.cards = function(data) {
     return data.map(function(obj){
 
         return `<div class="card row" section>
-            <div class="photo col-2" style="background-image: url(${obj.img})"></div>
-            <div class="col-10">
+            <div class="photo col-2">
+                <img src="img/${obj.id}.jpg"/>
+            </div>
+            <div class="data col-10">
                 <div class="name">${obj.name}</div>
                 <div class="row">
                     <div class="labels col-4">
                         Area:<br/>
                         Position:<br/>
                         Skills:<br/>
-                        Email:
                     </div>
                     <div class="values col-8">
                         ${obj.area}<br/>
                         ${obj.position}<br/>
                         ${obj.skills}<br/>
-                        ${obj.email}
                     </div>
                 </div>
             </div>

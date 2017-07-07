@@ -4,6 +4,7 @@ var filesToCache = [
   '/index.html',
   '/app.js',
   '/app.css',
+  '/manifest.json',
   '/extra/config.js',
   '/extra/people.js',
   '../dist/rasti+zepto.js',

@@ -272,7 +272,7 @@ nav > div, [tab-label] {
 }
 
 
-[modal] {
+[modal], .modal {
     display: none;
     position: fixed;
     left: 0; right: 0; top: 0; bottom: 0;
@@ -903,16 +903,6 @@ input[type=checkbox]:checked + label:before {
     nav ~ [page] {
         min-height: calc(100vh - 40px);
         max-height: calc(100vh - 40px);
-    }
-
-    [class*=col-],
-    [col-1], [col-2], [col-3],
-    [col-4], [col-5], [col-6],
-    [col-7], [col-8], [col-9],
-    [col-10], [col-11]  {
-        min-width: 100%;
-        margin-left: 0;
-        margin-bottom: 15px;
     }
 
     [template] > .controls > .columns,
