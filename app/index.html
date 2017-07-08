@@ -25,18 +25,29 @@ the [rasti=X] declaration does 3 things:
     2. binds it to the container (in this case the body, but could be any div as well)
     3. creates an X global var to access the instance (window.X = instance)
 -->
-<body rasti=app persist>
+<body rasti=app>
 
-    <nav class=dark>
+    <nav class=mid>
         <div nav=login text=logout></div>
         <div nav=main text=main></div>
         <div nav=about text=about></div>
     </nav>
 
 
+    <div page=about>
+        <div panel pad-l>
+            <div section textc>
+                <img src=rasti-192x192.png />
+                <div>rasti.js demo app</div>
+                <div block=list data=features label=features></div>
+            </div>
+        </div>
+    </div>
+
+
     <div row page=login header=welcome>
 
-        <div panel autom inline pad10>
+        <div panel autom inline pad>
             <input field=user navparam
                 label=username
                 required />
@@ -46,7 +57,7 @@ the [rasti=X] declaration does 3 things:
                 label
                 required />
 
-            <button fullw btn
+            <button btn fullw
                 nav=main params
                 text=login
                 validate></button>

@@ -1,12 +1,13 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.rasti = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 module.exports = {
+    list    : require('./list'),
 	buttons : require('./buttons'),
 	checks  : require('./checks'),
 	radios  : require('./radios'),
 	multi   : require('./multi'),
 	select  : require('./select'),
 }
-},{"./buttons":2,"./checks":3,"./multi":4,"./radios":5,"./select":6}],2:[function(require,module,exports){
+},{"./buttons":2,"./checks":3,"./list":4,"./multi":5,"./radios":6,"./select":7}],2:[function(require,module,exports){
 const utils = require('../utils')
 
 module.exports = {
@@ -54,7 +55,7 @@ style : `
 
 }
 
-},{"../utils":8}],3:[function(require,module,exports){
+},{"../utils":9}],3:[function(require,module,exports){
 const utils = require('../utils')
 
 module.exports = {
@@ -115,7 +116,27 @@ style : `
 `
 
 }
-},{"../utils":8}],4:[function(require,module,exports){
+},{"../utils":9}],4:[function(require,module,exports){
+const utils = require('../utils')
+
+module.exports = {
+
+template : function(data, $el) {
+    var tag = $el[0].hasAttribute('ordered') ? 'ol' : 'ul'
+    var ret = '<' + tag + '>'
+    for (var d of data) {
+        ret += `<li>${d}</li>`
+    }
+    ret += '</' + tag + '>'
+    return ret
+},
+
+init : function($el) {},
+
+style : ''
+
+}
+},{"../utils":9}],5:[function(require,module,exports){
 const utils = require('../utils')
 
 module.exports = {
@@ -317,7 +338,7 @@ style : `
 `
 
 }
-},{"../utils":8}],5:[function(require,module,exports){
+},{"../utils":9}],6:[function(require,module,exports){
 const utils = require('../utils')
 
 module.exports = {
@@ -368,7 +389,7 @@ style : `
 `
 
 }
-},{"../utils":8}],6:[function(require,module,exports){
+},{"../utils":9}],7:[function(require,module,exports){
 const utils = require('../utils')
 
 module.exports = {
@@ -479,7 +500,7 @@ style : `
 
 }
 
-},{"../utils":8}],7:[function(require,module,exports){
+},{"../utils":9}],8:[function(require,module,exports){
 (function (global){
 /* zepto */
 
@@ -2779,7 +2800,7 @@ bootstrap()
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./blocks/all":1,"./utils":8}],8:[function(require,module,exports){
+},{"./blocks/all":1,"./utils":9}],9:[function(require,module,exports){
 const is = {}
 'object function array string number regex boolean'.split(' ').forEach(function(t){
     is[t] = function(exp){ return type(exp) === t }
@@ -2848,6 +2869,6 @@ module.exports = {
 	onMobile : onMobile,
     rastiError : rastiError,
 }
-},{}]},{},[7])(7)
+},{}]},{},[8])(8)
 });
 //# sourceMappingURL=rasti.map

@@ -30,6 +30,8 @@ app.pages.main = {
 
 app.data.skills = ['html', 'css', 'javascript']
 
+app.data.features = 'navigation ajax templates paging actions themes i18n tabs modals blocks validation responsive'.split(' ')
+
 
 app.templates.cards = function(data) {
 
