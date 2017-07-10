@@ -38,11 +38,23 @@ app.data.people = [{
 
 
 app.utils.getPeople = criteria => {
-    var ret = []
-    people.forEach(person => {
+    var matches, query, and = true
+    return app.data.people.filter(person => {
+        matches = true
         Object.keys(criteria).forEach(prop => {
-            if ( person[prop].matches(new Regex(criteria[prop])) ) ret.push(person)
+            query = criteria[prop]
+            if ( app.utils.is.array(query) ) { 
+                query = and
+                    ? '(?=.*'+ query.join(')(?=.*') +')'
+                    : query.join('|')
+            }
+            if ( app.utils.is.string(query) ) {
+                matches = matches && RegExp(query, 'i').test( person[prop] )
+            }
+            else {
+                console.warn('Invalid criteria property : %s. Must be array or string!', prop)
+            }
         })
+        return matches
     })
-    return ret
 }
