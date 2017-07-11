@@ -6,7 +6,6 @@ app.pages.login = {
 
     out : function() {
         $('nav').show()
-
     },
 }
 
@@ -27,10 +26,11 @@ app.pages.main = {
     }
 }
 
+app.data.area = 'SDA, I+D, Recursos Humanos, Comunicación, Administración, Dirección'.split(', ')
 
-app.data.skills = ['html', 'css', 'javascript']
+app.data.skills = 'HTML, CSS, Javascript, Node, git, Angular, React, Cordoba, Java, SQL, Networking, Security, PaaS, Docker, Bash'.split(', ')
 
-app.data.features = 'navigation ajax templates paging actions themes i18n tabs modals blocks validation responsive'.split(' ')
+app.data.features = 'navigation, ajax, templates, paging, actions, themes, i18n, tabs, modals, blocks, validation, responsive'.split(', ')
 
 
 app.templates.cards = function(data) {
@@ -67,7 +67,7 @@ app.ajax.getPeople = function(reqdata, render) {
 
     app.set('name=reqdata', JSON.stringify(reqdata, null, 2) )
 
-    var people = app.data.people //app.utils.getPeople(reqdata)
+    var people = app.utils.getPeople(reqdata)
 
     render(people) // (or not)
 

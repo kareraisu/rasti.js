@@ -32,9 +32,7 @@ init : function($el) {
     }
 
     // structure
-
-    $el.prepend('<div add>')
-    $el.append('<div selected>')
+    $el.html('<div selected/><div add/>')
     var $selected = $el.find('[selected]')
 
     // bindings
@@ -121,25 +119,20 @@ init : function($el) {
 
 style : `
     [block=multi] {
-        position: relative;
+        display: flex;
         min-height: 35px;
-        padding-right: 20px;
+        padding-right: 0;
         text-shadow: 0 0 0 #000;
         cursor: pointer;
     }
     [block=multi] [add] {
         display: flex;
         align-items: center;
-        position: absolute;
-        right: 0;
-        top: 0;
-        height: 100%;
         width: 20px;
         border-left: 1px solid rgba(0,0,0,0.2);
     }
     [block=multi] [add]:before {
         content: '〉';
-        padding-top: 2px;
         padding-left: 6px;
     }
     [block=multi].open [add] {
@@ -166,10 +159,11 @@ style : `
         line-height: 1.5;
     }
     [block=multi] [selected] {
+        flex-basis: 100%;
         max-height: 100px;
         overflow-y: auto;
     }
-    [block=multi] [selected]>option:hover:before {
+    [block=multi] [selected] > option:hover:before {
         color: #d90000;
         background-color: rgba(255, 0, 0, 0.5);
     }
@@ -184,10 +178,10 @@ style : `
         z-index: 10;
         overflow-y: auto;
     }
-    [block=multi][options]>option:before {
+    [block=multi][options] > option:before {
         transform: rotate(45deg);
     }
-    [block=multi][options]>option:hover:before {
+    [block=multi][options] > option:hover:before {
         color: #008000;
         background-color: rgba(0, 128, 0, 0.5);
     }

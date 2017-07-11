@@ -379,6 +379,7 @@ var rasti = function(name, container) {
                     targetSelector = $el.attr(action)
                 if ( !targetSelector ) return error('Missing target selector in [%s] attribute of element:', action, el)
                 var $target = $page.find('['+targetSelector+']')
+                if ( !$target.length ) $target = container.find('['+targetSelector+']')
                 if ( !$target.length ) return error('Could not find target [%s] declared in [%s] attribute of element:', targetSelector, action, el)
                 $el.on('click', function(e){
                         if ($target[0].hasAttribute('modal')) $page.find('.page-options').addClass('backdrop')
@@ -529,26 +530,23 @@ var rasti = function(name, container) {
 
 
     function get(selector) {
-        if ( !self.active.page || !self.active.page.length ) return error('Cannot get(%s), active page is not defined', selector)
-        var $els = self.active.page.find('['+ selector +']')
-        if (!$els.length) error('Cannot get(%s), element not found in page [%s]', selector, self.active.page.attr('page'))
+        var $els = self.active.page && self.active.page.find('['+ selector +']')
+        if (!$els || !$els.length) $els = container.find('['+ selector +']')
+        if (!$els.length) warn('No elements found for selector [%s]', selector)
         return $els
     }
 
     function set(selector, value) {        
-        if ( !self.active.page || !self.active.page.length ) return error('Cannot set(%s), active page is not defined', selector)
-        var $els = self.active.page.find('['+ selector +']')
-        if (!$els.length) error('Cannot set(%s), element not found in page [%s]', selector, self.active.page.attr('page'))
+        var $els = get(selector)
         $els.each(function(i, el){
             el.value = value
             $(el).change()
         })
+        return $els
     }
 
     function add(selector, ...values) {
-        if ( !self.active.page || !self.active.page.length ) return error('Cannot add(%s), active page is not defined', selector)
-        var $els = self.active.page.find('['+ selector +']')
-        if (!$els.length) error('Cannot add(%s), element not found in page [%s]', selector, self.active.page.attr('page'))
+        var $els = get(selector)
         $els.each(function(i, el){
             values.forEach(function(val){
                 if (is.array(val)) el.value = el.value.concat(val)
@@ -556,6 +554,7 @@ var rasti = function(name, container) {
             })
             $(el).change()
         })
+        return $els
     }
 
 

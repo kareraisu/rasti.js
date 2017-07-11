@@ -171,9 +171,7 @@ init : function($el) {
     }
 
     // structure
-
-    $el.prepend('<div add>')
-    $el.append('<div selected>')
+    $el.html('<div selected/><div add/>')
     var $selected = $el.find('[selected]')
 
     // bindings
@@ -260,25 +258,20 @@ init : function($el) {
 
 style : `
     [block=multi] {
-        position: relative;
+        display: flex;
         min-height: 35px;
-        padding-right: 20px;
+        padding-right: 0;
         text-shadow: 0 0 0 #000;
         cursor: pointer;
     }
     [block=multi] [add] {
         display: flex;
         align-items: center;
-        position: absolute;
-        right: 0;
-        top: 0;
-        height: 100%;
         width: 20px;
         border-left: 1px solid rgba(0,0,0,0.2);
     }
     [block=multi] [add]:before {
         content: '〉';
-        padding-top: 2px;
         padding-left: 6px;
     }
     [block=multi].open [add] {
@@ -305,10 +298,11 @@ style : `
         line-height: 1.5;
     }
     [block=multi] [selected] {
+        flex-basis: 100%;
         max-height: 100px;
         overflow-y: auto;
     }
-    [block=multi] [selected]>option:hover:before {
+    [block=multi] [selected] > option:hover:before {
         color: #d90000;
         background-color: rgba(255, 0, 0, 0.5);
     }
@@ -323,10 +317,10 @@ style : `
         z-index: 10;
         overflow-y: auto;
     }
-    [block=multi][options]>option:before {
+    [block=multi][options] > option:before {
         transform: rotate(45deg);
     }
-    [block=multi][options]>option:hover:before {
+    [block=multi][options] > option:hover:before {
         color: #008000;
         background-color: rgba(0, 128, 0, 0.5);
     }
@@ -883,6 +877,7 @@ var rasti = function(name, container) {
                     targetSelector = $el.attr(action)
                 if ( !targetSelector ) return error('Missing target selector in [%s] attribute of element:', action, el)
                 var $target = $page.find('['+targetSelector+']')
+                if ( !$target.length ) $target = container.find('['+targetSelector+']')
                 if ( !$target.length ) return error('Could not find target [%s] declared in [%s] attribute of element:', targetSelector, action, el)
                 $el.on('click', function(e){
                         if ($target[0].hasAttribute('modal')) $page.find('.page-options').addClass('backdrop')
@@ -1033,26 +1028,23 @@ var rasti = function(name, container) {
 
 
     function get(selector) {
-        if ( !self.active.page || !self.active.page.length ) return error('Cannot get(%s), active page is not defined', selector)
-        var $els = self.active.page.find('['+ selector +']')
-        if (!$els.length) error('Cannot get(%s), element not found in page [%s]', selector, self.active.page.attr('page'))
+        var $els = self.active.page && self.active.page.find('['+ selector +']')
+        if (!$els || !$els.length) $els = container.find('['+ selector +']')
+        if (!$els.length) warn('No elements found for selector [%s]', selector)
         return $els
     }
 
     function set(selector, value) {        
-        if ( !self.active.page || !self.active.page.length ) return error('Cannot set(%s), active page is not defined', selector)
-        var $els = self.active.page.find('['+ selector +']')
-        if (!$els.length) error('Cannot set(%s), element not found in page [%s]', selector, self.active.page.attr('page'))
+        var $els = get(selector)
         $els.each(function(i, el){
             el.value = value
             $(el).change()
         })
+        return $els
     }
 
     function add(selector, ...values) {
-        if ( !self.active.page || !self.active.page.length ) return error('Cannot add(%s), active page is not defined', selector)
-        var $els = self.active.page.find('['+ selector +']')
-        if (!$els.length) error('Cannot add(%s), element not found in page [%s]', selector, self.active.page.attr('page'))
+        var $els = get(selector)
         $els.each(function(i, el){
             values.forEach(function(val){
                 if (is.array(val)) el.value = el.value.concat(val)
@@ -1060,6 +1052,7 @@ var rasti = function(name, container) {
             })
             $(el).change()
         })
+        return $els
     }
 
 
@@ -1886,14 +1879,14 @@ nav ~ [page] {
 }
 
 [panel] {
-    padding: 20px 15px;
+    padding: 25px;
     border-radius: 4px;
 }
 
 
 [section] {
     margin-bottom: 15px;
-    padding: 10px;
+    padding: 20px;
     border-radius: 4px;
 }
 [section] [label]:before {
@@ -1905,10 +1898,10 @@ nav ~ [page] {
 
 
 [header][panel] {
-    padding-top: 65px;
+    padding-top: 75px;
 }
 [header][section] {
-    padding-top: 55px;
+    padding-top: 65px;
 }
 [header][page]:before,
 [header][panel]:before,
@@ -1940,6 +1933,9 @@ nav ~ [page] {
     height: 40px;
     padding: 10px;
     font-size: 1.5em;
+}
+[header][collapse]:before {
+    cursor: pointer;
 }
 
 [footer][page]:after {
@@ -2175,6 +2171,7 @@ nav > div, [tab-label] {
 [inline][label]:before, [inline]>[label]:before {
     width: 40%;
     margin-top: 0;
+    margin-left: 0;
     text-align: right;
 }
 
@@ -2183,10 +2180,6 @@ select[field] {
     appearance: none;
     -moz-appearance: none;
     -webkit-appearance: none;
-    padding-right: 25px;
-    background-image: url(../img/caret.png);
-    background-repeat: no-repeat;
-    background-position: right;
     cursor: pointer;
 }
 

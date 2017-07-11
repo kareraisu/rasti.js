@@ -51,14 +51,14 @@ nav ~ [page] {
 }
 
 [panel] {
-    padding: 20px 15px;
+    padding: 25px;
     border-radius: 4px;
 }
 
 
 [section] {
     margin-bottom: 15px;
-    padding: 10px;
+    padding: 20px;
     border-radius: 4px;
 }
 [section] [label]:before {
@@ -70,10 +70,10 @@ nav ~ [page] {
 
 
 [header][panel] {
-    padding-top: 65px;
+    padding-top: 75px;
 }
 [header][section] {
-    padding-top: 55px;
+    padding-top: 65px;
 }
 [header][page]:before,
 [header][panel]:before,
@@ -105,6 +105,9 @@ nav ~ [page] {
     height: 40px;
     padding: 10px;
     font-size: 1.5em;
+}
+[header][collapse]:before {
+    cursor: pointer;
 }
 
 [footer][page]:after {
@@ -340,6 +343,7 @@ nav > div, [tab-label] {
 [inline][label]:before, [inline]>[label]:before {
     width: 40%;
     margin-top: 0;
+    margin-left: 0;
     text-align: right;
 }
 
@@ -348,10 +352,6 @@ select[field] {
     appearance: none;
     -moz-appearance: none;
     -webkit-appearance: none;
-    padding-right: 25px;
-    background-image: url(../img/caret.png);
-    background-repeat: no-repeat;
-    background-position: right;
     cursor: pointer;
 }
 

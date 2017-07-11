@@ -12,7 +12,7 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker
                 .register('./service-worker.js')
-                .then(function() { console.log('Service Worker Registered'); });
+                .then(function() { console.log('Service Worker Registered') })
         }
     </script>
 
@@ -32,6 +32,30 @@ the [rasti=X] declaration does 3 things:
         <div nav=main text=main></div>
         <div nav=about text=about></div>
     </nav>
+
+
+    <div section=user fix top left></div>
+
+    <button fab btn=config
+        show="panel=config"
+        fix top right>☰</button>
+
+    <div modal panel=config header
+        inline pad pad-s-desktop>           
+        <div block=buttons
+            field=lang data label
+            onchange=app.setLang(this.value)></div>
+
+        <div block=radios
+            field=theme data label
+            on-change=applyTheme></div>
+
+        <div block=buttons
+            field
+            data=themeMaps
+            label=variante
+            on-change=applyTheme></div>
+    </div>
 
 
     <div page=about>
@@ -74,14 +98,10 @@ the [rasti=X] declaration does 3 things:
             state
             scrolly hh-phone pad pad-s-desktop>
 
-            <div section=personal header
-                inline collapse>
+            <div section inline pad>
                 <input field=name label>
-            </div>
-
-            <div section=work header
-                inline collapse>
-                <select field=skills label data></select>
+                <select field=area label data></select>
+                <div block=multi field=skills label data></div>
             </div>
 
             <div section=reqdata header
@@ -105,31 +125,6 @@ the [rasti=X] declaration does 3 things:
 
             <!-- here be cards! -->
 
-        </div>
-
-
-        <div section=user fix top left></div>
-
-        <button fab btn=config
-            show="panel=config"
-            right>☰</button>
-
-
-        <div modal panel=config header
-            inline pad pad-s-desktop>           
-            <div block=buttons
-                field=lang data label
-                onchange=app.setLang(this.value)></div>
-
-            <div block=radios
-                field=theme data label
-                on-change=applyTheme></div>
-
-            <div block=buttons
-                field
-                data=themeMaps
-                label=variante
-                on-change=applyTheme></div>
         </div>
 
     </div>
