@@ -3,23 +3,18 @@ const utils = require('../utils')
 module.exports = {
 
 template : function(data, $el) {
-    var ret = ''
-    for (var d of data) {
-        d = utils.checkData(d)
-        ret += `<div value="${d.value}">${d.label}</div>`
-    }
-    return ret
+    return data
+        .map( d => utils.checkData(d) )
+        .map( d => `<div value="${d.value}">${d.label}</div>` )
+        .join('')
 },
 
 init : function($el) {
-    $el.find('div').click(function(e) {
-        var $el = $(this)
-        $el.parent()
-            .val($el.attr('value'))
+    $el.on('click', 'div', function(e) {
+        $el.val($(e.target).attr('value'))
             .trigger('change')
     })
-    $el.change(function(e) {
-        var $el = $(this)
+    $el.on('change', function(e) {
         $el.children().removeClass('active')
         $el.find('[value="'+ $el.val() +'"]').addClass('active')
     })

@@ -151,8 +151,8 @@ var rasti = function(name, container) {
                 darker  : '#222',
                 black   : '#000',
                 detail  : 'darkcyan',
-                lighten : 'rgba(255,255,255,0.1)',
-                darken  : 'rgba(0,0,0,0.1)',
+                lighten : 'rgba(255,255,255,0.2)',
+                darken  : 'rgba(0,0,0,0.2)',
             },
         },
 
@@ -243,10 +243,13 @@ var rasti = function(name, container) {
         })
 
 
-        // create options for selects with data source
-        container.find('select[data]').each(function(i, el) {
-            updateBlock($(el))
-        })
+        // create options for selects and lists with data source
+        container.find('select[data]')
+            .add('ol[data]', container)
+            .add('ul[data]', container)
+            .each(function(i, el) {
+                updateBlock($(el))
+            })
 
 
         // create tabs
@@ -578,7 +581,7 @@ var rasti = function(name, container) {
         if (prevPage && prevPage.out) {
             !is.function(prevPage.out)
                 ? warn('Page [%s] {out} property must be a function!', prevPagename)
-                : prevPage.out()
+                : prevPage.out(params)
         }
 
         self.active.page = $page
@@ -752,12 +755,17 @@ var rasti = function(name, container) {
 
 
     function updateBlock($el, data) {
+        var types = {
+            SELECT : 'select',
+            OL : 'list',
+            UL : 'list',
+        }
         var el = $el[0]
-        var type = el.nodeName == 'SELECT' ? 'select' : $el.attr('block')
-        if (!type) return error('Missing block type in [block] attribute in element:', el)
+        var type = types[el.nodeName] || $el.attr('block')
+        if (!type) return error('Missing block type in [block] attribute of element:', el)
         
         var block = rasti.blocks[type]
-        if (!block) return error('Undefined block type "%s" declared in [block] attribute of element:', type, el)
+        if (!block) return error('Undefined block type "%s" resolved for element:', type, el)
         
         if (!data) {
             var datakey = resolveAttr($el, 'data')
@@ -767,23 +775,10 @@ var rasti = function(name, container) {
             if (!data) return error('Undefined data source "%s" resolved for element:', datakey, el)
         }
 
-        var $options, field, alias
-
-        // TODO: this should be in the block, not here
-        if (type === 'multi') {
-            var field = $el.attr('field')
-            if (!field) return error('Missing field name in [field] attribute of element:', el)
-            // check if options div already exists
-            $options = $el.closest('[page]').find('[options='+ field +']')
-            if (!$options.length) {
-                // if not create it and append it to page
-                $options = $('<div field block='+ type +' options='+ field +'>')
-                $el.closest('[page]').children('.page-options').append($options)
-            }   
-        }
-        else {
-            $options = $el
-        }
+        // TODO: this should be in multi block, not here
+        var $options = type === 'multi'
+            ? $el.closest('[page]').find('[options='+ $el.attr('field') +']')
+            : $el
 
         is.function(data)
             ? data(applyTemplate)
@@ -885,15 +880,15 @@ var rasti = function(name, container) {
     function initBlock($el) {
         var el = $el[0]
         var type = el.nodeName == 'SELECT' ? 'select' : $el.attr('block')
-        if (!type) return error('Missing block type in [block] attribute in element:', el)
+        if (!type) return error('Missing block type in [block] attribute of element:', el)
         
         var block = rasti.blocks[type]
         if (!block) return error('Undefined block type "%s" declared in [block] attribute of element:', type, el)
 
+        block.init($el)
+
         // if applicable, create options from data source
         if (el.hasAttribute('data')) updateBlock($el)
-
-        block.init($el)
     }
 
 
@@ -1322,7 +1317,7 @@ function genBlockStyles() {
         styles += rasti.blocks[key].style
     }
     styles += '</style>'
-    $('head').append(styles)
+    $('head').prepend(styles)
 }
 
 
@@ -1330,7 +1325,7 @@ var rastiCSS
 
 /* rasti CSS */
 
-if (rastiCSS) $('head').append('<style>' + rastiCSS + '</style>')
+if (rastiCSS) $('head').prepend('<style>' + rastiCSS + '</style>')
 
 genBlockStyles()
 

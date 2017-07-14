@@ -2,10 +2,15 @@ app.pages.login = {
 
     in : function(params) {
         $('nav').hide()
+        app.get('btn=config').hide()
     },
 
-    out : function() {
+    out : function(params) {
         $('nav').show()
+        app.get('btn=config').show()
+        if (params) {
+            app.get('nav=login').text(params.user)
+        }
     },
 }
 
@@ -13,11 +18,6 @@ app.pages.login = {
 app.pages.main = {
 
     url : 'the-main-page',
-
-    in : function(params) {
-        if (!params) return
-        app.get('section=user').text(params.user)
-    },
 
     init : function() {
         app.get('panel=results').on('click', '.card', function(e){
@@ -38,10 +38,8 @@ app.templates.cards = function(data) {
     return data.map(function(obj){
 
         return `<div class="card row" section>
-            <div class="photo col-2">
-                <img src="img/${obj.id}.jpg"/>
-            </div>
-            <div class="data col-10">
+            <img src="img/${obj.id}.jpg"/>
+            <div class="data">
                 <div class="name">${obj.name}</div>
                 <div class="row">
                     <div class="labels col-4">
@@ -71,6 +69,13 @@ app.ajax.getPeople = function(reqdata, render) {
 
     render(people) // (or not)
 
+}
+
+
+app.utils.login = function(e){
+    if (app.get('field=pass').val() == '1234') {
+        app.navTo('main', {user: app.get('field=user').val()})
+    }
 }
 
 

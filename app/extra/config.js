@@ -54,6 +54,7 @@ app.extend({
 			lang     : 'language',
 			theme    : 'theme',
 			about    : 'about',
+			features : 'features',
 		},
 
 		es : {
@@ -74,6 +75,7 @@ app.extend({
 			lang     : 'idioma',
 			theme    : 'tema',
 			about    : 'acerca de',
+			features : 'características',
 		},
 
 	},

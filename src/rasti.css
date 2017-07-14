@@ -84,6 +84,7 @@ nav ~ [page] {
     height: 70px;
     width: 100%;
     padding: 20px;
+    line-height: 30px;
     font-size: 2.5em;
     text-align: center;
     text-transform: uppercase;
@@ -99,11 +100,13 @@ nav ~ [page] {
 [header][panel]:before {
     height: 50px;
     padding: 10px 20px;
+    line-height: 30px;
     font-size: 2em;
 }
 [header][section]:before {
     height: 40px;
     padding: 10px;
+    line-height: 20px;
     font-size: 1.5em;
 }
 [header][collapse]:before {
@@ -125,6 +128,7 @@ nav ~ [page] {
 
 
 [field], [btn], .field, .btn {
+    min-height: 35px;
     width: 100%;
     padding: 5px 10px;
     border: 0;
@@ -247,7 +251,6 @@ nav, .tab-labels {
     border-bottom: 1px solid rgba(0,0,0, 0.2);
     border-radius: 0;
     text-transform: uppercase;
-    z-index: 1;
 }
 .tab-labels {
     justify-content: space-around;
@@ -286,7 +289,7 @@ nav > div, [tab-label] {
     max-width: 500px;
     overflow-y: auto;
     animation: zoomIn .4s, fadeIn .4s;
-    z-index: 2;
+    z-index: 11;
 }
 
 
@@ -299,11 +302,12 @@ nav > div, [tab-label] {
     width: 100vw;
     background: rgba(0,0,0,.7);
     animation: fadeIn .4s;
-    z-index: 1;
+    z-index: 10;
 }
 
 
 [label] {
+    position: relative;
     margin-top: 25px;
     vertical-align: bottom;
 }
@@ -318,33 +322,39 @@ nav > div, [tab-label] {
 [label]:not([panel]):not([section]):before {
     content: attr(label);
     position: absolute;
-    left: 0;
-    height: 20px;
+    height: 35px;
+    line-height: 35px;
     font-size: 1.2em;
     text-transform: capitalize;
 }
-[label][field]:before {
-    margin-top: -27px;
-    margin-left: -7px;
+[label]:before {
+    margin-top: -35px;
+    margin-left: -8px;
 }
 [label][fixed]:before {
-    margin-top: -22px;
+    margin-top: -30px;
     margin-left: 4px;
 }
 [label][field][big]:before {
     margin-left: 0;
 }
-[inline][label], [inline]>[label] {
+[inline][label],
+[inline]>[label] {
     width: auto;
     margin-top: 0;
-    margin-bottom: 30px;
     margin-left: calc(40% + 10px);
 }
-[inline][label]:before, [inline]>[label]:before {
-    width: 40%;
-    margin-top: 0;
-    margin-left: 0;
+[inline][label]:before,
+[inline]>[label]:before {
+    width: 80%;
+    left: -80%;
+    margin-top: -5px;
     text-align: right;
+}
+[inline][label][fixed]:before,
+[inline]>[label][fixed]:before {
+    margin-top: 0;
+    margin-left: -8px;
 }
 
 
@@ -368,8 +378,10 @@ input[type=checkbox] {
 }
 input[type=radio] + label,
 input[type=checkbox] + label {
-    display: inline-block;
+    display: block;
+    height: 40px;
     max-width: 90%;
+    padding: 12px 0;
     margin-left: 40px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -400,6 +412,10 @@ input[type=checkbox]:checked + label:before {
     color: #222;
     animation: stamp 0.4s ease-out;
 }
+input[type=radio] + label:hover,
+input[type=checkbox] + label:hover {
+    font-weight: 600;
+}
 @keyframes stamp {
     50% { transform: scale(1.2); }
 }
@@ -410,6 +426,13 @@ input[type=checkbox]:checked + label:before {
     flex-flow: row wrap;
     align-content: flex-start;
     width: 100%;
+}
+.column, [column] {
+    display: flex;
+    flex-flow: column nowrap;
+    min-height: min-content !important;
+    align-content: flex-start;
+    align-items: center;
 }
 .row > .col-1,  [row] > [col-1]  { flex-basis: calc(08.33% - 15px); }
 .row > .col-2,  [row] > [col-2]  { flex-basis: calc(16.66% - 15px); }
@@ -572,30 +595,56 @@ input[type=checkbox]:checked + label:before {
     text-align: center;
 }
 
+[textr], .textr,
+[textr_]>*, .textr_>* {
+    text-align: right;
+}
+
+[textl], .textl,
+[textl_]>*, .textl_>* {
+    text-align: left;
+}
+
 [autom], .autom,
 [autom_]>*, .autom_>* {
     margin: auto !important;
 }
 
-[centerx], .centerx,
-[centerx_]>*, .centerx_>* {
+[floatcx], .floatcx,
+[floatcx_]>*, .floatcx_>* {
     position: absolute;
     left: 0; right: 0;
     margin: auto !important;
 }
 
-[centery], .centery,
-[centery_]>*, .centery_>* {
+[floatcy], .floatcy,
+[floatcy_]>*, .floatcy_>* {
     position: absolute;
     top: 0; bottom: 0;
     margin: auto !important;
 }
 
-[center], .center,
-[center_]>*, .center_>* {
+[floatc], .floatc,
+[floatc_]>*, .floatc_>* {
     position: absolute;
     left: 0; right: 0; top: 0; bottom: 0;
     margin: auto !important;
+}
+
+[centerx], .centerx {
+    display: flex;
+    justify-content: center;
+}
+
+[centery], .centery {
+    display: flex;
+    align-items: center;
+}
+
+[center], .center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 [left], .left,
@@ -726,7 +775,7 @@ input[type=checkbox]:checked + label:before {
     width: 50px;
     margin: 20px;
     border-radius: 50%;
-    z-index: 1;
+    z-index: 5;
 }
 
 [close][btn], .close.btn {

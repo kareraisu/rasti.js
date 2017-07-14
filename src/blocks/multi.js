@@ -3,27 +3,28 @@ const utils = require('../utils')
 module.exports = {
 
 template : function(data, $el) {
+    $el[0].total = data.length // WARNING : SIDE EFFECTS
+
     var ret = $el[0].hasAttribute('filter')
-        ? `<input field type="text" placeholder="${ $el.attr('filter') || self.options.multiFilterText }"/>`
+        ? `<input field type="text" placeholder="${ $el.attr('filter') }"/>`
         : ''
-    for (var d of data) {
-        d = utils.checkData(d)
-        ret += `<option value="${d.value}" alias="${d.alias}">${d.label}</option>`
-    }
-    return ret
+
+    return ret + data
+        .map( d => utils.checkData(d) )
+        .map( d => `<option value="${d.value}" alias="${d.alias}">${d.label}</option>` )
+        .join('')
 },
 
 init : function($el) {
-    var el = $el[0],
-        field = $el.attr('field'),
-        $options = $el.closest('[page]').find('[options='+ field +']'),
-        initialized = utils.is.number(el.total)
+    var el = $el[0]
+    var field = $el.attr('field')
+
+    if (!field) return error('Missing field name in [field] attribute of element:', el)
     
     el.value = []
-    el.total = $options.children().length
     el.max = parseInt($el.attr('max'))
 
-    if (initialized) {
+    if (el.initialized) {
         // empty selected options (and remove full class in case it was full)
         $el.find('[selected]').empty()
         $el.removeClass('full')
@@ -32,8 +33,12 @@ init : function($el) {
     }
 
     // structure
+
     $el.html('<div selected/><div add/>')
+    $el.closest('[page]').children('.page-options')
+        .append('<div field block=multi options='+ field +'>')
     var $selected = $el.find('[selected]')
+    var $options = $el.closest('[page]').find('[options='+ field +']')
 
     // bindings
 
@@ -115,6 +120,8 @@ init : function($el) {
 
         return isFull
     }
+
+    el.initialized = true
 },
 
 style : `

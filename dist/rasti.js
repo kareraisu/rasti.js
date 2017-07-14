@@ -13,23 +13,18 @@ const utils = require('../utils')
 module.exports = {
 
 template : function(data, $el) {
-    var ret = ''
-    for (var d of data) {
-        d = utils.checkData(d)
-        ret += `<div value="${d.value}">${d.label}</div>`
-    }
-    return ret
+    return data
+        .map( d => utils.checkData(d) )
+        .map( d => `<div value="${d.value}">${d.label}</div>` )
+        .join('')
 },
 
 init : function($el) {
-    $el.find('div').click(function(e) {
-        var $el = $(this)
-        $el.parent()
-            .val($el.attr('value'))
+    $el.on('click', 'div', function(e) {
+        $el.val($(e.target).attr('value'))
             .trigger('change')
     })
-    $el.change(function(e) {
-        var $el = $(this)
+    $el.on('change', function(e) {
         $el.children().removeClass('active')
         $el.find('[value="'+ $el.val() +'"]').addClass('active')
     })
@@ -62,28 +57,19 @@ module.exports = {
 
 template : function(data, $el) {
     var uid = utils.random()
-    var ret = ''
-    for (var d of data) {
-        d = utils.checkData(d)
-        ret += `<div>
-            <input type="checkbox" name="${uid}[]" value="${d.value}">
-            <label>${d.label}</label>
-        </div>`
-    }
-    return ret
+    return data
+        .map( d => utils.checkData(d) )
+        .map( d => `<input type="checkbox" name="${uid}[]" value="${d.value}"><label>${d.label}</label>` )
+        .join('')
 },
 
 init : function($el) {
     var values = $el[0].value = []
-    $el.find('div').click(function(e) {
+    $el.on('click', 'label', function(e) {
         // forward clicks to hidden input
-        $(e.currentTarget).find('input').click()
+        $(e.currentTarget).prev().click()
     })
-    $el.find('input').click(function(e) {
-        // prevent event loop (due to click bubbling up to div)
-        e.stopPropagation()
-    })
-    $el.find('input').change(function(e) {
+    $el.on('change', 'input', function(e) {
         // update component value
         var $input = $(e.currentTarget),
             val = $input.attr('value')
@@ -91,7 +77,7 @@ init : function($el) {
             ? values.push(val)
             : values.remove(val)
     })
-    $el.change(function(e) {
+    $el.on('change', function(e) {
         // update component ui
         var $input, checked
         $el.find('input').each(function(i, input){
@@ -102,18 +88,7 @@ init : function($el) {
     })
 },
 
-style : `
-    [block=checks] label {
-        height: 40px;
-        padding: 12px 0;
-    }
-    [block=checks] div {
-        cursor: pointer;
-    }
-    [block=checks] div:hover label {
-        font-weight: 600;
-    }
-`
+style : ``
 
 }
 },{"../utils":9}],4:[function(require,module,exports){
@@ -122,13 +97,9 @@ const utils = require('../utils')
 module.exports = {
 
 template : function(data, $el) {
-    var tag = $el[0].hasAttribute('ordered') ? 'ol' : 'ul'
-    var ret = '<' + tag + '>'
-    for (var d of data) {
-        ret += `<li>${d}</li>`
-    }
-    ret += '</' + tag + '>'
-    return ret
+    return data
+        .map( d => `<li>${d}</li>` )
+        .join('')
 },
 
 init : function($el) {},
@@ -142,27 +113,28 @@ const utils = require('../utils')
 module.exports = {
 
 template : function(data, $el) {
+    $el[0].total = data.length // WARNING : SIDE EFFECTS
+
     var ret = $el[0].hasAttribute('filter')
-        ? `<input field type="text" placeholder="${ $el.attr('filter') || self.options.multiFilterText }"/>`
+        ? `<input field type="text" placeholder="${ $el.attr('filter') }"/>`
         : ''
-    for (var d of data) {
-        d = utils.checkData(d)
-        ret += `<option value="${d.value}" alias="${d.alias}">${d.label}</option>`
-    }
-    return ret
+
+    return ret + data
+        .map( d => utils.checkData(d) )
+        .map( d => `<option value="${d.value}" alias="${d.alias}">${d.label}</option>` )
+        .join('')
 },
 
 init : function($el) {
-    var el = $el[0],
-        field = $el.attr('field'),
-        $options = $el.closest('[page]').find('[options='+ field +']'),
-        initialized = utils.is.number(el.total)
+    var el = $el[0]
+    var field = $el.attr('field')
+
+    if (!field) return error('Missing field name in [field] attribute of element:', el)
     
     el.value = []
-    el.total = $options.children().length
     el.max = parseInt($el.attr('max'))
 
-    if (initialized) {
+    if (el.initialized) {
         // empty selected options (and remove full class in case it was full)
         $el.find('[selected]').empty()
         $el.removeClass('full')
@@ -171,8 +143,12 @@ init : function($el) {
     }
 
     // structure
+
     $el.html('<div selected/><div add/>')
+    $el.closest('[page]').children('.page-options')
+        .append('<div field block=multi options='+ field +'>')
     var $selected = $el.find('[selected]')
+    var $options = $el.closest('[page]').find('[options='+ field +']')
 
     // bindings
 
@@ -254,6 +230,8 @@ init : function($el) {
 
         return isFull
     }
+
+    el.initialized = true
 },
 
 style : `
@@ -339,48 +317,28 @@ module.exports = {
 
 template : function(data, $el) {
     var uid = utils.random()
-    var ret = ''
-    for (var d of data) {
-        d = utils.checkData(d)
-        ret += `<div>
-            <input type="radio" name="${uid}" value="${d.value}">
-            <label>${d.label}</label>
-        </div>`
-    }
-    return ret
+    return data
+        .map( d => utils.checkData(d) )
+        .map( d => `<input type="radio" name="${uid}" value="${d.value}"/><label>${d.label}</label>` )
+        .join('')
 },
 
 init : function($el) {
-    $el.find('div').click(function(e) {
+    $el.on('click', 'label', function(e) {
         // forward clicks to hidden input
-        $(e.currentTarget).find('input').click()
+        $(e.currentTarget).prev().click()
     })
-    $el.find('input').click(function(e) {
-        // prevent event loop (due to click bubbling up to div)
-        e.stopPropagation()
-    })
-    $el.find('input').change(function(e) {
+    $el.on('change', 'input', function(e) {
         // update component value
         $el.val( $(e.currentTarget).attr('value') )
     })
-    $el.change(function(e) {
+    $el.on('change', function(e) {
         // update component ui
         $el.find('[value="'+ $el.val() +'"]').prop('checked', true)
     })
 },
 
-style : `
-    [block=radios] label {
-        height: 40px;
-        padding: 12px 0;
-    }
-    [block=radios] div {
-        cursor: pointer;
-    }
-    [block=radios] div:hover label {
-        font-weight: 600;
-    }
-`
+style : ``
 
 }
 },{"../utils":9}],7:[function(require,module,exports){
@@ -649,8 +607,8 @@ var rasti = function(name, container) {
                 darker  : '#222',
                 black   : '#000',
                 detail  : 'darkcyan',
-                lighten : 'rgba(255,255,255,0.1)',
-                darken  : 'rgba(0,0,0,0.1)',
+                lighten : 'rgba(255,255,255,0.2)',
+                darken  : 'rgba(0,0,0,0.2)',
             },
         },
 
@@ -741,10 +699,13 @@ var rasti = function(name, container) {
         })
 
 
-        // create options for selects with data source
-        container.find('select[data]').each(function(i, el) {
-            updateBlock($(el))
-        })
+        // create options for selects and lists with data source
+        container.find('select[data]')
+            .add('ol[data]', container)
+            .add('ul[data]', container)
+            .each(function(i, el) {
+                updateBlock($(el))
+            })
 
 
         // create tabs
@@ -1076,7 +1037,7 @@ var rasti = function(name, container) {
         if (prevPage && prevPage.out) {
             !is.function(prevPage.out)
                 ? warn('Page [%s] {out} property must be a function!', prevPagename)
-                : prevPage.out()
+                : prevPage.out(params)
         }
 
         self.active.page = $page
@@ -1250,12 +1211,17 @@ var rasti = function(name, container) {
 
 
     function updateBlock($el, data) {
+        var types = {
+            SELECT : 'select',
+            OL : 'list',
+            UL : 'list',
+        }
         var el = $el[0]
-        var type = el.nodeName == 'SELECT' ? 'select' : $el.attr('block')
-        if (!type) return error('Missing block type in [block] attribute in element:', el)
+        var type = types[el.nodeName] || $el.attr('block')
+        if (!type) return error('Missing block type in [block] attribute of element:', el)
         
         var block = rasti.blocks[type]
-        if (!block) return error('Undefined block type "%s" declared in [block] attribute of element:', type, el)
+        if (!block) return error('Undefined block type "%s" resolved for element:', type, el)
         
         if (!data) {
             var datakey = resolveAttr($el, 'data')
@@ -1265,23 +1231,10 @@ var rasti = function(name, container) {
             if (!data) return error('Undefined data source "%s" resolved for element:', datakey, el)
         }
 
-        var $options, field, alias
-
-        // TODO: this should be in the block, not here
-        if (type === 'multi') {
-            var field = $el.attr('field')
-            if (!field) return error('Missing field name in [field] attribute of element:', el)
-            // check if options div already exists
-            $options = $el.closest('[page]').find('[options='+ field +']')
-            if (!$options.length) {
-                // if not create it and append it to page
-                $options = $('<div field block='+ type +' options='+ field +'>')
-                $el.closest('[page]').children('.page-options').append($options)
-            }   
-        }
-        else {
-            $options = $el
-        }
+        // TODO: this should be in multi block, not here
+        var $options = type === 'multi'
+            ? $el.closest('[page]').find('[options='+ $el.attr('field') +']')
+            : $el
 
         is.function(data)
             ? data(applyTemplate)
@@ -1383,15 +1336,15 @@ var rasti = function(name, container) {
     function initBlock($el) {
         var el = $el[0]
         var type = el.nodeName == 'SELECT' ? 'select' : $el.attr('block')
-        if (!type) return error('Missing block type in [block] attribute in element:', el)
+        if (!type) return error('Missing block type in [block] attribute of element:', el)
         
         var block = rasti.blocks[type]
         if (!block) return error('Undefined block type "%s" declared in [block] attribute of element:', type, el)
 
+        block.init($el)
+
         // if applicable, create options from data source
         if (el.hasAttribute('data')) updateBlock($el)
-
-        block.init($el)
     }
 
 
@@ -1820,7 +1773,7 @@ function genBlockStyles() {
         styles += rasti.blocks[key].style
     }
     styles += '</style>'
-    $('head').append(styles)
+    $('head').prepend(styles)
 }
 
 
@@ -1912,6 +1865,7 @@ nav ~ [page] {
     height: 70px;
     width: 100%;
     padding: 20px;
+    line-height: 30px;
     font-size: 2.5em;
     text-align: center;
     text-transform: uppercase;
@@ -1927,11 +1881,13 @@ nav ~ [page] {
 [header][panel]:before {
     height: 50px;
     padding: 10px 20px;
+    line-height: 30px;
     font-size: 2em;
 }
 [header][section]:before {
     height: 40px;
     padding: 10px;
+    line-height: 20px;
     font-size: 1.5em;
 }
 [header][collapse]:before {
@@ -1953,6 +1909,7 @@ nav ~ [page] {
 
 
 [field], [btn], .field, .btn {
+    min-height: 35px;
     width: 100%;
     padding: 5px 10px;
     border: 0;
@@ -2075,7 +2032,6 @@ nav, .tab-labels {
     border-bottom: 1px solid rgba(0,0,0, 0.2);
     border-radius: 0;
     text-transform: uppercase;
-    z-index: 1;
 }
 .tab-labels {
     justify-content: space-around;
@@ -2114,7 +2070,7 @@ nav > div, [tab-label] {
     max-width: 500px;
     overflow-y: auto;
     animation: zoomIn .4s, fadeIn .4s;
-    z-index: 2;
+    z-index: 11;
 }
 
 
@@ -2127,11 +2083,12 @@ nav > div, [tab-label] {
     width: 100vw;
     background: rgba(0,0,0,.7);
     animation: fadeIn .4s;
-    z-index: 1;
+    z-index: 10;
 }
 
 
 [label] {
+    position: relative;
     margin-top: 25px;
     vertical-align: bottom;
 }
@@ -2146,33 +2103,39 @@ nav > div, [tab-label] {
 [label]:not([panel]):not([section]):before {
     content: attr(label);
     position: absolute;
-    left: 0;
-    height: 20px;
+    height: 35px;
+    line-height: 35px;
     font-size: 1.2em;
     text-transform: capitalize;
 }
-[label][field]:before {
-    margin-top: -27px;
-    margin-left: -7px;
+[label]:before {
+    margin-top: -35px;
+    margin-left: -8px;
 }
 [label][fixed]:before {
-    margin-top: -22px;
+    margin-top: -30px;
     margin-left: 4px;
 }
 [label][field][big]:before {
     margin-left: 0;
 }
-[inline][label], [inline]>[label] {
+[inline][label],
+[inline]>[label] {
     width: auto;
     margin-top: 0;
-    margin-bottom: 30px;
     margin-left: calc(40% + 10px);
 }
-[inline][label]:before, [inline]>[label]:before {
-    width: 40%;
-    margin-top: 0;
-    margin-left: 0;
+[inline][label]:before,
+[inline]>[label]:before {
+    width: 80%;
+    left: -80%;
+    margin-top: -5px;
     text-align: right;
+}
+[inline][label][fixed]:before,
+[inline]>[label][fixed]:before {
+    margin-top: 0;
+    margin-left: -8px;
 }
 
 
@@ -2196,8 +2159,10 @@ input[type=checkbox] {
 }
 input[type=radio] + label,
 input[type=checkbox] + label {
-    display: inline-block;
+    display: block;
+    height: 40px;
     max-width: 90%;
+    padding: 12px 0;
     margin-left: 40px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2228,6 +2193,10 @@ input[type=checkbox]:checked + label:before {
     color: #222;
     animation: stamp 0.4s ease-out;
 }
+input[type=radio] + label:hover,
+input[type=checkbox] + label:hover {
+    font-weight: 600;
+}
 @keyframes stamp {
     50% { transform: scale(1.2); }
 }
@@ -2238,6 +2207,13 @@ input[type=checkbox]:checked + label:before {
     flex-flow: row wrap;
     align-content: flex-start;
     width: 100%;
+}
+.column, [column] {
+    display: flex;
+    flex-flow: column nowrap;
+    min-height: min-content !important;
+    align-content: flex-start;
+    align-items: center;
 }
 .row > .col-1,  [row] > [col-1]  { flex-basis: calc(08.33% - 15px); }
 .row > .col-2,  [row] > [col-2]  { flex-basis: calc(16.66% - 15px); }
@@ -2400,30 +2376,56 @@ input[type=checkbox]:checked + label:before {
     text-align: center;
 }
 
+[textr], .textr,
+[textr_]>*, .textr_>* {
+    text-align: right;
+}
+
+[textl], .textl,
+[textl_]>*, .textl_>* {
+    text-align: left;
+}
+
 [autom], .autom,
 [autom_]>*, .autom_>* {
     margin: auto !important;
 }
 
-[centerx], .centerx,
-[centerx_]>*, .centerx_>* {
+[floatcx], .floatcx,
+[floatcx_]>*, .floatcx_>* {
     position: absolute;
     left: 0; right: 0;
     margin: auto !important;
 }
 
-[centery], .centery,
-[centery_]>*, .centery_>* {
+[floatcy], .floatcy,
+[floatcy_]>*, .floatcy_>* {
     position: absolute;
     top: 0; bottom: 0;
     margin: auto !important;
 }
 
-[center], .center,
-[center_]>*, .center_>* {
+[floatc], .floatc,
+[floatc_]>*, .floatc_>* {
     position: absolute;
     left: 0; right: 0; top: 0; bottom: 0;
     margin: auto !important;
+}
+
+[centerx], .centerx {
+    display: flex;
+    justify-content: center;
+}
+
+[centery], .centery {
+    display: flex;
+    align-items: center;
+}
+
+[center], .center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 [left], .left,
@@ -2554,7 +2556,7 @@ input[type=checkbox]:checked + label:before {
     width: 50px;
     margin: 20px;
     border-radius: 50%;
-    z-index: 1;
+    z-index: 5;
 }
 
 [close][btn], .close.btn {
@@ -2785,7 +2787,7 @@ input[type=checkbox]:checked + label:before {
 
 `
 
-if (rastiCSS) $('head').append('<style>' + rastiCSS + '</style>')
+if (rastiCSS) $('head').prepend('<style>' + rastiCSS + '</style>')
 
 genBlockStyles()
 
