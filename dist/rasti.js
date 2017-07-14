@@ -1991,6 +1991,7 @@ nav ~ [page] {
 }
 [template] > .stats {
     height: 40px;
+    padding: 10px;
     font-size: 1.1em;
 }
 

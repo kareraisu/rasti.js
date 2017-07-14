@@ -65,9 +65,12 @@ app.ajax.getPeople = function(reqdata, render) {
 
     app.set('name=reqdata', JSON.stringify(reqdata, null, 2) )
 
-    var people = app.utils.getPeople(reqdata)
-
-    render(people) // (or not)
+    // ajax simulation
+    setTimeout(function() {
+        var people = app.utils.getPeople(reqdata)
+        app.get('tab-label="1"').click()
+        render(people)
+    }, 2000)
 
 }
 
@@ -79,7 +82,12 @@ app.utils.login = function(e){
 }
 
 
-app.init()
+app.init({
+    root : 'login'
+    //theme : 'blue',
+    //lang : 'es',
+    //persist : true,
+})
 
 
 

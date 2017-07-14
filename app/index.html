@@ -18,14 +18,13 @@
 
 </head>
 
-
+<body rasti=app>
 <!-- 
 the [rasti=X] declaration does 3 things:
     1. creates a rasti instance named X
     2. binds it to the container (in this case the body, but could be any div as well)
     3. creates an X global var to access the instance (window.X = instance)
 -->
-<body rasti=app root=login>
 
     <nav class=mid>
         <div nav=login></div>
@@ -35,7 +34,7 @@ the [rasti=X] declaration does 3 things:
 
     <button fab btn=config
         show="panel=config"
-        fix top right>☰</button>
+        class="top right">☰</button>
 
     <div modal panel=config header
         inline pad pad-s-desktop>           
