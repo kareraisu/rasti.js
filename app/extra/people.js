@@ -42,13 +42,19 @@ app.data.people = [{
     skills   : 'Java, SQL, Git',
 },{
     name     : 'Marcelo Olgiati',
-    id       : 'molgiati2',
+    id       : 'molgiati',
     area     : 'SDA',
     position : 'Java dev',
     skills   : 'Java, Angular, SQL, Git',
 },{
     name     : 'Alejandro Paiz',
     id       : 'apaiz',
+    area     : 'SDA',
+    position : 'Java dev',
+    skills   : 'Java, SQL, Git',
+},{
+    name     : 'Joaquin Bouchat',
+    id       : 'jbouchat',
     area     : 'SDA',
     position : 'Java dev',
     skills   : 'Java, SQL, Git',
