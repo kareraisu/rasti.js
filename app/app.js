@@ -9,7 +9,10 @@ app.pages.login = {
         $('nav').show()
         app.get('btn=config').show()
         if (params) {
-            app.get('nav=login').text(params.user)
+            app.get('nav=login').css({
+                'background-image' : `url(img/${ params.user }.jpg)`,
+                'background-size' : 'contain',
+            })
         }
     },
 }

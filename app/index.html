@@ -27,17 +27,16 @@ the [rasti=X] declaration does 3 things:
 -->
 
     <nav class=mid>
-        <div nav=login></div>
+        <div btn=config
+            show="panel=config"
+            class="icon menu"></div>
         <div nav=main text=main></div>
         <div nav=about text=about></div>
+        <div nav=login class="round right"></div>
     </nav>
 
-    <button fab btn=config
-        show="panel=config"
-        class="top right">☰</button>
-
     <div modal panel=config header
-        inline pad pad-s-desktop>           
+        class="inline pad pad-s-desktop">           
         <div block=buttons
             field=lang data label
             onchange=app.setLang(this.value)></div>
@@ -54,19 +53,21 @@ the [rasti=X] declaration does 3 things:
     </div>
 
 
-    <div row center page=about header>
-        <div col-6 panel pad-desktop>
+    <div page=about header
+        class="row center">
+        <div panel class="col-6 pad-desktop">
             <h1>rasti.js demo app</h1>
             <ul data=features label=features class="lighten"></ul>
         </div>
     </div>
 
 
-    <div column page=login header=welcome scroll>
+    <div page=login header=welcome
+        class="column scroll">
 
         <img src=rasti-192x192.png />
 
-        <div panel inline pad>
+        <div panel class="inline pad">
             <input field=user navparam
                 label=username
                 required />
@@ -76,7 +77,7 @@ the [rasti=X] declaration does 3 things:
                 label
                 required />
 
-            <button btn fullw
+            <button btn class="fullw"
                 text=login
                 on-click=login
                 validate></button>
@@ -85,38 +86,38 @@ the [rasti=X] declaration does 3 things:
     </div>
 
 
-    <div row page=main header
-        tabs-tablet hh-phone>
+    <div page=main header
+        class="row tabs-tablet hh-phone">
 
-        <div col-4 panel=filters header
+        <div panel=filters header
             ajax=getPeople
             state
-            scrolly hh-phone pad pad-s-desktop>
+            class="col-4 scrolly hh-phone pad pad-s-desktop">
 
-            <div section inline pad>
+            <div section class="inline pad">
                 <input field=name label>
                 <select field=area label data></select>
                 <div block=multi field=skills label data></div>
             </div>
 
             <div section=reqdata header
-                collapse>
+                class="collapse">
                 <textarea name=reqdata field disabled
                     style=height:100px></textarea>
             </div>
 
-            <button fullw btn
+            <button btn class="fullw" 
                 submit=getPeople
                 render=cards
                 text=search></button>
         </div>
 
 
-        <div col-8 panel=results header
+        <div panel=results header
             template=cards
             paging=4 columns stats
             fx=stack
-            hh-phone>
+            class="col-8 hh-phone">
 
             <!-- here be cards! -->
 

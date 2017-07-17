@@ -709,20 +709,20 @@ var rasti = function(name, container) {
 
 
         // create tabs
-        container.find('[tabs]').each(function(i, el) {
+        container.find('.tabs').each(function(i, el) {
             createTabs($(el))
         })
-        if (media.tablet || media.phone) container.find('[tabs-tablet]').each(function(i, el) {
+        if (media.tablet || media.phone) container.find('.tabs-tablet').each(function(i, el) {
             createTabs($(el))
         })
-        if (media.phone) container.find('[tabs-phone]').each(function(i, el) {
+        if (media.phone) container.find('.tabs-phone').each(function(i, el) {
             createTabs($(el))
         })
 
 
         // add close btn to modals
         container.find('[modal]').each(function(i, el) {
-            $('<button close btn>✕</button>')
+            $('<div class="icon close top right" />')
             .on('click', function(e){
                 $(this).parent().hide()
                 self.active.page.find('.backdrop').removeClass('backdrop')
@@ -850,13 +850,13 @@ var rasti = function(name, container) {
 
 
         // init move
-        container.find('[move]').each(function(i, el){
+        container.find('.move').each(function(i, el){
             $(el).move()
         })
 
 
         // init collapse
-        container.find('[collapse]').on('click', function(e){
+        container.find('.collapse').on('click', function(e){
             this.classList.toggle('folded')
         })
 
@@ -1366,32 +1366,21 @@ var rasti = function(name, container) {
             fx = $el.attr('fx') && rasti.fx[$el.attr('fx')],
             page_size = parseInt($el.attr('paging')),
             pager = newPager(name, data, page_size),
-            paging, columns, sizes
+            paging, columns, sizes, col=1, size=0
 
-        if ($el[0].hasAttribute('columns')) columns = `
-            <div class="columns floatl ib_">
-                <label>Columns:</label>
-                <button btn>1</button>
-                <button btn value=2>2</button>
-                <button btn value=3>3</button>
-            </div>`
+        if ($el[0].hasAttribute('columns')) columns = `<button btn class="icon columns" />`
 
         if (pager.total > 1) paging = `<div class="paging ib ib_">
-                <button class="btn prev">&lt;</button>
-                <span class="page"></span>
-                <button class="btn next">&gt;</button>
+                <button btn class="icon prev" />
+                <span class="page" />
+                <button btn class="icon next" />
             </div>`
 
-        sizes = `<div class="sizes floatr ib_">
-                <label>Page size:</label>
-                <button btn value=5>5</button>
-                <button btn value=10>10</button>
-                <button btn value=20>20</button>
-            </div>`
+        sizes = `<button btn class="icon rows" />`
 
         $el.html(`
             <div class="results scrolly"></div>
-            <div class="controls small bottom centerx ib_">
+            <div class="controls floatcx bottom ib_">
                 ${ columns || '' }
                 ${ paging || '' }
                 ${ sizes }
@@ -1409,17 +1398,22 @@ var rasti = function(name, container) {
             update( pager.prev() )
         })
 
-        $controls.on('click', '.sizes button', function(e){
-            pager.setPageSize(this.value)
+        $controls.on('click', '.rows', function(e){
+            size += 1
+            var newSize = pager.sizes[size % pager.sizes.length]
+            pager.setPageSize(newSize)
+            $(e.target).html(newSize)
             update( pager.next() )
             pager.total > 1
                 ? $controls.find('.paging').show()
                 : $controls.find('.paging').hide()
         })
 
-        $controls.on('click', '.columns button', function(e){
-            $results.removeClass('columns-2 columns-3')
-                .addClass(this.value ? 'columns-' + this.value : '')
+        $controls.on('click', '.columns', function(e){
+            col = col+1 > 3 ? 1 : col+1
+            $(e.target).html(col)
+            $results.removeClass('columns-1 columns-2 columns-3')
+                .addClass('columns-' + col)
         })
 
         $results.html( template(pager.next(), lang) )
@@ -1568,6 +1562,7 @@ var rasti = function(name, container) {
             if ( !is.array(results) ) return error('%s Results must be an array', this.logid)
             if ( !is.number(page_size) ) return error('%s Page size must be a number', this.logid)
             this.results = results
+            this.sizes = [5, 10, 20]
             this.page_size = page_size
             this.page = 0
             this.total = Math.ceil(this.results.length / this.page_size)
@@ -1793,10 +1788,6 @@ rastiCSS = `body {
     transition: background-color 0.2s,
                 font 0.2s;
 }
-nav {
-    height: 50px;
-    width: 100vw;
-}
 input {
     width: 100%;
     margin: 0;
@@ -1890,7 +1881,7 @@ nav ~ [page] {
     line-height: 20px;
     font-size: 1.5em;
 }
-[header][collapse]:before {
+[header].collapse:before {
     cursor: pointer;
 }
 
@@ -1908,7 +1899,7 @@ nav ~ [page] {
 }
 
 
-[field], [btn], .field, .btn {
+[field], [btn] {
     min-height: 35px;
     width: 100%;
     padding: 5px 10px;
@@ -1918,7 +1909,7 @@ nav ~ [page] {
     font-family: inherit !important;
     font-size: inherit;
 }
-[btn], .btn {
+[btn] {
     display: inline-block;
     height: 50px;
     width: auto;
@@ -1930,47 +1921,43 @@ nav ~ [page] {
     text-transform: uppercase;
 	cursor: pointer;
 }
-[btn]:not(:disabled):hover, .btn:not(:disabled):hover {
+[btn]:not(:disabled):hover {
     filter: contrast(1.5);
 }
-[btn][disabled], .btn[disabled]{
+[btn][disabled] {
     filter: contrast(0.5);
 }
-[btn][disabled], .btn[disabled] {
+[btn][disabled] {
     cursor: auto;
 }
 [panel] [field], [panel] [btn], [panel] [label],
-[panel] .field, [panel] .btn,
-[section] [field], [section] [btn], [section] [label],
-[section] .field, [section] .btn {
+[section] [field], [section] [btn], [section] [label] {
     margin-bottom: 15px;
 }
 
 
-[big][field], [big][btn], .big.field , .big.btn,
-[big].field, [big].btn, .big[field] , .big[btn],
-[big] [field], [big] [btn], .big .field, .big .btn,
-[big] .field, [big] .btn, .big [field] , .big [btn] {
+.big[field], .big[btn],
+.big [field], .big [btn] {
     min-height: 70px;
     margin-bottom: 25px;
     font-size: 1.5em;
 }
-[small][field], [small][btn], .small.field , .small.btn,
-[small].field, [small].btn, .small[field] , .small[btn],
-[small] [field], [small] [btn], .small .field, .small .btn,
-[small] .field, [small] .btn, .small [field] , .small [btn] {
+
+.small[field], .small[btn],
+.small [field], .small [btn] {
     height: 25px;
     margin-bottom: 15px;
     font-size: 1em;
 }
-[big] [label], .big [label]{
+
+.big [label]{
     margin-top: 25px;
     font-size: 1.2em;
 }
-[big] [label]:before, .big [label]:before {
+.big [label]:before {
     margin-top: -27px;
 }
-[big] [label][field]:before, .big [label][field]:before {
+.big [label][field]:before {
     margin-top: -25px;
 }
 
@@ -1985,9 +1972,12 @@ nav ~ [page] {
 }
 [template] > .controls {
     height: 60px;
-    padding: 15px;
+    padding: 5px;
     color: #fff;
     text-align: center;
+}
+[template] > .controls * {
+    vertical-align: super;
 }
 [template] > .stats {
     height: 40px;
@@ -2028,9 +2018,9 @@ nav, .tab-labels {
     position: relative;
     white-space: nowrap;
     min-width: 100vw;
-    height: 40px;
+    height: 50px;
     padding: 0;
-    border-bottom: 1px solid rgba(0,0,0, 0.2);
+    border-bottom: 1px solid rgba(0,0,0,0.2);
     border-radius: 0;
     text-transform: uppercase;
 }
@@ -2048,12 +2038,16 @@ nav > div, [tab-label] {
     justify-content: center;
     align-items: center;
     flex: 1 1 auto;
+    height: 100%;
     min-width: 50px;
-    max-width: 120px;
     padding: 5px;
-    font-size: 1.2em;
+    font-size: 1.4em;
     text-shadow: 0 0 0 #000;
     cursor: pointer;
+}
+nav > div {
+    max-width: 200px;
+    border-right: 1px solid rgba(0,0,0,0.2);
 }
 [tab-label].active {
     filter: contrast(1.5);
@@ -2075,7 +2069,7 @@ nav > div, [tab-label] {
 }
 
 
-[backdrop]:before, .backdrop:before {
+.backdrop:before {
     content: '';
     position: fixed;
     top: 0;
@@ -2117,24 +2111,24 @@ nav > div, [tab-label] {
     margin-top: -30px;
     margin-left: 4px;
 }
-[label][field][big]:before {
+[label][field].big:before {
     margin-left: 0;
 }
-[inline][label],
-[inline]>[label] {
+.inline [label],
+.inline > [label] {
     width: auto;
     margin-top: 0;
     margin-left: calc(40% + 10px);
 }
-[inline][label]:before,
-[inline]>[label]:before {
+.inline[label]:before,
+.inline > [label]:before {
     width: 80%;
     left: -80%;
     margin-top: -5px;
     text-align: right;
 }
-[inline][label][fixed]:before,
-[inline]>[label][fixed]:before {
+.inline[label][fixed]:before,
+.inline > [label][fixed]:before {
     margin-top: 0;
     margin-left: -8px;
 }
@@ -2203,43 +2197,31 @@ input[type=checkbox] + label:hover {
 }
 
 
-.row, [row] {
+.row {
     display: flex;
     flex-flow: row wrap;
     align-content: flex-start;
     width: 100%;
 }
-.column, [column] {
+.column {
     display: flex;
     flex-flow: column nowrap;
     min-height: min-content !important;
     align-content: flex-start;
     align-items: center;
 }
-.row > .col-1,  [row] > [col-1]  { flex-basis: calc(08.33% - 15px); }
-.row > .col-2,  [row] > [col-2]  { flex-basis: calc(16.66% - 15px); }
-.row > .col-3,  [row] > [col-3]  { flex-basis: calc(25.00% - 15px); }
-.row > .col-4,  [row] > [col-4]  { flex-basis: calc(33.33% - 15px); }
-.row > .col-5,  [row] > [col-5]  { flex-basis: calc(41.66% - 15px); }
-.row > .col-6,  [row] > [col-6]  { flex-basis: calc(50.00% - 15px); }
-.row > .col-7,  [row] > [col-7]  { flex-basis: calc(58.33% - 15px); }
-.row > .col-8,  [row] > [col-8]  { flex-basis: calc(66.66% - 15px); }
-.row > .col-9,  [row] > [col-9]  { flex-basis: calc(75.00% - 15px); }
-.row > .col-10, [row] > [col-10] { flex-basis: calc(83.33% - 15px); }
-.row > .col-11, [row] > [col-11] { flex-basis: calc(91.66% - 15px); }
-
-.row [class*=col-]:not(:first-child),
-[row] [col-1]:not(:first-child),
-[row] [col-2]:not(:first-child),
-[row] [col-3]:not(:first-child),
-[row] [col-4]:not(:first-child),
-[row] [col-5]:not(:first-child),
-[row] [col-6]:not(:first-child),
-[row] [col-7]:not(:first-child),
-[row] [col-8]:not(:first-child),
-[row] [col-9]:not(:first-child),
-[row] [col-10]:not(:first-child),
-[row] [col-11]:not(:first-child) { margin-left: 15px; }
+.row > .col-1  { flex-basis: calc(08.33% - 15px); }
+.row > .col-2  { flex-basis: calc(16.66% - 15px); }
+.row > .col-3  { flex-basis: calc(25.00% - 15px); }
+.row > .col-4  { flex-basis: calc(33.33% - 15px); }
+.row > .col-5  { flex-basis: calc(41.66% - 15px); }
+.row > .col-6  { flex-basis: calc(50.00% - 15px); }
+.row > .col-7  { flex-basis: calc(58.33% - 15px); }
+.row > .col-8  { flex-basis: calc(66.66% - 15px); }
+.row > .col-9  { flex-basis: calc(75.00% - 15px); }
+.row > .col-10 { flex-basis: calc(83.33% - 15px); }
+.row > .col-11 { flex-basis: calc(91.66% - 15px); }
+.row [class*=col-]:not(:first-child) { margin-left: 15px; }
 
 
 .page-options {
@@ -2249,19 +2231,20 @@ input[type=checkbox] + label:hover {
 
 /* utils */
 
-[move] {
+.move {
     user-select: none;
     cursor: move;
 }
 
-[resize] {
+.resize {
     resize: both;
     overflow: hidden;
 }
-[collapse] {
+
+.collapse {
     animation: foldOut 0.5s;
 }
-[section][collapse].folded {
+[section].collapse.folded {
     animation: foldIn 0.5s;
     height: 0;
     padding-bottom: 0;
@@ -2357,216 +2340,209 @@ input[type=checkbox] + label:hover {
     display: none !important;
 }
 
-[ib], .ib,
-[ib_]>*, .ib_>* {
+.ib, .ib_>* {
     display: inline-block;
     width: auto;
     margin-top: 0;
     margin-bottom: 0;
 }
 
-[floatl], .floatl {
+.floatl {
     float: left;
 }
-[floatr], .floatr {
+.floatr {
     float: right;
 }
 
-[textc], .textc,
-[textc_]>*, .textc_>* {
+.textc, .textc_>* {
     text-align: center;
 }
-
-[textr], .textr,
-[textr_]>*, .textr_>* {
+.textr, .textr_>* {
     text-align: right;
 }
-
-[textl], .textl,
-[textl_]>*, .textl_>* {
+.textl, .textl_>* {
     text-align: left;
 }
 
-[autom], .autom,
-[autom_]>*, .autom_>* {
+.autom, .autom_>* {
     margin: auto !important;
 }
 
-[floatcx], .floatcx,
-[floatcx_]>*, .floatcx_>* {
+.floatcx, .floatcx_>* {
     position: absolute;
     left: 0; right: 0;
     margin: auto !important;
 }
-
-[floatcy], .floatcy,
-[floatcy_]>*, .floatcy_>* {
+.floatcy, .floatcy_>* {
     position: absolute;
     top: 0; bottom: 0;
     margin: auto !important;
 }
-
-[floatc], .floatc,
-[floatc_]>*, .floatc_>* {
+.floatc, .floatc_>* {
     position: absolute;
     left: 0; right: 0; top: 0; bottom: 0;
     margin: auto !important;
 }
 
-[centerx], .centerx {
+.centerx {
     display: flex;
     justify-content: center;
 }
-
-[centery], .centery {
+.centery {
     display: flex;
     align-items: center;
 }
-
-[center], .center {
+.center {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-[left], .left,
-[left_]>*, .left_>* {
+.left, .left_>* {
     position: absolute;
     left: 0;
 }
-
-[right], .right,
-[right_]>*, .right_>* {
+.right, .right_>* {
     position: absolute;
     right: 0;
 }
-
-[top], .top
-[top_]>*, .top_>* {
+.top, .top_>* {
     position: absolute;
     top: 0;
 }
-
-[bottom], .bottom,
-[bottom_]>*, .bottom_>* {
+.bottom, .bottom_>* {
     position: absolute;
     bottom: 0;
 }
 
-[fix], .fix {
+.fix {
     position: fixed;
 }
 
-[fullw], .fullw,
-[fullw_]>*, .fullw_>* {
+.fullw, .fullw_>* {
     width: 100%;
 }
-
-[fullh], .fullh,
-[fullh_]>*, .fullh_>* {
+.fullh, .fullh_>* {
     height: 100%;
 }
 
-[autow], .autow,
-[autow_]>*, .autow_>* {
+.autow, .autow_>* {
     width: auto;
 }
-
-[autoh], .autoh,
-[autoh_]>*, .autoh_>* {
+.autoh, .autoh_>* {
     height: auto;
 }
 
-[scrollx], .scrollx,
-[scrollx_]>*, .scrollx_>* {
+.scrollx, .scrollx_>* {
     overflow-x: auto;
     overflow-y: hidden;
 }
-
-[scrolly], .scrolly,
-[scrolly_]>*, .scrolly_>* {
+.scrolly, .scrolly_>* {
     overflow-x: hidden;
     overflow-y: auto;
 }
-
-[scroll], .scroll,
-[scroll_]>*, .scroll_>* {
+.scroll, .scroll_>* {
     overflow: auto;
 }
 
-[columns-2], .columns-2 {
+.columns-2 {
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
 }
-[columns-2]>*, .columns-2>* {
+.columns-2 > * {
     width: 49%;
     margin-right: 2%;
 }
-[columns-2]>*:nth-child(2n),
-.columns-2>*:nth-child(2n){
+.columns-2 > *:nth-child(2n){
     margin-right: 0;
 }
 
-[columns-3], .columns-3 {
+.columns-3 {
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
 }
-[columns-3]>*, .columns-3>* {
+.columns-3 > * {
     width: 32%;
     margin-right: 2%;
 }
-[columns-3]>*:nth-child(3n),
-.columns-3>*:nth-child(3n){
+.columns-3 > *:nth-child(3n) {
     margin-right: 0;
 }
 
-[pad-s] {
+.pad-s {
     padding-left: 5%;
     padding-right: 5%;
 }
-[pad] {
+.pad {
     padding-left: 10%;
     padding-right: 10%;
 }
-[pad-l] {
+.pad-l {
     padding-left: 15%;
     padding-right: 15%;
 }
 
-[msg], .msg {
+.msg {
     height: 60%;
     width: 60%;
     padding: 10% 5%;
     font-size: large;
 }
 
-[icon], .icon {
-    border: 1px solid #000;
-    font-size: 2em;
-    line-height: 1;
+.icon {
+    flex-grow: 0;
+    height: 50px;
+    width: auto;
+    font-size: 1.8em;
+    text-align: center;
+}
+.icon.small {
+    height: 30px;
+    width: 30px;
+    font-size: 1em;
+}
+.icon.big {
+    height: 70px;
+    width: 70px;
+    font-size: 2.2em;
+}
+.icon.options:before {
+    content: '⋮';
+}
+.icon.menu:before {
+    content: '☰';
+}
+.icon.rows:before {
+    content: '▤';
+}
+.icon.columns:before {
+    content: '▥';
+}
+.icon.close:before {
+    content: '✕';
+}
+.icon.next:before {
+    content: '▶';
+}
+.icon.prev:before {
+    content: '◀';
 }
 
-[round], .round {
+
+.round {
     border-radius: 50%;
 }
 
-[fab][btn], .fab.btn {
+.fab[btn] {
     position: fixed;
+    bottom: 0;
+    right: 0;
     width: 50px;
     margin: 20px;
     border-radius: 50%;
     z-index: 5;
-}
-
-[close][btn], .close.btn {
-    position: absolute;
-    top: 0; right: 0;
-    width: 50px;
-    background-color: transparent !important;
-    border: none;
-    font-size: 1.5em
 }
 
 .error {
@@ -2655,15 +2631,15 @@ input[type=checkbox] + label:hover {
 
 /* desktop only */
 @media only screen and (min-width: 800px) {
-    [pad-s-desktop] {
+    .pad-s-desktop {
         padding-left: 5%;
         padding-right: 5%;
     }
-    [pad-desktop] {
+    .pad-desktop {
         padding-left: 10%;
         padding-right: 10%;
     }
-    [pad-l-desktop] {
+    .pad-l-desktop {
         padding-left: 15%;
         padding-right: 15%;
     }
@@ -2680,28 +2656,28 @@ input[type=checkbox] + label:hover {
         display: block;
     }
 
-    [header][hh-tablet]:before {
+    [header].hh-tablet:before {
         display: none;
     }
-    [header][hh-tablet][page] {
+    [header].hh-tablet[page] {
         padding-top: 0;
     }
-    [header][hh-tablet][panel] {
+    [header].hh-tablet[panel] {
         padding-top: 20px;
     }
-    [header][hh-tablet][section] {
+    [header].hh-tablet[section] {
         padding-top: 15px;
     }
     
-    [pad-s-tablet] {
+    .pad-s-tablet {
         padding-left: 5%;
         padding-right: 5%;
     }
-    [pad-tablet] {
+    .pad-tablet {
         padding-left: 10%;
         padding-right: 10%;
     }
-    [pad-l-tablet] {
+    .pad-l-tablet {
         padding-left: 15%;
         padding-right: 15%;
     }
@@ -2723,17 +2699,9 @@ input[type=checkbox] + label:hover {
 /* phone only */
 @media only screen and (max-width: 500px) {
 
-    nav {
-        height: 40px;
-    }
-
     [page] {
         padding-bottom: 0;
         overflow-y: auto;
-    }
-    nav ~ [page] {
-        min-height: calc(100vh - 40px);
-        max-height: calc(100vh - 40px);
     }
 
     [template] > .controls > .columns,
@@ -2756,28 +2724,28 @@ input[type=checkbox] + label:hover {
         display: block;
     }
 
-    [header][hh-phone]:before {
+    [header].hh-phone:before {
         display: none;
     }
-    [header][hh-phone][page] {
+    [header].hh-phone[page] {
         padding-top: 0;
     }
-    [header][hh-phone][panel] {
+    [header].hh-phone[panel] {
         padding-top: 20px;
     }
-    [header][hh-phone][section] {
+    [header].hh-phone[section] {
         padding-top: 15px;
     }
 
-    [pad-s-phone] {
+    .pad-s-phone {
         padding-left: 5%;
         padding-right: 5%;
     }
-    [pad-phone] {
+    .pad-phone {
         padding-left: 10%;
         padding-right: 10%;
     }
-    [pad-l-phone] {
+    .pad-l-phone {
         padding-left: 15%;
         padding-right: 15%;
     }

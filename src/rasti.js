@@ -253,20 +253,20 @@ var rasti = function(name, container) {
 
 
         // create tabs
-        container.find('[tabs]').each(function(i, el) {
+        container.find('.tabs').each(function(i, el) {
             createTabs($(el))
         })
-        if (media.tablet || media.phone) container.find('[tabs-tablet]').each(function(i, el) {
+        if (media.tablet || media.phone) container.find('.tabs-tablet').each(function(i, el) {
             createTabs($(el))
         })
-        if (media.phone) container.find('[tabs-phone]').each(function(i, el) {
+        if (media.phone) container.find('.tabs-phone').each(function(i, el) {
             createTabs($(el))
         })
 
 
         // add close btn to modals
         container.find('[modal]').each(function(i, el) {
-            $('<button close btn>✕</button>')
+            $('<div class="icon close top right" />')
             .on('click', function(e){
                 $(this).parent().hide()
                 self.active.page.find('.backdrop').removeClass('backdrop')
@@ -394,13 +394,13 @@ var rasti = function(name, container) {
 
 
         // init move
-        container.find('[move]').each(function(i, el){
+        container.find('.move').each(function(i, el){
             $(el).move()
         })
 
 
         // init collapse
-        container.find('[collapse]').on('click', function(e){
+        container.find('.collapse').on('click', function(e){
             this.classList.toggle('folded')
         })
 
@@ -910,32 +910,21 @@ var rasti = function(name, container) {
             fx = $el.attr('fx') && rasti.fx[$el.attr('fx')],
             page_size = parseInt($el.attr('paging')),
             pager = newPager(name, data, page_size),
-            paging, columns, sizes
+            paging, columns, sizes, col=1, size=0
 
-        if ($el[0].hasAttribute('columns')) columns = `
-            <div class="columns floatl ib_">
-                <label>Columns:</label>
-                <button btn>1</button>
-                <button btn value=2>2</button>
-                <button btn value=3>3</button>
-            </div>`
+        if ($el[0].hasAttribute('columns')) columns = `<button btn class="icon columns" />`
 
         if (pager.total > 1) paging = `<div class="paging ib ib_">
-                <button class="btn prev">&lt;</button>
-                <span class="page"></span>
-                <button class="btn next">&gt;</button>
+                <button btn class="icon prev" />
+                <span class="page" />
+                <button btn class="icon next" />
             </div>`
 
-        sizes = `<div class="sizes floatr ib_">
-                <label>Page size:</label>
-                <button btn value=5>5</button>
-                <button btn value=10>10</button>
-                <button btn value=20>20</button>
-            </div>`
+        sizes = `<button btn class="icon rows" />`
 
         $el.html(`
             <div class="results scrolly"></div>
-            <div class="controls small bottom centerx ib_">
+            <div class="controls floatcx bottom ib_">
                 ${ columns || '' }
                 ${ paging || '' }
                 ${ sizes }
@@ -953,17 +942,22 @@ var rasti = function(name, container) {
             update( pager.prev() )
         })
 
-        $controls.on('click', '.sizes button', function(e){
-            pager.setPageSize(this.value)
+        $controls.on('click', '.rows', function(e){
+            size += 1
+            var newSize = pager.sizes[size % pager.sizes.length]
+            pager.setPageSize(newSize)
+            $(e.target).html(newSize)
             update( pager.next() )
             pager.total > 1
                 ? $controls.find('.paging').show()
                 : $controls.find('.paging').hide()
         })
 
-        $controls.on('click', '.columns button', function(e){
-            $results.removeClass('columns-2 columns-3')
-                .addClass(this.value ? 'columns-' + this.value : '')
+        $controls.on('click', '.columns', function(e){
+            col = col+1 > 3 ? 1 : col+1
+            $(e.target).html(col)
+            $results.removeClass('columns-1 columns-2 columns-3')
+                .addClass('columns-' + col)
         })
 
         $results.html( template(pager.next(), lang) )
@@ -1112,6 +1106,7 @@ var rasti = function(name, container) {
             if ( !is.array(results) ) return error('%s Results must be an array', this.logid)
             if ( !is.number(page_size) ) return error('%s Page size must be a number', this.logid)
             this.results = results
+            this.sizes = [5, 10, 20]
             this.page_size = page_size
             this.page = 0
             this.total = Math.ceil(this.results.length / this.page_size)
