@@ -52,7 +52,7 @@ style : `
 
 }
 
-},{"../utils":9}],3:[function(require,module,exports){
+},{"../utils":12}],3:[function(require,module,exports){
 const utils = require('../utils')
 
 module.exports = {
@@ -93,7 +93,7 @@ init : function($el) {
 style : ``
 
 }
-},{"../utils":9}],4:[function(require,module,exports){
+},{"../utils":12}],4:[function(require,module,exports){
 const utils = require('../utils')
 
 module.exports = {
@@ -109,7 +109,7 @@ init : function($el) {},
 style : ''
 
 }
-},{"../utils":9}],5:[function(require,module,exports){
+},{"../utils":12}],5:[function(require,module,exports){
 const utils = require('../utils')
 
 module.exports = {
@@ -312,7 +312,7 @@ style : `
 `
 
 }
-},{"../utils":9}],6:[function(require,module,exports){
+},{"../utils":12}],6:[function(require,module,exports){
 const utils = require('../utils')
 
 module.exports = {
@@ -343,7 +343,7 @@ init : function($el) {
 style : ``
 
 }
-},{"../utils":9}],7:[function(require,module,exports){
+},{"../utils":12}],7:[function(require,module,exports){
 const utils = require('../utils')
 
 module.exports = {
@@ -454,14 +454,213 @@ style : `
 
 }
 
-},{"../utils":9}],8:[function(require,module,exports){
+},{"../utils":12}],8:[function(require,module,exports){
+class History {
+
+    constructor() {
+        this.i = 0
+        this.content = []
+    }
+    
+    back() {
+        if (this.i > 0) navTo(this.content[--(this.i)])
+    }
+    forth() {
+        if (this.i < this.content.length) navTo(this.content[++(this.i)])
+    }
+    push(page) {
+        this.content.splice(this.i, null, page)
+        this.i++
+    }
+}
+
+
+class Pager {
+
+    constructor(id, results, page_size) {
+        this.id = id
+        if ( !is.string(id) ) return error('Pager id must be a string')
+        this.logid = `Pager for template [${ this.id }]:`
+        if ( !is.array(results) ) return error('%s Results must be an array', this.logid)
+        if ( !is.number(page_size) ) return error('%s Page size must be a number', this.logid)
+        this.results = results
+        this.sizes = [5, 10, 20]
+        this.page_size = page_size
+        this.page = 0
+        this.total = Math.ceil(this.results.length / this.page_size)
+
+    }
+
+    next() {
+        if (this.hasNext()) this.page++
+        else warn('%s No next page', this.logid)
+        return this.getPageResults(this.page)
+    }
+
+    prev() {
+        if (this.hasPrev()) this.page--
+        else warn('%s No previous page', this.logid)
+        return this.getPageResults(this.page)
+    }
+
+    hasNext() {
+        return this.results.length > this.page * this.page_size
+    }
+
+    hasPrev() {
+        return this.page > 1
+    }
+
+    setPageSize(size) {
+        size = parseInt(size)
+        if ( !is.number(size) ) return error('%s Must specify a number as the page size', this.logid)
+        this.page_size = size
+        this.page = 0
+        this.total = Math.ceil(this.results.length / this.page_size)
+    }
+
+    getPageResults(page) {
+        if ( !is.number(page) ) {
+            error('%s Must specify a page number to get results from', this.logid)
+            return []
+        }
+        try {
+            var i = (page -1) * this.page_size
+            return this.results.slice(i, i + this.page_size)
+        }
+        catch(err) {
+            error('%s Could not get results of page %s, error:', this.logid, page, err)
+            return []
+        }
+    }
+
+}
+
+
+let state = Object.defineProperties({}, {
+    page  : { get : function() { return self.active.page.attr('page') }, enumerable : true },
+    theme : { get : function() { return self.active.theme }, enumerable : true },
+    lang  : { get : function() { return self.active.lang }, enumerable : true },
+    save : { value : function() {
+        localStorage.setItem('rasti.' + self.name, JSON.stringify(self.state))
+        log('State saved')
+    } },
+    get : { value : function() {
+        var state
+        try {
+            state = JSON.parse( localStorage.getItem('rasti.' + self.name) )
+            if ( !state ) log('No saved state found for app [%s]', self.name)
+            else if ( !is.object(state) ) invalid()
+            else return state
+        }
+        catch(err) {
+            invalid()
+        }
+
+        function invalid() {
+            error('Saved state for app [%s] is invalid', self.name)
+        }
+    } },
+    restore : { value : function() {
+        var state = self.state.get()
+        if (state) {
+            log('Restoring state...')
+            for (let prop in state) {
+                self.state[prop] = state[prop]
+            }
+            if (state.theme) setTheme(state.theme)
+            if (state.lang) setLang(state.lang)
+            navTo(state.page)
+            log('State restored')
+        }
+        return state
+    } },
+    clear : { value : function() {
+        localStorage.removeItem('rasti.' + self.name)
+    } },
+})
+
+module.exports = {
+    History,
+    Pager,
+    state
+}
+},{}],9:[function(require,module,exports){
+// prototype extensions
+Array.prototype.remove = function(el) {
+    var i = this.indexOf(el);
+    if (i >= 0) this.splice(i, 1);
+}
+
+String.prototype.capitalize = function() {
+    return this.length && this[0].toUpperCase() + this.slice(1).toLowerCase()
+}
+
+
+// $ extensions
+$.fn.move = function(options) {
+    var options = Object.assign({
+            handle: this,
+            container: this.parent()
+        }, options),
+        object = this,
+        newX, newY,
+        nadir = object.css('z-index'),
+        apex = 100000,
+        hold = 'mousedown touchstart',
+        move = 'mousemove touchmove',
+        release = 'mouseup touchend'
+
+    if (!object[0].hasAttribute('move')) object.attr('move', '')
+
+    options.handle.on(hold, function(e) {
+        if (e.type == 'mousedown' && e.which != 1) return
+        object.css('z-index', apex)
+        var marginX = options.container.width() - object.width(),
+            marginY = options.container.height() - object.height(),
+            oldX = object.position().left,
+            oldY = object.position().top,
+            touch = e.touches,
+            startX = touch ? touch[0].pageX : e.pageX,
+            startY = touch ? touch[0].pageY : e.pageY
+
+        $(window)
+            .on(move, function(e) {
+                var touch = e.touches,
+                    endX = touch ? touch[0].pageX : e.pageX,
+                    endY = touch ? touch[0].pageY : e.pageY
+                newX = Math.max(0, Math.min(oldX + endX - startX, marginX))
+                newY = Math.max(0, Math.min(oldY + endY - startY, marginY))
+
+                window.requestAnimationFrame
+                    ? requestAnimationFrame(setElement)
+                    : setElement()
+            })
+            .one(release, function(e) {
+                e.preventDefault()
+                object.css('z-index', nadir)
+                $(this).off(move).off(release)
+            })
+
+        e.preventDefault()
+    })
+
+    return this
+
+    function setElement() {
+        object.css({top: newY, left: newX});
+    }
+}
+
+},{}],10:[function(require,module,exports){
 (function (global){
 /* zepto */
 
-var utils = require('./utils'),
-    is = utils.is,
-    type = utils.type,
-    sameType = utils.sameType
+require('./extensions')
+var { History, Pager, state } = require('./components')
+var utils = require('./utils')
+var { is, type, sameType } = utils
+var themes = require('./themes')
 
 var options = {
     persist : false,
@@ -529,119 +728,21 @@ var rasti = function(name, container) {
     // public properties
 
     this.options = Object.assign({}, options)
-
     this.defaults = {
         stats : self.options.stats,
         noData : self.options.noData,
     }
-
-    this.state = {}
-    Object.defineProperties(self.state, {
-        page  : { get : function() { return self.active.page.attr('page') }, enumerable : true },
-        theme : { get : function() { return self.active.theme }, enumerable : true },
-        lang  : { get : function() { return self.active.lang }, enumerable : true },
-        save : { value : function() {
-            localStorage.setItem('rasti.' + self.name, JSON.stringify(self.state))
-            log('State saved')
-        } },
-        get : { value : function() {
-            var state
-            try {
-                state = JSON.parse( localStorage.getItem('rasti.' + self.name) )
-                if ( !state ) log('No saved state found for app [%s]', self.name)
-                else if ( !is.object(state) ) invalid()
-                else return state
-            }
-            catch(err) {
-                invalid()
-            }
-
-            function invalid() {
-                error('Saved state for app [%s] is invalid', self.name)
-            }
-        } },
-        restore : { value : function() {
-            var state = self.state.get()
-            if (state) {
-                log('Restoring state...')
-                for (let prop in state) {
-                    self.state[prop] = state[prop]
-                }
-                if (state.theme) setTheme(state.theme)
-                if (state.lang) setLang(state.lang)
-                navTo(state.page)
-                log('State restored')
-            }
-            return state
-        } },
-        clear : { value : function() {
-            localStorage.removeItem('rasti.' + self.name)
-        } },
-    })
+    this.state = state
 
     this.pages = {}
-
     this.data = {}
-
     this.ajax = {}
-
-    this.utils = {
-        is : is,
-        type : type,
-        sameType : sameType,
-    }
-
+    this.utils = {}
     this.templates = {}
-
     this.langs = {}
 
-
-    this.themes = {
-
-        base : {
-            font : 'normal 14px sans-serif',
-            palette : {
-                white   : '#fff',
-                lighter : '#ddd',
-                light   : '#bbb',
-                mid     : '#888',
-                dark    : '#444',
-                darker  : '#222',
-                black   : '#000',
-                detail  : 'darkcyan',
-                lighten : 'rgba(255,255,255,0.2)',
-                darken  : 'rgba(0,0,0,0.2)',
-            },
-        },
-
-    }
-
-
-    this.themeMaps = {
-
-        dark : {
-            page    : 'darker lighten', // bg, header bg
-            panel   : 'dark lighten',   // bg, header bg
-            section : 'mid lighten',    // bg, header bg
-            field   : 'light darker',   // bg, text
-            btn     : 'detail darker',  // bg, text
-            header  : 'darker',         // text
-            label   : 'darker',         // text
-            text    : 'darker',         // text
-        },
-
-        light : {
-            page    : 'lighter darken',
-            panel   : 'mid lighten',
-            section : 'light darken',
-            field   : 'lighter dark',
-            btn     : 'detail light',
-            header  : 'dark',
-            label   : 'mid',
-            text    : 'dark',
-        },
-        
-    }
+    this.themes = themes.themes
+    this.themeMaps = themes.themeMaps
 
     // methods
 
@@ -1533,95 +1634,9 @@ var rasti = function(name, container) {
     }
 
 
-    // internal classes
-
-    class History {
-
-        constructor() {
-            this.i = 0
-            this.content = []
-        }
-        
-        back() {
-            if (this.i > 0) navTo(this.content[--(this.i)])
-        }
-        forth() {
-            if (this.i < this.content.length) navTo(this.content[++(this.i)])
-        }
-        push(page) {
-            this.content.splice(this.i, null, page)
-            this.i++
-        }
-    }
-
-
-    class Pager {
-
-        constructor(id, results, page_size) {
-            this.id = id
-            if ( !is.string(id) ) return error('Pager id must be a string')
-            this.logid = `Pager for template [${ this.id }]:`
-            if ( !is.array(results) ) return error('%s Results must be an array', this.logid)
-            if ( !is.number(page_size) ) return error('%s Page size must be a number', this.logid)
-            this.results = results
-            this.sizes = [5, 10, 20]
-            this.page_size = page_size
-            this.page = 0
-            this.total = Math.ceil(this.results.length / this.page_size)
-
-        }
-
-        next() {
-            if (this.hasNext()) this.page++
-            else warn('%s No next page', this.logid)
-            return this.getPageResults(this.page)
-        }
-
-        prev() {
-            if (this.hasPrev()) this.page--
-            else warn('%s No previous page', this.logid)
-            return this.getPageResults(this.page)
-        }
-
-        hasNext() {
-            return this.results.length > this.page * this.page_size
-        }
-
-        hasPrev() {
-            return this.page > 1
-        }
-
-        setPageSize(size) {
-            size = parseInt(size)
-            if ( !is.number(size) ) return error('%s Must specify a number as the page size', this.logid)
-            this.page_size = size
-            this.page = 0
-            this.total = Math.ceil(this.results.length / this.page_size)
-        }
-
-        getPageResults(page) {
-            if ( !is.number(page) ) {
-                error('%s Must specify a page number to get results from', this.logid)
-                return []
-            }
-            try {
-                var i = (page -1) * this.page_size
-                return this.results.slice(i, i + this.page_size)
-            }
-            catch(err) {
-                error('%s Could not get results of page %s, error:', this.logid, page, err)
-                return []
-            }
-        }
-
-    }
-
-
-
     // api
 
     return Object.freeze({
-
         // objects
         options : this.options,
         history : this.history,
@@ -1636,17 +1651,17 @@ var rasti = function(name, container) {
         templates : this.templates,
 
         // methods
-        extend : extend,
-        init : init,
-        get : get,
-        set : set,
-        add : add,
-        navTo : navTo,
-        render : render,
-        setLang : setLang,
-        setTheme : setTheme,
-        updateBlock : updateBlock,
-        toggleFullScreen : toggleFullScreen,
+        extend,
+        init,
+        get,
+        set,
+        add,
+        navTo,
+        render,
+        setLang,
+        setTheme,
+        updateBlock,
+        toggleFullScreen,
     })
 
 }
@@ -1656,6 +1671,7 @@ var rasti = function(name, container) {
 rasti.log = log
 rasti.warn = warn
 rasti.error = error
+rasti.utils = utils
 rasti.blocks = require('./blocks/all')
 rasti.fx = {
 
@@ -1673,71 +1689,6 @@ rasti.options = {log : 'debug'}
 
 module.exports = Object.freeze(rasti)
 
-
-// prototype extensions
-Array.prototype.remove = function(el) {
-    var i = this.indexOf(el);
-    if (i >= 0) this.splice(i, 1);
-}
-String.prototype.capitalize = function() {
-    return this.length && this[0].toUpperCase() + this.slice(1).toLowerCase()
-}
-
-
-// $ extensions
-$.fn.move = function(options) {
-    var options = $.extend({
-            handle: this,
-            container: this.parent()
-        }, options),
-        object = this,
-        newX, newY,
-        nadir = object.css('z-index'),
-        apex = 100000,
-        hold = 'mousedown touchstart',
-        move = 'mousemove touchmove',
-        release = 'mouseup touchend'
-
-    if (!object[0].hasAttribute('move')) object.attr('move', '')
-
-    options.handle.on(hold, function(e) {
-        if (e.type == 'mousedown' && e.which != 1) return
-        object.css('z-index', apex)
-        var marginX = options.container.width() - object.width(),
-            marginY = options.container.height() - object.height(),
-            oldX = object.position().left,
-            oldY = object.position().top,
-            touch = e.touches,
-            startX = touch ? touch[0].pageX : e.pageX,
-            startY = touch ? touch[0].pageY : e.pageY
-
-        $(window)
-            .on(move, function(e) {
-                var touch = e.touches,
-                    endX = touch ? touch[0].pageX : e.pageX,
-                    endY = touch ? touch[0].pageY : e.pageY
-                newX = Math.max(0, Math.min(oldX + endX - startX, marginX))
-                newY = Math.max(0, Math.min(oldY + endY - startY, marginY))
-
-                window.requestAnimationFrame
-                    ? requestAnimationFrame(setElement)
-                    : setElement()
-            })
-            .one(release, function(e) {
-                e.preventDefault()
-                object.css('z-index', nadir)
-                $(this).off(move).off(release)
-            })
-
-        e.preventDefault()
-    })
-
-    return this
-
-    function setElement() {
-        object.css({top: newY, left: newX});
-    }
-}
 
 
 // bootstrap any apps defined via rasti attribute
@@ -2766,7 +2717,54 @@ bootstrap()
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./blocks/all":1,"./utils":9}],9:[function(require,module,exports){
+},{"./blocks/all":1,"./components":8,"./extensions":9,"./themes":11,"./utils":12}],11:[function(require,module,exports){
+exports.themes = {
+
+    base : {
+        font : 'normal 14px sans-serif',
+        palette : {
+            white   : '#fff',
+            lighter : '#ddd',
+            light   : '#bbb',
+            mid     : '#888',
+            dark    : '#444',
+            darker  : '#222',
+            black   : '#000',
+            detail  : 'darkcyan',
+            lighten : 'rgba(255,255,255,0.2)',
+            darken  : 'rgba(0,0,0,0.2)',
+        },
+    },
+
+}
+
+
+exports.themeMaps = {
+
+    dark : {
+        page    : 'darker lighten', // bg, header bg
+        panel   : 'dark lighten',   // bg, header bg
+        section : 'mid lighten',    // bg, header bg
+        field   : 'light darker',   // bg, text
+        btn     : 'detail darker',  // bg, text
+        header  : 'darker',         // text
+        label   : 'darker',         // text
+        text    : 'darker',         // text
+    },
+
+    light : {
+        page    : 'lighter darken',
+        panel   : 'mid lighten',
+        section : 'light darken',
+        field   : 'lighter dark',
+        btn     : 'detail light',
+        header  : 'dark',
+        label   : 'mid',
+        text    : 'dark',
+    },
+    
+}
+},{}],12:[function(require,module,exports){
 const is = {}
 'object function array string number regex boolean'.split(' ').forEach(function(t){
     is[t] = function(exp){ return type(exp) === t }
@@ -2827,14 +2825,14 @@ function onMobile() {
 
 
 module.exports = {
-	is : is,
-	type : type,
-	sameType : sameType,
-	checkData : checkData,
-	random : random,
-	onMobile : onMobile,
-    rastiError : rastiError,
+	is,
+	type,
+	sameType,
+	checkData,
+	random,
+	onMobile,
+    rastiError,
 }
-},{}]},{},[8])(8)
+},{}]},{},[10])(10)
 });
 //# sourceMappingURL=rasti.map

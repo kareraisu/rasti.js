@@ -58,11 +58,11 @@ function onMobile() {
 
 
 module.exports = {
-	is : is,
-	type : type,
-	sameType : sameType,
-	checkData : checkData,
-	random : random,
-	onMobile : onMobile,
-    rastiError : rastiError,
+	is,
+	type,
+	sameType,
+	checkData,
+	random,
+	onMobile,
+    rastiError,
 }
