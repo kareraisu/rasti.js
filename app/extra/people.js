@@ -62,14 +62,14 @@ app.data.people = [{
     skills   : 'Java, SQL, Git',
 }]
 
-// TODO add: carlos, hernan, juan, angie, franco, fer, pablos(3)
+// TODO add: carlos, hernan, angie, franco, fer, pablos(3)
 
 
 app.utils.getPeople = criteria => {
     var matches, query
-    return app.data.people.filter(person => {
+    return app.data.people.filter( person => {
         matches = true
-        Object.keys(criteria).forEach(prop => {
+        Object.keys(criteria).forEach( prop => {
             query = criteria[prop]
             if ( !query ) return
             else if ( is.string(query) ) {

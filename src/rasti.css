@@ -201,7 +201,7 @@ nav ~ [page] {
     text-align: center;
 }
 [template] > .controls * {
-    vertical-align: super;
+    vertical-align: middle;
 }
 [template] > .stats {
     height: 40px;

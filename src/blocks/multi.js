@@ -19,7 +19,7 @@ init : function($el) {
     var el = $el[0]
     var field = $el.attr('field')
 
-    if (!field) return error('Missing field name in [field] attribute of element:', el)
+    if (!field) return rasti.error('Missing field name in [field] attribute of element:', el)
     
     el.value = []
     el.max = parseInt($el.attr('max'))

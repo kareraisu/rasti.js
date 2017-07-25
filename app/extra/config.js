@@ -82,7 +82,7 @@ app.extend({
 
 	utils : {
 
-	    applyTheme : function(el) {
+	    applyTheme : el => {
 	        var theme = app.get('field=theme').val(),
 	            map = app.get('data=themeMaps').val()
 	        if (theme && map) app.setTheme(theme +' '+ map)

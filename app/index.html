@@ -18,7 +18,7 @@
 
 </head>
 
-<body rasti=app>
+<body rasti=app persist>
 <!-- 
 the [rasti=X] declaration does 3 things:
     1. creates a rasti instance named X
@@ -97,7 +97,9 @@ the [rasti=X] declaration does 3 things:
             <div section class="inline pad">
                 <input field=name label>
                 <select field=area label data></select>
-                <div block=multi field=skills label data></div>
+                <div block=multi
+                    field=skills label data
+                    deps=area></div>
             </div>
 
             <div section=reqdata header
@@ -115,7 +117,7 @@ the [rasti=X] declaration does 3 things:
 
         <div panel=results header
             template=cards
-            paging=4 columns stats
+            paging=4 columns
             fx=stack
             class="col-8 hh-phone">
 

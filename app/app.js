@@ -1,11 +1,11 @@
 app.pages.login = {
 
-    in : function(params) {
+    in : params => {
         $('nav').hide()
         app.get('btn=config').hide()
     },
 
-    out : function(params) {
+    out : params => {
         $('nav').show()
         app.get('btn=config').show()
         if (params) {
@@ -22,25 +22,40 @@ app.pages.main = {
 
     url : 'the-main-page',
 
-    init : function() {
-        app.get('panel=results').on('click', '.card', function(e){
+    init : () => {
+        app.get('panel=results').on('click', '.card', e => {
             e.currentTarget.classList.toggle('modal')
         })
     }
 }
 
-app.data.area = 'SDA, I+D, Recursos Humanos, Comunicación, Administración, Dirección'.split(', ')
 
-app.data.skills = 'HTML, CSS, Javascript, Node, git, Angular, React, Cordoba, Java, SQL, Networking, Security, PaaS, Docker, Bash'.split(', ')
+skills = {
+    tech   : 'HTML, CSS, Javascript, Node, git, Angular, React, Cordoba, Java, Maven, Hibernate, SQL, Mongo, Networking, Security, PaaS, Docker, Bash',
+    people : 'Búsqueda, Selección, Psicología, Word, Excel, Powerpoint',
+    design : 'Creatividad, Dibujo, Composición, Teoría del color, Fotografía, Branding, UI & UX, Photoshop, Illustrator, After Effects, Blender',
+    manage : 'Planeamiento, Estrategia, Coordinación, Negociación, Análisis de costos, Word, Excel, Powerpoint',
+}
 
-app.data.features = 'navigation, ajax, templates, paging, actions, themes, i18n, tabs, modals, blocks, validation, responsive'.split(', ')
+areaSkills = {
+    SDA : 'tech',
+    'I+D' : 'tech',
+    'Recursos Humanos' : 'people',
+    Comunicación : 'design',
+    Administración : 'manage',
+}
+
+app.data.area = Object.keys(areaSkills)
+
+app.data.skills = (render, deps) => {
+    render( skills[ areaSkills[deps.area || 'SDA'] ] )
+}
+
+app.data.features = 'navigation, ajax, templates, paging, actions, themes, i18n, tabs, modals, blocks, field dependency, field validation, responsive'
 
 
-app.templates.cards = function(data) {
-
-    return data.map(function(obj){
-
-        return `<div class="card row" section>
+app.templates.cards = data => data.map(
+        obj => `<div class="card row" section>
             <img src="img/${obj.id}.jpg"/>
             <div class="data">
                 <div class="name">${obj.name}</div>
@@ -58,13 +73,10 @@ app.templates.cards = function(data) {
                 </div>
             </div>
         </div>`
-
-    }).join('')
-
-}
+    ).join('')
 
 
-app.ajax.getPeople = function(reqdata, render) {
+app.ajax.getPeople = (reqdata, render) => {
 
     app.set('name=reqdata', JSON.stringify(reqdata, null, 2) )
 
@@ -78,7 +90,7 @@ app.ajax.getPeople = function(reqdata, render) {
 }
 
 
-app.utils.login = function(e){
+app.utils.login = e => {
     if (app.get('field=pass').val() == '1234') {
         app.navTo('main', {user: app.get('field=user').val()})
     }
