@@ -2,12 +2,10 @@ app.pages.login = {
 
     in : params => {
         $('nav').hide()
-        app.get('btn=config').hide()
     },
 
     out : params => {
         $('nav').show()
-        app.get('btn=config').show()
         if (params) {
             app.get('nav=login').css({
                 'background-image' : `url(img/${ params.user }.jpg)`,

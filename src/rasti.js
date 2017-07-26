@@ -179,20 +179,19 @@ var rasti = function(name, container) {
 
 
         // init field validations
-        container.find('[validate]').on('click', function (e) {
-            var $container = $(this).parent().removeClass('invalid')
-            var invalid
-            $container.find('[field][required]').each(function(i, el){
-                invalid = el.validity && !el.validity.valid
-                el.classList.toggle('error', invalid)
-                if (invalid) $container.addClass('invalid')
+        container.find('[validate]').each(function(i, btn) {
+            btn.disabled = true
+            var $container = $(btn).parent()
+            var fields = $container.find('[field][required]')
+            fields.each(function(i, field){
+                var invalid = field.validity && !field.validity.valid
+                field.classList.toggle('error', invalid)
+                $(field).change(function(e){
+                    invalid = field.validity && !field.validity.valid
+                    field.classList.toggle('error', invalid)
+                    btn.disabled = $container.find('[field].error').length
+                })
             })
-            if ($container.hasClass('invalid')) {
-                // prevent any default actions
-                e.preventDefault()
-                // and any custom actions (such as nav)
-                e.stopImmediatePropagation()
-            }
         })
 
 

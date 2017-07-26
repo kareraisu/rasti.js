@@ -27,13 +27,14 @@ the [rasti=X] declaration does 3 things:
 -->
 
     <nav class=mid>
-        <div btn=config
+        <div name=config
             show="panel=config"
             class="icon menu"></div>
         <div nav=main text=main></div>
         <div nav=about text=about></div>
         <div nav=login class="round right"></div>
     </nav>
+
 
     <div modal panel=config header
         class="inline pad pad-s-desktop">           
@@ -55,9 +56,11 @@ the [rasti=X] declaration does 3 things:
 
     <div page=about header
         class="row center">
-        <div panel class="col-6 pad-desktop">
+        <div panel class="pad-desktop">
             <h1>rasti.js demo app</h1>
-            <ul data=features label=features class="lighten"></ul>
+            <div section>
+                <ul data=features label=features class="lighten"></ul>
+            </div>
         </div>
     </div>
 
@@ -70,11 +73,13 @@ the [rasti=X] declaration does 3 things:
         <div panel class="inline pad">
             <input field=user navparam
                 label=username
+                pattern="^[a-z\d\.]{5,}$"
                 required />
 
             <input type=password
                 field=pass
                 label
+                pattern="^[\d]{4,}$"
                 required />
 
             <button btn class="fullw"

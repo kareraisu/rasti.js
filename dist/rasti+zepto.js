@@ -791,20 +791,19 @@ var rasti = function(name, container) {
 
 
         // init field validations
-        container.find('[validate]').on('click', function (e) {
-            var $container = $(this).parent().removeClass('invalid')
-            var invalid
-            $container.find('[field][required]').each(function(i, el){
-                invalid = el.validity && !el.validity.valid
-                el.classList.toggle('error', invalid)
-                if (invalid) $container.addClass('invalid')
+        container.find('[validate]').each(function(i, btn) {
+            btn.disabled = true
+            var $container = $(btn).parent()
+            var fields = $container.find('[field][required]')
+            fields.each(function(i, field){
+                var invalid = field.validity && !field.validity.valid
+                field.classList.toggle('error', invalid)
+                $(field).change(function(e){
+                    invalid = field.validity && !field.validity.valid
+                    field.classList.toggle('error', invalid)
+                    btn.disabled = $container.find('[field].error').length
+                })
             })
-            if ($container.hasClass('invalid')) {
-                // prevent any default actions
-                e.preventDefault()
-                // and any custom actions (such as nav)
-                e.stopImmediatePropagation()
-            }
         })
 
 
@@ -1775,12 +1774,11 @@ input {
     margin: 0;
     vertical-align: text-bottom;
 }
-input:invalid{
-    outline: 1px solid red;
+input[field]:focus:invalid {
+    box-shadow: 0 0 0 2px red;
 }
-
-input:focus:invalid {
-    outline: none;
+input[field]:focus:valid {
+    box-shadow: 0 0 0 2px green;
 }
 
 
@@ -1884,12 +1882,14 @@ nav ~ [page] {
 [field], [btn] {
     min-height: 35px;
     width: 100%;
-    padding: 5px 10px;
     border: 0;
     border-radius: 2px;
     outline: none;
     font-family: inherit !important;
     font-size: inherit;
+}
+[field] {
+    padding: 5px 10px;
 }
 [btn] {
     display: inline-block;
@@ -1906,10 +1906,8 @@ nav ~ [page] {
 [btn]:not(:disabled):hover {
     filter: contrast(1.5);
 }
-[btn][disabled] {
+[btn]:disabled {
     filter: contrast(0.5);
-}
-[btn][disabled] {
     cursor: auto;
 }
 [panel] [field], [panel] [btn], [panel] [label],
@@ -1989,10 +1987,10 @@ nav ~ [page] {
     vertical-align: top;
 }
 .tab-labels + [h-flow] {
-    height: calc(100vh - 40px);
+    height: calc(100vh - 50px);
 }
 nav ~ [page] > .tab-labels + [h-flow] {
-    height: calc(100vh - 80px);
+    height: calc(100vh - 100px);
 }
 
 nav, .tab-labels {
@@ -2048,6 +2046,9 @@ nav > div {
     overflow-y: auto;
     animation: zoomIn .4s, fadeIn .4s;
     z-index: 11;
+}
+[modal] .close, .modal .close {
+    cursor: pointer;
 }
 
 
@@ -2477,7 +2478,9 @@ input[type=checkbox] + label:hover {
     flex-grow: 0;
     height: 50px;
     width: auto;
+    min-width: 50px;
     font-size: 1.8em;
+    line-height: 2;
     text-align: center;
 }
 .icon.small {
@@ -2525,10 +2528,6 @@ input[type=checkbox] + label:hover {
     margin: 20px;
     border-radius: 50%;
     z-index: 5;
-}
-
-.error {
-  box-shadow: 0px 0px 16px 2px red;
 }
 
 
