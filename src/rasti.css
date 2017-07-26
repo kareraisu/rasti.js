@@ -1,7 +1,5 @@
 body {
     margin: 0;
-    font-family: sans-serif;
-    font-size: 14px;
 }
 *, *:before, *:after {
     box-sizing: border-box;
@@ -9,19 +7,7 @@ body {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    transition: background-color 0.2s,
-                font 0.2s;
-}
-input {
-    width: 100%;
-    margin: 0;
-    vertical-align: text-bottom;
-}
-input[field]:focus:invalid {
-    box-shadow: 0 0 0 2px red;
-}
-input[field]:focus:valid {
-    box-shadow: 0 0 0 2px green;
+    transition: background-color 0.2s;
 }
 
 
@@ -290,7 +276,8 @@ nav > div {
     animation: zoomIn .4s, fadeIn .4s;
     z-index: 11;
 }
-[modal] .close, .modal .close {
+[modal] > [icon=close],
+.modal > [icon=close] {
     cursor: pointer;
 }
 
@@ -325,7 +312,7 @@ nav > div {
     content: attr(label);
     position: absolute;
     height: 35px;
-    line-height: 35px;
+       line-height: 35px;
     font-size: 1.2em;
     text-transform: capitalize;
 }
@@ -367,12 +354,23 @@ select[field] {
     cursor: pointer;
 }
 
-
 textarea[field] {
     height: 70px;
     resize: none;
 }
 
+input[field] {
+    width: 100%;
+    margin: 0;
+    font-size: 1rem;
+    vertical-align: text-bottom;
+}
+input[field]:focus:invalid {
+    box-shadow: 0 0 0 2px red;
+}
+input[field]:focus:valid {
+    box-shadow: 0 0 0 2px green;
+}
 
 input[type=radio],
 input[type=checkbox] {
@@ -453,6 +451,81 @@ input[type=checkbox] + label:hover {
 .page-options {
     flex-basis: initial !important;
 }
+
+/* icons */
+
+[icon] {
+    flex-grow: 0;
+    height: 50px;
+    width: auto;
+    min-width: 50px;
+    font-size: 1.5rem;
+    line-height: 2;
+    text-align: center;
+}
+[icon]:before {
+    filter: grayscale();
+}
+[icon].small {
+    height: 30px;
+    width: 30px;
+    font-size: 1em;
+}
+[icon].big {
+    height: 70px;
+    width: 70px;
+    font-size: 2.2em;
+}
+[icon].floating:before {
+    position: absolute;
+    margin-left: 10px;
+    margin-top: -5px;
+}
+[icon].floating > input {
+    padding-left: 45px;
+}
+[icon=options]:before { content: '⋯'; }
+[icon=voptions]:before { content: '⋮'; }
+[icon=menu]:before { content: '☰'; }
+[icon=user]:before { content: '👤'; }
+[icon=pass]:before,
+[icon=lock]:before { content: '🔒'; }
+[icon=file]:before { content: '📄'; }
+[icon=folder]:before { content: '📂'; }
+[icon=attach]:before,
+[icon=clip]:before { content: '📎'; }
+[icon=link]:before { content: '🔗'; }
+[icon=edit]:before,
+[icon=pen]:before { content: '✎'; }
+[icon=warning]:before { content: '⚠'; }
+[icon=error]:before { content: '⨂'; }/*𐌈*/
+[icon=rows]:before { content: '𝌆'; }
+[icon=columns]:before { content: '▥'; }
+[icon=grid]:before { content: '▦'; }
+[icon=spacedgrid]:before { content: '𝍖'; }
+[icon=roundgrid]:before { content: '𐄡'; }
+[icon=close]:before { content: '✕'; }
+[icon=eject]:before { content: '⏏'; }
+[icon=play]:before,
+[icon=next]:before { content: '▶'; }
+[icon=prev]:before { content: '◀'; }
+[icon=pause]:before { content: 'Ⅱ'; }
+[icon=stop]:before { content: '■'; }
+[icon=rec]:before { content: '●'; }
+[icon=timer]:before { content: '⏱'; }
+[icon=clock]:before { content: '⏰'; }
+[icon=cog]:before { content: '⚙'; }
+[icon=flag]:before { content: '⚑'; }
+[icon=clef]:before { content: '𝄞'; }
+[icon=note]:before { content: '♪'; }
+[icon=star]:before { content: '★'; }
+[icon=goldstar]:before { content: '⭐'; }
+[icon=snow]:before { content: '❄'; }
+[icon=command]:before { content: '⌘'; }
+[icon=pentagon]:before { content: '⬟'; }
+[icon=hexagon]:before { content: '⬢'; }
+[icon=cycle]:before { content: '⟳'; }
+[icon=recycle]:before { content: '♻'; }
 
 
 /* utils */
@@ -716,48 +789,6 @@ input[type=checkbox] + label:hover {
     padding: 10% 5%;
     font-size: large;
 }
-
-.icon {
-    flex-grow: 0;
-    height: 50px;
-    width: auto;
-    min-width: 50px;
-    font-size: 1.8em;
-    line-height: 2;
-    text-align: center;
-}
-.icon.small {
-    height: 30px;
-    width: 30px;
-    font-size: 1em;
-}
-.icon.big {
-    height: 70px;
-    width: 70px;
-    font-size: 2.2em;
-}
-.icon.options:before {
-    content: '⋮';
-}
-.icon.menu:before {
-    content: '☰';
-}
-.icon.rows:before {
-    content: '▤';
-}
-.icon.columns:before {
-    content: '▥';
-}
-.icon.close:before {
-    content: '✕';
-}
-.icon.next:before {
-    content: '▶';
-}
-.icon.prev:before {
-    content: '◀';
-}
-
 
 .round {
     border-radius: 50%;

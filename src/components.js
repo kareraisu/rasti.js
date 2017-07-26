@@ -1,3 +1,5 @@
+const { is } = require('./utils')
+
 class History {
 
     constructor() {

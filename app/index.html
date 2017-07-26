@@ -7,14 +7,17 @@
     <link rel=manifest href=manifest.json>
 
     <link rel=stylesheet href=app.css>
-
+    
+    <!-- 
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker
                 .register('./service-worker.js')
                 .then(function() { console.log('Service Worker Registered') })
         }
+        else alert('Sorry, offline functionality is not available')
     </script>
+    -->
 
 </head>
 
@@ -29,7 +32,7 @@ the [rasti=X] declaration does 3 things:
     <nav class=mid>
         <div name=config
             show="panel=config"
-            class="icon menu"></div>
+            icon=menu></div>
         <div nav=main text=main></div>
         <div nav=about text=about></div>
         <div nav=login class="round right"></div>
@@ -70,15 +73,16 @@ the [rasti=X] declaration does 3 things:
 
         <img src=rasti-192x192.png />
 
-        <div panel class="inline pad">
+        <div panel class="pad">
+            
             <input field=user navparam
-                label=username
+                icon=user
                 pattern="^[a-z\d\.]{5,}$"
                 required />
 
             <input type=password
                 field=pass
-                label
+                icon=pass
                 pattern="^[\d]{4,}$"
                 required />
 
@@ -102,7 +106,7 @@ the [rasti=X] declaration does 3 things:
             <div section class="inline pad">
                 <input field=name label>
                 <select field=area label data></select>
-                <div block=multi
+                <div block=multi filter
                     field=skills label data
                     deps=area></div>
             </div>
@@ -132,7 +136,7 @@ the [rasti=X] declaration does 3 things:
 
     </div>
 
-    <script src=../dist/rasti+zepto.js></script>
+    <script src=../dist/rasti+zepto.min.js></script>
 
     <script src=extra/people.js></script>
     <script src=extra/config.js></script>

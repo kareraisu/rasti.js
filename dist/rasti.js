@@ -453,6 +453,8 @@ style : `
 }
 
 },{"../utils":12}],8:[function(require,module,exports){
+const { is } = require('./utils')
+
 class History {
 
     constructor() {
@@ -539,7 +541,7 @@ module.exports = {
     Pager,
 }
 
-},{}],9:[function(require,module,exports){
+},{"./utils":12}],9:[function(require,module,exports){
 // prototype extensions
 Array.prototype.remove = function(el) {
     var i = this.indexOf(el);
@@ -756,7 +758,7 @@ var rasti = function(name, container) {
         })
 
 
-        // create options for selects and lists with data source
+        // create items for selects and lists with data source
         container.find('select[data]')
             .add('ol[data]', container)
             .add('ul[data]', container)
@@ -779,7 +781,7 @@ var rasti = function(name, container) {
 
         // add close btn to modals
         container.find('[modal]').each(function(i, el) {
-            $('<div class="icon close top right" />')
+            $('<div icon=close class="top right" />')
             .on('click', function(e){
                 $(this).parent().hide()
                 self.active.page.find('.backdrop').removeClass('backdrop')
@@ -963,6 +965,12 @@ var rasti = function(name, container) {
             container.find(tag + '[label]').each(function(i, el) {
                 fixLabel($(el))
             })
+        })
+
+
+        // fix icons
+        container.find('input[icon]').each(function(i, el) {
+            fixIcon($(el))
         })
 
 
@@ -1497,15 +1505,15 @@ var rasti = function(name, container) {
             pager = newPager(name, data, page_size),
             paging, columns, sizes, col=1, size=0
 
-        if ($el[0].hasAttribute('columns')) columns = `<button btn class="icon columns" />`
+        if ($el[0].hasAttribute('columns')) columns = `<button btn icon=columns />`
 
         if (pager.total > 1) paging = `<div class="paging ib ib_">
-                <button btn class="icon prev" />
+                <button btn icon=prev />
                 <span class="page" />
-                <button btn class="icon next" />
+                <button btn icon=next />
             </div>`
 
-        sizes = `<button btn class="icon rows" />`
+        sizes = `<button btn icon=rows />`
 
         $el.html(`
             <div class="results scrolly"></div>
@@ -1519,15 +1527,15 @@ var rasti = function(name, container) {
         $controls = $el.children('.controls')
         $results = $el.children('.results')
 
-        $controls.on('click', '.next', function(e){
+        $controls.on('click', '[icon=next]', function(e){
             update( pager.next() )
         })
 
-        $controls.on('click', '.prev', function(e){
+        $controls.on('click', '[icon=prev]', function(e){
             update( pager.prev() )
         })
 
-        $controls.on('click', '.rows', function(e){
+        $controls.on('click', '[icon=rows]', function(e){
             size += 1
             var newSize = pager.sizes[size % pager.sizes.length]
             pager.setPageSize(newSize)
@@ -1538,7 +1546,7 @@ var rasti = function(name, container) {
                 : $controls.find('.paging').hide()
         })
 
-        $controls.on('click', '.columns', function(e){
+        $controls.on('click', '[icon=columns]', function(e){
             col = col+1 > 3 ? 1 : col+1
             $(e.target).html(col)
             $results.removeClass('columns-1 columns-2 columns-3')
@@ -1655,6 +1663,13 @@ var rasti = function(name, container) {
     }
 
 
+    function fixIcon($el) {
+        var $div = $(`<div icon=${ $el.attr('icon') } class=floating >`)
+        $el.wrap($div)
+        $el[0].removeAttribute('icon')
+    }
+
+
     function setImg($el, basepath) {
         $el.css('background-image', 'url('+ basepath + ($el.val() || $el.attr('value')) +'.png)')
     }
@@ -1755,8 +1770,6 @@ var rastiCSS
 
 rastiCSS = `body {
     margin: 0;
-    font-family: sans-serif;
-    font-size: 14px;
 }
 *, *:before, *:after {
     box-sizing: border-box;
@@ -1764,19 +1777,7 @@ rastiCSS = `body {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    transition: background-color 0.2s,
-                font 0.2s;
-}
-input {
-    width: 100%;
-    margin: 0;
-    vertical-align: text-bottom;
-}
-input[field]:focus:invalid {
-    box-shadow: 0 0 0 2px red;
-}
-input[field]:focus:valid {
-    box-shadow: 0 0 0 2px green;
+    transition: background-color 0.2s;
 }
 
 
@@ -2045,7 +2046,8 @@ nav > div {
     animation: zoomIn .4s, fadeIn .4s;
     z-index: 11;
 }
-[modal] .close, .modal .close {
+[modal] > [icon=close],
+.modal > [icon=close] {
     cursor: pointer;
 }
 
@@ -2080,7 +2082,7 @@ nav > div {
     content: attr(label);
     position: absolute;
     height: 35px;
-    line-height: 35px;
+       line-height: 35px;
     font-size: 1.2em;
     text-transform: capitalize;
 }
@@ -2122,12 +2124,23 @@ select[field] {
     cursor: pointer;
 }
 
-
 textarea[field] {
     height: 70px;
     resize: none;
 }
 
+input[field] {
+    width: 100%;
+    margin: 0;
+    font-size: 1rem;
+    vertical-align: text-bottom;
+}
+input[field]:focus:invalid {
+    box-shadow: 0 0 0 2px red;
+}
+input[field]:focus:valid {
+    box-shadow: 0 0 0 2px green;
+}
 
 input[type=radio],
 input[type=checkbox] {
@@ -2208,6 +2221,81 @@ input[type=checkbox] + label:hover {
 .page-options {
     flex-basis: initial !important;
 }
+
+/* icons */
+
+[icon] {
+    flex-grow: 0;
+    height: 50px;
+    width: auto;
+    min-width: 50px;
+    font-size: 1.5rem;
+    line-height: 2;
+    text-align: center;
+}
+[icon]:before {
+    filter: grayscale();
+}
+[icon].small {
+    height: 30px;
+    width: 30px;
+    font-size: 1em;
+}
+[icon].big {
+    height: 70px;
+    width: 70px;
+    font-size: 2.2em;
+}
+[icon].floating:before {
+    position: absolute;
+    margin-left: 10px;
+    margin-top: -5px;
+}
+[icon].floating > input {
+    padding-left: 45px;
+}
+[icon=options]:before { content: '⋯'; }
+[icon=voptions]:before { content: '⋮'; }
+[icon=menu]:before { content: '☰'; }
+[icon=user]:before { content: '👤'; }
+[icon=pass]:before,
+[icon=lock]:before { content: '🔒'; }
+[icon=file]:before { content: '📄'; }
+[icon=folder]:before { content: '📂'; }
+[icon=attach]:before,
+[icon=clip]:before { content: '📎'; }
+[icon=link]:before { content: '🔗'; }
+[icon=edit]:before,
+[icon=pen]:before { content: '✎'; }
+[icon=warning]:before { content: '⚠'; }
+[icon=error]:before { content: '⨂'; }/*𐌈*/
+[icon=rows]:before { content: '𝌆'; }
+[icon=columns]:before { content: '▥'; }
+[icon=grid]:before { content: '▦'; }
+[icon=spacedgrid]:before { content: '𝍖'; }
+[icon=roundgrid]:before { content: '𐄡'; }
+[icon=close]:before { content: '✕'; }
+[icon=eject]:before { content: '⏏'; }
+[icon=play]:before,
+[icon=next]:before { content: '▶'; }
+[icon=prev]:before { content: '◀'; }
+[icon=pause]:before { content: 'Ⅱ'; }
+[icon=stop]:before { content: '■'; }
+[icon=rec]:before { content: '●'; }
+[icon=timer]:before { content: '⏱'; }
+[icon=clock]:before { content: '⏰'; }
+[icon=cog]:before { content: '⚙'; }
+[icon=flag]:before { content: '⚑'; }
+[icon=clef]:before { content: '𝄞'; }
+[icon=note]:before { content: '♪'; }
+[icon=star]:before { content: '★'; }
+[icon=goldstar]:before { content: '⭐'; }
+[icon=snow]:before { content: '❄'; }
+[icon=command]:before { content: '⌘'; }
+[icon=pentagon]:before { content: '⬟'; }
+[icon=hexagon]:before { content: '⬢'; }
+[icon=cycle]:before { content: '⟳'; }
+[icon=recycle]:before { content: '♻'; }
 
 
 /* utils */
@@ -2471,48 +2559,6 @@ input[type=checkbox] + label:hover {
     padding: 10% 5%;
     font-size: large;
 }
-
-.icon {
-    flex-grow: 0;
-    height: 50px;
-    width: auto;
-    min-width: 50px;
-    font-size: 1.8em;
-    line-height: 2;
-    text-align: center;
-}
-.icon.small {
-    height: 30px;
-    width: 30px;
-    font-size: 1em;
-}
-.icon.big {
-    height: 70px;
-    width: 70px;
-    font-size: 2.2em;
-}
-.icon.options:before {
-    content: '⋮';
-}
-.icon.menu:before {
-    content: '☰';
-}
-.icon.rows:before {
-    content: '▤';
-}
-.icon.columns:before {
-    content: '▥';
-}
-.icon.close:before {
-    content: '✕';
-}
-.icon.next:before {
-    content: '▶';
-}
-.icon.prev:before {
-    content: '◀';
-}
-
 
 .round {
     border-radius: 50%;

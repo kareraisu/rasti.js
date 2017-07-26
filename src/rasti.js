@@ -146,7 +146,7 @@ var rasti = function(name, container) {
         })
 
 
-        // create options for selects and lists with data source
+        // create items for selects and lists with data source
         container.find('select[data]')
             .add('ol[data]', container)
             .add('ul[data]', container)
@@ -169,7 +169,7 @@ var rasti = function(name, container) {
 
         // add close btn to modals
         container.find('[modal]').each(function(i, el) {
-            $('<div class="icon close top right" />')
+            $('<div icon=close class="top right" />')
             .on('click', function(e){
                 $(this).parent().hide()
                 self.active.page.find('.backdrop').removeClass('backdrop')
@@ -353,6 +353,12 @@ var rasti = function(name, container) {
             container.find(tag + '[label]').each(function(i, el) {
                 fixLabel($(el))
             })
+        })
+
+
+        // fix icons
+        container.find('input[icon]').each(function(i, el) {
+            fixIcon($(el))
         })
 
 
@@ -887,15 +893,15 @@ var rasti = function(name, container) {
             pager = newPager(name, data, page_size),
             paging, columns, sizes, col=1, size=0
 
-        if ($el[0].hasAttribute('columns')) columns = `<button btn class="icon columns" />`
+        if ($el[0].hasAttribute('columns')) columns = `<button btn icon=columns />`
 
         if (pager.total > 1) paging = `<div class="paging ib ib_">
-                <button btn class="icon prev" />
+                <button btn icon=prev />
                 <span class="page" />
-                <button btn class="icon next" />
+                <button btn icon=next />
             </div>`
 
-        sizes = `<button btn class="icon rows" />`
+        sizes = `<button btn icon=rows />`
 
         $el.html(`
             <div class="results scrolly"></div>
@@ -909,15 +915,15 @@ var rasti = function(name, container) {
         $controls = $el.children('.controls')
         $results = $el.children('.results')
 
-        $controls.on('click', '.next', function(e){
+        $controls.on('click', '[icon=next]', function(e){
             update( pager.next() )
         })
 
-        $controls.on('click', '.prev', function(e){
+        $controls.on('click', '[icon=prev]', function(e){
             update( pager.prev() )
         })
 
-        $controls.on('click', '.rows', function(e){
+        $controls.on('click', '[icon=rows]', function(e){
             size += 1
             var newSize = pager.sizes[size % pager.sizes.length]
             pager.setPageSize(newSize)
@@ -928,7 +934,7 @@ var rasti = function(name, container) {
                 : $controls.find('.paging').hide()
         })
 
-        $controls.on('click', '.columns', function(e){
+        $controls.on('click', '[icon=columns]', function(e){
             col = col+1 > 3 ? 1 : col+1
             $(e.target).html(col)
             $results.removeClass('columns-1 columns-2 columns-3')
@@ -1042,6 +1048,13 @@ var rasti = function(name, container) {
         var $div = $(`<div fixed label="${ $el.attr('label') }" >`)
         $el.wrap($div)
         $el[0].removeAttribute('label')
+    }
+
+
+    function fixIcon($el) {
+        var $div = $(`<div icon=${ $el.attr('icon') } class=floating >`)
+        $el.wrap($div)
+        $el[0].removeAttribute('icon')
     }
 
 

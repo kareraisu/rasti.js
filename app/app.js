@@ -46,7 +46,9 @@ areaSkills = {
 app.data.area = Object.keys(areaSkills)
 
 app.data.skills = (render, deps) => {
-    render( skills[ areaSkills[deps.area || 'SDA'] ] )
+    if (deps) {
+        render( skills[ areaSkills[deps.area || 'SDA'] ] )
+    }
 }
 
 app.data.features = 'navigation, ajax, templates, paging, actions, themes, i18n, tabs, modals, blocks, field dependency, field validation, responsive'
@@ -54,7 +56,7 @@ app.data.features = 'navigation, ajax, templates, paging, actions, themes, i18n,
 
 app.templates.cards = data => data.map(
         obj => `<div class="card row" section>
-            <img src="img/${obj.id}.jpg"/>
+            <img src="img/${obj.id}.jpg" onerror=app.utils.imgFallback(this) />
             <div class="data">
                 <div class="name">${obj.name}</div>
                 <div class="row">
@@ -83,6 +85,7 @@ app.ajax.getPeople = (reqdata, render) => {
         var people = app.utils.getPeople(reqdata)
         app.get('tab-label="1"').click()
         render(people)
+
     }, 2000)
 
 }
@@ -92,6 +95,11 @@ app.utils.login = e => {
     if (app.get('field=pass').val() == '1234') {
         app.navTo('main', {user: app.get('field=user').val()})
     }
+}
+
+
+app.utils.imgFallback = img => {
+    img.src = 'img/user.png'
 }
 
 
