@@ -48,7 +48,7 @@ function bundle() {
     // then turn stream into buffer (expected by some gulp plugins, i.e. babili, concat)
     .pipe(buffer())
     // inject rasti css
-    .pipe( replace('/* rasti CSS */', 'rastiCSS = `' + fs.readFileSync('src/rasti.css') + '`') )
+    .pipe( replace('rasti.css', fs.readFileSync('src/rasti.css')) )
     .pipe(gulp.dest('dist'))
 }
 
