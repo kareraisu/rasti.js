@@ -9,7 +9,11 @@ body {
     user-select: none;
     transition: background-color 0.2s;
 }
-
+h1 { font-size: 4em; }
+h2 { font-size: 3em; }
+h3 { font-size: 2em; }
+h4 { font-size: 1.5em; }
+p.big { font-size: 1.5em; }
 
 [page], [panel], [section] {
     position: relative;
@@ -130,6 +134,8 @@ nav ~ [page] {
     text-align: center;
     text-decoration: none;
     text-transform: uppercase;
+}
+[btn], [nav] {
 	cursor: pointer;
 }
 [btn]:not(:disabled):hover {
@@ -168,6 +174,14 @@ nav ~ [page] {
 }
 .big [label][field]:before {
     margin-top: -25px;
+}
+
+
+[img] {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-origin: content-box;
 }
 
 
@@ -327,23 +341,31 @@ nav > div {
 [label][field].big:before {
     margin-left: 0;
 }
-.inline [label],
-.inline > [label] {
+.inline[label],
+.inline_ > [label] {
     width: auto;
     margin-top: 0;
     margin-left: calc(40% + 10px);
 }
 .inline[label]:before,
-.inline > [label]:before {
+.inline_ > [label]:before {
     width: 80%;
     left: -80%;
     margin-top: -5px;
     text-align: right;
 }
 .inline[label][fixed]:before,
-.inline > [label][fixed]:before {
+.inline_ > [label][fixed]:before {
     margin-top: 0;
     margin-left: -8px;
+}
+.below[label]:before,
+.below_ > [label]:before {
+    bottom: -40px;
+    left: 0;
+    right: 0;
+    margin-top: 0;
+    margin-left: 0;
 }
 
 
@@ -646,10 +668,10 @@ input[type=checkbox] + label:hover {
     margin-bottom: 0;
 }
 
-.floatl {
+.floatl, .floatl_>* {
     float: left;
 }
-.floatr {
+.floatr, .floatr_>* {
     float: right;
 }
 
@@ -770,15 +792,15 @@ input[type=checkbox] + label:hover {
     margin-right: 0;
 }
 
-.pad-s {
+.pad-s, .pad-s_>* {
     padding-left: 5%;
     padding-right: 5%;
 }
-.pad {
+.pad, .pad_>* {
     padding-left: 10%;
     padding-right: 10%;
 }
-.pad-l {
+.pad-l, .pad-l_>* {
     padding-left: 15%;
     padding-right: 15%;
 }
@@ -790,7 +812,7 @@ input[type=checkbox] + label:hover {
     font-size: large;
 }
 
-.round {
+.round, .round_>* {
     border-radius: 50%;
 }
 
@@ -802,6 +824,13 @@ input[type=checkbox] + label:hover {
     margin: 20px;
     border-radius: 50%;
     z-index: 5;
+}
+
+.scale, .scale_>* {
+    transition: all .2s ease-in-out;
+}
+.scale:hover, .scale_>*:hover {
+    transform: scale(1.1);
 }
 
 

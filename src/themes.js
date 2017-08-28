@@ -40,7 +40,7 @@ exports.themeMaps = {
         btn     : 'detail light',
         header  : 'dark',
         label   : 'mid',
-        text    : 'dark',
+        text    : 'darker',
     },
     
 }

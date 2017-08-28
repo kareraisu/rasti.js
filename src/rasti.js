@@ -12,6 +12,8 @@ const options = {
     lang    : '',
     stats   : '%n results in %t seconds',
     noData  : 'No data available',
+    imgPath : 'img/',
+    imgExt  : '.png',
 }
 
 const breakpoints = {
@@ -335,13 +337,22 @@ function rasti(name, container) {
         self.active.page = null // must clear it in case it was assigned
 
 
-        // resolve empty headers and labels
-        'header label'.split(' ').forEach( attr => {
+        // resolve empty attributes
+        'header label text'.split(' ').forEach( attr => {
             var $el
             container.find('['+attr+']').each( (i, el) => {
                 $el = $(el)
                 if (!$el.attr(attr)) $el.attr( attr, resolveAttr($el, attr) )
             })
+        })
+
+
+        // resolve bg imgs
+        container.find('[img]').each( (i, el) => {
+            var img = el.getAttribute('img')
+            el.style['background-image'] = img
+                ? `url(${img})`
+                : `url(${self.options.imgPath}${resolveAttr($(el), 'img')}${self.options.imgExt})`
         })
 
 
@@ -586,50 +597,66 @@ function rasti(name, container) {
 
     function setTheme(themeString) {
         var themeName = themeString.split(' ')[0],
-            theme = self.themes[themeName]
+            theme = self.themes[themeName],
+            baseTheme = self.themes.base,
+            baseMap = self.themeMaps.dark
 
         if (!theme) return error('Cannot set theme [%s]: theme not found', themeName)
 
         var mapName = themeString.split(' ')[1] || ( is.object(theme.maps) && Object.keys(theme.maps)[0] ) || 'dark',
             themeMap = ( is.object(theme.maps) && theme.maps[mapName] ) || self.themeMaps[mapName]
 
-        if (!themeMap) return error('Theme map [%s] not found', mapName)
+        if (!themeMap) {
+            warn('Theme map [%s] not found, using default theme map [dark]', mapName)
+            themeMap = baseMap
+            mapName = 'dark'
+        }
 
         log('Setting theme [%s:%s]', themeName, mapName)
         self.active.theme = themeName
         
         var values = {
-            font : theme.font || self.themes.base.font,
+            font : theme.font || baseTheme.font,
         }, colorNames, colors, c1, c2, defaultColorName
 
-        // map palette colors to attributes
-        for (var attr of Object.keys(themeMap)) {
-            if (!self.themeMaps.dark[attr]) return error('Mapping error in theme [%s]. Incorrect theme map property [%s]', themeName, attr)
+        // clone themeMap
+        themeMap = Object.assign({}, themeMap)
 
-            colorNames = [c1, c2] = themeMap[attr].split(' ')
+        // map palette colors to attributes
+        for (var attr of Object.keys(baseMap)) {
+            colorNames = themeMap[attr] || baseMap[attr]
+            colorNames = [c1, c2] = colorNames.split(' ')
             colors = [theme.palette[ c1 ], theme.palette[ c2 ]]
 
             for (var i in colors) {
-                defaultColorName = self.themeMaps.dark[attr].split(' ')[i]
+                defaultColorName = baseMap[attr].split(' ')[i]
                 if (defaultColorName && !colors[i]) {
-                    colors[i] = self.themes.base.palette[ colorNames[i] ]
+                    colors[i] = baseTheme.palette[ colorNames[i] ]
                     if (!colors[i]) {
                         warn('Mapping error in theme [%s] for attribute [%s]. Color [%s] not found. Falling back to default color [%s].', themeName, attr, colorNames[i], defaultColorName)
-                        colors[i] = self.themes.base.palette[ defaultColorName ]
+                        colors[i] = baseTheme.palette[ defaultColorName ]
                     }
                 }
             }
+
             values[attr] = colors
+            if (themeMap[attr]) delete themeMap[attr]
         }
+
+        var invalidKeys = Object.keys(themeMap)
+        if (invalidKeys.length) warn('Ignored %s invalid theme map keys:', invalidKeys.length, invalidKeys)
 
         // generate theme style and apply it
         container.find('style[theme]').html( getThemeStyle(values) )
 
-        // apply any styles defined by class
-        for (var key of Object.keys(theme.palette)) {
-            var color = theme.palette[key]
-            container.find('.' + key).css('background-color', color)
-        }
+        // apply bg colors
+        var colorName, color
+        container.find('[bg]').each( (i, el) => {
+            colorName = el.getAttribute('bg')
+            color = theme.palette[colorName] || baseTheme.palette[colorName]
+            if (color) el.style['background-color'] = color
+            else warn('Invalid color [%s] declared in el:', colorName, el)
+        })
     }
 
 
@@ -1031,7 +1058,7 @@ function rasti(name, container) {
 
 
     function resolveAttr($el, name) {
-        var value = $el.attr(name) || $el.attr('field') || $el.attr('section') || $el.attr('panel') || $el.attr('page')
+        var value = $el.attr(name) || $el.attr('field') || $el.attr('nav') ||  $el.attr('section') || $el.attr('panel') || $el.attr('page')
         if (!value) warn('Could not resolve value of [%s] attribute in el:', name, $el[0])
         return value
     }

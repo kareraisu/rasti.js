@@ -626,6 +626,8 @@ const options = {
     lang    : '',
     stats   : '%n results in %t seconds',
     noData  : 'No data available',
+    imgPath : 'img/',
+    imgExt  : '.png',
 }
 
 const breakpoints = {
@@ -949,13 +951,22 @@ function rasti(name, container) {
         self.active.page = null // must clear it in case it was assigned
 
 
-        // resolve empty headers and labels
-        'header label'.split(' ').forEach( attr => {
+        // resolve empty attributes
+        'header label text'.split(' ').forEach( attr => {
             var $el
             container.find('['+attr+']').each( (i, el) => {
                 $el = $(el)
                 if (!$el.attr(attr)) $el.attr( attr, resolveAttr($el, attr) )
             })
+        })
+
+
+        // resolve bg imgs
+        container.find('[img]').each( (i, el) => {
+            var img = el.getAttribute('img')
+            el.style['background-image'] = img
+                ? `url(${img})`
+                : `url(${self.options.imgPath}${resolveAttr($(el), 'img')}${self.options.imgExt})`
         })
 
 
@@ -1200,50 +1211,66 @@ function rasti(name, container) {
 
     function setTheme(themeString) {
         var themeName = themeString.split(' ')[0],
-            theme = self.themes[themeName]
+            theme = self.themes[themeName],
+            baseTheme = self.themes.base,
+            baseMap = self.themeMaps.dark
 
         if (!theme) return error('Cannot set theme [%s]: theme not found', themeName)
 
         var mapName = themeString.split(' ')[1] || ( is.object(theme.maps) && Object.keys(theme.maps)[0] ) || 'dark',
             themeMap = ( is.object(theme.maps) && theme.maps[mapName] ) || self.themeMaps[mapName]
 
-        if (!themeMap) return error('Theme map [%s] not found', mapName)
+        if (!themeMap) {
+            warn('Theme map [%s] not found, using default theme map [dark]', mapName)
+            themeMap = baseMap
+            mapName = 'dark'
+        }
 
         log('Setting theme [%s:%s]', themeName, mapName)
         self.active.theme = themeName
         
         var values = {
-            font : theme.font || self.themes.base.font,
+            font : theme.font || baseTheme.font,
         }, colorNames, colors, c1, c2, defaultColorName
 
-        // map palette colors to attributes
-        for (var attr of Object.keys(themeMap)) {
-            if (!self.themeMaps.dark[attr]) return error('Mapping error in theme [%s]. Incorrect theme map property [%s]', themeName, attr)
+        // clone themeMap
+        themeMap = Object.assign({}, themeMap)
 
-            colorNames = [c1, c2] = themeMap[attr].split(' ')
+        // map palette colors to attributes
+        for (var attr of Object.keys(baseMap)) {
+            colorNames = themeMap[attr] || baseMap[attr]
+            colorNames = [c1, c2] = colorNames.split(' ')
             colors = [theme.palette[ c1 ], theme.palette[ c2 ]]
 
             for (var i in colors) {
-                defaultColorName = self.themeMaps.dark[attr].split(' ')[i]
+                defaultColorName = baseMap[attr].split(' ')[i]
                 if (defaultColorName && !colors[i]) {
-                    colors[i] = self.themes.base.palette[ colorNames[i] ]
+                    colors[i] = baseTheme.palette[ colorNames[i] ]
                     if (!colors[i]) {
                         warn('Mapping error in theme [%s] for attribute [%s]. Color [%s] not found. Falling back to default color [%s].', themeName, attr, colorNames[i], defaultColorName)
-                        colors[i] = self.themes.base.palette[ defaultColorName ]
+                        colors[i] = baseTheme.palette[ defaultColorName ]
                     }
                 }
             }
+
             values[attr] = colors
+            if (themeMap[attr]) delete themeMap[attr]
         }
+
+        var invalidKeys = Object.keys(themeMap)
+        if (invalidKeys.length) warn('Ignored %s invalid theme map keys:', invalidKeys.length, invalidKeys)
 
         // generate theme style and apply it
         container.find('style[theme]').html( getThemeStyle(values) )
 
-        // apply any styles defined by class
-        for (var key of Object.keys(theme.palette)) {
-            var color = theme.palette[key]
-            container.find('.' + key).css('background-color', color)
-        }
+        // apply bg colors
+        var colorName, color
+        container.find('[bg]').each( (i, el) => {
+            colorName = el.getAttribute('bg')
+            color = theme.palette[colorName] || baseTheme.palette[colorName]
+            if (color) el.style['background-color'] = color
+            else warn('Invalid color [%s] declared in el:', colorName, el)
+        })
     }
 
 
@@ -1645,7 +1672,7 @@ function rasti(name, container) {
 
 
     function resolveAttr($el, name) {
-        var value = $el.attr(name) || $el.attr('field') || $el.attr('section') || $el.attr('panel') || $el.attr('page')
+        var value = $el.attr(name) || $el.attr('field') || $el.attr('nav') ||  $el.attr('section') || $el.attr('panel') || $el.attr('page')
         if (!value) warn('Could not resolve value of [%s] attribute in el:', name, $el[0])
         return value
     }
@@ -1772,7 +1799,11 @@ $('head').prepend(`<style>body {
     user-select: none;
     transition: background-color 0.2s;
 }
-
+h1 { font-size: 4em; }
+h2 { font-size: 3em; }
+h3 { font-size: 2em; }
+h4 { font-size: 1.5em; }
+p.big { font-size: 1.5em; }
 
 [page], [panel], [section] {
     position: relative;
@@ -1893,6 +1924,8 @@ nav ~ [page] {
     text-align: center;
     text-decoration: none;
     text-transform: uppercase;
+}
+[btn], [nav] {
 	cursor: pointer;
 }
 [btn]:not(:disabled):hover {
@@ -1931,6 +1964,14 @@ nav ~ [page] {
 }
 .big [label][field]:before {
     margin-top: -25px;
+}
+
+
+[img] {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-origin: content-box;
 }
 
 
@@ -2090,23 +2131,31 @@ nav > div {
 [label][field].big:before {
     margin-left: 0;
 }
-.inline [label],
-.inline > [label] {
+.inline[label],
+.inline_ > [label] {
     width: auto;
     margin-top: 0;
     margin-left: calc(40% + 10px);
 }
 .inline[label]:before,
-.inline > [label]:before {
+.inline_ > [label]:before {
     width: 80%;
     left: -80%;
     margin-top: -5px;
     text-align: right;
 }
 .inline[label][fixed]:before,
-.inline > [label][fixed]:before {
+.inline_ > [label][fixed]:before {
     margin-top: 0;
     margin-left: -8px;
+}
+.below[label]:before,
+.below_ > [label]:before {
+    bottom: -40px;
+    left: 0;
+    right: 0;
+    margin-top: 0;
+    margin-left: 0;
 }
 
 
@@ -2409,10 +2458,10 @@ input[type=checkbox] + label:hover {
     margin-bottom: 0;
 }
 
-.floatl {
+.floatl, .floatl_>* {
     float: left;
 }
-.floatr {
+.floatr, .floatr_>* {
     float: right;
 }
 
@@ -2533,15 +2582,15 @@ input[type=checkbox] + label:hover {
     margin-right: 0;
 }
 
-.pad-s {
+.pad-s, .pad-s_>* {
     padding-left: 5%;
     padding-right: 5%;
 }
-.pad {
+.pad, .pad_>* {
     padding-left: 10%;
     padding-right: 10%;
 }
-.pad-l {
+.pad-l, .pad-l_>* {
     padding-left: 15%;
     padding-right: 15%;
 }
@@ -2553,7 +2602,7 @@ input[type=checkbox] + label:hover {
     font-size: large;
 }
 
-.round {
+.round, .round_>* {
     border-radius: 50%;
 }
 
@@ -2565,6 +2614,13 @@ input[type=checkbox] + label:hover {
     margin: 20px;
     border-radius: 50%;
     z-index: 5;
+}
+
+.scale, .scale_>* {
+    transition: all .2s ease-in-out;
+}
+.scale:hover, .scale_>*:hover {
+    transform: scale(1.1);
 }
 
 
@@ -2823,7 +2879,7 @@ exports.themeMaps = {
         btn     : 'detail light',
         header  : 'dark',
         label   : 'mid',
-        text    : 'dark',
+        text    : 'darker',
     },
     
 }
