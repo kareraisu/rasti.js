@@ -338,21 +338,21 @@ function rasti(name, container) {
 
 
         // resolve empty attributes
-        'header label text'.split(' ').forEach( attr => {
+        'header label text placeholder'.split(' ').forEach( attr => {
             var $el
-            container.find('['+attr+']').each( (i, el) => {
+            container.find('['+attr+'=""]').each( (i, el) => {
                 $el = $(el)
-                if (!$el.attr(attr)) $el.attr( attr, resolveAttr($el, attr) )
+                $el.attr( attr, resolveAttr($el, attr) )
             })
         })
 
 
         // resolve bg imgs
         container.find('[img]').each( (i, el) => {
-            var img = el.getAttribute('img')
-            el.style['background-image'] = img
-                ? `url(${img})`
-                : `url(${self.options.imgPath}${resolveAttr($(el), 'img')}${self.options.imgExt})`
+            var path = el.getAttribute('img') || resolveAttr($(el), 'img')
+            if (path.indexOf('/')==-1) path = self.options.imgPath + path
+            if (path.charAt(path.length-4)!='.') path += self.options.imgExt
+            el.style['background-image'] = `url(${path})`
         })
 
 
