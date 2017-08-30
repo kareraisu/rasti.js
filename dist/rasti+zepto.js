@@ -717,7 +717,9 @@ function rasti(name, container) {
         var initStart = window.performance.now()
         log('Initializing app [%s]...', self.name)
 
-        container.addClass('big loading backdrop')
+        container
+            .addClass('big loading backdrop')
+            .removeAttr('hidden')
 
         // cache options
         if (options) {
@@ -1759,20 +1761,33 @@ function bootstrap() {
     var appContainers = $(document).find('[rasti]'),
         appName, app, extendProps
 
-    if (appContainers.length) appContainers.forEach( el => {
-        appName = el.getAttribute('rasti')
-        if (!appName) error('Missing app name in [rasti] attribute of app container:', el)
-        else if (global[appName]) error('Name [%s] already taken, please choose another name for app in container:', appName, el)
+    if (appContainers.length) appContainers.forEach( container => {
+        appName = container.getAttribute('rasti')
+        if (!appName) error('Missing app name in [rasti] attribute of app container:', container)
+        else if (global[appName]) error('Name [%s] already taken, please choose another name for app in container:', appName, container)
         else {
-            global[appName] = app = new rasti(appName, el)
+            log('Creating app [%s]...', appName)
+            global[appName] = app = new rasti(appName, container)
             Object.keys(app.options).forEach( key => {
-                if (el.hasAttribute(key)) {
-                    app.options[key] = el.getAttribute(key)
+                if (container.hasAttribute(key)) {
+                    app.options[key] = container.getAttribute(key)
                     // non-value boolean attributes are true
                     if (is.boolean(options[key]) && !app.options[key]) app.options[key] = true
                 }
             })
-            log('Created rasti app [%s]', appName)
+            var sources = container.getAttribute('src')
+            if (sources) {
+                log('Loading sources for app [%s]...', appName)
+                sources = sources.split(' ')
+                var script,
+                    body = $('body'),
+                    inject = (sources) => {
+                        script = $('<script>').attr('src', sources.shift())
+                        if (sources.length) script.attr('onload', () => inject(sources))
+                        body.append(script)
+                    }
+                inject(sources)
+            }
         }
     })
 }
