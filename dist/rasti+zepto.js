@@ -1674,7 +1674,7 @@ function rasti(name, container) {
 
 
     function resolveAttr($el, name) {
-        var value = $el.attr(name) || $el.attr('field') || $el.attr('nav') ||  $el.attr('section') || $el.attr('panel') || $el.attr('page')
+        var value = $el.attr(name) || $el.attr('name') || $el.attr('field') || $el.attr('nav') ||  $el.attr('section') || $el.attr('panel') || $el.attr('page')
         if (!value) warn('Could not resolve value of [%s] attribute in el:', name, $el[0])
         return value
     }
@@ -2062,7 +2062,8 @@ nav, .tab-labels {
     height: 4px;
     transition: left 0.2s, width 0.2s;
 }
-nav > div, [tab-label] {
+nav > div, nav > a,
+[tab-label] {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2072,11 +2073,11 @@ nav > div, [tab-label] {
     padding: 5px;
     font-size: 1.4em;
     text-shadow: 0 0 0 #000;
+    text-decoration: none;
     cursor: pointer;
 }
-nav > div {
+nav > div, nav > a {
     max-width: 200px;
-    border-right: 1px solid rgba(0,0,0,0.2);
 }
 [tab-label].active {
     filter: contrast(1.5);
@@ -2112,6 +2113,15 @@ nav > div {
     background: rgba(0,0,0,.7);
     animation: fadeIn .4s;
     z-index: 10;
+}
+
+
+[menu] {
+    display: none;
+    position: absolute;
+    background-color: inherit;
+    box-shadow: 0 0 2px 2px rgba(0,0,0,0.2);
+    z-index: 1;
 }
 
 
@@ -2866,7 +2876,7 @@ exports.themes = {
             darker  : '#222',
             black   : '#000',
             detail  : 'darkcyan',
-            lighten : 'rgba(255,255,255,0.2)',
+            lighten : 'rgba(255,255,255,0.5)',
             darken  : 'rgba(0,0,0,0.2)',
         },
     },

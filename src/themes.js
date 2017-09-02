@@ -11,7 +11,7 @@ exports.themes = {
             darker  : '#222',
             black   : '#000',
             detail  : 'darkcyan',
-            lighten : 'rgba(255,255,255,0.2)',
+            lighten : 'rgba(255,255,255,0.5)',
             darken  : 'rgba(0,0,0,0.2)',
         },
     },

@@ -1060,7 +1060,7 @@ function rasti(name, container) {
 
 
     function resolveAttr($el, name) {
-        var value = $el.attr(name) || $el.attr('field') || $el.attr('nav') ||  $el.attr('section') || $el.attr('panel') || $el.attr('page')
+        var value = $el.attr(name) || $el.attr('name') || $el.attr('field') || $el.attr('nav') ||  $el.attr('section') || $el.attr('panel') || $el.attr('page')
         if (!value) warn('Could not resolve value of [%s] attribute in el:', name, $el[0])
         return value
     }
