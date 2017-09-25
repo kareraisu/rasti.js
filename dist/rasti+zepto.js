@@ -639,6 +639,11 @@ for (var device in breakpoints) {
     media[device] = window.matchMedia(`(max-width: ${ breakpoints[device] }px)`).matches
 }
 
+const TEXT_ATTRS = 'label header text placeholder'.split(' ')
+const EVENT_ATTRS = 'click change hover load'.split(' ')
+const ACTION_ATTRS = 'show hide toggle'.split(' ')
+const NOCHILD_TAGS = 'input select textarea img'.split(' ')
+
 const log = (...params) => {
     if (rasti.options.log.search(/debug/i) != -1) console.log.call(this, ...params)
 }
@@ -787,12 +792,18 @@ function rasti(name, container) {
         container.find('[modal]').each( (i, el) => {
             $('<div icon=close class="top right" />')
             .on('click', e => {
-                $(e.target).parent().hide()
+                el.style.display = 'none'
                 self.active.page.find('.backdrop').removeClass('backdrop')
             })
             .appendTo(el)
         })
 
+        // auto-close menus
+        container.find('[menu]').each( (i, el) => {
+            $(el).on('click', e => {
+                el.style.display = 'none'
+            })
+        })
 
         // init field validations
         container.find('[validate]').each( (i, btn) => {
@@ -893,18 +904,18 @@ function rasti(name, container) {
 
 
         // init actions
-        for (var action of 'click change hover load'.split(' ')) {
+        for (var action of EVENT_ATTRS) {
             container.find('[on-'+ action +']').each( (i, el) => {
                 var $el = $(el),
                     methodName = $el.attr('on-' + action)
-                if ( !methodName ) return error('Missing utility method in [%s] attribute of element:', action, el)
+                if ( !methodName ) return error('Missing utility method in [on-%s] attribute of element:', action, el)
                 var method = self.utils[methodName]
                 if ( !method ) return error('Undefined utility method "%s" declared in [on-%s] attribute of element:', methodName, action, el)
                 $el.on(action, method)
                    .removeAttr('on-' + action)
             })
         }
-        for (var action of 'show hide toggle'.split(' ')) {
+        for (var action of ACTION_ATTRS) {
             container.find('['+ action +']').each( (i, el) => {
                 var $el = $(el),
                     $page = $el.closest('[page]'),
@@ -923,14 +934,14 @@ function rasti(name, container) {
 
 
         // init move
-        container.find('.move').each( (i, el) => {
+        container.find('.movable').each( (i, el) => {
             $(el).move()
         })
 
 
         // init collapse
-        container.find('.collapse').on('click', e => {
-            this.classList.toggle('folded')
+        container.find('.collapsable').on('click', e => {
+            e.target.classList.toggle('folded')
         })
 
 
@@ -954,7 +965,7 @@ function rasti(name, container) {
 
 
         // resolve empty attributes
-        'header label text placeholder'.split(' ').forEach( attr => {
+        TEXT_ATTRS.forEach( attr => {
             var $el
             container.find('['+attr+'=""]').each( (i, el) => {
                 $el = $(el)
@@ -973,7 +984,7 @@ function rasti(name, container) {
 
 
         // fix labels
-        'input select textarea'.split(' ').forEach( tag => {
+        NOCHILD_TAGS.forEach( tag => {
             container.find(tag + '[label]').each( (i, el) => {
                 fixLabel($(el))
             })
@@ -1287,9 +1298,8 @@ function rasti(name, container) {
         self.active.lang = langName
 
         var $elems = $(), $el, keys, string
-        var attributes = 'label header text placeholder'.split(' ')
-
-        attributes.forEach( attr => {
+        
+        TEXT_ATTRS.forEach( attr => {
             $elems = $elems.add('['+attr+']')
         })
 
@@ -1504,6 +1514,8 @@ function rasti(name, container) {
         var block = rasti.blocks[type]
         if (!block) return error('Undefined block type "%s" declared in [block] attribute of element:', type, el)
 
+        if (!is.function(block.init)) return error('Invalid or missing init function in block type "%s" declared in [block] attribute of element:', type, el)
+
         block.init($el)
 
         // if applicable, create options from data source
@@ -1541,7 +1553,7 @@ function rasti(name, container) {
 
         $el.html(`
             <div class="results scrolly"></div>
-            <div class="controls floatcx bottom ib_">
+            <div class="controls centerx bottom ib_">
                 ${ columns || '' }
                 ${ paging || '' }
                 ${ sizes }
@@ -1794,18 +1806,25 @@ function bootstrap() {
 
 
 function genBlockStyles() {
-    var styles = '<style blocks>'
+    var styles = ['<style blocks>'], style
     for (var key in rasti.blocks) {
-        styles += rasti.blocks[key].style
+        style = rasti.blocks[key].style
+        if (style) styles.push(style)
     }
-    styles += '</style>'
-    $('head').prepend(styles)
+    styles.push('</style>')
+    $('head').prepend(styles.join(''))
 }
 
 
-$('head').prepend(`<style>body {
+$('head').prepend(`<style>/*******************************************************************************
+********************************* ELEMENTS *************************************
+*******************************************************************************/
+
+body {
     margin: 0;
+    overflow-x: hidden;
 }
+
 *, *:before, *:after {
     box-sizing: border-box;
     -webkit-user-select: none;
@@ -1814,11 +1833,67 @@ $('head').prepend(`<style>body {
     user-select: none;
     transition: background-color 0.2s;
 }
+
 h1 { font-size: 4em; }
 h2 { font-size: 3em; }
 h3 { font-size: 2em; }
 h4 { font-size: 1.5em; }
+
 p.big { font-size: 1.5em; }
+
+input[type=radio],
+input[type=checkbox] {
+    display: none;
+}
+input[type=radio] + label,
+input[type=checkbox] + label {
+    display: block;
+    height: 40px;
+    max-width: 90%;
+    padding: 12px 0;
+    margin-left: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+input[type=radio] + label:before,
+input[type=checkbox] + label:before {
+    content: '\\2713';
+    position: absolute;
+    height: 32px;
+    width: 32px;
+    margin-top: -8px;
+    margin-left: -36px;
+    border: 1px solid #999;
+    color: transparent;
+    background-color: #fff;
+    font-size: 2.3em;
+    line-height: 1;
+    text-align: center;
+}
+input[type=radio] + label:before {
+    content: '\\25cf';
+    border-radius: 50%;
+    line-height: 0.8;
+}
+input[type=radio]:checked + label:before,
+input[type=checkbox]:checked + label:before {
+    color: #222;
+    animation: stamp 0.4s ease-out;
+}
+input[type=radio] + label:hover,
+input[type=checkbox] + label:hover {
+    font-weight: 600;
+}
+@keyframes stamp {
+    50% { transform: scale(1.2); }
+}
+
+
+
+/*******************************************************************************
+********************************* ATTRIBUTES ***********************************
+*******************************************************************************/
 
 [page], [panel], [section] {
     position: relative;
@@ -1956,6 +2031,30 @@ nav ~ [page] {
     margin-bottom: 15px;
 }
 
+select[field] {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+}
+
+textarea[field] {
+    height: 70px;
+    resize: none;
+}
+
+input[field] {
+    width: 100%;
+    margin: 0;
+    font-size: 1rem;
+    vertical-align: text-bottom;
+}
+input[field]:focus:invalid {
+    box-shadow: 0 0 0 2px red;
+}
+input[field]:focus:valid {
+    box-shadow: 0 0 0 2px green;
+}
 
 .big[field], .big[btn],
 .big [field], .big [btn] {
@@ -2052,6 +2151,7 @@ nav, .tab-labels {
     border-bottom: 1px solid rgba(0,0,0,0.2);
     border-radius: 0;
     text-transform: uppercase;
+    z-index: 1;
 }
 .tab-labels {
     justify-content: space-around;
@@ -2074,6 +2174,7 @@ nav > div, nav > a,
     font-size: 1.4em;
     text-shadow: 0 0 0 #000;
     text-decoration: none;
+    color: inherit;
     cursor: pointer;
 }
 nav > div, nav > a {
@@ -2103,25 +2204,13 @@ nav > div, nav > a {
 }
 
 
-.backdrop:before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 100vw;
-    background: rgba(0,0,0,.7);
-    animation: fadeIn .4s;
-    z-index: 10;
-}
-
-
 [menu] {
     display: none;
-    position: absolute;
+    position: fixed;
     background-color: inherit;
-    box-shadow: 0 0 2px 2px rgba(0,0,0,0.2);
+    box-shadow: 0 0 4px 4px rgba(0,0,0,0.2);
     z-index: 1;
+    cursor: pointer;
 }
 
 
@@ -2185,79 +2274,10 @@ nav > div, nav > a {
 }
 
 
-select[field] {
-    appearance: none;
-    -moz-appearance: none;
-    -webkit-appearance: none;
-    cursor: pointer;
-}
 
-textarea[field] {
-    height: 70px;
-    resize: none;
-}
-
-input[field] {
-    width: 100%;
-    margin: 0;
-    font-size: 1rem;
-    vertical-align: text-bottom;
-}
-input[field]:focus:invalid {
-    box-shadow: 0 0 0 2px red;
-}
-input[field]:focus:valid {
-    box-shadow: 0 0 0 2px green;
-}
-
-input[type=radio],
-input[type=checkbox] {
-    display: none;
-}
-input[type=radio] + label,
-input[type=checkbox] + label {
-    display: block;
-    height: 40px;
-    max-width: 90%;
-    padding: 12px 0;
-    margin-left: 40px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    cursor: pointer;
-}
-input[type=radio] + label:before,
-input[type=checkbox] + label:before {
-    content: '\\2713';
-    position: absolute;
-    height: 32px;
-    width: 32px;
-    margin-top: -8px;
-    margin-left: -36px;
-    border: 1px solid #999;
-    color: transparent;
-    background-color: #fff;
-    font-size: 2.3em;
-    line-height: 1;
-    text-align: center;
-}
-input[type=radio] + label:before {
-    content: '\\25cf';
-    border-radius: 50%;
-    line-height: 0.8;
-}
-input[type=radio]:checked + label:before,
-input[type=checkbox]:checked + label:before {
-    color: #222;
-    animation: stamp 0.4s ease-out;
-}
-input[type=radio] + label:hover,
-input[type=checkbox] + label:hover {
-    font-weight: 600;
-}
-@keyframes stamp {
-    50% { transform: scale(1.2); }
-}
-
+/*******************************************************************************
+******************************* 12 COLUMNS ************************************* 
+*******************************************************************************/
 
 .row {
     display: flex;
@@ -2265,32 +2285,34 @@ input[type=checkbox] + label:hover {
     align-content: flex-start;
     width: 100%;
 }
-.column {
+.col {
     display: flex;
     flex-flow: column nowrap;
     min-height: min-content !important;
     align-content: flex-start;
     align-items: center;
 }
-.row > .col-1  { flex-basis: calc(08.33% - 15px); }
-.row > .col-2  { flex-basis: calc(16.66% - 15px); }
-.row > .col-3  { flex-basis: calc(25.00% - 15px); }
-.row > .col-4  { flex-basis: calc(33.33% - 15px); }
-.row > .col-5  { flex-basis: calc(41.66% - 15px); }
-.row > .col-6  { flex-basis: calc(50.00% - 15px); }
-.row > .col-7  { flex-basis: calc(58.33% - 15px); }
-.row > .col-8  { flex-basis: calc(66.66% - 15px); }
-.row > .col-9  { flex-basis: calc(75.00% - 15px); }
-.row > .col-10 { flex-basis: calc(83.33% - 15px); }
-.row > .col-11 { flex-basis: calc(91.66% - 15px); }
+.row > .col-1,  .col > .row-1  { flex-basis: calc(08.33% - 15px); }
+.row > .col-2,  .col > .row-2  { flex-basis: calc(16.66% - 15px); }
+.row > .col-3,  .col > .row-3  { flex-basis: calc(25.00% - 15px); }
+.row > .col-4,  .col > .row-4  { flex-basis: calc(33.33% - 15px); }
+.row > .col-5,  .col > .row-5  { flex-basis: calc(41.66% - 15px); }
+.row > .col-6,  .col > .row-6  { flex-basis: calc(50.00% - 15px); }
+.row > .col-7,  .col > .row-7  { flex-basis: calc(58.33% - 15px); }
+.row > .col-8,  .col > .row-8  { flex-basis: calc(66.66% - 15px); }
+.row > .col-9,  .col > .row-9  { flex-basis: calc(75.00% - 15px); }
+.row > .col-10, .col > .row-10 { flex-basis: calc(83.33% - 15px); }
+.row > .col-11, .col > .row-11 { flex-basis: calc(91.66% - 15px); }
 .row [class*=col-]:not(:first-child) { margin-left: 15px; }
+.col [class*=row-]:not(:first-child) { margin-top: 15px; }
+
+.page-options { flex-basis: initial !important; }
 
 
-.page-options {
-    flex-basis: initial !important;
-}
 
-/* icons */
+/*******************************************************************************
+********************************** ICONS *************************************** 
+*******************************************************************************/
 
 [icon] {
     flex-grow: 0;
@@ -2366,26 +2388,51 @@ input[type=checkbox] + label:hover {
 [icon=recycle]:before { content: '♻'; }
 
 
-/* utils */
 
-.move {
-    user-select: none;
-    cursor: move;
+/*******************************************************************************
+****************************** VISUAL ENHANCERS ******************************** 
+*******************************************************************************/
+.list {
+    padding: 0;
+    border: 1px solid rgba(0,0,0,0.2);
 }
-
-.resize {
-    resize: both;
-    overflow: hidden;
-}
-
-.collapse {
-    animation: foldOut 0.5s;
-}
-[section].collapse.folded {
-    animation: foldIn 0.5s;
-    height: 0;
-    padding-bottom: 0;
+.list[header] {
     padding-top: 40px;
+}
+.list > div {
+    height: 7vh;
+}
+.list > div:not(:last-child) {
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+}
+
+.msg {
+    height: 60%;
+    width: 60%;
+    padding: 10% 5%;
+    font-size: large;
+}
+
+.fab[btn] {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 50px;
+    margin: 20px;
+    border-radius: 50%;
+    z-index: 5;
+}
+
+.backdrop:before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background: rgba(0,0,0,.7);
+    animation: fadeIn .4s;
+    z-index: 10;
 }
 
 .loading {
@@ -2421,6 +2468,38 @@ input[type=checkbox] + label:hover {
     animation: flip 1s infinite linear;
 }
 
+
+
+/*******************************************************************************
+**************************** FUNCTIONAL ENHANCERS ****************************** 
+*******************************************************************************/
+
+.movable {
+    user-select: none;
+    cursor: move;
+}
+
+.resizable {
+    resize: both;
+    overflow: hidden;
+}
+
+.collapsable {
+    animation: foldOut 0.5s;
+    overflow: hidden; 
+}
+.collapsable[header].folded {
+    animation: foldIn 0.5s;
+    height: 0;
+    padding-bottom: 0;
+    padding-top: 40px;
+}
+
+
+
+/*******************************************************************************
+********************************* ANIMATIONS *********************************** 
+*******************************************************************************/
 
 @keyframes spin {
     0%   { transform: rotate(0); }
@@ -2473,6 +2552,11 @@ input[type=checkbox] + label:hover {
 }
 
 
+
+/*******************************************************************************
+****************************** UTILITY CLASSES ********************************* 
+*******************************************************************************/
+
 [hidden], .hidden {
     display: none !important;
 }
@@ -2489,50 +2573,6 @@ input[type=checkbox] + label:hover {
 }
 .floatr, .floatr_>* {
     float: right;
-}
-
-.textc, .textc_>* {
-    text-align: center;
-}
-.textr, .textr_>* {
-    text-align: right;
-}
-.textl, .textl_>* {
-    text-align: left;
-}
-
-.autom, .autom_>* {
-    margin: auto !important;
-}
-
-.floatcx, .floatcx_>* {
-    position: absolute;
-    left: 0; right: 0;
-    margin: auto !important;
-}
-.floatcy, .floatcy_>* {
-    position: absolute;
-    top: 0; bottom: 0;
-    margin: auto !important;
-}
-.floatc, .floatc_>* {
-    position: absolute;
-    left: 0; right: 0; top: 0; bottom: 0;
-    margin: auto !important;
-}
-
-.centerx {
-    display: flex;
-    justify-content: center;
-}
-.centery {
-    display: flex;
-    align-items: center;
-}
-.center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .left, .left_>* {
@@ -2552,22 +2592,38 @@ input[type=checkbox] + label:hover {
     bottom: 0;
 }
 
+.centerx, .centerx_>* {
+    position: absolute;
+    left: 0; right: 0;
+    margin: auto !important;
+}
+.centery, .centery_>* {
+    position: absolute;
+    top: 0; bottom: 0;
+    margin: auto !important;
+}
+.center, .center_>* {
+    position: absolute;
+    left: 0; right: 0; top: 0; bottom: 0;
+    margin: auto !important;
+}
+
 .fix {
     position: fixed;
 }
 
-.fullw, .fullw_>* {
-    width: 100%;
+.ccx, .ccx_>* {
+    display: flex;
+    justify-content: center;
 }
-.fullh, .fullh_>* {
-    height: 100%;
+.ccy, .ccy_>* {
+    display: flex;
+    align-items: center;
 }
-
-.autow, .autow_>* {
-    width: auto;
-}
-.autoh, .autoh_>* {
-    height: auto;
+.cc, .cc_>* {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .scrollx, .scrollx_>* {
@@ -2580,6 +2636,39 @@ input[type=checkbox] + label:hover {
 }
 .scroll, .scroll_>* {
     overflow: auto;
+}
+
+.textl, .textl_>* {
+    text-align: left;
+}
+.textr, .textr_>* {
+    text-align: right;
+}
+.textc, .textc_>* {
+    text-align: center;
+}
+
+.fullw, .fullw_>* {
+    width: 100%;
+}
+.fullh, .fullh_>* {
+    height: 100%;
+}
+.halfw, .halfw_>* {
+    width: 50%;
+}
+.halfh, .halfh_>* {
+    height: 50%;
+}
+.autow, .autow_>* {
+    width: auto;
+}
+.autoh, .autoh_>* {
+    height: auto;
+}
+
+.autom, .autom_>* {
+    margin: auto !important;
 }
 
 .columns-2 {
@@ -2621,25 +2710,8 @@ input[type=checkbox] + label:hover {
     padding-right: 15%;
 }
 
-.msg {
-    height: 60%;
-    width: 60%;
-    padding: 10% 5%;
-    font-size: large;
-}
-
 .round, .round_>* {
     border-radius: 50%;
-}
-
-.fab[btn] {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    width: 50px;
-    margin: 20px;
-    border-radius: 50%;
-    z-index: 5;
 }
 
 .scale, .scale_>* {
@@ -2650,7 +2722,10 @@ input[type=checkbox] + label:hover {
 }
 
 
-/* fx */
+
+/*******************************************************************************
+************************************* FX *************************************** 
+*******************************************************************************/
 
 [fx=stack]:not([paging]) > *,
 [fx=stack][paging] > .results > * {
@@ -2686,7 +2761,10 @@ input[type=checkbox] + label:hover {
 }
 
 
-/* scrollbar */
+
+/*******************************************************************************
+********************************* SCROLLBARS *********************************** 
+*******************************************************************************/
 
 /* webkit */
 ::-webkit-scrollbar {
@@ -2726,8 +2804,10 @@ input[type=checkbox] + label:hover {
 }
 
 
-/*** MEDIA QUERIES ***/
 
+/*******************************************************************************
+****************************** MEDIA QUERIES *********************************** 
+*******************************************************************************/
 
 /* desktop only */
 @media only screen and (min-width: 800px) {

@@ -25,6 +25,11 @@ for (var device in breakpoints) {
     media[device] = window.matchMedia(`(max-width: ${ breakpoints[device] }px)`).matches
 }
 
+const TEXT_ATTRS = 'label header text placeholder'.split(' ')
+const EVENT_ATTRS = 'click change hover load'.split(' ')
+const ACTION_ATTRS = 'show hide toggle'.split(' ')
+const NOCHILD_TAGS = 'input select textarea img'.split(' ')
+
 const log = (...params) => {
     if (rasti.options.log.search(/debug/i) != -1) console.log.call(this, ...params)
 }
@@ -173,12 +178,18 @@ function rasti(name, container) {
         container.find('[modal]').each( (i, el) => {
             $('<div icon=close class="top right" />')
             .on('click', e => {
-                $(e.target).parent().hide()
+                el.style.display = 'none'
                 self.active.page.find('.backdrop').removeClass('backdrop')
             })
             .appendTo(el)
         })
 
+        // auto-close menus
+        container.find('[menu]').each( (i, el) => {
+            $(el).on('click', e => {
+                el.style.display = 'none'
+            })
+        })
 
         // init field validations
         container.find('[validate]').each( (i, btn) => {
@@ -279,18 +290,18 @@ function rasti(name, container) {
 
 
         // init actions
-        for (var action of 'click change hover load'.split(' ')) {
+        for (var action of EVENT_ATTRS) {
             container.find('[on-'+ action +']').each( (i, el) => {
                 var $el = $(el),
                     methodName = $el.attr('on-' + action)
-                if ( !methodName ) return error('Missing utility method in [%s] attribute of element:', action, el)
+                if ( !methodName ) return error('Missing utility method in [on-%s] attribute of element:', action, el)
                 var method = self.utils[methodName]
                 if ( !method ) return error('Undefined utility method "%s" declared in [on-%s] attribute of element:', methodName, action, el)
                 $el.on(action, method)
                    .removeAttr('on-' + action)
             })
         }
-        for (var action of 'show hide toggle'.split(' ')) {
+        for (var action of ACTION_ATTRS) {
             container.find('['+ action +']').each( (i, el) => {
                 var $el = $(el),
                     $page = $el.closest('[page]'),
@@ -309,14 +320,14 @@ function rasti(name, container) {
 
 
         // init move
-        container.find('.move').each( (i, el) => {
+        container.find('.movable').each( (i, el) => {
             $(el).move()
         })
 
 
         // init collapse
-        container.find('.collapse').on('click', e => {
-            this.classList.toggle('folded')
+        container.find('.collapsable').on('click', e => {
+            e.target.classList.toggle('folded')
         })
 
 
@@ -340,7 +351,7 @@ function rasti(name, container) {
 
 
         // resolve empty attributes
-        'header label text placeholder'.split(' ').forEach( attr => {
+        TEXT_ATTRS.forEach( attr => {
             var $el
             container.find('['+attr+'=""]').each( (i, el) => {
                 $el = $(el)
@@ -359,7 +370,7 @@ function rasti(name, container) {
 
 
         // fix labels
-        'input select textarea'.split(' ').forEach( tag => {
+        NOCHILD_TAGS.forEach( tag => {
             container.find(tag + '[label]').each( (i, el) => {
                 fixLabel($(el))
             })
@@ -673,9 +684,8 @@ function rasti(name, container) {
         self.active.lang = langName
 
         var $elems = $(), $el, keys, string
-        var attributes = 'label header text placeholder'.split(' ')
-
-        attributes.forEach( attr => {
+        
+        TEXT_ATTRS.forEach( attr => {
             $elems = $elems.add('['+attr+']')
         })
 
@@ -890,6 +900,8 @@ function rasti(name, container) {
         var block = rasti.blocks[type]
         if (!block) return error('Undefined block type "%s" declared in [block] attribute of element:', type, el)
 
+        if (!is.function(block.init)) return error('Invalid or missing init function in block type "%s" declared in [block] attribute of element:', type, el)
+
         block.init($el)
 
         // if applicable, create options from data source
@@ -927,7 +939,7 @@ function rasti(name, container) {
 
         $el.html(`
             <div class="results scrolly"></div>
-            <div class="controls floatcx bottom ib_">
+            <div class="controls centerx bottom ib_">
                 ${ columns || '' }
                 ${ paging || '' }
                 ${ sizes }
@@ -1180,12 +1192,13 @@ function bootstrap() {
 
 
 function genBlockStyles() {
-    var styles = '<style blocks>'
+    var styles = ['<style blocks>'], style
     for (var key in rasti.blocks) {
-        styles += rasti.blocks[key].style
+        style = rasti.blocks[key].style
+        if (style) styles.push(style)
     }
-    styles += '</style>'
-    $('head').prepend(styles)
+    styles.push('</style>')
+    $('head').prepend(styles.join(''))
 }
 
 
