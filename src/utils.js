@@ -11,6 +11,20 @@ function sameType(exp1, exp2) {
 }
 
 
+function inject(sources) {
+    if (is.string(sources)) sources = sources.split(' ')
+    if (!is.array(sources)) return error('Invalid sources, must be an array or a string')
+    var script,
+        body = $('body'),
+        inject = (sources) => {
+            script = $('<script>').attr('src', sources.shift())
+            if (sources.length) script.attr('onload', () => inject(sources))
+            body.append(script)
+        }
+    inject(sources)
+}
+
+
 function checkData(data) {
     switch (typeof data) {
     case 'string':
@@ -58,11 +72,12 @@ function onMobile() {
 
 
 module.exports = {
-	is,
-	type,
-	sameType,
-	checkData,
-	random,
-	onMobile,
+    is,
+    type,
+    sameType,
+    inject,
+    checkData,
+    random,
+    onMobile,
     rastiError,
 }

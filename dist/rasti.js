@@ -613,7 +613,7 @@ $.fn.move = function(options) {
 require('./extensions')
 const { History, Pager, createState } = require('./components')
 const utils = require('./utils')
-const { is, type, sameType } = utils
+const { is, sameType } = utils
 const themes = require('./themes')
 
 const options = {
@@ -822,27 +822,41 @@ function rasti(name, container) {
 
         // init nav
         container.find('[nav]').click( e => {
-            var $el = $(e.target),
+            var el = e.target,
+                $el = $(el),
                 page = $el.attr('nav'),
                 params = {}
 
             if (!page) return error('Missing page name in [nav] attribute of element:', el)
 
-            if (e.target.hasAttribute('params')) {
+            if (el.hasAttribute('params')) {
                 var $page = self.active.page,
-                    paramkeys = $el.attr('params'),
+                    navparams = $el.attr('params'),
                     $paramEl
-                if (paramkeys) {
-                    // get specified params
-                    paramkeys = paramkeys.split(' ')
-                    paramkeys.forEach( key => {
-                        $paramEl = $page.find('[navparam='+ key +']')
-                        if ($paramEl.length) params[key] = $paramEl.val()
-                        else warn('Could not find navparam element [%s]', key)
-                    })
+                if (navparams) {
+                    // check to see if params is an object
+                    if (navparams[0]=='{') {
+                        try {
+                            params = JSON.parse(navparams)
+                        }
+                        catch(err){
+                            error('Invalid JSON in [params] attribute of element:', el)
+                            error('Tip: be sure to use double quotes ("") for both keys and values')
+                            return
+                        }
+                    }
+                    else {
+                        // get values of specified navparams
+                        navparams = params.split(' ')
+                        navparams.forEach( key => {
+                            $paramEl = $page.find('[navparam='+ key +']')
+                            if ($paramEl.length) params[key] = $paramEl.val()
+                            else warn('Could not find navparam element [%s]', key)
+                        })
+                    }
                 }
                 else {
-                    // get all params
+                    // get values of all navparams in page
                     $page.find('[navparam]').each( (i, el) => {
                         $el = $(el)
                         key = resolveAttr($el, 'navparam')
@@ -926,7 +940,6 @@ function rasti(name, container) {
                         if ($target[0].hasAttribute('modal')) $page.find('.page-options').addClass('backdrop')
                         $target[action]()
                     })
-                    .removeAttr(action)
             })
         }
 
@@ -1188,7 +1201,7 @@ function rasti(name, container) {
         var el = $el[0]
 
         if (!data) {
-            var datakey = $el.attr('data')
+            var datakey = resolveAttr($el, 'data')
             if (!datakey) return error(errPrefix + 'no data found for template. Please provide in ajax response or via [data] attribute in element:', name, el)
             data = self.data[datakey]
             if (!data) return error(errPrefix + 'undefined data source "%s" in [data] attribute of element:', name, datakey, el)
@@ -1240,12 +1253,11 @@ function rasti(name, container) {
         log('Setting theme [%s:%s]', themeName, mapName)
         self.active.theme = themeName
         
-        var values = {
-            font : theme.font || baseTheme.font,
-        }, colorNames, colors, c1, c2, defaultColorName
-
         // clone themeMap
         themeMap = Object.assign({}, themeMap)
+
+        var values = { font : theme.font || baseTheme.font, },
+            colorNames, colors, c1, c2, defaultColorName
 
         // map palette colors to attributes
         for (var attr of Object.keys(baseMap)) {
@@ -1256,10 +1268,15 @@ function rasti(name, container) {
             for (var i in colors) {
                 defaultColorName = baseMap[attr].split(' ')[i]
                 if (defaultColorName && !colors[i]) {
+                    // look for color in base palette
                     colors[i] = baseTheme.palette[ colorNames[i] ]
                     if (!colors[i]) {
+                        warn('Color [%s] not found in theme nor base palette, using it as is', colorNames[i])
+                        colors[i] = colorNames[i]
+                        /*
                         warn('Mapping error in theme [%s] for attribute [%s]. Color [%s] not found. Falling back to default color [%s].', themeName, attr, colorNames[i], defaultColorName)
                         colors[i] = baseTheme.palette[ defaultColorName ]
+                        */
                     }
                 }
             }
@@ -1684,7 +1701,7 @@ function rasti(name, container) {
 
 
     function resolveAttr($el, name) {
-        var value = $el.attr(name) || $el.attr('name') || $el.attr('field') || $el.attr('nav') ||  $el.attr('section') || $el.attr('panel') || $el.attr('page')
+        var value = $el.attr(name) || $el.attr('name') || $el.attr('field') || $el.attr('nav') || $el.attr('template') ||  $el.attr('section') || $el.attr('panel') || $el.attr('page')
         if (!value) warn('Could not resolve value of [%s] attribute in el:', name, $el[0])
         return value
     }
@@ -1766,7 +1783,7 @@ module.exports = Object.freeze(rasti)
 
 
 
-// bootstrap any apps defined via rasti attribute
+// bootstrap any apps declared via rasti attribute
 function bootstrap() {
     var appContainers = $(document).find('[rasti]'),
         appName, app, extendProps
@@ -1785,18 +1802,11 @@ function bootstrap() {
                     if (is.boolean(options[key]) && !app.options[key]) app.options[key] = true
                 }
             })
+            // load any declared sources
             var sources = container.getAttribute('src')
             if (sources) {
                 log('Loading sources for app [%s]...', appName)
-                sources = sources.split(' ')
-                var script,
-                    body = $('body'),
-                    inject = (sources) => {
-                        script = $('<script>').attr('src', sources.shift())
-                        if (sources.length) script.attr('onload', () => inject(sources))
-                        body.append(script)
-                    }
-                inject(sources)
+                utils.inject(sources)
             }
         }
     })
@@ -2178,6 +2188,9 @@ nav > div, nav > a,
 nav > div, nav > a {
     max-width: 200px;
 }
+nav > div:hover, nav > a:hover {
+    text-shadow: 0 0 1px #000;
+}
 [tab-label].active {
     filter: contrast(1.5);
 }
@@ -2188,13 +2201,21 @@ nav > div, nav > a {
     position: fixed;
     left: 0; right: 0; top: 0; bottom: 0;
     margin: auto !important;
-    height: 100%;
-    width: 100%;
-    max-height: 500px;
-    max-width: 500px;
+    height: auto;
+    width: auto;
+    max-height: 600px;
+    max-width: 400px;
     overflow-y: auto;
     animation: zoomIn .4s, fadeIn .4s;
     z-index: 11;
+}
+[modal].big, .modal.big {
+    max-height: 800px;
+    max-width: 600px;
+}
+[modal].small, .modal.small {
+    max-height: 400px;
+    max-width: 200px;
 }
 [modal] > [icon=close],
 .modal > [icon=close] {
@@ -2271,6 +2292,11 @@ nav > div, nav > a {
     margin-left: 0;
 }
 
+
+[show], [hide], [toggle],
+[onclick] {
+    cursor: pointer;
+}
 
 
 /*******************************************************************************
@@ -3001,6 +3027,20 @@ function sameType(exp1, exp2) {
 }
 
 
+function inject(sources) {
+    if (is.string(sources)) sources = sources.split(' ')
+    if (!is.array(sources)) return error('Invalid sources, must be an array or a string')
+    var script,
+        body = $('body'),
+        inject = (sources) => {
+            script = $('<script>').attr('src', sources.shift())
+            if (sources.length) script.attr('onload', () => inject(sources))
+            body.append(script)
+        }
+    inject(sources)
+}
+
+
 function checkData(data) {
     switch (typeof data) {
     case 'string':
@@ -3048,14 +3088,16 @@ function onMobile() {
 
 
 module.exports = {
-	is,
-	type,
-	sameType,
-	checkData,
-	random,
-	onMobile,
+    is,
+    type,
+    sameType,
+    inject,
+    checkData,
+    random,
+    onMobile,
     rastiError,
 }
+
 },{}]},{},[10])(10)
 });
 //# sourceMappingURL=rasti.map
