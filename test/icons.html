@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rasti icons</title>
+    <meta charset=utf-8>
+    <meta name=viewport content="width=device-width, initial-scale=1 maximum-scale=1">
+</head>
+
+<style>
+[icon]:before {
+    background-color: #bbb;
+}
+    
+</style>
+
+<body rasti=app hidden>
+
+<div page=main header="Rasti Icons">
+
+    <input field onkeydown="if (event.key == 'Enter') { app.render('icons', this.value)}"
+    placeholder="write any icon names, comma separated" >
+    <div class="row rel" style="height: 80vh" bg=white>       
+
+        <div class="col-3 scrolly">
+            <div auto template=categories class="list">
+                <div value=${data} onclick="app.render('icons', app.data.icons[$(this).attr('value')])">
+                   ${data} 
+                </div>
+            </div>
+        </div>
+
+        <div class="col-9 scrolly">
+            <div template=icons class="round_ inline_ none"
+                style="padding: 10px"
+                on-click=changeSize > 
+                    <div icon=${data} class="textc" 
+                        style="margin: 10px; font-size: 1rem">${data}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="../dist/rasti+zepto.js"></script>
+<script>
+    app.data.categories = Object.keys(rasti.icons)
+    app.data.icons = {}
+    app.data.categories.forEach(cat => app.data.icons[cat] = Object.keys(rasti.icons[cat]))
+    app.utils.changeSize = e => {
+        const el = e.currentTarget
+        const cn = el.className
+        const mods = 'big_ huge_ small_ none'.split(' ')
+        mods.forEach((m, i) => {
+            if (cn.indexOf(m) > -1)
+                el.className = cn.replace(m, mods[i == mods.length-1 ? 0 : i+1])
+        })
+    }
+    app.init()
+</script>
+
+</body>

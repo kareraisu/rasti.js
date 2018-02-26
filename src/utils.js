@@ -54,6 +54,13 @@ function checkData(data) {
 }
 
 
+function resolveAttr($el, name) {
+    var value = $el.attr(name) || $el.attr('name') || $el.attr('field') || $el.attr('nav') || $el.attr('template') ||  $el.attr('section') || $el.attr('panel') || $el.attr('page')
+    if (!value) warn('Could not resolve value of [%s] attribute in el:', name, $el[0])
+    return value
+}
+
+
 function rastiError(msg, ...args){
     this.msg = msg
     this.el = args.pop()
@@ -77,6 +84,7 @@ module.exports = {
     sameType,
     inject,
     checkData,
+    resolveAttr,
     random,
     onMobile,
     rastiError,

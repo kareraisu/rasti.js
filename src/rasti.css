@@ -271,7 +271,13 @@ input[field]:focus:valid {
     background-origin: content-box;
 }
 
-
+[template] {
+    display: none;
+    position: relative;
+}
+[template].rendered {
+    display: block;
+}
 [template] > .results {
     max-height: calc(100% - 40px);
     margin: 0 -15px;
@@ -293,6 +299,31 @@ input[field]:focus:valid {
     height: 40px;
     padding: 10px;
     font-size: 1.1em;
+}
+
+[crud] > * {
+    position: relative;
+}
+.rasti-crud-create {
+    display: block !important;
+}
+.rasti-crud,
+.rasti-crud-accept,
+.rasti-crud-cancel,
+.rasti-crud.active > .rasti-crud-create {
+    display: none !important;
+}
+.rasti-crud.active > .rasti-crud-accept,
+.rasti-crud.active > .rasti-crud-cancel {
+    display: inline-block !important;
+}
+[crud] > .rasti-crud {
+    bottom: -40px;
+    z-index: 1;
+}
+[crud]:hover > .rasti-crud,
+[crud]>*:hover > .rasti-crud {
+    display: block !important;
 }
 
 
@@ -361,9 +392,13 @@ nav > div, nav > a,
 }
 nav > div, nav > a {
     max-width: 200px;
+    transition: all 0.2s;
 }
 nav > div:hover, nav > a:hover {
-    text-shadow: 0 0 1px #000;
+    letter-spacing: 4px;
+}
+nav > .active {
+    border-bottom: 5px solid #222;
 }
 [tab-label].active {
     filter: contrast(1.5);
@@ -391,8 +426,8 @@ nav > div:hover, nav > a:hover {
     max-height: 400px;
     max-width: 200px;
 }
-[modal] > [icon=close],
-.modal > [icon=close] {
+[modal] > close],
+.modal > close] {
     cursor: pointer;
 }
 
@@ -512,79 +547,44 @@ nav > div:hover, nav > a:hover {
 ********************************** ICONS *************************************** 
 *******************************************************************************/
 
-[icon] {
+[icon]:before {
+    display: block;
     flex-grow: 0;
     height: 50px;
     width: auto;
-    min-width: 50px;
+    width: 50px;
     font-size: 1.5rem;
     line-height: 2;
     text-align: center;
+    text-decoration: none;
 }
-[icon]:before {
-    filter: grayscale();
+.small[icon]:before, .small_ > [icon]:before  {
+    height: 35px;
+    width: 35px;
+    font-size: 1.1rem;
 }
-[icon].small {
-    height: 30px;
-    width: 30px;
-    font-size: 1em;
-}
-[icon].big {
+.big[icon]:before, .big_ > [icon]:before {
     height: 70px;
     width: 70px;
-    font-size: 2.2em;
+    font-size: 2.2rem;
 }
-[icon].floating:before {
+.huge[icon]:before, .huge_ > [icon]:before {
+    height: 100px;
+    width: 100px;
+    font-size: 3.2rem;
+    line-height: 1.9;
+}
+.round[icon]:before, .round_ > [icon]:before {
+    border-radius: 50%;
+}
+.floating[icon]:before {
     position: absolute;
     margin-left: 10px;
     margin-top: -5px;
 }
-[icon].floating > input {
+.floating[icon] > input {
     padding-left: 45px;
 }
-[icon=options]:before { content: '⋯'; }
-[icon=voptions]:before { content: '⋮'; }
-[icon=menu]:before { content: '☰'; }
-[icon=user]:before { content: '👤'; }
-[icon=pass]:before,
-[icon=lock]:before { content: '🔒'; }
-[icon=file]:before { content: '📄'; }
-[icon=folder]:before { content: '📂'; }
-[icon=attach]:before,
-[icon=clip]:before { content: '📎'; }
-[icon=link]:before { content: '🔗'; }
-[icon=edit]:before,
-[icon=pen]:before { content: '✎'; }
-[icon=warning]:before { content: '⚠'; }
-[icon=error]:before { content: '⨂'; }/*𐌈*/
-[icon=rows]:before { content: '𝌆'; }
-[icon=columns]:before { content: '▥'; }
-[icon=grid]:before { content: '▦'; }
-[icon=spacedgrid]:before { content: '𝍖'; }
-[icon=roundgrid]:before { content: '𐄡'; }
-[icon=close]:before { content: '✕'; }
-[icon=eject]:before { content: '⏏'; }
-[icon=play]:before,
-[icon=next]:before { content: '▶'; }
-[icon=prev]:before { content: '◀'; }
-[icon=pause]:before { content: 'Ⅱ'; }
-[icon=stop]:before { content: '■'; }
-[icon=rec]:before { content: '●'; }
-[icon=timer]:before { content: '⏱'; }
-[icon=clock]:before { content: '⏰'; }
-[icon=cog]:before { content: '⚙'; }
-[icon=flag]:before { content: '⚑'; }
-[icon=clef]:before { content: '𝄞'; }
-[icon=note]:before { content: '♪'; }
-[icon=star]:before { content: '★'; }
-[icon=goldstar]:before { content: '⭐'; }
-[icon=snow]:before { content: '❄'; }
-[icon=command]:before { content: '⌘'; }
-[icon=pentagon]:before { content: '⬟'; }
-[icon=hexagon]:before { content: '⬢'; }
-[icon=cycle]:before { content: '⟳'; }
-[icon=recycle]:before { content: '♻'; }
-
 
 
 /*******************************************************************************
@@ -599,9 +599,16 @@ nav > div:hover, nav > a:hover {
 }
 .list > div {
     height: 7vh;
+    transition: all 0.2s;
 }
 .list > div:not(:last-child) {
     border-bottom: 1px solid rgba(0,0,0,0.2);
+}
+.list > div.active {
+    border-left: 7px solid #222;
+}
+.list > div:hover {
+    letter-spacing: 4px;
 }
 
 .msg {
@@ -759,9 +766,8 @@ nav > div:hover, nav > a:hover {
     display: none !important;
 }
 
-.ib, .ib_>* {
+.inline, .inline_>* {
     display: inline-block;
-    width: auto;
     margin-top: 0;
     margin-bottom: 0;
 }
@@ -771,6 +777,10 @@ nav > div:hover, nav > a:hover {
 }
 .floatr, .floatr_>* {
     float: right;
+}
+
+.rel {
+    position: relative;
 }
 
 .left, .left_>* {
@@ -825,10 +835,12 @@ nav > div:hover, nav > a:hover {
 }
 
 .scrollx, .scrollx_>* {
+    width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
 }
 .scrolly, .scrolly_>* {
+    height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
 }

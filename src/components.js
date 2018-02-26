@@ -1,4 +1,4 @@
-const { is } = require('./utils')
+const { is, resolveAttr } = require('./utils')
 
 class History {
 
@@ -81,7 +81,105 @@ class Pager {
 
 }
 
+
+function state(app) {
+    function invalid() {
+        error('Saved state for app [%s] is invalid', app.name)
+    }
+
+    return Object.defineProperties({}, {
+        page  : { get : _ => app.active.page.attr('page'), enumerable : true },
+        theme : { get : _ => app.active.theme, enumerable : true },
+        lang  : { get : _ => app.active.lang, enumerable : true },
+        save : { value : _ => {
+            localStorage.setItem('rasti.' + app.name, JSON.stringify(app.state))
+            log('State saved')
+        } },
+        get : { value : _ => {
+            var state
+            try {
+                state = JSON.parse( localStorage.getItem('rasti.' + app.name) )
+                if ( !state ) log('No saved state found for app [%s]', app.name)
+                else if ( !is.object(state) ) invalid()
+                else return state
+            }
+            catch(err) {
+                invalid()
+            }
+        } },
+        restore : { value : _ => {
+            var state = app.state.get()
+            if (state) {
+                log('Restoring state...')
+                for (let prop in state) {
+                    app.state[prop] = state[prop]
+                }
+                if (state.theme) setTheme(state.theme)
+                if (state.lang) setLang(state.lang)
+                navTo(state.page)
+                log('State restored')
+            }
+            return state
+        } },
+        clear : { value : _ => {
+            localStorage.removeItem('rasti.' + app.name)
+        } },
+    })
+}
+
+
+function crud(app) {
+    function checkDataSource(fn) {
+        return (datakey, ...args) => {
+            const data = app.data[datakey]
+            if (!data) {
+                error('Undefined data source "%s"', datakey)
+                return false
+            }
+            else return fn(data, datakey, ...args)
+        }
+    }
+
+    return {
+        create : checkDataSource((data, datakey, el) => {
+            const exists = data.find(e => e === el)
+            exists
+                ? warn('El [%s] already exists in data source [%s]', el, datakey)
+                : data.push(el)
+            return !exists
+        }),
+        delete : checkDataSource((data, datakey, el) => {
+            const exists = data.find(e => e === el)
+            !exists
+                ? warn('El [%s] not found in data source [%s]', el, datakey)
+                : data.remove(el)
+            return exists
+        }),
+        update : checkDataSource((data, datakey, el, newel) => {
+            const exists_el = data.find(e => e === el)
+            const exists_newel = data.find(e => e === newel)
+            if (!exists_el) warn('El [%s] not found in data source [%s]', el, datakey)
+            if (exists_newel) warn('El [%s] already exists in data source [%s]', newel, datakey)
+            const valid = exists_el && !exists_newel
+            if (valid) data.update(el, newel)
+            return valid
+        }),
+        addInputEl : $el => {
+            let template = resolveAttr($el, 'template')
+            template = app.templates[template]
+            // TODO: try to parse the template identifying props in order to build a similar html tree but with inputs instead of divs or spans, binding each input to its corresponding prop
+            $el.append('<div class=rasti-crud-input>' + template(['TEST']) +'</div>')
+        },
+        removeInputEl : $el => {
+            $el.find('.rasti-crud-input').detach()
+        },
+    }
+}
+
+
 module.exports = {
     History,
     Pager,
+    state,
+    crud,
 }

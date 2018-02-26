@@ -1,12 +1,20 @@
 // prototype extensions
-Array.prototype.remove = function(el) {
-    var i = this.indexOf(el);
-    if (i >= 0) this.splice(i, 1);
-}
-
-String.prototype.capitalize = function() {
-    return this.length && this[0].toUpperCase() + this.slice(1).toLowerCase()
-}
+Object.defineProperties(Array.prototype, {
+    get : { value : function(i) {
+       return i < 0 ? this[this.length + i] : this[i]
+    }},
+    remove : { value : function(el) {
+        var i = this.indexOf(el)
+        if (i >= 0) this.splice(i, 1)
+    }},
+    update : { value : function(el, newel) {
+        var i = this.indexOf(el)
+        if (i >= 0) this.splice(i, 1, newel)
+    }},
+    capitalize : { value : function() {
+       return this.length && this[0].toUpperCase() + this.slice(1).toLowerCase()
+    }},
+})
 
 
 // $ extensions
