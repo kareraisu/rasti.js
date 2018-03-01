@@ -67,9 +67,6 @@ input[type=radio] + label:hover,
 input[type=checkbox] + label:hover {
     font-weight: 600;
 }
-@keyframes stamp {
-    50% { transform: scale(1.2); }
-}
 
 
 
@@ -599,6 +596,7 @@ nav > .active {
 }
 .list > div {
     height: 7vh;
+    padding: 2vh;
     transition: all 0.2s;
 }
 .list > div:not(:last-child) {
@@ -705,7 +703,9 @@ nav > .active {
 /*******************************************************************************
 ********************************* ANIMATIONS *********************************** 
 *******************************************************************************/
-
+@keyframes stamp {
+    50% { transform: scale(1.2); }
+}
 @keyframes spin {
     0%   { transform: rotate(0); }
     100% { transform: rotate(360deg); }
@@ -937,12 +937,21 @@ nav > .active {
 ************************************* FX *************************************** 
 *******************************************************************************/
 
-[fx=stack]:not([paging]) > *,
-[fx=stack][paging] > .results > * {
-    opacity: 0;
+.fx-stack-container > * {
+    transition: margin-top 2s ease; /*FIXME: NOT WORKING*/
+    margin-top: 0;
+}
+.fx-stack-el {
     margin-top: 100px;
-    transition: opacity 0.5s ease,
-                margin-top 0.5s ease;
+}
+
+.fx-stamp-container > * {
+    transition: opacity 0.3s;
+    animation: stamp 0.3s;
+}
+.fx-stamp-el {
+    opacity: 0;
+    animation: none;
 }
 
 .flip-container {

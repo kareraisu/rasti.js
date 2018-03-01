@@ -718,10 +718,7 @@ $.fn.move = function(options) {
 module.exports = {
 
 app : {
-    menu : '☰',
-    options : '⋯',
-    voptions : '⋮',
-    settings : '⚙',
+    gear : '⚙️',
     user : '👤',
     users : '👥',
     lock : '🔒',
@@ -729,8 +726,7 @@ app : {
     key : '🔑',
     home : '🏠',
     exit : '🚪',
-    command : '⌘',
-    option : '⌥',
+    call : '📞',
     search : '🔍',
     battery : '🔋',
     'power-plug' : '🔌',
@@ -744,7 +740,12 @@ app : {
     'brightness-hi' : '🔆',
     warning : '⚠',
     error : '⨂',/*𐌈*/
-    nope : '🚫',
+    ban : '🚫',
+    bars : '☰',
+    'h-dots' : '⋯',
+    'v-dots' : '⋮',
+    command : '⌘',
+    option : '⌥',
     rows : '𝌆',
     columns : '▥',
     grid : '▦',
@@ -755,14 +756,18 @@ app : {
 office : {
     file : '📄',
     folder : '📂',
-    edit : '✎',
-    cut : '✂',
+    edit : '✏️',
+    pen : '🖊️',
+    pen2 : '🖋️',
+    paintbrush : '🖌️',
+    cut : '✂️',
     copy : '📋',
     attach : '📎',
     link : '🔗',
     ruler : '📏',
     pin : '📌',
     card : '💳',
+    label : '🏷️',
     memo : '📝',
     scroll : '📜',
     book : '📕',
@@ -771,17 +776,19 @@ office : {
     'open-book' : '📖',
     notebook : '📓',
     calendar : '📅',
+    envelope : '✉️',
     email : '📧',
     mailbox : '📫',
     package : '📦',
     briefcase : '💼',
     newspaper : '📰',
+    trash : '🗑️',
 },
 
 actions : {
     add : '✚',
     remove : '-',
-    update : '🔄',
+    sync : '🔄',
     close : '✕',
     accept : '✔',
     cancel : '✘',
@@ -796,20 +803,26 @@ actions : {
 },
 
 electronics : {
-    computer : '💻',
-    keyboard : '⌨',
+    laptop : '💻',
+    desktop : '🖥️',
+    keyboard : '⌨️',
+    'pc-mouse' : '🖱️',
+    printer : '🖨️',
     smartphone : '📱',
-    telephone : '📞',
+    telephone : '☎️',
     microphone : '🎤',
+    'studio-mic' : '🎙️',
     megaphone : '📣',
     headphones : '🎧',
     camera : '📷',
-    videocamera : '📹',
+    'video-camera' : '📹',
+    'movie-camera' : '🎥',
+    projector : '📽️',
     tv : '📺',
     radio : '📻',
     stereo : '📾',
     gamepad : '🎮',
-    joystick : '🎮',
+    joystick : '🕹️',
 },
 
 media : {
@@ -825,47 +838,70 @@ tools : {
     wrench : '🔧',
     hammer : '🔨',
     bolt : '🔩',
-    glasses : '👓',
     microscope : '🔬',
     telescope : '🔭',
     antenna : '📡',
+    satellite : '🛰️',
     watch : '⌚',
-    timer : '⏱',
+    stopwatch : '⏱️',
     clock : '⏰',
     hourglass : '⌛',
 },
 
 vehicles : {
+    skate : '🛹',
+    scooter : '🛴',
     bicycle : '🚲',
+    motorscooter : '🛵',
+    motorcycle : '🏍️',
     car : '🚗',
+    'race-car' : '🏎️',
+    rv : '🚙',
     bus : '🚌',
+    minibus : '🚐',
     truck : '🚚',
+    ambulance : '🚑',
+    'fire-engine' : '🚒',
     metro : '🚇',
     train : '🚄',
     locomotive : '🚂',
+    sailboat : '⛵',
+    speedboat : '🚤',
+    motorboat : '🛥️',
+    ferry : '⛴️',
     ship : '🚢',
-    plane : '✈',
+    plane : '✈️',
+    'small-plane': '🛩️',
     helicopter : '🚁',
     rocket : '🚀',
+    ufo : '🛸',
 },
 
 nature : {
+    sun : '☀️',
+    moon : '🌕',
+    'new-moon' : '🌑',
+    'crescent-moon' : '🌙',
     fire : '🔥',
     water : '💧',
     wave : '🌊',
     ice : '❄',
     wind : '💨',
+    cloud : '☁️',
+    mountain : '⛰️',
     volcano : '🌋',
     rainbow : '🌈',
+    comet : '☄️',
     asiania : '🌏',
     americas : '🌎',
     eurafrica : '🌍',
+    galaxy : '🌌',
 },
 
 plants : {
     leaf : '🍂',
     leaves : '🌿',
-    oak : '🍁',
+    maple : '🍁',
     clover : '☘',
     luck : '🍀',
     weat : '🌾',
@@ -911,8 +947,9 @@ music : {
 },
 
 faces : {
+    robot : '🤖',
     skull : '💀',
-    poison : '☠',
+    poison : '☠️',
     imp : '👿',
     monster : '👾',
     alien : '👽',
@@ -951,43 +988,6 @@ chess : {
     bpawn : '♟',
 },
 
-other : {
-    good : '👍',
-    bad : '👎',
-    strong : '💪',
-    poo : '💩',
-    shit : '💩',
-    love : '❤',
-    heart : '❤',
-    hearts : '💕',
-    'broken-heart' : '💔',
-    star : '★',
-    goldstar : '⭐',
-    diamond : '💎',
-    pill : '💊',
-    globe : '🌐',
-    voltage : '⚡',
-    wheelchair : '♿',
-    flag : '⚑',
-    pentagon : '⬟',
-    hexagon : '⬢',
-    cycle : '⟳',
-    recycle : '♻',
-    newbie : '🔰',
-    trident : '🔱',
-    japan : '🗾',
-    fuji : '🗻',
-    'tokyo-tower' : '🗼',
-    liberty : '🗽',
-    bomb : '💣',
-    crown : '👑',
-    palette : '🎨',
-    ribbon : '🎀',
-    'crystal-ball' : '🔮',
-    hal : '🔘',
-},
-
-
 animals : {
     elefant : '🐘',
     monkey : '🐒',
@@ -1005,6 +1005,7 @@ animals : {
     dragon : '🐉',
     camel : '🐪',
     turtle : '🐢',
+    squirrel : '🐿️',
     dolphin : '🐬',
     whale : '🐋',
     whale2 : '🐳',
@@ -1013,24 +1014,104 @@ animals : {
     dori : '🐠',
     nemo : '🐟',
     octopus : '🐙',
+    crab : '🦀',
     penguin : '🐧',
-    pidgeon : '🐦',
-    bird : '🐥',
-    bird2 : '🐤',
-    bird3: '🐣',
+    bird : '🐦',
+    dove : '🕊️',
+    parrot : '🦜',
+    eagle : '🦅',
+    duck : '🦆',
+    swan : '🦢',
+    owl : '🦉',
+    bat : '🦇',
+    turkey : '🦃',
+    rooster : '🐓',
+    chick : '🐥',
+    chick2 : '🐤',
+    chick3: '🐣',
     snail : '🐌',
+    butterfly : '🦋',
     bee : '🐝',
     ant : '🐜',
     bug : '🐛',
     ladybug : '🐞',
+    spider : '🕷️',
+    scorpion : '🦂',
+    cricket : '🦗',
+},
+
+people : {
+    hacker : '👨‍💻',
+    hackerw : '👩‍💻',
+    artist : '👨‍🎨',
+    artistw : '👩‍🎨',
+    doctor : '👨‍⚕️',
+    doctorw : '👩‍⚕️',
+    astronaut : '👨‍🚀',
+    astronautw : '👩‍🚀',
+    mage : '🧙‍♂️',
+    magew : '🧙‍♀️',
+    genie : '🧞‍♂️',
+    geniew : '🧞‍♀️',
+    fairy : '🧚',
+    fairym : '🧚‍♂️',
+    zombie : '🧟‍♂️',
+    zombiew : '🧟‍♀️',
+
+},
+
+other : {
+    'thumbs-up' : '👍',
+    'thumbs-down' : '👎',
+    cool : '🤙',
+    metal : '🤘',
+    spock : '🖖',
+    strong : '💪',
+    eye : '👁️',
+    ear : '👂',
+    glasses : '👓',
+    sunglasses : '🕶️',
+    poo : '💩',
+    heart : '❤️',
+    hearts : '💕',
+    'broken-heart' : '💔',
+    star : '⭐',
+    diamond : '💎',
+    trophy : '🏆',
+    jar : '🏺',
+    pill : '💊',
+    globe : '🌐',
+    voltage : '⚡',
+    wheelchair : '♿',
+    flag : '⚑',
+    pentagon : '⬟',
+    hexagon : '⬢',
+    cycle : '⟳',
+    recycle : '♻',
+    newbie : '🔰',
+    trident : '🔱',
+    anchor : '⚓',
+    japan : '🗾',
+    fuji : '🗻',
+    'tokyo-tower' : '🗼',
+    liberty : '🗽',
+    die : '🎲',
+    bomb : '💣',
+    crown : '👑',
+    palette : '🎨',
+    painting : '🖼️',
+    map : '🗺️',
+    compass : '🧭',
+    ribbon : '🎀',
+    'crystal-ball' : '🔮',
 },
 
 /*
 
-🐼🐻🐺🐮🐷🐭🐹🐰🐱🐶🐵🐴🐯🐲🐨🐸
+🐼🐻🐺🐮🐷🐭🐹🐰🐱🐶🐵🐴🐯🐲🐨🐸🦄
 
 sports & entertainment
-🏆🏄🏃🏂🏇🏊🏀⚽⚾🎾⛷⛸⛵⛵
+🏄🏃🏂🏇🏊🏀⚽⚾🎾⛷⛸⛵⛵
 🎳🎲🎱🎰🎯🎭🎬🎩
 🎊🎉🎈🎇🎆🎅🎄🎃🎂🎁
 
@@ -2266,12 +2347,32 @@ rasti.icons = require('./icons')
 rasti.fx = {
 
     stack : $el => {
-        $el.children().each( (i, el) => {
-            setTimeout( () => {
-                el.style.opacity = 1
-                el.style.marginTop = '15px'
+        $el.addClass('fx-stack-container')
+        const $children = $el.children()
+        $children.each( (i, el) => {
+            el.classList.add('fx-stack-el')
+            setTimeout( _ => {
+                el.classList.remove('fx-stack-el')
             }, i * 50);
         })
+        setTimeout( _ => {
+            $el.removeClass('fx-stack-container')
+        }, $children.length * 50 + 500);
+
+    },
+
+    stamp : $el => {
+        $el.addClass('fx-stamp-container')
+        const $children = $el.children()
+        $children.each( (i, el) => {
+            el.classList.add('fx-stamp-el')
+            setTimeout( _ => {
+                el.classList.remove('fx-stamp-el')
+            }, i * 40);
+        })
+        setTimeout( _ => {
+            $el.removeClass('fx-stamp-container')
+        }, $children.length * 40 + 500);
     },
 
 }
@@ -2405,9 +2506,6 @@ input[type=checkbox]:checked + label:before {
 input[type=radio] + label:hover,
 input[type=checkbox] + label:hover {
     font-weight: 600;
-}
-@keyframes stamp {
-    50% { transform: scale(1.2); }
 }
 
 
@@ -2938,6 +3036,7 @@ nav > .active {
 }
 .list > div {
     height: 7vh;
+    padding: 2vh;
     transition: all 0.2s;
 }
 .list > div:not(:last-child) {
@@ -3044,7 +3143,9 @@ nav > .active {
 /*******************************************************************************
 ********************************* ANIMATIONS *********************************** 
 *******************************************************************************/
-
+@keyframes stamp {
+    50% { transform: scale(1.2); }
+}
 @keyframes spin {
     0%   { transform: rotate(0); }
     100% { transform: rotate(360deg); }
@@ -3276,12 +3377,21 @@ nav > .active {
 ************************************* FX *************************************** 
 *******************************************************************************/
 
-[fx=stack]:not([paging]) > *,
-[fx=stack][paging] > .results > * {
-    opacity: 0;
+.fx-stack-container > * {
+    transition: margin-top 2s ease; /*FIXME: NOT WORKING*/
+    margin-top: 0;
+}
+.fx-stack-el {
     margin-top: 100px;
-    transition: opacity 0.5s ease,
-                margin-top 0.5s ease;
+}
+
+.fx-stamp-container > * {
+    transition: opacity 0.3s;
+    animation: stamp 0.3s;
+}
+.fx-stamp-el {
+    opacity: 0;
+    animation: none;
 }
 
 .flip-container {

@@ -4,35 +4,37 @@
     <title>Rasti icons</title>
     <meta charset=utf-8>
     <meta name=viewport content="width=device-width, initial-scale=1 maximum-scale=1">
-</head>
 
-<style>
-[icon]:before {
-    background-color: #bbb;
-}
-    
-</style>
+    <style>
+        [icon]:before { background-color: #bbb; } 
+    </style>
+</head>
 
 <body rasti=app hidden>
 
 <div page=main header="Rasti Icons">
 
-    <input field onkeydown="if (event.key == 'Enter') { app.render('icons', this.value)}"
-    placeholder="write any icon names, comma separated" >
-    <div class="row rel" style="height: 80vh" bg=white>       
+    <input field
+        onkeydown="if (event.key == 'Enter') { app.render('icons', this.value)}"
+        placeholder="write any icon names, comma separated" >
 
-        <div class="col-3 scrolly">
-            <div auto template=categories class="list">
-                <div value=${data} onclick="app.render('icons', app.data.icons[$(this).attr('value')])">
-                   ${data} 
-                </div>
+    <div class="row" style="height: 80vh" bg=white>       
+
+        <div class="col-3 scrolly hide-phone">
+            <div auto template=categories
+                fx=stack
+                on-click=selectCategory
+                class="list" style="cursor: pointer">
+                <div value=${data}>${data}</div>
             </div>
         </div>
 
         <div class="col-9 scrolly">
-            <div template=icons class="round_ inline_ none"
-                style="padding: 10px"
-                on-click=changeSize > 
+            <div template=icons
+                fx=stamp
+                on-click=changeSize
+                class="big_ round_ inline_"
+                style="padding: 10px" > 
                     <div icon=${data} class="textc" 
                         style="margin: 10px; font-size: 1rem">${data}</div>
                 </div>
@@ -47,6 +49,7 @@
     app.data.categories = Object.keys(rasti.icons)
     app.data.icons = {}
     app.data.categories.forEach(cat => app.data.icons[cat] = Object.keys(rasti.icons[cat]))
+
     app.utils.changeSize = e => {
         const el = e.currentTarget
         const cn = el.className
@@ -56,7 +59,13 @@
                 el.className = cn.replace(m, mods[i == mods.length-1 ? 0 : i+1])
         })
     }
-    app.init()
+
+    app.utils.selectCategory = e => {
+        const el = e.target
+        app.render('icons', app.data.icons[$(el).attr('value')])
+    }
+
+    app.init({theme:'base dark'})
 </script>
 
 </body>
