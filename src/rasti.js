@@ -289,8 +289,8 @@ function rasti(name, container) {
 
         // init render
         container.find('[render]').not('[submit]').click( e => {
-            const $el = $(e.target)
-            const template = $el.attr('render')
+            const el = e.target
+            const template = el.getAttribute('render')
             if (!template) return error('Missing template name in [render] attribute of element:', el)
             render(template)
         })
@@ -317,6 +317,7 @@ function rasti(name, container) {
                 if ( !method ) return error('Undefined utility method "%s" declared in [on-%s] attribute of element:', methodName, action, el)
                 $el.on(action, method)
                    .removeAttr('on-' + action)
+                if (action == 'click') el.style.cursor = 'pointer'
             })
         }
         for (let action of ACTION_ATTRS) {
@@ -529,9 +530,13 @@ function rasti(name, container) {
 
         // render automatic templates
         container.find('[auto][template]').each( (i, el) => {
-            const $el = $(el)
-            const template = resolveAttr($el, 'template')
-            render(template)
+            render(el)
+        })
+
+
+        // init bound templates
+        container.find('[bind]').each( (i, el) => {
+            bind(el)
         })
 
 
@@ -641,11 +646,32 @@ function rasti(name, container) {
     }
 
 
-    function render(name, data, time) {
+    function bind(el) {
+        const errPrefix = 'Cannot bind template: '
+        const $el = el.nodeName ? $(el) : el
+        el = $el[0]
+        const src = $el.attr('bind')
+        const $src = container.find('[name='+ src +']')
+        if (!$src.length) return error(errPrefix + 'source element "%s" not found, declared in [bind] attribute of el: ', src, el)
+        $el.attr('template', 'bind=' + src)
+        $src.on('change', e => render($el, e.target.value))
+            .trigger('change')
+    }
+
+
+    function render(el, data, time) {
+        let $el, name
+        if ( is.string(el) ) {
+            name = el
+            $el = container.find('[template='+ name +']')
+        }
+        else {
+            $el = el.nodeName ? $(el) : el
+            name = $el.attr('template')
+        }
         const errPrefix = 'Cannot render template ['+ name +']: '
-        const $el = container.find('[template='+ name +']')
         if (!$el.length) return error(errPrefix + 'no element bound to template. Please bind one via [template] attribute.')
-        const el = $el[0]
+        el = $el[0]
 
         if (!data) {
             const datakey = resolveAttr($el, 'data')
@@ -670,12 +696,12 @@ function rasti(name, container) {
 
         const isCrud = el.hasAttribute('crud')
         if (isCrud) {
-            const controls = `
+            const el_controls = `
                 <div class="rasti-crud right centery small_ round_ inline_">
                     <div class="rasti-crud-update" icon=edit></div>
                     <div class="rasti-crud-delete" icon=close></div>
                 </div>`
-            template = append(template, controls)
+            template = append(template, el_controls)
         }
 
         const paging = $el.attr('paging')
@@ -690,13 +716,13 @@ function rasti(name, container) {
             $el.prepend(stats)
         }
         if (isCrud) {
-            const controls = `
+            const container_controls = `
                 <div class="rasti-crud right small_ round_ ">
                     <div class="rasti-crud-create" icon=star></div>
                     <div class="rasti-crud-accept" icon=ok></div>
                     <div class="rasti-crud-cancel" icon=nok></div>
                 </div>`
-            $el.prepend(controls)
+            $el.prepend(container_controls)
         }
         $el.addClass('rendered')
         if (!paging) applyFX($el)

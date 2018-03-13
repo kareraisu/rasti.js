@@ -12,60 +12,90 @@
 
 <body rasti=app hidden>
 
-<div page=main header="Rasti Icons">
+<div page=main class="fullh col" header="Rasti Icons">
 
-    <input field
-        onkeydown="if (event.key == 'Enter') { app.render('icons', this.value)}"
-        placeholder="write any icon names, comma separated" >
+    <input field class="row-1"
+        onkeydown="if (event.key == 'Enter') app.render('icons', this.value.split(' '))"
+        placeholder="write any icon names" >
+    
+    <div class="row-3 fullw scrolly" label=Categories bg=light>
+        <div auto template=categories
+            fx=stack
+            on-click=selectCategory
+            class="list" bg=mid >
+            <div value=${data}>${data}</div>
+        </div>
+    </div>
 
-    <div class="row" style="height: 80vh" bg=white>       
+    <div class="row row-7" bg=mid>
+        <div template=icons
+            fx=stamp
+            class="scrolly normal round_ inline_"
+            style="padding: 10px;" >
 
-        <div class="col-3 scrolly hide-phone">
-            <div auto template=categories
-                fx=stack
-                on-click=selectCategory
-                class="list" style="cursor: pointer">
-                <div value=${data}>${data}</div>
-            </div>
+            <div icon=${data} class="textc" 
+                style="margin: 1vw; font-size: 1rem">${data}</div>
+
         </div>
 
-        <div class="col-9 scrolly">
-            <div template=icons
-                fx=stamp
-                on-click=changeSize
-                class="big_ round_ inline_"
-                style="padding: 10px" > 
-                    <div icon=${data} class="textc" 
-                        style="margin: 10px; font-size: 1rem">${data}</div>
-                </div>
-            </div>
-        </div>
+        <input name=size type=range max=3 value=2
+            onchange=app.utils.changeSize(this.value) bg=dark
+            style="transform: rotate(-90deg);
+                position: absolute; right: -40px; bottom: 70px;">
+
+    </div>
+
+    <div class="row-1 inline_" bg=light>
+        <div bind=size style="font-size: 1.5em;">Size: ${ 'small normal big huge'.split(' ')[data] }</div>
+        <div icon=remove on-click=decSize style="cursor: pointer;"></div>
+        <div icon=add on-click=incSize style="cursor: pointer;"></div>
     </div>
 
 </div>
 
+
 <script src="../dist/rasti+zepto.js"></script>
+
 <script>
+
+	app.pages.main = {}
+	app.pages.main.init = _ => {
+        app.state.size = app.get('name=size')
+    }
     app.data.categories = Object.keys(rasti.icons)
     app.data.icons = {}
     app.data.categories.forEach(cat => app.data.icons[cat] = Object.keys(rasti.icons[cat]))
 
-    app.utils.changeSize = e => {
-        const el = e.currentTarget
+    app.utils.changeSize = value => {
+        const el = app.get('template=icons')[0]
         const cn = el.className
-        const mods = 'big_ huge_ small_ none'.split(' ')
+        const mods = 'small_ normal big_ huge_'.split(' ')
         mods.forEach((m, i) => {
             if (cn.indexOf(m) > -1)
-                el.className = cn.replace(m, mods[i == mods.length-1 ? 0 : i+1])
+                el.className = cn.replace(m, mods[value])
         })
+    }
+    
+    app.utils.incSize = e => {
+    	let size = app.state.size.val()
+    	if (size < 3) size++
+        app.utils.changeSize(size)
+        app.state.size.val(size).trigger('change')
+    }
+
+    app.utils.decSize = e => {
+    	let size = app.state.size.val()
+    	if (size > 0) size--
+        app.utils.changeSize(size)
+        app.state.size.val(size).trigger('change')
     }
 
     app.utils.selectCategory = e => {
-        const el = e.target
-        app.render('icons', app.data.icons[$(el).attr('value')])
+        app.render('icons', app.data.icons[$(e.target).attr('value')])
     }
 
     app.init({theme:'base dark'})
+
 </script>
 
 </body>

@@ -1,7 +1,7 @@
 exports.themes = {
 
     base : {
-        font : 'normal 14px sans-serif',
+        font : 'normal 14px Apple Color Emoji, Segoe UI Emoji, NotoColorEmoji, Segoe UI Symbol, Android Emoji, EmojiSymbols, EmojiOne Mozilla',
         palette : {
             white   : '#fff',
             lighter : '#ddd',

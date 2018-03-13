@@ -82,7 +82,7 @@ input[type=checkbox] + label:hover {
 [page] {
     min-height: 100vh;
     width: 100vw !important;
-    padding-bottom: 15px;
+    padding-bottom: 10px;
     margin-bottom: -5px;
     overflow-y: auto;
 }
@@ -93,6 +93,10 @@ nav ~ [page] {
     min-height: calc(100vh - 50px);
     max-height: calc(100vh - 50px);
 }
+.fullh[page] {
+    height: 100vh;
+}
+
 
 [panel] {
     padding: 25px;
@@ -269,11 +273,11 @@ input[field]:focus:valid {
 }
 
 [template] {
-    display: none;
+    visibility: hidden;
     position: relative;
 }
 [template].rendered {
-    display: block;
+    visibility: visible;
 }
 [template] > .results {
     max-height: calc(100% - 40px);
@@ -500,7 +504,8 @@ nav > .active {
 
 
 [show], [hide], [toggle],
-[onclick] {
+[onclick],
+input[type=range] {
     cursor: pointer;
 }
 
@@ -510,31 +515,38 @@ nav > .active {
 *******************************************************************************/
 
 .row {
-    display: flex;
-    flex-flow: row wrap;
-    align-content: flex-start;
     width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    align-content: flex-start;
+    padding-left: 1%;
 }
 .col {
+    /*min-height: min-content !important;*/
     display: flex;
     flex-flow: column nowrap;
-    min-height: min-content !important;
     align-content: flex-start;
     align-items: center;
 }
-.row > .col-1,  .col > .row-1  { flex-basis: calc(08.33% - 15px); }
-.row > .col-2,  .col > .row-2  { flex-basis: calc(16.66% - 15px); }
-.row > .col-3,  .col > .row-3  { flex-basis: calc(25.00% - 15px); }
-.row > .col-4,  .col > .row-4  { flex-basis: calc(33.33% - 15px); }
-.row > .col-5,  .col > .row-5  { flex-basis: calc(41.66% - 15px); }
-.row > .col-6,  .col > .row-6  { flex-basis: calc(50.00% - 15px); }
-.row > .col-7,  .col > .row-7  { flex-basis: calc(58.33% - 15px); }
-.row > .col-8,  .col > .row-8  { flex-basis: calc(66.66% - 15px); }
-.row > .col-9,  .col > .row-9  { flex-basis: calc(75.00% - 15px); }
-.row > .col-10, .col > .row-10 { flex-basis: calc(83.33% - 15px); }
-.row > .col-11, .col > .row-11 { flex-basis: calc(91.66% - 15px); }
-.row [class*=col-]:not(:first-child) { margin-left: 15px; }
-.col [class*=row-]:not(:first-child) { margin-top: 15px; }
+.row > .col-1,  .col > .row-1  { flex-basis: 07.33%; }
+.row > .col-2,  .col > .row-2  { flex-basis: 15.66%; }
+.row > .col-3,  .col > .row-3  { flex-basis: 24.00%; }
+.row > .col-4,  .col > .row-4  { flex-basis: 32.33%; }
+.row > .col-5,  .col > .row-5  { flex-basis: 40.66%; }
+.row > .col-6,  .col > .row-6  { flex-basis: 49.00%; }
+.row > .col-7,  .col > .row-7  { flex-basis: 57.33%; }
+.row > .col-8,  .col > .row-8  { flex-basis: 65.66%; }
+.row > .col-9,  .col > .row-9  { flex-basis: 74.00%; }
+.row > .col-10, .col > .row-10 { flex-basis: 82.33%; }
+.row > .col-11, .col > .row-11 { flex-basis: 90.66%; }
+.row [class*=col-] {
+    margin-left: 0 !important;
+    margin-right: 1% !important;
+}
+.col [class*=row-]{
+    margin-top: 0 !important;
+    margin-bottom: 1vh !important;
+}
 
 .page-options { flex-basis: initial !important; }
 
@@ -987,14 +999,15 @@ nav > .active {
 
 /* webkit */
 ::-webkit-scrollbar {
-    width: 16px;
+    width: 10px;
     background: transparent;
 }
 ::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.3);
     background-clip: content-box;
-    border-right: solid transparent 8px;
-    border-radius: 10px 23px 23px 10px;
+    border-left: solid transparent 2px;
+    border-right: solid transparent 2px;
+    border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
     background-color: rgba(0, 0, 0, 0.4);

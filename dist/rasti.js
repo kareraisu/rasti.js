@@ -718,9 +718,9 @@ $.fn.move = function(options) {
 module.exports = {
 
 app : {
-    gear : '⚙️',
     user : '👤',
     users : '👥',
+    gear : '⚙️',
     lock : '🔒',
     'open-lock' : '🔓',
     key : '🔑',
@@ -731,26 +731,24 @@ app : {
     battery : '🔋',
     'power-plug' : '🔌',
     alarm : '🔔',
-    'alarm-off' : '🔕',
     'volume-min' : '🔈',
     'volume-mid' : '🔉',
     'volume-max' : '🔊',
-    mute : '🔇',
-    'brightness-low' : '🔅',
-    'brightness-hi' : '🔆',
-    warning : '⚠',
-    error : '⨂',/*𐌈*/
-    ban : '🚫',
+    'dim' : '🔅',
+    'bright' : '🔆',
+    access : '♿',
     bars : '☰',
     'h-dots' : '⋯',
     'v-dots' : '⋮',
-    command : '⌘',
-    option : '⌥',
     rows : '𝌆',
     columns : '▥',
     grid : '▦',
     'spaced-grid' : '𝍖',
-    'round-grid' : '𐄡',
+    warning : '⚠',
+    error : '⨂',
+    ban : '🛇',
+    mute : '🔇',
+    'alarm-off' : '🔕',
 },
 
 office : {
@@ -761,11 +759,12 @@ office : {
     pen2 : '🖋️',
     paintbrush : '🖌️',
     cut : '✂️',
-    copy : '📋',
-    attach : '📎',
+    clip : '📎',
+    clipboard : '📋',
     link : '🔗',
     ruler : '📏',
     pin : '📌',
+    'safety-pin' : '🧷',
     card : '💳',
     label : '🏷️',
     memo : '📝',
@@ -775,6 +774,7 @@ office : {
     bookmark : '🔖',
     'open-book' : '📖',
     notebook : '📓',
+    notepad : '🗒️',
     calendar : '📅',
     envelope : '✉️',
     email : '📧',
@@ -782,24 +782,8 @@ office : {
     package : '📦',
     briefcase : '💼',
     newspaper : '📰',
-    trash : '🗑️',
-},
-
-actions : {
-    add : '✚',
-    remove : '-',
-    sync : '🔄',
-    close : '✕',
-    accept : '✔',
-    cancel : '✘',
-    eject : '⏏',
-    play : '▶',
-    next : '▶',
-    back : '◀',
-    prev : '◀',
-    pause : 'Ⅱ',
-    stop : '■',
-    rec : '●',
+    cabinet : '🗄️',
+    'trash-can' : '🗑️',
 },
 
 electronics : {
@@ -812,7 +796,6 @@ electronics : {
     telephone : '☎️',
     microphone : '🎤',
     'studio-mic' : '🎙️',
-    megaphone : '📣',
     headphones : '🎧',
     camera : '📷',
     'video-camera' : '📹',
@@ -821,23 +804,34 @@ electronics : {
     tv : '📺',
     radio : '📻',
     stereo : '📾',
+    loudspeaker : '📢',
     gamepad : '🎮',
     joystick : '🕹️',
-},
-
-media : {
+    'sd-card' : '⛘',
     cd : '💿',
-    floppy : '💾',
     minidisc : '💽',
+    floppy : '💾',
     tape : '📼',
 },
 
 tools : {
-    bulb : '💡',
-    flashlight : '🔦',
     wrench : '🔧',
     hammer : '🔨',
+    pick : '⛏️',
+    tools : '🛠️',
+    tools2 : '⚒️',
+    toolbox : '🧰',
+    clamp : '🗜️',
     bolt : '🔩',
+    anchor : '⚓',
+    scales : '⚖️',
+    'old-key' : '🗝️',
+    map : '🗺️',
+    compass : '🧭',
+    magnet : '🧲',
+    abacus : '🧮',
+    bulb : '💡',
+    flashlight : '🔦',
     microscope : '🔬',
     telescope : '🔭',
     antenna : '📡',
@@ -846,6 +840,11 @@ tools : {
     stopwatch : '⏱️',
     clock : '⏰',
     hourglass : '⌛',
+    dagger : '🗡️',
+    swords : '⚔️',
+    shield : '🛡️',
+    bow : '🏹',
+    gun : '🔫',
 },
 
 vehicles : {
@@ -865,6 +864,7 @@ vehicles : {
     metro : '🚇',
     train : '🚄',
     locomotive : '🚂',
+    canoe : '🛶',
     sailboat : '⛵',
     speedboat : '🚤',
     motorboat : '🛥️',
@@ -875,6 +875,139 @@ vehicles : {
     helicopter : '🚁',
     rocket : '🚀',
     ufo : '🛸',
+},
+
+faces : {
+    man : '👨',
+    woman : '👩',
+    prince : '🤴',
+    princess : '👸',
+    robot : '🤖',
+    skull : '💀',
+    imp : '👿',
+    monster : '👾',
+    alien : '👽',
+    ghost : '👻',
+    goblin : '👺',
+    ogre : '👹',
+},
+
+characters : {
+    teacher : '👨‍🏫',
+    teacherw : '👩‍🏫',
+    scientist : '👨‍🔬',
+    scientistw : '👩‍🔬',
+    hacker : '👨‍💻',
+    hackerw : '👩‍💻',
+    artist : '👨‍🎨',
+    artistw : '👩‍🎨',
+    doctor : '👨‍⚕️',
+    doctorw : '👩‍⚕️',
+    astronaut : '👨‍🚀',
+    astronautw : '👩‍🚀',
+    elf : '🧝‍♂️',
+    elfw : '🧝‍♀️',
+    mage : '🧙‍♂️',
+    magew : '🧙‍♀️',
+    genie : '🧞‍♂️',
+    geniew : '🧞‍♀️',
+    fairy : '🧚',
+    fairym : '🧚‍♂️',
+    vampire : '🧛‍♂️',
+    vampirew : '🧛‍♀️',
+    zombie : '🧟‍♂️',
+    zombiew : '🧟‍♀️',
+},
+
+animals : {
+    elefant : '🐘',
+    rhino : '🦏',
+    monkey : '🐒',
+    gorilla : '🦍',
+    sheep : '🐑',
+    ram : '🐏',
+    goat : '🐐',
+    deer : '🦌',
+    camel : '🐪',
+    horse : '🐎',
+    pig : '🐖',
+    cow : '🐄',
+    turtle : '🐢',
+    rabbit : '🐇',
+    squirrel : '🐿️',
+    hedgehog : '🦔',
+    badger : '🦡',
+    mouse : '🐁',
+    rat : '🐀',
+    cat : '🐈',
+    dog : '🐕',
+    leopard : '🐆',
+    tiger : '🐅',
+    snake : '🐍',
+    gecko : '🦎',
+    crocodile : '🐊',
+    dragon : '🐉',
+    dinosaur : '🦕',
+    't-rex' : '🦖',
+    dolphin : '🐬',
+    shark : '🦈',
+    whale : '🐋',
+    whale2 : '🐳',
+    fugu : '🐡',
+    nemo : '🐟',
+    dori : '🐠',
+    shrimp : '🦐',
+    crab : '🦀',
+    lobster : '🦞',
+    squid : '🦑',
+    octopus : '🐙',
+    penguin : '🐧',
+    bird : '🐦',
+    dove : '🕊️',
+    parrot : '🦜',
+    eagle : '🦅',
+    duck : '🦆',
+    swan : '🦢',
+    owl : '🦉',
+    bat : '🦇',
+    turkey : '🦃',
+    rooster : '🐓',
+    chick : '🐥',
+    chick2 : '🐤',
+    chick3: '🐣',
+    snail : '🐌',
+    butterfly : '🦋',
+    bee : '🐝',
+    ant : '🐜',
+    cricket : '🦗',
+    bug : '🐛',
+    ladybug : '🐞',
+    spider : '🕷️',
+    scorpion : '🦂',
+    microbe : '🦠',
+},
+
+plants : {
+    leaf : '🍂',
+    herb : '🌿',
+    maple : '🍁',
+    shamrock : '☘️',
+    luck : '🍀',
+    wheat : '🌾',
+    corn : '🌽',
+    flower : '🌼',
+    sunflower : '🌻',
+    rose : '🌹',
+    hibiscus : '🌺',
+    sakura : '🌸',
+    tulip : '🌷',
+    tree : '🌳',
+    pine : '🌲',
+    'palm-tree' : '🌴',
+    cactus : '🌵',
+    sprout : '🌱',
+    mushroom : '🍄',
+    nut : '🌰',
 },
 
 nature : {
@@ -896,39 +1029,50 @@ nature : {
     americas : '🌎',
     eurafrica : '🌍',
     galaxy : '🌌',
+    dna : '🧬',
 },
 
-plants : {
-    leaf : '🍂',
-    leaves : '🌿',
-    maple : '🍁',
-    clover : '☘',
-    luck : '🍀',
-    weat : '🌾',
-    corn : '🌽',
-    flower : '🌼',
-    sunflower : '🌻',
-    rose : '🌹',
-    hibiscus : '🌺',
-    sakura : '🌸',
-    tulip : '🌷',
-    tree : '🌳',
-    pine : '🌲',
-    'palm-tree' : '🌴',
-    cactus : '🌵',
-    sprout : '🌱',
-    nut : '🌰',
+actions : {
+    add : '✚',
+    remove : '─',
+    undo : '↶',
+    redo : '↷',
+    reload : '⟳',
+    sync : '🗘',
+    minimize : '🗕',
+    restore : '🗗',
+    maximize : '🗖',
+    close : '⨯',
+    copy : '🗇',
+    accept : '✔️',
+    cancel : '✖️',
+    eject : '⏏',
+    play : '▶',
+    pause : 'Ⅱ',
+    'play-pause' : '⏯',
+    stop : '■',
+    prev : '⏮',
+    next : '⏭',
+    rec : '⚫',
+    'rec-on' : '🔴',
+    select : '⛶',
+    select2 : '⬚',
 },
 
 culture : {
-    christian : '✝',
+    pommee : '🕂',
+    maltese : '✠',
+    latin : '✝',
+    latin2 : '🕇',
+    celtic : '🕈',
     jew : '✡',
-    egipt : '☥',
+    ankh : '☥',
     peace : '☮',
+    om : '🕉',
     'ying-yang' : '☯',
+    atom : '⚛️',
     comunism : '☭',
     'moon-star' : '☪',
-    columbus : '✠',
     health : '⛨',
     darpa : '☸',
     diamonds : '❖',
@@ -937,28 +1081,21 @@ culture : {
 music : {
     note : '🎵',
     notes : '🎶',
-    cleff : '𝄞',
-    cleff2 : '🎼',
+    sharp : '♯',
+    flat : '♭',
+    cleff : '🎼',
+    'cleff-g' : '𝄞',
+    'cleff-f' : '𝄢',
+    'cleff-c' : '𝄡',
     guitar : '🎸',
     piano : '🎹',
     violin : '🎻',
     saxophone : '🎷',
     trumpet : '🎺',
+    drum : '🥁',
 },
 
-faces : {
-    robot : '🤖',
-    skull : '💀',
-    poison : '☠️',
-    imp : '👿',
-    monster : '👾',
-    alien : '👽',
-    ghost : '👻',
-    goblin : '👺',
-    ogre : '👹',
-},
-
-zodiac : {
+astro : {
     aries : '♈',
     tauro : '♉',
     gemini : '♊',
@@ -971,6 +1108,20 @@ zodiac : {
     capricorn : '♑',
     aquarius : '♒',
     cancer : '♓',
+    mercury : '☿️',
+    venus : '♀',
+    earth : '♁',
+    mars : '♂',
+    jupiter : '♃',
+    saturn : '♄',
+    uranus : '♅',
+    neptune : '♆',
+    pluto : '♇',
+    ceres : '⚳',
+    pallas : '⚴',
+    juno : '⚵',
+    vesta : '⚶',
+    chiron : '⚷',
 },
 
 chess : {
@@ -988,76 +1139,65 @@ chess : {
     bpawn : '♟',
 },
 
-animals : {
-    elefant : '🐘',
-    monkey : '🐒',
-    sheep : '🐑',
-    goat : '🐐',
-    horse : '🐎',
-    snake : '🐍',
-    puma : '🐆',
-    cow : '🐄',
-    rabbit : '🐇',
-    mouse : '🐁',
-    rat : '🐀',
-    cat : '🐈',
-    tiger : '🐅',
-    dragon : '🐉',
-    camel : '🐪',
-    turtle : '🐢',
-    squirrel : '🐿️',
-    dolphin : '🐬',
-    whale : '🐋',
-    whale2 : '🐳',
-    crocodile : '🐊',
-    fugu : '🐡',
-    dori : '🐠',
-    nemo : '🐟',
-    octopus : '🐙',
-    crab : '🦀',
-    penguin : '🐧',
-    bird : '🐦',
-    dove : '🕊️',
-    parrot : '🦜',
-    eagle : '🦅',
-    duck : '🦆',
-    swan : '🦢',
-    owl : '🦉',
-    bat : '🦇',
-    turkey : '🦃',
-    rooster : '🐓',
-    chick : '🐥',
-    chick2 : '🐤',
-    chick3: '🐣',
-    snail : '🐌',
-    butterfly : '🦋',
-    bee : '🐝',
-    ant : '🐜',
-    bug : '🐛',
-    ladybug : '🐞',
-    spider : '🕷️',
-    scorpion : '🦂',
-    cricket : '🦗',
+arrows : {
+    /*
+    ↑ ↓ ← → 
+    ⬅ ➡ ⬆ ⬇
+    ⇦ ⇨ ⇧ ⇩ 
+    ◀ ▶ ▲ ▼ 
+    ◁ ▷ △ ▽ 
+    ↶ ↷
+    */
 },
 
-people : {
-    hacker : '👨‍💻',
-    hackerw : '👩‍💻',
-    artist : '👨‍🎨',
-    artistw : '👩‍🎨',
-    doctor : '👨‍⚕️',
-    doctorw : '👩‍⚕️',
-    astronaut : '👨‍🚀',
-    astronautw : '👩‍🚀',
-    mage : '🧙‍♂️',
-    magew : '🧙‍♀️',
-    genie : '🧞‍♂️',
-    geniew : '🧞‍♀️',
-    fairy : '🧚',
-    fairym : '🧚‍♂️',
-    zombie : '🧟‍♂️',
-    zombiew : '🧟‍♀️',
+keys : {
+    command : '⌘',
+    option : '⌥',
+    shift : '⇧',
+    'caps-lock' : '⇪',
+    backspace : '⌫',
+    return : '⏎',
+    enter : '⎆',
+    escape : '⎋',
+    tab : '↹',
+},
 
+geometric : {
+    'curved-triangle' : '🛆',
+    'curved-square' : '▢',
+    pentagon : '⬟',
+    hexagon : '⬢',
+},
+
+hieroglyph : {
+    'an-eye' : '𓁹',
+    'tear-eye' : '𓂀',
+    'an-ear' : '𓂈',
+    'writing-arm' : '𓃈',
+    'a-leg' : '𓂾',
+    'watering-leg' : '𓃂',
+    'closed-hand' : '𓂧',
+    'open-hand' : '𓂩',
+    'a-finger' : '𓂭',
+    'crying-blank-eye' : '𓂍',
+    'arms-hat-spear' : '𓂙',
+    'a-staff' : '𓋈',
+    'a-fan' : '𓇬',
+    'a-jar' : '𓄣',
+    'a-beetle' : '𓆣',
+    'a-wasp' : '𓆤',
+    'a-fairy' : '𓋏',
+    'sitting-man' : '𓀀',
+    'happy-sitting-man' : '𓁏',
+    'exited-sitting-man' : '𓁕',
+    'sitting-woman' : '𓁑',
+    'sitting-bird-man' : '𓁟',
+    'sitting-wolf-man' : '𓁢',
+    'dancing-man' : '𓀤',
+    'broken-arms-man' : '𓀣',
+    'upside-down-man' : '𓀡',
+    'dead-guy' : '𓀿',
+    'three-leg-guy' : '𓁲',
 },
 
 other : {
@@ -1069,41 +1209,43 @@ other : {
     strong : '💪',
     eye : '👁️',
     ear : '👂',
+    brain : '🧠',
     glasses : '👓',
     sunglasses : '🕶️',
+    goggles : '🥽',
+    ribbon : '🎀',
+    backpack : '🎒',
+    cart : '🛒',
     poo : '💩',
     heart : '❤️',
     hearts : '💕',
     'broken-heart' : '💔',
     star : '⭐',
-    diamond : '💎',
+    crown : '👑',
     trophy : '🏆',
+    diamond : '💎',
     jar : '🏺',
     pill : '💊',
     globe : '🌐',
-    voltage : '⚡',
-    wheelchair : '♿',
+    bolt : '⚡',
     flag : '⚑',
-    pentagon : '⬟',
-    hexagon : '⬢',
-    cycle : '⟳',
     recycle : '♻',
+    network : '🖧',
     newbie : '🔰',
     trident : '🔱',
-    anchor : '⚓',
     japan : '🗾',
     fuji : '🗻',
     'tokyo-tower' : '🗼',
     liberty : '🗽',
     die : '🎲',
-    bomb : '💣',
-    crown : '👑',
     palette : '🎨',
     painting : '🖼️',
-    map : '🗺️',
-    compass : '🧭',
-    ribbon : '🎀',
     'crystal-ball' : '🔮',
+    bomb : '💣',
+    poison : '☠️',
+    bitcoin : '₿',
+    bisexual : '⚥',
+    pansexual : '⚧',
 },
 
 /*
@@ -1423,8 +1565,8 @@ function rasti(name, container) {
 
         // init render
         container.find('[render]').not('[submit]').click( e => {
-            const $el = $(e.target)
-            const template = $el.attr('render')
+            const el = e.target
+            const template = el.getAttribute('render')
             if (!template) return error('Missing template name in [render] attribute of element:', el)
             render(template)
         })
@@ -1451,6 +1593,7 @@ function rasti(name, container) {
                 if ( !method ) return error('Undefined utility method "%s" declared in [on-%s] attribute of element:', methodName, action, el)
                 $el.on(action, method)
                    .removeAttr('on-' + action)
+                if (action == 'click') el.style.cursor = 'pointer'
             })
         }
         for (let action of ACTION_ATTRS) {
@@ -1663,9 +1806,13 @@ function rasti(name, container) {
 
         // render automatic templates
         container.find('[auto][template]').each( (i, el) => {
-            const $el = $(el)
-            const template = resolveAttr($el, 'template')
-            render(template)
+            render(el)
+        })
+
+
+        // init bound templates
+        container.find('[bind]').each( (i, el) => {
+            bind(el)
         })
 
 
@@ -1775,11 +1922,32 @@ function rasti(name, container) {
     }
 
 
-    function render(name, data, time) {
+    function bind(el) {
+        const errPrefix = 'Cannot bind template: '
+        const $el = el.nodeName ? $(el) : el
+        el = $el[0]
+        const src = $el.attr('bind')
+        const $src = container.find('[name='+ src +']')
+        if (!$src.length) return error(errPrefix + 'source element "%s" not found, declared in [bind] attribute of el: ', src, el)
+        $el.attr('template', 'bind=' + src)
+        $src.on('change', e => render($el, e.target.value))
+            .trigger('change')
+    }
+
+
+    function render(el, data, time) {
+        let $el, name
+        if ( is.string(el) ) {
+            name = el
+            $el = container.find('[template='+ name +']')
+        }
+        else {
+            $el = el.nodeName ? $(el) : el
+            name = $el.attr('template')
+        }
         const errPrefix = 'Cannot render template ['+ name +']: '
-        const $el = container.find('[template='+ name +']')
         if (!$el.length) return error(errPrefix + 'no element bound to template. Please bind one via [template] attribute.')
-        const el = $el[0]
+        el = $el[0]
 
         if (!data) {
             const datakey = resolveAttr($el, 'data')
@@ -1804,12 +1972,12 @@ function rasti(name, container) {
 
         const isCrud = el.hasAttribute('crud')
         if (isCrud) {
-            const controls = `
+            const el_controls = `
                 <div class="rasti-crud right centery small_ round_ inline_">
                     <div class="rasti-crud-update" icon=edit></div>
                     <div class="rasti-crud-delete" icon=close></div>
                 </div>`
-            template = append(template, controls)
+            template = append(template, el_controls)
         }
 
         const paging = $el.attr('paging')
@@ -1824,13 +1992,13 @@ function rasti(name, container) {
             $el.prepend(stats)
         }
         if (isCrud) {
-            const controls = `
+            const container_controls = `
                 <div class="rasti-crud right small_ round_ ">
                     <div class="rasti-crud-create" icon=star></div>
                     <div class="rasti-crud-accept" icon=ok></div>
                     <div class="rasti-crud-cancel" icon=nok></div>
                 </div>`
-            $el.prepend(controls)
+            $el.prepend(container_controls)
         }
         $el.addClass('rendered')
         if (!paging) applyFX($el)
@@ -2522,7 +2690,7 @@ input[type=checkbox] + label:hover {
 [page] {
     min-height: 100vh;
     width: 100vw !important;
-    padding-bottom: 15px;
+    padding-bottom: 10px;
     margin-bottom: -5px;
     overflow-y: auto;
 }
@@ -2533,6 +2701,10 @@ nav ~ [page] {
     min-height: calc(100vh - 50px);
     max-height: calc(100vh - 50px);
 }
+.fullh[page] {
+    height: 100vh;
+}
+
 
 [panel] {
     padding: 25px;
@@ -2709,11 +2881,11 @@ input[field]:focus:valid {
 }
 
 [template] {
-    display: none;
+    visibility: hidden;
     position: relative;
 }
 [template].rendered {
-    display: block;
+    visibility: visible;
 }
 [template] > .results {
     max-height: calc(100% - 40px);
@@ -2940,7 +3112,8 @@ nav > .active {
 
 
 [show], [hide], [toggle],
-[onclick] {
+[onclick],
+input[type=range] {
     cursor: pointer;
 }
 
@@ -2950,31 +3123,38 @@ nav > .active {
 *******************************************************************************/
 
 .row {
-    display: flex;
-    flex-flow: row wrap;
-    align-content: flex-start;
     width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    align-content: flex-start;
+    padding-left: 1%;
 }
 .col {
+    /*min-height: min-content !important;*/
     display: flex;
     flex-flow: column nowrap;
-    min-height: min-content !important;
     align-content: flex-start;
     align-items: center;
 }
-.row > .col-1,  .col > .row-1  { flex-basis: calc(08.33% - 15px); }
-.row > .col-2,  .col > .row-2  { flex-basis: calc(16.66% - 15px); }
-.row > .col-3,  .col > .row-3  { flex-basis: calc(25.00% - 15px); }
-.row > .col-4,  .col > .row-4  { flex-basis: calc(33.33% - 15px); }
-.row > .col-5,  .col > .row-5  { flex-basis: calc(41.66% - 15px); }
-.row > .col-6,  .col > .row-6  { flex-basis: calc(50.00% - 15px); }
-.row > .col-7,  .col > .row-7  { flex-basis: calc(58.33% - 15px); }
-.row > .col-8,  .col > .row-8  { flex-basis: calc(66.66% - 15px); }
-.row > .col-9,  .col > .row-9  { flex-basis: calc(75.00% - 15px); }
-.row > .col-10, .col > .row-10 { flex-basis: calc(83.33% - 15px); }
-.row > .col-11, .col > .row-11 { flex-basis: calc(91.66% - 15px); }
-.row [class*=col-]:not(:first-child) { margin-left: 15px; }
-.col [class*=row-]:not(:first-child) { margin-top: 15px; }
+.row > .col-1,  .col > .row-1  { flex-basis: 07.33%; }
+.row > .col-2,  .col > .row-2  { flex-basis: 15.66%; }
+.row > .col-3,  .col > .row-3  { flex-basis: 24.00%; }
+.row > .col-4,  .col > .row-4  { flex-basis: 32.33%; }
+.row > .col-5,  .col > .row-5  { flex-basis: 40.66%; }
+.row > .col-6,  .col > .row-6  { flex-basis: 49.00%; }
+.row > .col-7,  .col > .row-7  { flex-basis: 57.33%; }
+.row > .col-8,  .col > .row-8  { flex-basis: 65.66%; }
+.row > .col-9,  .col > .row-9  { flex-basis: 74.00%; }
+.row > .col-10, .col > .row-10 { flex-basis: 82.33%; }
+.row > .col-11, .col > .row-11 { flex-basis: 90.66%; }
+.row [class*=col-] {
+    margin-left: 0 !important;
+    margin-right: 1% !important;
+}
+.col [class*=row-]{
+    margin-top: 0 !important;
+    margin-bottom: 1vh !important;
+}
 
 .page-options { flex-basis: initial !important; }
 
@@ -3427,14 +3607,15 @@ nav > .active {
 
 /* webkit */
 ::-webkit-scrollbar {
-    width: 16px;
+    width: 10px;
     background: transparent;
 }
 ::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.3);
     background-clip: content-box;
-    border-right: solid transparent 8px;
-    border-radius: 10px 23px 23px 10px;
+    border-left: solid transparent 2px;
+    border-right: solid transparent 2px;
+    border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
     background-color: rgba(0, 0, 0, 0.4);
@@ -3607,7 +3788,7 @@ bootstrap()
 exports.themes = {
 
     base : {
-        font : 'normal 14px sans-serif',
+        font : 'normal 14px Apple Color Emoji, Segoe UI Emoji, NotoColorEmoji, Segoe UI Symbol, Android Emoji, EmojiSymbols, EmojiOne Mozilla',
         palette : {
             white   : '#fff',
             lighter : '#ddd',
