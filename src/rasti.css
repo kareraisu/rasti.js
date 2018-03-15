@@ -23,6 +23,75 @@ h4 { font-size: 1.5em; }
 
 p.big { font-size: 1.5em; }
 
+input, select, textarea {
+    min-height: 35px;
+    width: 100%;
+    padding: 5px 10px;
+    border: 0;
+    margin: 0;
+    font-size: inherit;
+    vertical-align: text-bottom;
+}
+input:focus:invalid {
+    box-shadow: 0 0 0 2px red;
+}
+input:focus:valid {
+    box-shadow: 0 0 0 2px green;
+}
+input, select, textarea, button {
+    border-radius: 2px;
+    outline: none;
+    font-family: inherit !important;
+}
+input[type=range], select, button {
+    cursor: pointer;
+}
+
+button {
+    display: inline-block;
+    height: 50px;
+    width: auto;
+    min-width: 50px;
+    padding: 10px 20px;
+    border: 1px solid rgba(0,0,0,0.1);
+    font-size: 1.2em;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+button:not(:disabled):hover {
+    filter: contrast(1.5);
+}
+button:disabled {
+    filter: contrast(0.5);
+    cursor: auto;
+}
+
+select {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+}
+
+textarea {
+    height: 70px;
+    resize: none;
+}
+
+input.big, button.big,
+.big_ > input, .big_ > button {
+    min-height: 70px;
+    margin-bottom: 25px;
+    font-size: 1.5em;
+}
+
+input.small, button.small,
+.small_ > input, .small_ > button {
+    height: 25px;
+    margin-bottom: 15px;
+    font-size: 1em;
+}
+
 input[type=radio],
 input[type=checkbox] {
     display: none;
@@ -117,6 +186,12 @@ nav ~ [page] {
 }
 
 
+[panel] input, [panel] button, [panel] [label],
+[section] input, [section] button, [section] [label] {
+    margin-bottom: 15px;
+}
+
+
 [header][panel] {
     padding-top: 75px;
 }
@@ -175,102 +250,13 @@ nav ~ [page] {
 }
 
 
-[field] {
-    min-height: 35px;
-    width: 100%;
-    padding: 5px 10px;
-    border: 0;
-    font-size: inherit;
-}
-[field], [btn] {
-    border-radius: 2px;
-    outline: none;
-    font-family: inherit !important;
-}
-[btn] {
-    display: inline-block;
-    height: 50px;
-    width: auto;
-    min-width: 50px;
-    padding: 10px 20px;
-    border: 1px solid rgba(0,0,0,0.1);
-    font-size: 1.2em;
-    text-align: center;
-    text-decoration: none;
-    text-transform: uppercase;
-}
-[btn], [nav] {
-	cursor: pointer;
-}
-[btn]:not(:disabled):hover {
-    filter: contrast(1.5);
-}
-[btn]:disabled {
-    filter: contrast(0.5);
-    cursor: auto;
-}
-[panel] [field], [panel] [btn], [panel] [label],
-[section] [field], [section] [btn], [section] [label] {
-    margin-bottom: 15px;
-}
-
-select[field] {
-    appearance: none;
-    -moz-appearance: none;
-    -webkit-appearance: none;
-    cursor: pointer;
-}
-
-textarea[field] {
-    height: 70px;
-    resize: none;
-}
-
-input[field] {
-    width: 100%;
-    margin: 0;
-    font-size: 1rem;
-    vertical-align: text-bottom;
-}
-input[field]:focus:invalid {
-    box-shadow: 0 0 0 2px red;
-}
-input[field]:focus:valid {
-    box-shadow: 0 0 0 2px green;
-}
-
-.big[field], .big[btn],
-.big [field], .big [btn] {
-    min-height: 70px;
-    margin-bottom: 25px;
-    font-size: 1.5em;
-}
-
-.small[field], .small[btn],
-.small [field], .small [btn] {
-    height: 25px;
-    margin-bottom: 15px;
-    font-size: 1em;
-}
-
-.big [label]{
-    margin-top: 25px;
-    font-size: 1.2em;
-}
-.big [label]:before {
-    margin-top: -27px;
-}
-.big [label][field]:before {
-    margin-top: -25px;
-}
-
-
 [img] {
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
     background-origin: content-box;
 }
+
 
 [template] {
     visibility: hidden;
@@ -301,6 +287,7 @@ input[field]:focus:valid {
     padding: 10px;
     font-size: 1.1em;
 }
+
 
 [crud] > * {
     position: relative;
@@ -472,7 +459,7 @@ nav > .active {
     margin-top: -30px;
     margin-left: 4px;
 }
-[label][field].big:before {
+[label].big:before {
     margin-left: 0;
 }
 .inline[label],
@@ -501,11 +488,18 @@ nav > .active {
     margin-top: 0;
     margin-left: 0;
 }
+.big [label] {
+    margin-top: 25px;
+    font-size: 1.2em;
+}
+.big [label]:before {
+    margin-top: -27px;
+}
 
 
+[nav],
 [show], [hide], [toggle],
-[onclick],
-input[type=range] {
+[onclick] {
     cursor: pointer;
 }
 
@@ -628,7 +622,7 @@ input[type=range] {
     font-size: large;
 }
 
-.fab[btn] {
+button.fab {
     position: fixed;
     bottom: 0;
     right: 0;

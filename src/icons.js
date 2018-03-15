@@ -23,7 +23,7 @@ app : {
     bars : '☰',
     'h-dots' : '⋯',
     'v-dots' : '⋮',
-    rows : '𝌆',
+    rows : '▤',
     columns : '▥',
     grid : '▦',
     'spaced-grid' : '𝍖',
@@ -36,6 +36,8 @@ app : {
 
 office : {
     file : '📄',
+    file2 : '🖻',
+    file3 : '🖺',
     folder : '📂',
     edit : '✏️',
     pen : '🖊️',
@@ -446,10 +448,18 @@ keys : {
 },
 
 geometric : {
-    'curved-triangle' : '🛆',
-    'curved-square' : '▢',
+    triangle : '▲',
+    square : '■',
     pentagon : '⬟',
     hexagon : '⬢',
+    circle : '●',
+    'curved-triangle' : '🛆',
+    'curved-square' : '▢',
+    'square-quadrant' : '◰',
+    'round-quadrant' : '◴',
+    contrast : '◐',
+    contrast2 : '◧',
+    contrast3 : '◩',
 },
 
 hieroglyph : {
@@ -510,8 +520,9 @@ other : {
     jar : '🏺',
     pill : '💊',
     globe : '🌐',
-    bolt : '⚡',
+    voltage : '⚡',
     flag : '⚑',
+    film : '🎞️',
     recycle : '♻',
     network : '🖧',
     newbie : '🔰',
@@ -522,7 +533,7 @@ other : {
     liberty : '🗽',
     die : '🎲',
     palette : '🎨',
-    painting : '🖼️',
+    frame : '🖼️',
     'crystal-ball' : '🔮',
     bomb : '💣',
     poison : '☠️',

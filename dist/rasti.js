@@ -740,7 +740,7 @@ app : {
     bars : '☰',
     'h-dots' : '⋯',
     'v-dots' : '⋮',
-    rows : '𝌆',
+    rows : '▤',
     columns : '▥',
     grid : '▦',
     'spaced-grid' : '𝍖',
@@ -753,6 +753,8 @@ app : {
 
 office : {
     file : '📄',
+    file2 : '🖻',
+    file3 : '🖺',
     folder : '📂',
     edit : '✏️',
     pen : '🖊️',
@@ -1163,10 +1165,18 @@ keys : {
 },
 
 geometric : {
-    'curved-triangle' : '🛆',
-    'curved-square' : '▢',
+    triangle : '▲',
+    square : '■',
     pentagon : '⬟',
     hexagon : '⬢',
+    circle : '●',
+    'curved-triangle' : '🛆',
+    'curved-square' : '▢',
+    'square-quadrant' : '◰',
+    'round-quadrant' : '◴',
+    contrast : '◐',
+    contrast2 : '◧',
+    contrast3 : '◩',
 },
 
 hieroglyph : {
@@ -1227,8 +1237,9 @@ other : {
     jar : '🏺',
     pill : '💊',
     globe : '🌐',
-    bolt : '⚡',
+    voltage : '⚡',
     flag : '⚑',
+    film : '🎞️',
     recycle : '♻',
     network : '🖧',
     newbie : '🔰',
@@ -1239,7 +1250,7 @@ other : {
     liberty : '🗽',
     die : '🎲',
     palette : '🎨',
-    painting : '🖼️',
+    frame : '🖼️',
     'crystal-ball' : '🔮',
     bomb : '💣',
     poison : '☠️',
@@ -1359,11 +1370,11 @@ function rasti(name, container) {
     }
     this.state = state(this)
 
+    this.props = {}
+    this.methods = {}
     this.pages = {}
-    this.data = {}
-    this.ajax = {}
-    this.utils = {}
     this.templates = {}
+    this.data = {}
     this.langs = {}
 
     this.themes = themes
@@ -1474,14 +1485,14 @@ function rasti(name, container) {
         container.find('[validate]').each( (i, btn) => {
             btn.disabled = true
             const $container = $(btn).parent()
-            const $fields = $container.find('[field][required]')
+            const $fields = $container.find('[required]')
             $fields.each( (i, field) => {
                 const invalid = field.validity && !field.validity.valid
                 field.classList.toggle('error', invalid)
                 $(field).change( e => {
                     invalid = field.validity && !field.validity.valid
                     field.classList.toggle('error', invalid)
-                    btn.disabled = $container.find('[field].error').length
+                    btn.disabled = $container.find('.error').length
                 })
             })
         })
@@ -1542,12 +1553,12 @@ function rasti(name, container) {
             const method = $el.attr('submit')
             const callback = $el.attr('then')
             const template = $el.attr('render')
-            const isValidCB = callback && is.function(self.utils[callback])
+            const isValidCB = callback && is.function(self.methods[callback])
             const start = window.performance.now()
 
-            if (!method) return error('Missing ajax method in [submit] attribute of el:', this)
+            if (!method) return error('Missing method in [submit] attribute of el:', this)
 
-            if (callback && !isValidCB) error('Undefined utility method [%s] declared in [then] attribute of el:', callback, this)
+            if (callback && !isValidCB) error('Undefined method [%s] declared in [then] attribute of el:', callback, this)
             
             $el.addClass('loading').attr('disabled', true)
 
@@ -1555,7 +1566,7 @@ function rasti(name, container) {
                 const time = Math.floor(window.performance.now() - start) / 1000
                 log('Ajax method [%s] took %s seconds', method, time)
 
-                if (isValidCB) self.utils[callback](resdata)
+                if (isValidCB) self.methods[callback](resdata)
                 if (template) render(template, resdata, time)
 
                 $el.removeClass('loading').removeAttr('disabled')
@@ -1573,11 +1584,11 @@ function rasti(name, container) {
 
 
         // init field dependencies
-        container.find('[deps]').each( (i, el) => {
+        container.find('[prop][bind]').each( (i, el) => {
             const $el = $(el)
-            const deps = $el.attr('deps')
-            if (deps) deps.split(' ').forEach( field => {
-                $el.closest('[page]').find('[field='+ field +']')
+            const deps = $el.attr('bind')
+            if (deps) deps.split(' ').forEach( dep => {
+                $el.closest('[page]').find('[prop='+ dep +']')
                     .change( e => { updateBlock($el) })
             })
         })
@@ -1589,7 +1600,7 @@ function rasti(name, container) {
                 const $el = $(el)
                 const methodName = $el.attr('on-' + action)
                 if ( !methodName ) return error('Missing utility method in [on-%s] attribute of element:', action, el)
-                const method = self.utils[methodName]
+                const method = self.methods[methodName]
                 if ( !method ) return error('Undefined utility method "%s" declared in [on-%s] attribute of element:', methodName, action, el)
                 $el.on(action, method)
                    .removeAttr('on-' + action)
@@ -1729,9 +1740,9 @@ function rasti(name, container) {
             }
             else {
                 // it's a container
-                $el.find('[field]').each( (i, el) => {
+                $el.find('[prop]').each( (i, el) => {
                     const $el = $(el)
-                    const subprop = $el.attr('field')
+                    const subprop = $el.attr('prop')
                     if (subprop) bindElement($el, prop, subprop)
                 })
             }
@@ -1811,7 +1822,7 @@ function rasti(name, container) {
 
 
         // init bound templates
-        container.find('[bind]').each( (i, el) => {
+        container.find('[bind][template]').each( (i, el) => {
             bind(el)
         })
 
@@ -2166,13 +2177,13 @@ function rasti(name, container) {
 
         // TODO: this should be in multi block, not here
         var $options = type === 'multi'
-            ? $el.closest('[page]').find('[options='+ $el.attr('field') +']')
+            ? $el.closest('[page]').find('[options='+ $el.attr('prop') +']')
             : $el
 
         var deps = $el.attr('deps')
         var depValues = {}
-        if (deps) deps.split(' ').forEach( field => {
-            depValues[field] = get('field='+field).val()
+        if (deps) deps.split(' ').forEach( prop => {
+            depValues[prop] = get('prop='+prop).val()
         })
 
         is.function(data)
@@ -2184,9 +2195,9 @@ function rasti(name, container) {
             $options.html( block.template(data, $el) )
 
             if (invalidData) {
-                var field = $el.attr('field'),
+                var prop = $el.attr('prop'),
                     page = $el.closest('[page]').attr('page')
-                warn('Detected %s invalid data entries for field [%s] in page [%s]', invalidData, field, page)
+                warn('Detected %s invalid data entries for prop [%s] in page [%s]', invalidData, prop, page)
                 invalidData = 0
             }
         }
@@ -2382,18 +2393,18 @@ function rasti(name, container) {
 
 
     function submitAjax(method, callback) {
-        var ajax = self.ajax[ method ]
+        var ajax = self.methods[ method ]
         if ( !is.function(ajax) ) return error('Ajax method ['+ method +'] is not defined')
 
         var $form = container.find('[ajax='+ method +']')
         if (!$form.length) return error('No container element bound to ajax method [%s]. Please bind one via [ajax] attribute', method)
 
-        var reqdata = {}, field
-        $form.find('[field]').each( (i, el) => {
+        var reqdata = {}, prop
+        $form.find('[prop]').each( (i, el) => {
             $el = $(el)
-            field = $el.attr('field')
-            if (field) {
-                reqdata[field] = $el.val() || $el.attr('value')
+            prop = $el.attr('prop')
+            if (prop) {
+                reqdata[prop] = $el.val() || $el.attr('value')
             }
         })
 
@@ -2421,13 +2432,14 @@ function rasti(name, container) {
             ${ns} .tab-labels        { background-color: ${ values.panel[0] }; }
             ${ns} .tab-labels > .bar { background-color: ${ values.btn[0] }; }
 
-            ${ns} [field] {
+            ${ns} input:not([type=radio]):not([type=checkbox]),
+            ${ns} select,
+            ${ns} textarea {
                 background-color: ${ values.field[0] };
                 color: ${ values.field[1] };
             }
 
-            ${ns} [btn],
-            ${ns} .btn,
+            ${ns} button,
             ${ns} [block=buttons] > div,
             ${ns} nav > div.active,
             ${ns} nav > a.active,
@@ -2477,23 +2489,20 @@ function rasti(name, container) {
     return {
         // objects
         options : this.options,
+        props : this.props,
+        methods : this.methods,
+        templates : this.templates,
+        data : this.data,
+        pages : this.pages,
         history : this.history,
         state : this.state,
-        pages : this.pages,
-        data : this.data,
-        ajax : this.ajax,
-        utils : this.utils,
         langs : this.langs,
         themes : this.themes,
         themeMaps : this.themeMaps,
-        templates : this.templates,
 
         // methods
         extend,
         init,
-        get,
-        set,
-        add,
         navTo,
         render,
         setLang,
@@ -2631,6 +2640,75 @@ h4 { font-size: 1.5em; }
 
 p.big { font-size: 1.5em; }
 
+input, select, textarea {
+    min-height: 35px;
+    width: 100%;
+    padding: 5px 10px;
+    border: 0;
+    margin: 0;
+    font-size: inherit;
+    vertical-align: text-bottom;
+}
+input:focus:invalid {
+    box-shadow: 0 0 0 2px red;
+}
+input:focus:valid {
+    box-shadow: 0 0 0 2px green;
+}
+input, select, textarea, button {
+    border-radius: 2px;
+    outline: none;
+    font-family: inherit !important;
+}
+input[type=range], select, button {
+    cursor: pointer;
+}
+
+button {
+    display: inline-block;
+    height: 50px;
+    width: auto;
+    min-width: 50px;
+    padding: 10px 20px;
+    border: 1px solid rgba(0,0,0,0.1);
+    font-size: 1.2em;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+button:not(:disabled):hover {
+    filter: contrast(1.5);
+}
+button:disabled {
+    filter: contrast(0.5);
+    cursor: auto;
+}
+
+select {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+}
+
+textarea {
+    height: 70px;
+    resize: none;
+}
+
+input.big, button.big,
+.big_ > input, .big_ > button {
+    min-height: 70px;
+    margin-bottom: 25px;
+    font-size: 1.5em;
+}
+
+input.small, button.small,
+.small_ > input, .small_ > button {
+    height: 25px;
+    margin-bottom: 15px;
+    font-size: 1em;
+}
+
 input[type=radio],
 input[type=checkbox] {
     display: none;
@@ -2725,6 +2803,12 @@ nav ~ [page] {
 }
 
 
+[panel] input, [panel] button, [panel] [label],
+[section] input, [section] button, [section] [label] {
+    margin-bottom: 15px;
+}
+
+
 [header][panel] {
     padding-top: 75px;
 }
@@ -2783,102 +2867,13 @@ nav ~ [page] {
 }
 
 
-[field] {
-    min-height: 35px;
-    width: 100%;
-    padding: 5px 10px;
-    border: 0;
-    font-size: inherit;
-}
-[field], [btn] {
-    border-radius: 2px;
-    outline: none;
-    font-family: inherit !important;
-}
-[btn] {
-    display: inline-block;
-    height: 50px;
-    width: auto;
-    min-width: 50px;
-    padding: 10px 20px;
-    border: 1px solid rgba(0,0,0,0.1);
-    font-size: 1.2em;
-    text-align: center;
-    text-decoration: none;
-    text-transform: uppercase;
-}
-[btn], [nav] {
-	cursor: pointer;
-}
-[btn]:not(:disabled):hover {
-    filter: contrast(1.5);
-}
-[btn]:disabled {
-    filter: contrast(0.5);
-    cursor: auto;
-}
-[panel] [field], [panel] [btn], [panel] [label],
-[section] [field], [section] [btn], [section] [label] {
-    margin-bottom: 15px;
-}
-
-select[field] {
-    appearance: none;
-    -moz-appearance: none;
-    -webkit-appearance: none;
-    cursor: pointer;
-}
-
-textarea[field] {
-    height: 70px;
-    resize: none;
-}
-
-input[field] {
-    width: 100%;
-    margin: 0;
-    font-size: 1rem;
-    vertical-align: text-bottom;
-}
-input[field]:focus:invalid {
-    box-shadow: 0 0 0 2px red;
-}
-input[field]:focus:valid {
-    box-shadow: 0 0 0 2px green;
-}
-
-.big[field], .big[btn],
-.big [field], .big [btn] {
-    min-height: 70px;
-    margin-bottom: 25px;
-    font-size: 1.5em;
-}
-
-.small[field], .small[btn],
-.small [field], .small [btn] {
-    height: 25px;
-    margin-bottom: 15px;
-    font-size: 1em;
-}
-
-.big [label]{
-    margin-top: 25px;
-    font-size: 1.2em;
-}
-.big [label]:before {
-    margin-top: -27px;
-}
-.big [label][field]:before {
-    margin-top: -25px;
-}
-
-
 [img] {
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
     background-origin: content-box;
 }
+
 
 [template] {
     visibility: hidden;
@@ -2909,6 +2904,7 @@ input[field]:focus:valid {
     padding: 10px;
     font-size: 1.1em;
 }
+
 
 [crud] > * {
     position: relative;
@@ -3080,7 +3076,7 @@ nav > .active {
     margin-top: -30px;
     margin-left: 4px;
 }
-[label][field].big:before {
+[label].big:before {
     margin-left: 0;
 }
 .inline[label],
@@ -3109,11 +3105,18 @@ nav > .active {
     margin-top: 0;
     margin-left: 0;
 }
+.big [label] {
+    margin-top: 25px;
+    font-size: 1.2em;
+}
+.big [label]:before {
+    margin-top: -27px;
+}
 
 
+[nav],
 [show], [hide], [toggle],
-[onclick],
-input[type=range] {
+[onclick] {
     cursor: pointer;
 }
 
@@ -3236,7 +3239,7 @@ input[type=range] {
     font-size: large;
 }
 
-.fab[btn] {
+button.fab {
     position: fixed;
     bottom: 0;
     right: 0;

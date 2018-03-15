@@ -83,11 +83,11 @@ function rasti(name, container) {
     }
     this.state = state(this)
 
+    this.props = {}
+    this.methods = {}
     this.pages = {}
-    this.data = {}
-    this.ajax = {}
-    this.utils = {}
     this.templates = {}
+    this.data = {}
     this.langs = {}
 
     this.themes = themes
@@ -198,14 +198,14 @@ function rasti(name, container) {
         container.find('[validate]').each( (i, btn) => {
             btn.disabled = true
             const $container = $(btn).parent()
-            const $fields = $container.find('[field][required]')
+            const $fields = $container.find('[required]')
             $fields.each( (i, field) => {
                 const invalid = field.validity && !field.validity.valid
                 field.classList.toggle('error', invalid)
                 $(field).change( e => {
                     invalid = field.validity && !field.validity.valid
                     field.classList.toggle('error', invalid)
-                    btn.disabled = $container.find('[field].error').length
+                    btn.disabled = $container.find('.error').length
                 })
             })
         })
@@ -266,12 +266,12 @@ function rasti(name, container) {
             const method = $el.attr('submit')
             const callback = $el.attr('then')
             const template = $el.attr('render')
-            const isValidCB = callback && is.function(self.utils[callback])
+            const isValidCB = callback && is.function(self.methods[callback])
             const start = window.performance.now()
 
-            if (!method) return error('Missing ajax method in [submit] attribute of el:', this)
+            if (!method) return error('Missing method in [submit] attribute of el:', this)
 
-            if (callback && !isValidCB) error('Undefined utility method [%s] declared in [then] attribute of el:', callback, this)
+            if (callback && !isValidCB) error('Undefined method [%s] declared in [then] attribute of el:', callback, this)
             
             $el.addClass('loading').attr('disabled', true)
 
@@ -279,7 +279,7 @@ function rasti(name, container) {
                 const time = Math.floor(window.performance.now() - start) / 1000
                 log('Ajax method [%s] took %s seconds', method, time)
 
-                if (isValidCB) self.utils[callback](resdata)
+                if (isValidCB) self.methods[callback](resdata)
                 if (template) render(template, resdata, time)
 
                 $el.removeClass('loading').removeAttr('disabled')
@@ -297,11 +297,11 @@ function rasti(name, container) {
 
 
         // init field dependencies
-        container.find('[deps]').each( (i, el) => {
+        container.find('[prop][bind]').each( (i, el) => {
             const $el = $(el)
-            const deps = $el.attr('deps')
-            if (deps) deps.split(' ').forEach( field => {
-                $el.closest('[page]').find('[field='+ field +']')
+            const deps = $el.attr('bind')
+            if (deps) deps.split(' ').forEach( dep => {
+                $el.closest('[page]').find('[prop='+ dep +']')
                     .change( e => { updateBlock($el) })
             })
         })
@@ -313,7 +313,7 @@ function rasti(name, container) {
                 const $el = $(el)
                 const methodName = $el.attr('on-' + action)
                 if ( !methodName ) return error('Missing utility method in [on-%s] attribute of element:', action, el)
-                const method = self.utils[methodName]
+                const method = self.methods[methodName]
                 if ( !method ) return error('Undefined utility method "%s" declared in [on-%s] attribute of element:', methodName, action, el)
                 $el.on(action, method)
                    .removeAttr('on-' + action)
@@ -453,9 +453,9 @@ function rasti(name, container) {
             }
             else {
                 // it's a container
-                $el.find('[field]').each( (i, el) => {
+                $el.find('[prop]').each( (i, el) => {
                     const $el = $(el)
-                    const subprop = $el.attr('field')
+                    const subprop = $el.attr('prop')
                     if (subprop) bindElement($el, prop, subprop)
                 })
             }
@@ -535,7 +535,7 @@ function rasti(name, container) {
 
 
         // init bound templates
-        container.find('[bind]').each( (i, el) => {
+        container.find('[bind][template]').each( (i, el) => {
             bind(el)
         })
 
@@ -890,13 +890,13 @@ function rasti(name, container) {
 
         // TODO: this should be in multi block, not here
         var $options = type === 'multi'
-            ? $el.closest('[page]').find('[options='+ $el.attr('field') +']')
+            ? $el.closest('[page]').find('[options='+ $el.attr('prop') +']')
             : $el
 
         var deps = $el.attr('deps')
         var depValues = {}
-        if (deps) deps.split(' ').forEach( field => {
-            depValues[field] = get('field='+field).val()
+        if (deps) deps.split(' ').forEach( prop => {
+            depValues[prop] = get('prop='+prop).val()
         })
 
         is.function(data)
@@ -908,9 +908,9 @@ function rasti(name, container) {
             $options.html( block.template(data, $el) )
 
             if (invalidData) {
-                var field = $el.attr('field'),
+                var prop = $el.attr('prop'),
                     page = $el.closest('[page]').attr('page')
-                warn('Detected %s invalid data entries for field [%s] in page [%s]', invalidData, field, page)
+                warn('Detected %s invalid data entries for prop [%s] in page [%s]', invalidData, prop, page)
                 invalidData = 0
             }
         }
@@ -1106,18 +1106,18 @@ function rasti(name, container) {
 
 
     function submitAjax(method, callback) {
-        var ajax = self.ajax[ method ]
+        var ajax = self.methods[ method ]
         if ( !is.function(ajax) ) return error('Ajax method ['+ method +'] is not defined')
 
         var $form = container.find('[ajax='+ method +']')
         if (!$form.length) return error('No container element bound to ajax method [%s]. Please bind one via [ajax] attribute', method)
 
-        var reqdata = {}, field
-        $form.find('[field]').each( (i, el) => {
+        var reqdata = {}, prop
+        $form.find('[prop]').each( (i, el) => {
             $el = $(el)
-            field = $el.attr('field')
-            if (field) {
-                reqdata[field] = $el.val() || $el.attr('value')
+            prop = $el.attr('prop')
+            if (prop) {
+                reqdata[prop] = $el.val() || $el.attr('value')
             }
         })
 
@@ -1145,13 +1145,14 @@ function rasti(name, container) {
             ${ns} .tab-labels        { background-color: ${ values.panel[0] }; }
             ${ns} .tab-labels > .bar { background-color: ${ values.btn[0] }; }
 
-            ${ns} [field] {
+            ${ns} input:not([type=radio]):not([type=checkbox]),
+            ${ns} select,
+            ${ns} textarea {
                 background-color: ${ values.field[0] };
                 color: ${ values.field[1] };
             }
 
-            ${ns} [btn],
-            ${ns} .btn,
+            ${ns} button,
             ${ns} [block=buttons] > div,
             ${ns} nav > div.active,
             ${ns} nav > a.active,
@@ -1201,23 +1202,20 @@ function rasti(name, container) {
     return {
         // objects
         options : this.options,
+        props : this.props,
+        methods : this.methods,
+        templates : this.templates,
+        data : this.data,
+        pages : this.pages,
         history : this.history,
         state : this.state,
-        pages : this.pages,
-        data : this.data,
-        ajax : this.ajax,
-        utils : this.utils,
         langs : this.langs,
         themes : this.themes,
         themeMaps : this.themeMaps,
-        templates : this.templates,
 
         // methods
         extend,
         init,
-        get,
-        set,
-        add,
         navTo,
         render,
         setLang,
