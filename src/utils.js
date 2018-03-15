@@ -54,6 +54,41 @@ function checkData(data) {
 }
 
 
+function html(templateObject, ...substs) {
+    // Use raw template strings (don’t want backslashes to be interpreted)
+    const raw = templateObject.raw
+    let result = ''
+
+    substs.forEach((subst, i) => {
+        let lit = raw[i]
+        // Turn array into string
+        if ( is.array(subst) ) subst = subst.join('')
+        // If subst is preceded by an !, escape it
+        if ( lit.endsWith('!') ) {
+            subst = htmlEscape(subst)
+            lit = lit.slice(0, -1)
+        }
+        result += lit
+        result += subst
+    })
+    // Take care of last template string
+    result += raw[raw.length - 1]
+
+    return result
+}
+
+
+function htmlEscape(str) {
+    return str.replace(/&/g, '&amp;') // first!
+        .replace(/>/g, '&gt;')
+        .replace(/</g, '&lt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/`/g, '&#96;')
+}
+
+
+
 function resolveAttr($el, name) {
     var value = $el.attr(name) || $el.attr('name') || $el.attr('field') || $el.attr('nav') || $el.attr('template') ||  $el.attr('section') || $el.attr('panel') || $el.attr('page')
     if (!value) warn('Could not resolve value of [%s] attribute in el:', name, $el[0])
@@ -84,6 +119,7 @@ module.exports = {
     sameType,
     inject,
     checkData,
+    html,
     resolveAttr,
     random,
     onMobile,

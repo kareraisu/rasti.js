@@ -1279,7 +1279,7 @@ other
 require('./extensions')
 const { History, Pager, state, crud } = require('./components')
 const utils = require('./utils')
-const { is, sameType, resolveAttr } = utils
+const { is, sameType, resolveAttr, html } = utils
 const { themes, themeMaps } = require('./themes')
 
 const options = {
@@ -1605,7 +1605,7 @@ function rasti(name, container) {
                 const targetSelector = $el.attr(action)
 
                 if ( !targetSelector ) return error('Missing target selector in [%s] attribute of element:', action, el)
-                const $target = $page.find('['+targetSelector+']')
+                let $target = $page.find('['+targetSelector+']')
                 if ( !$target.length ) $target = container.find('['+targetSelector+']')
                 if ( !$target.length ) return error('Could not find target [%s] declared in [%s] attribute of element:', targetSelector, action, el)
 
@@ -2008,7 +2008,7 @@ function rasti(name, container) {
     }
 
     function evalTemplate(string, dataArray, lang) {
-        return dataArray.map(data => eval('`'+string+'`'))
+        return dataArray.map(data => eval('html`'+string+'`'))
     }
 
     function wrap(template, wrapper) {
@@ -3037,8 +3037,8 @@ nav > .active {
     max-height: 400px;
     max-width: 200px;
 }
-[modal] > close],
-.modal > close] {
+[modal] > [icon=close],
+.modal > [icon=close] {
     cursor: pointer;
 }
 
@@ -3278,7 +3278,7 @@ input[type=range] {
 .big.loading:after {
     position: fixed;
     width: 100px; height: 100px;
-    z-index: 1;
+    z-index: 10;
 }
 
 .loading2 {
@@ -3890,6 +3890,41 @@ function checkData(data) {
 }
 
 
+function html(templateObject, ...substs) {
+    // Use raw template strings (don’t want backslashes to be interpreted)
+    const raw = templateObject.raw
+    let result = ''
+
+    substs.forEach((subst, i) => {
+        let lit = raw[i]
+        // Turn array into string
+        if ( is.array(subst) ) subst = subst.join('')
+        // If subst is preceded by an !, escape it
+        if ( lit.endsWith('!') ) {
+            subst = htmlEscape(subst)
+            lit = lit.slice(0, -1)
+        }
+        result += lit
+        result += subst
+    })
+    // Take care of last template string
+    result += raw[raw.length - 1]
+
+    return result
+}
+
+
+function htmlEscape(str) {
+    return str.replace(/&/g, '&amp;') // first!
+        .replace(/>/g, '&gt;')
+        .replace(/</g, '&lt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/`/g, '&#96;')
+}
+
+
+
 function resolveAttr($el, name) {
     var value = $el.attr(name) || $el.attr('name') || $el.attr('field') || $el.attr('nav') || $el.attr('template') ||  $el.attr('section') || $el.attr('panel') || $el.attr('page')
     if (!value) warn('Could not resolve value of [%s] attribute in el:', name, $el[0])
@@ -3920,6 +3955,7 @@ module.exports = {
     sameType,
     inject,
     checkData,
+    html,
     resolveAttr,
     random,
     onMobile,

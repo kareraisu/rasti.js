@@ -1,7 +1,7 @@
 require('./extensions')
 const { History, Pager, state, crud } = require('./components')
 const utils = require('./utils')
-const { is, sameType, resolveAttr } = utils
+const { is, sameType, resolveAttr, html } = utils
 const { themes, themeMaps } = require('./themes')
 
 const options = {
@@ -327,7 +327,7 @@ function rasti(name, container) {
                 const targetSelector = $el.attr(action)
 
                 if ( !targetSelector ) return error('Missing target selector in [%s] attribute of element:', action, el)
-                const $target = $page.find('['+targetSelector+']')
+                let $target = $page.find('['+targetSelector+']')
                 if ( !$target.length ) $target = container.find('['+targetSelector+']')
                 if ( !$target.length ) return error('Could not find target [%s] declared in [%s] attribute of element:', targetSelector, action, el)
 
@@ -730,7 +730,7 @@ function rasti(name, container) {
     }
 
     function evalTemplate(string, dataArray, lang) {
-        return dataArray.map(data => eval('`'+string+'`'))
+        return dataArray.map(data => eval('html`'+string+'`'))
     }
 
     function wrap(template, wrapper) {
