@@ -12,6 +12,7 @@ const options = {
     lang    : '',
     stats   : '%n results in %t seconds',
     noData  : 'No data available',
+    newEl   : 'New element',
     imgPath : 'img/',
     imgExt  : '.png',
 }
@@ -487,47 +488,6 @@ function rasti(name, container) {
         })
 
 
-        // init crud templates
-        container.find('[crud][template]').each( (i, el) => {
-            const $el = $(el)
-            const template = resolveAttr($el, 'template')
-            const datakey = resolveAttr($el, 'data')
-
-            $el.on('click', '.rasti-crud-delete', e => {
-                const value = $(e.currentTarget).closest('[value]').attr('value')
-                if ( value && self.crud.delete(datakey, value) ) {
-                    app.render(template)
-                }
-            })
-
-            $el.on('click', '.rasti-crud-update', e => {
-                // TODO: add update logic
-            })
-
-            $el.on('click', '.rasti-crud-create', e => {
-                self.crud.addInputEl($el)
-                $el.find('.rasti-crud-input').find('input').focus()
-                $(e.currentTarget).parent().addClass('active')
-            })
-
-            $el.on('click', '.rasti-crud-accept', e => {
-                // TODO: finish this
-                /*
-                const newel = crud.genDataEl($el)
-                if (newel && crud.create(datakey, newel) ) {
-                    app.render(template)
-                }
-                */
-                $(e.currentTarget).parent().removeClass('active')
-            })
-
-            $el.on('click', '.rasti-crud-cancel', e => {
-                $(e.currentTarget).parent().removeClass('active')
-                self.crud.removeInputEl($el)
-            })
-        })
-
-
         // render automatic templates
         container.find('[auto][template]').each( (i, el) => {
             render(el)
@@ -537,6 +497,48 @@ function rasti(name, container) {
         // init bound templates
         container.find('[bind][template]').each( (i, el) => {
             bind(el)
+        })
+
+
+        // init crud templates
+        container.find('[crud][template]').each( (i, el) => {
+            const $el = $(el)
+            const template = resolveAttr($el, 'template')
+            const datakey = resolveAttr($el, 'data')
+
+            render(el)
+
+            $el.on('click', '.rasti-crud-delete', e => {
+                const $controls = $(e.currentTarget).closest('[data-id]')
+                const id = $controls.attr('data-id')
+                if ( id && self.crud.delete(datakey, id) ) {
+                    $controls.parent().detach()
+                    log('Removed element [%s] from template [%s]', id, template)
+                }
+            })
+
+            $el.on('click', '.rasti-crud-update', e => {
+                // TODO: add update logic
+            })
+
+            $el.on('click', '.rasti-crud-create', e => {
+                self.crud.showInputEl($el)
+                $el.addClass('active')
+            })
+
+            $el.on('click', '.rasti-crud-accept', e => {
+                // TODO: finish this
+                const newel = self.crud.genDataEl($el)
+                if (newel && self.crud.create(datakey, newel) ) {
+                    self.crud.persistNewEl($el)
+                }
+                $el.removeClass('active')
+            })
+
+            $el.on('click', '.rasti-crud-cancel', e => {
+                self.crud.hideInputEl($el)
+                $el.removeClass('active')
+            })
         })
 
 
@@ -684,9 +686,12 @@ function rasti(name, container) {
         if (!data.length) return $el.html(`<div msg center textc>${ self.options.noData }</div>`)
 
         let template = self.templates[name]
+        let html
         if (!template || is.string(template)) try {
-            const html = template || $el.html()
-            template = (data, lang) => evalTemplate(html.trim(), data, lang)
+            html = template || $el.html()
+            html = html.trim()
+            template = genTemplate(html)
+            template.html = html
             self.templates[name] = template
         }
         catch(err) {
@@ -696,49 +701,60 @@ function rasti(name, container) {
 
         const isCrud = el.hasAttribute('crud')
         if (isCrud) {
-            const el_controls = `
-                <div class="rasti-crud right centery small_ round_ inline_">
-                    <div class="rasti-crud-update" icon=edit></div>
-                    <div class="rasti-crud-delete" icon=close></div>
-                </div>`
-            template = append(template, el_controls)
+            if (is.object(data[0]) && !data[0].id) data.forEach((el, i) => el.id = i)
+            //log('crud data:', data)
+            const el_controls =
+                '<div class="rasti-crud right centery small_ round_ inline_" data-id=${ rasti.utils.is.object(data) ? data.id : data }>\
+                    <div class="rasti-crud-update" icon=edit></div>\
+                    <div class="rasti-crud-delete" icon=trash-can></div>\
+                </div>'
+            html = append(template.html, el_controls)
+            template = genTemplate(html)
+            template.html = html
         }
 
         const paging = $el.attr('paging')
-        const lang = self.langs && self.langs[self.active.lang]
         paging
-            ? initPager($el, template, data, lang)
-            : $el.html( template(data, lang).join('') )
+            ? initPager($el, template, data, getActiveLang())
+            : $el.html( template(data).join('') )
 
         if (el.hasAttribute('stats')) {
             const stats = $('<div section class="stats">')
             stats.html( self.options.stats.replace('%n', data.length).replace('%t', time) )
             $el.prepend(stats)
         }
+
         if (isCrud) {
             const container_controls = `
                 <div class="rasti-crud right small_ round_ ">
                     <div class="rasti-crud-create" icon=star></div>
-                    <div class="rasti-crud-accept" icon=ok></div>
-                    <div class="rasti-crud-cancel" icon=nok></div>
+                    <div class="rasti-crud-accept" icon=accept></div>
+                    <div class="rasti-crud-cancel" icon=cancel></div>
                 </div>`
             $el.prepend(container_controls)
+            self.crud.genInputEl($el)
         }
+
         $el.addClass('rendered')
         if (!paging) applyFX($el)
 
     }
 
-    function evalTemplate(string, dataArray, lang) {
+
+    function genTemplate(html) {
+        return data => evalTemplate(html, data, self.props, self.methods, getActiveLang())
+    }
+
+    function evalTemplate(string, dataArray, props, methods, lang) {
         return dataArray.map(data => eval('html`'+string+'`'))
     }
 
     function wrap(template, wrapper) {
-        return (data, lang) => template(data, lang).map(html => wrapper.replace('{{content}}', html))
+        return (data, props, methods, lang) => template(data, props, methods, lang).map(html => wrapper.replace('{{content}}', html))
     }
 
-    function append(template, appendix) {
-        return (data, lang) => template(data, lang).map(html => html.substring(0, html.length-6).concat(appendix + '</div>'))
+    function append(html, appendix) {
+        return html.substring(0, html.length-6).concat(appendix + '</div>')
     }
 
     function applyFX($el, selector) {
@@ -752,6 +768,10 @@ function rasti(name, container) {
         const $target = selector ? $el.find(selector) : $el
         if (!$target.length) return warn('Cannot apply fx, cannot find target "%s" in el', target, el)
         fx($target)
+    }
+
+    function getActiveLang() {
+        return self.langs && self.langs[self.active.lang]
     }
 
 
@@ -1083,7 +1103,7 @@ function rasti(name, container) {
         update( pager.next() )
 
         function update(data){
-            $results.html( template(data, lang).join('') )
+            $results.html( template(data).join('') )
             $controls.find('.page').html(pager.page + '/' + pager.total)
             applyFX($el, '.results')
         }

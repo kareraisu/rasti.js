@@ -8,18 +8,25 @@
     <link rel=stylesheet href=app.css>
 </head>
 
-<body rasti=app>
+<body rasti=app hidden>
 
-    <nav bg=mid>
-        <div name=config
-            show="panel=menu"
-            icon=bars></div>
+    <nav class=mid>
+        <div icon=bars show="panel=menu"></div>
         <div nav=main text=main></div>
         <div nav=about text=about></div>
     </nav>
 
+    <div modal panel=menu header
+        class="inline pad pad-s-desktop">
+        THIS IS THE MENU
+    </div>
+
     <div page=main header>
-                
+        THIS IS THE MAIN PAGE
+    </div>
+
+    <div page=about header>
+        THIS IS THE ABOUT PAGE
     </div>
 
     <script src=dist/rasti+zepto.js></script>

@@ -93,13 +93,13 @@ function state(app) {
         lang  : { get : _ => app.active.lang, enumerable : true },
         save : { value : _ => {
             localStorage.setItem('rasti.' + app.name, JSON.stringify(app.state))
-            log('State saved')
+            rasti.log('State saved')
         } },
         get : { value : _ => {
             var state
             try {
                 state = JSON.parse( localStorage.getItem('rasti.' + app.name) )
-                if ( !state ) log('No saved state found for app [%s]', app.name)
+                if ( !state ) rasti.log('No saved state found for app [%s]', app.name)
                 else if ( !is.object(state) ) invalid()
                 else return state
             }
@@ -110,19 +110,19 @@ function state(app) {
         restore : { value : _ => {
             var state = app.state.get()
             if (state) {
-                log('Restoring state...')
+                rasti.log('Restoring state...')
                 for (let prop in state) {
                     app.state[prop] = state[prop]
                 }
-                if (state.theme) setTheme(state.theme)
-                if (state.lang) setLang(state.lang)
-                navTo(state.page)
-                log('State restored')
+                if (state.theme) app.setTheme(state.theme)
+                if (state.lang) app.setLang(state.lang)
+                app.navTo(state.page)
+                rasti.log('State restored')
             }
             return state
         } },
         clear : { value : _ => {
-            localStorage.removeItem('rasti.' + app.name)
+            window.localStorage.removeItem('rasti.' + app.name)
         } },
     })
 }
@@ -133,45 +133,103 @@ function crud(app) {
         return (datakey, ...args) => {
             const data = app.data[datakey]
             if (!data) {
-                error('Undefined data source "%s"', datakey)
+                rasti.error('Undefined data source "%s"', datakey)
                 return false
             }
             else return fn(data, datakey, ...args)
         }
     }
 
+    function exists(el, arr) {
+        return is.object(el)
+            ? arr.find(d => d.id === el.id)
+            : arr.indexOf(el) > -1
+    }
+
     return {
-        create : checkDataSource((data, datakey, el) => {
-            const exists = data.find(e => e === el)
-            exists
-                ? warn('El [%s] already exists in data source [%s]', el, datakey)
-                : data.push(el)
+        create : checkDataSource((data, datakey, newel) => {
+            const exists = exists(newel, data)
+            if (exists) {
+                rasti.warn('Element [%s] already exists in data source [%s]', newel.id || newel, datakey)
+            }
+            else {
+                if (is.object(newel)) newel.id = newel.id || datakey + '-' + Date.now()
+                data.push(newel)
+            }
             return !exists
         }),
-        delete : checkDataSource((data, datakey, el) => {
-            const exists = data.find(e => e === el)
-            !exists
-                ? warn('El [%s] not found in data source [%s]', el, datakey)
+
+        delete : checkDataSource((data, datakey, id) => {
+            const el = data.length && (is.object(data[0]) ? data.find(el => el.id === id) : id)
+            !el
+                ? rasti.warn('Element [%s] not found in data source [%s]', id, datakey)
                 : data.remove(el)
-            return exists
+            return el
         }),
+
         update : checkDataSource((data, datakey, el, newel) => {
-            const exists_el = data.find(e => e === el)
-            const exists_newel = data.find(e => e === newel)
-            if (!exists_el) warn('El [%s] not found in data source [%s]', el, datakey)
-            if (exists_newel) warn('El [%s] already exists in data source [%s]', newel, datakey)
+            const exists_el = exists(el, data)
+            const exists_newel = exists(newel, data)
+            if (!exists_el) rasti.warn('El [%s] not found in data source [%s]', el, datakey)
+            if (exists_newel) rasti.warn('El [%s] already exists in data source [%s]', newel, datakey)
             const valid = exists_el && !exists_newel
             if (valid) data.update(el, newel)
             return valid
         }),
-        addInputEl : $el => {
-            let template = resolveAttr($el, 'template')
-            template = app.templates[template]
-            // TODO: try to parse the template identifying props in order to build a similar html tree but with inputs instead of divs or spans, binding each input to its corresponding prop
-            $el.append('<div class=rasti-crud-input>' + template(['TEST']) +'</div>')
+
+        genInputEl : $el => {
+            const template = app.templates[ resolveAttr($el, 'template') ]
+
+            if (!template.props) {
+                // extract props from the template's html
+                // and generate a props object with placeholder values
+                const regexp = /data\.([a-z]*)/g
+                let props = {}
+                let prop
+                while (prop = regexp.exec(template.html)) {
+                  props[ prop[1] ] = prop[1]
+                }
+                // if no props are found, assume data are strings
+                // hence, replace the empty props object with the newEl string
+                if (!Object.keys(props).length) props = app.options.newEl
+                // cache the props in the template
+                template.props = props
+                rasti.log('Props:', props)
+            }
+            // create a dummy element using the (self-)extracted props
+            const inputEl = $('<div class=rasti-crud-input contenteditable>' + template( [template.props] ) +'</div>')
+
+            // TODO: identify prop elements within the inputEl element and apply [contenteditable] only to them
+            
+            $el.append(inputEl)
         },
-        removeInputEl : $el => {
-            $el.find('.rasti-crud-input').detach()
+
+        genDataEl : $el => {
+            const template = app.templates[ resolveAttr($el, 'template') ]
+            const values = $el.find('.rasti-crud-input').find('[contenteditable]')
+            let dataEl
+            if ( is.object(template.props) ) {
+                dataEl = {}
+                Object.keys(template.props).forEach( (key, i) => {
+                    dataEl[key] = values[i].html()
+                })
+            }
+            else dataEl = values[0].html()
+            return dataEl
+        },
+
+        showInputEl : $el => {
+            $el.find('.rasti-crud-input').show()
+        },
+
+        hideInputEl : $el => {
+            $el.find('.rasti-crud-input').hide()
+        },
+
+        persistNewEl : $el => {
+            $el.find('.rasti-crud-input').removeClass('.rasti-crud-input')
+                .find('[contenteditable]').removeAttr('[contenteditable]')
+            app.crud.genInputEl($el)
         },
     }
 }

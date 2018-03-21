@@ -296,13 +296,15 @@ nav ~ [page] {
     display: block !important;
 }
 .rasti-crud,
+.rasti-crud-input,
 .rasti-crud-accept,
 .rasti-crud-cancel,
-.rasti-crud.active > .rasti-crud-create {
+[crud].active .rasti-crud-create {
     display: none !important;
 }
-.rasti-crud.active > .rasti-crud-accept,
-.rasti-crud.active > .rasti-crud-cancel {
+[crud].active .rasti-crud-input,
+[crud].active .rasti-crud-accept,
+[crud].active .rasti-crud-cancel {
     display: inline-block !important;
 }
 [crud] > .rasti-crud {
