@@ -127,9 +127,9 @@ template : function(data, $el) {
 
 init : function($el) {
     var el = $el[0]
-    var field = $el.attr('field')
+    var name = $el.attr('prop') || $el.attr('name')
 
-    if (!field) return rasti.error('Missing field name in [field] attribute of element:', el)
+    if (!name) return rasti.error('Could not resolve name of element:', el)
     
     el.value = []
     el.max = parseInt($el.attr('max'))
@@ -144,15 +144,17 @@ init : function($el) {
 
     // structure
 
+    $el.addClass('field')
     $el.html('<div selected/><div add/>')
     $el.closest('[page]').children('.page-options')
-        .append('<div field block=multi options='+ field +'>')
+        .append('<div block=multi section options='+ name +'>')
     var $selected = $el.find('[selected]')
-    var $options = $el.closest('[page]').find('[options='+ field +']')
+    var $options = $el.closest('[page]').find('[options='+ name +']')
 
     // bindings
 
     $el.on('click', function(e) {
+        e.stopPropagation()
         $options.siblings('[options]').hide() // hide other options
         if ( utils.onMobile() ) $options.parent().addClass('backdrop')
         $options.css('left', this.getBoundingClientRect().right).show()
@@ -160,8 +162,8 @@ init : function($el) {
     })
 
     $el.closest('[page]').on('click', '*:not(option)', function(e) {
-        if ( $(e.target).attr('field') === field
-          || $(e.target).parent().attr('field') === field ) return
+        if ( $(e.target).attr('name') === name
+          || $(e.target).parent().attr('name') === name ) return
         if ( utils.onMobile() ) $options.parent().removeClass('backdrop')
         $options.hide()
     })
@@ -205,7 +207,7 @@ init : function($el) {
             $options.append(el)
         })
         for (var val of el.value) {
-            $selected.append($options.find('[value='+ val +']'))
+            $selected.append($options.find('[value="'+ val +'"]'))
             if ( checkFull() ) break
         }
     })
@@ -235,7 +237,7 @@ init : function($el) {
 },
 
 style : `
-    [block=multi] {
+    [block=multi]:not([options]) {
         display: flex;
         min-height: 35px;
         padding-right: 0;
@@ -245,12 +247,12 @@ style : `
     [block=multi] [add] {
         display: flex;
         align-items: center;
-        width: 20px;
+        width: 30px;
         border-left: 1px solid rgba(0,0,0,0.2);
     }
     [block=multi] [add]:before {
         content: '〉';
-        padding-left: 6px;
+        padding-left: 10px;
     }
     [block=multi].open [add] {
         box-shadow: inset 0 0 2px #000;
@@ -262,7 +264,7 @@ style : `
         display: none;
     }
     [block=multi] option {
-        padding: 2px 0;
+        padding: 6px 0;
     }
     [block=multi] option:before {
         content: '✕';
@@ -477,18 +479,15 @@ class History {
 
 class Pager {
 
-    constructor(id, results, page_size) {
+    constructor(id, results, sizes) {
         this.id = id
         if ( !is.string(id) ) return rasti.error('Pager id must be a string')
         this.logid = `Pager for template [${ this.id }]:`
         if ( !is.array(results) ) return rasti.error('%s Results must be an array', this.logid)
-        if ( !is.number(page_size) ) return rasti.error('%s Page size must be a number', this.logid)
         this.results = results
-        this.sizes = [5, 10, 20]
-        this.page_size = page_size
-        this.page = 0
-        this.total = Math.ceil(this.results.length / this.page_size)
-
+        if ( !is.array(sizes) || !is.number(sizes[0]) ) return rasti.error('%s Page sizes must be an array of numbers', this.logid)
+        this.sizes = sizes
+        this.setPageSize(this.sizes[0])
     }
 
     next() {
@@ -1360,6 +1359,7 @@ const options = {
     newEl   : 'New element',
     imgPath : 'img/',
     imgExt  : '.png',
+    page_sizes : [5, 10, 20, 50],
 }
 
 const breakpoints = {
@@ -1406,41 +1406,49 @@ function rasti(name, container) {
     
     const self = this
 
-    let invalidData = 0
 
+    // private properties
 
-    // private properties  
-
-    this.active = {
-        page  : null,
-        theme : '',
-        lang  : '',
-    }
-    this.pagers = new Map()
-    this.crud = crud(this)
+    const __pagers = new Map()
+    const __crud = crud(this)
+    let __invalid_data_count = 0
 
 
     // public properties
 
     this.options = Object.assign({}, options)
     this.defaults = {
-        stats : self.options.stats,
-        noData : self.options.noData,
+        stats : this.options.stats,
+        noData : this.options.noData,
+    }
+    this.active = {
+        page  : null,
+        theme : '',
+        lang  : '',
     }
     this.state = state(this)
-
     this.props = {}
     this.methods = {}
     this.pages = {}
     this.templates = {}
     this.data = {}
     this.langs = {}
-
     this.themes = themes
     this.themeMaps = themeMaps
 
 
-    // methods
+    // public methods
+
+    this.extend = extend
+    this.init = init
+    this.navTo = navTo
+    this.render = render
+    this.setLang = setLang
+    this.setTheme = setTheme
+    this.updateBlock = updateBlock
+    this.toggleFullScreen = toggleFullScreen
+
+
 
     function extend(props) {
         if (!props || !is.object(props)) return error('Cannot extend app: no properties found')
@@ -1546,7 +1554,7 @@ function rasti(name, container) {
             const $container = $(btn).parent()
             const $fields = $container.find('[required]')
             $fields.each( (i, field) => {
-                const invalid = field.validity && !field.validity.valid
+                let invalid = field.validity && !field.validity.valid
                 field.classList.toggle('error', invalid)
                 $(field).change( e => {
                     invalid = field.validity && !field.validity.valid
@@ -1648,7 +1656,9 @@ function rasti(name, container) {
             const deps = $el.attr('bind')
             if (deps) deps.split(' ').forEach( dep => {
                 $el.closest('[page]').find('[prop='+ dep +']')
-                    .change( e => { updateBlock($el) })
+                    .change( e => {
+                        updateBlock($el)
+                    })
             })
         })
 
@@ -1807,7 +1817,7 @@ function rasti(name, container) {
             }
 
             function bindElement($el, prop, subprop){
-                const root = self.state
+                let root = self.state
 
                 if (subprop) {
                     // go down one level
@@ -1817,8 +1827,7 @@ function rasti(name, container) {
                 }
                 if ( root[prop] ) {
                     // update ui from restored state
-                    $el.val( root[prop] )
-                    if ( $el.attr('block') ) $el.trigger('change')
+                    $el.val( root[prop] ).trigger('change')
                 }
                 else {
                     // first invocation, create empty (sub)prop
@@ -1856,7 +1865,7 @@ function rasti(name, container) {
             $el.on('click', '.rasti-crud-delete', e => {
                 const $controls = $(e.currentTarget).closest('[data-id]')
                 const id = $controls.attr('data-id')
-                if ( id && self.crud.delete(datakey, id) ) {
+                if ( id && __crud.delete(datakey, id) ) {
                     $controls.parent().detach()
                     log('Removed element [%s] from template [%s]', id, template)
                 }
@@ -1867,21 +1876,21 @@ function rasti(name, container) {
             })
 
             $el.on('click', '.rasti-crud-create', e => {
-                self.crud.showInputEl($el)
+                __crud.showInputEl($el)
                 $el.addClass('active')
             })
 
             $el.on('click', '.rasti-crud-accept', e => {
                 // TODO: finish this
-                const newel = self.crud.genDataEl($el)
-                if (newel && self.crud.create(datakey, newel) ) {
-                    self.crud.persistNewEl($el)
+                const newel = __crud.genDataEl($el)
+                if (newel && __crud.create(datakey, newel) ) {
+                    __crud.persistNewEl($el)
                 }
                 $el.removeClass('active')
             })
 
             $el.on('click', '.rasti-crud-cancel', e => {
-                self.crud.hideInputEl($el)
+                __crud.hideInputEl($el)
                 $el.removeClass('active')
             })
         })
@@ -1973,6 +1982,10 @@ function rasti(name, container) {
                 : page.in(params)
         }
 
+        $page.hasClass('hide-nav')
+            ? $('nav').hide()
+            : $('nav').show()
+
         $page.addClass('active')
 
         container
@@ -2058,7 +2071,7 @@ function rasti(name, container) {
             template.html = html
         }
 
-        const paging = $el.attr('paging')
+        const paging = el.hasAttribute('paging')
         paging
             ? initPager($el, template, data, getActiveLang())
             : $el.html( template(data).join('') )
@@ -2077,7 +2090,7 @@ function rasti(name, container) {
                     <div class="rasti-crud-cancel" icon=cancel></div>
                 </div>`
             $el.prepend(container_controls)
-            self.crud.genInputEl($el)
+            __crud.genInputEl($el)
         }
 
         $el.addClass('rendered')
@@ -2212,7 +2225,7 @@ function rasti(name, container) {
 
             if (!keys) {
                 keys = {}
-                attributes.forEach( attr => {
+                TEXT_ATTRS.forEach( attr => {
                     if ($el.attr(attr)) keys[attr] = $el.attr(attr)
                 })
                 el.langkeys = keys
@@ -2258,10 +2271,10 @@ function rasti(name, container) {
             ? $el.closest('[page]').find('[options='+ $el.attr('prop') +']')
             : $el
 
-        var deps = $el.attr('deps')
+        var deps = $el.attr('bind')
         var depValues = {}
         if (deps) deps.split(' ').forEach( prop => {
-            depValues[prop] = get('prop='+prop).val()
+            depValues[prop] = $('[prop='+ prop +']').val()
         })
 
         is.function(data)
@@ -2269,15 +2282,19 @@ function rasti(name, container) {
             : render(data)
         
         function render(data) {
+            if (!data) return warn('Cannot render block: no data available', el)
             if ( is.string(data) ) data = data.split(', ')
+            if ( !is.array(data) ) return error('Cannot render block: invalid data, must be array or string', el)
             $options.html( block.template(data, $el) )
-
+            // TODO : handle invalid data count side-effect
+            /*
             if (invalidData) {
                 var prop = $el.attr('prop'),
                     page = $el.closest('[page]').attr('page')
                 warn('Detected %s invalid data entries for prop [%s] in page [%s]', invalidData, prop, page)
                 invalidData = 0
             }
+            */
         }
 
 
@@ -2308,7 +2325,7 @@ function rasti(name, container) {
                 : el.hasAttribute('panel')
                     ? $el.children('[section]:not([modal])')
                     : undefined
-        if (!$tabs) return error('[tabs] attribute can only be used in pages or panels, was found in element:', el)
+        if (!$tabs) return error('Cannot create tabs: container must be a [page] or a [panel]', el)
 
         var $labels = $('<div class="tab-labels">'),
             $bar = $('<div class="bar">'),
@@ -2339,8 +2356,8 @@ function rasti(name, container) {
         })
 
         $flow.on('scroll', e => {
-            position = this.scrollLeft / this.scrollWidth
-            $bar.css({ left : position * this.offsetWidth })
+            position = e.target.scrollLeft / e.target.scrollWidth
+            $bar.css({ left : position * e.target.offsetWidth })
         })
 
         container.on('rasti-nav', e => {
@@ -2376,7 +2393,7 @@ function rasti(name, container) {
         block.init($el)
 
         // if applicable, create options from data source
-        if (el.hasAttribute('data')) updateBlock($el)
+        if ( resolveAttr($el, 'data') ) updateBlock($el)
     }
 
 
@@ -2392,24 +2409,26 @@ function rasti(name, container) {
 
 
     function initPager($el, template, data, lang) {
-        var name = $el.attr('template'),
-            page_size = parseInt($el.attr('paging')),
-            pager = newPager(name, data, page_size),
-            paging, columns, sizes, col=1, size=0
+        const name = $el.attr('template'),
+            pager = newPager(name, data, self.options.page_sizes)
+        let paging, sizes, columns, size=0, col=1
 
-        if ($el[0].hasAttribute('columns')) columns = `<button btn icon=columns />`
-
-        if (pager.total > 1) paging = `<div class="paging inline inline_">
-                <button btn icon=prev />
+        if (pager.total > 1) {
+            paging = `<div class="paging inline inline_">
+                <button icon=prev />
                 <span class=page />
-                <button btn icon=next />
+                <button icon=next />
             </div>`
 
-        sizes = `<button btn icon=rows />`
+            sizes = `<button icon=rows>${ self.options.page_sizes[0] }</button>`
+        }
+
+        if ($el[0].hasAttribute('columns'))
+            columns = `<button icon=columns>1</button>`
 
         $el.html(`
             <div class="results scrolly"></div>
-            <div class="controls centerx bottom ib_">
+            <div class="controls centerx bottom inline_">
                 ${ columns || '' }
                 ${ paging || '' }
                 ${ sizes }
@@ -2455,18 +2474,18 @@ function rasti(name, container) {
     }
 
     function getPager(id) {
-        let pager = self.pagers.get(id)
+        let pager = __pagers.get(id)
         if (!pager) error('No pager found for template [%s]', id)
         return pager
     }
     function newPager(id, results, page_size) {
         let pager = new Pager(id, results, page_size)
-        self.pagers.set(id, pager)
+        __pagers.set(id, pager)
         return pager
     }
     function deletePager(pager) {
         if (!pager || !pager.id) return
-        self.pagers.delete(pager.id)
+        __pagers.delete(pager.id)
     }
 
 
@@ -2512,7 +2531,8 @@ function rasti(name, container) {
 
             ${ns} input:not([type=radio]):not([type=checkbox]),
             ${ns} select,
-            ${ns} textarea {
+            ${ns} textarea,
+            ${ns} .field {
                 background-color: ${ values.field[0] };
                 color: ${ values.field[1] };
             }
@@ -2562,32 +2582,7 @@ function rasti(name, container) {
     }
 
 
-    // api
-
-    return {
-        // objects
-        options : this.options,
-        props : this.props,
-        methods : this.methods,
-        templates : this.templates,
-        data : this.data,
-        pages : this.pages,
-        history : this.history,
-        state : this.state,
-        langs : this.langs,
-        themes : this.themes,
-        themeMaps : this.themeMaps,
-
-        // methods
-        extend,
-        init,
-        navTo,
-        render,
-        setLang,
-        setTheme,
-        updateBlock,
-        toggleFullScreen,
-    }
+    return this
 
 }
 
@@ -2711,17 +2706,16 @@ body {
     transition: background-color 0.2s;
 }
 
-h1 { font-size: 4em; }
-h2 { font-size: 3em; }
-h3 { font-size: 2em; }
-h4 { font-size: 1.5em; }
+h1 { font-size: 3em; }
+h2 { font-size: 2em; }
+h3 { font-size: 1.5em; }
+h1, h2, h3 { margin-top: 0; }
 
 p.big { font-size: 1.5em; }
 
 input, select, textarea {
     min-height: 35px;
     width: 100%;
-    padding: 5px 10px;
     border: 0;
     margin: 0;
     font-size: inherit;
@@ -2733,7 +2727,8 @@ input:focus:invalid {
 input:focus:valid {
     box-shadow: 0 0 0 2px green;
 }
-input, select, textarea, button {
+input, select, textarea, button, .field {
+    padding: 5px 10px;
     border-radius: 2px;
     outline: none;
     font-family: inherit !important;
@@ -2761,11 +2756,21 @@ button:disabled {
     filter: contrast(0.5);
     cursor: auto;
 }
+button[icon] {
+    position: relative;
+    padding-left: 50px;
+}
+button[icon]:empty {
+    padding-right: 0;
+}
 
 select {
     appearance: none;
     -moz-appearance: none;
     -webkit-appearance: none;
+}
+option {
+    cursor: pointer;
 }
 
 textarea {
@@ -2853,7 +2858,7 @@ input[type=checkbox] + label:hover {
 [page]:not(.active) {
 	display: none !important;
 }
-nav ~ [page] {
+nav ~ [page]:not(.hide-nav) {
     min-height: calc(100vh - 50px);
     max-height: calc(100vh - 50px);
 }
@@ -3049,10 +3054,13 @@ nav, .tab-labels {
     border-bottom: 1px solid rgba(0,0,0,0.2);
     border-radius: 0;
     text-transform: uppercase;
-    z-index: 1;
+}
+nav {
+    z-index: 8;
 }
 .tab-labels {
     justify-content: space-around;
+    z-index: 2;
 }
 .tab-labels > .bar {
     position: absolute;
@@ -3101,7 +3109,7 @@ nav > .active {
     max-width: 400px;
     overflow-y: auto;
     animation: zoomIn .4s, fadeIn .4s;
-    z-index: 11;
+    z-index: 10;
 }
 [modal].big, .modal.big {
     max-height: 800px;
@@ -3122,14 +3130,14 @@ nav > .active {
     position: fixed;
     background-color: inherit;
     box-shadow: 0 0 4px 4px rgba(0,0,0,0.2);
-    z-index: 1;
+    z-index: 7;
     cursor: pointer;
 }
 
 
 [label] {
     position: relative;
-    margin-top: 25px;
+    margin-top: 35px;
     vertical-align: bottom;
 }
 [label][fixed]>* {
@@ -3150,13 +3158,13 @@ nav > .active {
 }
 [label]:before {
     margin-top: -35px;
-    margin-left: -8px;
+    margin-left: -10px;
+}
+[label].big:before {
+    margin-left: 0;
 }
 [label][fixed]:before {
     margin-top: -30px;
-    margin-left: 4px;
-}
-[label].big:before {
     margin-left: 0;
 }
 .inline[label],
@@ -3208,7 +3216,7 @@ nav > .active {
 .row {
     width: 100%;
     display: flex;
-    flex-flow: row nowrap;
+    flex-flow: row wrap;
     align-content: flex-start;
     padding-left: 1%;
 }
@@ -3251,12 +3259,15 @@ nav > .active {
     display: block;
     flex-grow: 0;
     height: 50px;
-    width: auto;
     width: 50px;
     font-size: 1.5rem;
     line-height: 2;
     text-align: center;
     text-decoration: none;
+}
+button[icon]:before {
+    position: absolute;
+    top: 0; left: 0;
 }
 .small[icon]:before, .small_ > [icon]:before  {
     height: 35px;
@@ -3279,8 +3290,7 @@ nav > .active {
 }
 .floating[icon]:before {
     position: absolute;
-    margin-left: 10px;
-    margin-top: -5px;
+    margin-top: -8px;
 }
 .floating[icon] > input {
     padding-left: 45px;
@@ -3338,12 +3348,15 @@ button.fab {
     width: 100vw;
     background: rgba(0,0,0,.7);
     animation: fadeIn .4s;
-    z-index: 10;
+    z-index: 9;
 }
 
 .loading {
     color: transparent !important;
     position: relative;
+}
+.loading > * {
+    visibility: hidden;
 }
 .loading:after {
     content: '';
@@ -3355,6 +3368,7 @@ button.fab {
     border: 0.25rem solid rgba(255, 255, 255, 0.2);
     border-top-color: white;
     animation: spin 1s infinite linear;
+    visibility: visible;
 }
 .big.loading:after {
     position: fixed;
@@ -3950,13 +3964,13 @@ function checkData(data) {
     case 'object':
         if ( !is.string(data.value) || !is.string(data.label) ) {
             rasti.error('Invalid data object (must have string properties "value" and "label"):', data)
-            invalidData++
+            //invalid_count++
             data = {value: '', label: 'INVALID DATA', alias: ''}
         }
         else if ( !is.string(data.alias) ) {
             if (data.alias) {
                 rasti.error('Invalid data property "alias" (must be a string):', data)
-                invalidData++
+                //invalid_count++
             }
             data.alias = data.value.toLowerCase()
         }
@@ -3964,7 +3978,7 @@ function checkData(data) {
         break
     default:
         rasti.error('Invalid data (must be a string or an object):', data)
-        invalidData++
+        //invalid_count++
         data = {value: '', label: 'INVALID DATA', alias: ''}
     }
     return data
@@ -4007,7 +4021,7 @@ function htmlEscape(str) {
 
 
 function resolveAttr($el, name) {
-    var value = $el.attr(name) || $el.attr('name') || $el.attr('prop') || $el.attr('nav') || $el.attr('template') ||  $el.attr('section') || $el.attr('panel') || $el.attr('page')
+    var value = $el.attr(name) || $el.attr('name') || $el.attr('prop') || $el.attr('nav') || $el.attr('section') || $el.attr('panel') || $el.attr('page') || $el.attr('template')
     if (!value) rasti.warn('Could not resolve value of [%s] attribute in el:', name, $el[0])
     return value
 }

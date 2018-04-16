@@ -16,17 +16,16 @@ body {
     transition: background-color 0.2s;
 }
 
-h1 { font-size: 4em; }
-h2 { font-size: 3em; }
-h3 { font-size: 2em; }
-h4 { font-size: 1.5em; }
+h1 { font-size: 3em; }
+h2 { font-size: 2em; }
+h3 { font-size: 1.5em; }
+h1, h2, h3 { margin-top: 0; }
 
 p.big { font-size: 1.5em; }
 
 input, select, textarea {
     min-height: 35px;
     width: 100%;
-    padding: 5px 10px;
     border: 0;
     margin: 0;
     font-size: inherit;
@@ -38,7 +37,8 @@ input:focus:invalid {
 input:focus:valid {
     box-shadow: 0 0 0 2px green;
 }
-input, select, textarea, button {
+input, select, textarea, button, .field {
+    padding: 5px 10px;
     border-radius: 2px;
     outline: none;
     font-family: inherit !important;
@@ -66,11 +66,21 @@ button:disabled {
     filter: contrast(0.5);
     cursor: auto;
 }
+button[icon] {
+    position: relative;
+    padding-left: 50px;
+}
+button[icon]:empty {
+    padding-right: 0;
+}
 
 select {
     appearance: none;
     -moz-appearance: none;
     -webkit-appearance: none;
+}
+option {
+    cursor: pointer;
 }
 
 textarea {
@@ -158,7 +168,7 @@ input[type=checkbox] + label:hover {
 [page]:not(.active) {
 	display: none !important;
 }
-nav ~ [page] {
+nav ~ [page]:not(.hide-nav) {
     min-height: calc(100vh - 50px);
     max-height: calc(100vh - 50px);
 }
@@ -354,10 +364,13 @@ nav, .tab-labels {
     border-bottom: 1px solid rgba(0,0,0,0.2);
     border-radius: 0;
     text-transform: uppercase;
-    z-index: 1;
+}
+nav {
+    z-index: 8;
 }
 .tab-labels {
     justify-content: space-around;
+    z-index: 2;
 }
 .tab-labels > .bar {
     position: absolute;
@@ -406,7 +419,7 @@ nav > .active {
     max-width: 400px;
     overflow-y: auto;
     animation: zoomIn .4s, fadeIn .4s;
-    z-index: 11;
+    z-index: 10;
 }
 [modal].big, .modal.big {
     max-height: 800px;
@@ -427,14 +440,14 @@ nav > .active {
     position: fixed;
     background-color: inherit;
     box-shadow: 0 0 4px 4px rgba(0,0,0,0.2);
-    z-index: 1;
+    z-index: 7;
     cursor: pointer;
 }
 
 
 [label] {
     position: relative;
-    margin-top: 25px;
+    margin-top: 35px;
     vertical-align: bottom;
 }
 [label][fixed]>* {
@@ -455,13 +468,13 @@ nav > .active {
 }
 [label]:before {
     margin-top: -35px;
-    margin-left: -8px;
+    margin-left: -10px;
+}
+[label].big:before {
+    margin-left: 0;
 }
 [label][fixed]:before {
     margin-top: -30px;
-    margin-left: 4px;
-}
-[label].big:before {
     margin-left: 0;
 }
 .inline[label],
@@ -513,7 +526,7 @@ nav > .active {
 .row {
     width: 100%;
     display: flex;
-    flex-flow: row nowrap;
+    flex-flow: row wrap;
     align-content: flex-start;
     padding-left: 1%;
 }
@@ -556,12 +569,15 @@ nav > .active {
     display: block;
     flex-grow: 0;
     height: 50px;
-    width: auto;
     width: 50px;
     font-size: 1.5rem;
     line-height: 2;
     text-align: center;
     text-decoration: none;
+}
+button[icon]:before {
+    position: absolute;
+    top: 0; left: 0;
 }
 .small[icon]:before, .small_ > [icon]:before  {
     height: 35px;
@@ -584,8 +600,7 @@ nav > .active {
 }
 .floating[icon]:before {
     position: absolute;
-    margin-left: 10px;
-    margin-top: -5px;
+    margin-top: -8px;
 }
 .floating[icon] > input {
     padding-left: 45px;
@@ -643,12 +658,15 @@ button.fab {
     width: 100vw;
     background: rgba(0,0,0,.7);
     animation: fadeIn .4s;
-    z-index: 10;
+    z-index: 9;
 }
 
 .loading {
     color: transparent !important;
     position: relative;
+}
+.loading > * {
+    visibility: hidden;
 }
 .loading:after {
     content: '';
@@ -660,6 +678,7 @@ button.fab {
     border: 0.25rem solid rgba(255, 255, 255, 0.2);
     border-top-color: white;
     animation: spin 1s infinite linear;
+    visibility: visible;
 }
 .big.loading:after {
     position: fixed;

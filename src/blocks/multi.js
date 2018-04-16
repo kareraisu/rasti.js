@@ -17,9 +17,9 @@ template : function(data, $el) {
 
 init : function($el) {
     var el = $el[0]
-    var field = $el.attr('field')
+    var name = $el.attr('prop') || $el.attr('name')
 
-    if (!field) return rasti.error('Missing field name in [field] attribute of element:', el)
+    if (!name) return rasti.error('Could not resolve name of element:', el)
     
     el.value = []
     el.max = parseInt($el.attr('max'))
@@ -34,15 +34,17 @@ init : function($el) {
 
     // structure
 
+    $el.addClass('field')
     $el.html('<div selected/><div add/>')
     $el.closest('[page]').children('.page-options')
-        .append('<div field block=multi options='+ field +'>')
+        .append('<div block=multi section options='+ name +'>')
     var $selected = $el.find('[selected]')
-    var $options = $el.closest('[page]').find('[options='+ field +']')
+    var $options = $el.closest('[page]').find('[options='+ name +']')
 
     // bindings
 
     $el.on('click', function(e) {
+        e.stopPropagation()
         $options.siblings('[options]').hide() // hide other options
         if ( utils.onMobile() ) $options.parent().addClass('backdrop')
         $options.css('left', this.getBoundingClientRect().right).show()
@@ -50,8 +52,8 @@ init : function($el) {
     })
 
     $el.closest('[page]').on('click', '*:not(option)', function(e) {
-        if ( $(e.target).attr('field') === field
-          || $(e.target).parent().attr('field') === field ) return
+        if ( $(e.target).attr('name') === name
+          || $(e.target).parent().attr('name') === name ) return
         if ( utils.onMobile() ) $options.parent().removeClass('backdrop')
         $options.hide()
     })
@@ -95,7 +97,7 @@ init : function($el) {
             $options.append(el)
         })
         for (var val of el.value) {
-            $selected.append($options.find('[value='+ val +']'))
+            $selected.append($options.find('[value="'+ val +'"]'))
             if ( checkFull() ) break
         }
     })
@@ -125,7 +127,7 @@ init : function($el) {
 },
 
 style : `
-    [block=multi] {
+    [block=multi]:not([options]) {
         display: flex;
         min-height: 35px;
         padding-right: 0;
@@ -135,12 +137,12 @@ style : `
     [block=multi] [add] {
         display: flex;
         align-items: center;
-        width: 20px;
+        width: 30px;
         border-left: 1px solid rgba(0,0,0,0.2);
     }
     [block=multi] [add]:before {
         content: '〉';
-        padding-left: 6px;
+        padding-left: 10px;
     }
     [block=multi].open [add] {
         box-shadow: inset 0 0 2px #000;
@@ -152,7 +154,7 @@ style : `
         display: none;
     }
     [block=multi] option {
-        padding: 2px 0;
+        padding: 6px 0;
     }
     [block=multi] option:before {
         content: '✕';

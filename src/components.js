@@ -22,18 +22,15 @@ class History {
 
 class Pager {
 
-    constructor(id, results, page_size) {
+    constructor(id, results, sizes) {
         this.id = id
         if ( !is.string(id) ) return rasti.error('Pager id must be a string')
         this.logid = `Pager for template [${ this.id }]:`
         if ( !is.array(results) ) return rasti.error('%s Results must be an array', this.logid)
-        if ( !is.number(page_size) ) return rasti.error('%s Page size must be a number', this.logid)
         this.results = results
-        this.sizes = [5, 10, 20]
-        this.page_size = page_size
-        this.page = 0
-        this.total = Math.ceil(this.results.length / this.page_size)
-
+        if ( !is.array(sizes) || !is.number(sizes[0]) ) return rasti.error('%s Page sizes must be an array of numbers', this.logid)
+        this.sizes = sizes
+        this.setPageSize(this.sizes[0])
     }
 
     next() {
