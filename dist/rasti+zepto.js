@@ -40,6 +40,7 @@ style : `
         border-radius: 6px;
         border: 2px outset rgba(255, 255, 255, 0.5);
         background-clip: padding-box;
+        text-transform: uppercase;
         cursor: pointer;
     }
     [block=buttons] > div.active {
@@ -117,7 +118,7 @@ module.exports = {
 template : function(data, $el) {
     $el[0].total = data.length // WARNING : SIDE EFFECTS
 
-    var ret = $el[0].hasAttribute('filter')
+    var ret = $el.hasAttr('filter')
         ? `<input field type="text" placeholder="${ $el.attr('filter') }"/>`
         : ''
 
@@ -195,7 +196,8 @@ init : function($el) {
 
     $options.on('click', 'option', toggleOption)
 
-    $options.on('click', function(e) { $options.find('input').focus() })
+    if ( !utils.onMobile() )
+        $options.on('click', function(e) { $options.find('input').focus() })
 
     $options.on('input', 'input', function(e) {
         this.value
@@ -204,7 +206,7 @@ init : function($el) {
     })
 
     $el.on('change', function(e, params){
-        if (params && params.ui) return // triggered from ui, do nothing
+        if (params && params.ui) return // change triggered from ui, do nothing
         $selected.children().each(function(i, el) {
             $options.append(el)
         })
@@ -526,7 +528,7 @@ class Pager {
             return []
         }
         try {
-            var i = (page -1) * this.page_size
+            const i = (page -1) * this.page_size
             return this.results.slice(i, i + this.page_size)
         }
         catch(err) {
@@ -540,7 +542,7 @@ class Pager {
 
 function state(app) {
     function invalid() {
-        error('Saved state for app [%s] is invalid', app.name)
+        rasti.error('Saved state for app [%s] is invalid', app.name)
     }
 
     return Object.defineProperties({}, {
@@ -548,11 +550,12 @@ function state(app) {
         theme : { get : _ => app.active.theme, enumerable : true },
         lang  : { get : _ => app.active.lang, enumerable : true },
         save : { value : _ => {
+            app.state.props = app.props
             localStorage.setItem('rasti.' + app.name, JSON.stringify(app.state))
             rasti.log('State saved')
         } },
         get : { value : _ => {
-            var state
+            let state
             try {
                 state = JSON.parse( localStorage.getItem('rasti.' + app.name) )
                 if ( !state ) rasti.log('No saved state found for app [%s]', app.name)
@@ -564,12 +567,13 @@ function state(app) {
             }
         } },
         restore : { value : _ => {
-            var state = app.state.get()
+            const state = app.state.get()
             if (state) {
                 rasti.log('Restoring state...')
-                for (let prop in state) {
+                for (let prop in app.state) {
                     app.state[prop] = state[prop]
                 }
+                if (state.props) app.props = state.props
                 if (state.theme) app.setTheme(state.theme)
                 if (state.lang) app.setLang(state.lang)
                 app.navTo(state.page)
@@ -719,6 +723,10 @@ Object.defineProperties(Array.prototype, {
 
 
 // $ extensions
+$.fn.hasAttr = function(name) {  
+    return this[0].hasAttribute(name)
+}
+
 $.fn.move = function(options) {
     var options = Object.assign({
             handle: this,
@@ -732,7 +740,7 @@ $.fn.move = function(options) {
         move = 'mousemove touchmove',
         release = 'mouseup touchend'
 
-    if (!object[0].hasAttribute('move')) object.attr('move', '')
+    if (!object.hasAttr('move')) object.attr('move', '')
 
     options.handle.on(hold, function(e) {
         if (e.type == 'mousedown' && e.which != 1) return
@@ -1347,11 +1355,10 @@ other
 require('./extensions')
 const { History, Pager, state, crud } = require('./components')
 const utils = require('./utils')
-const { is, sameType, resolveAttr, html } = utils
+const { is, sameType, exists, resolveAttr, html } = utils
 const { themes, themeMaps } = require('./themes')
 
 const options = {
-    persist : false,
     history : false,
     root    : '',
     theme   : 'base',
@@ -1542,34 +1549,9 @@ function rasti(name, container) {
         })
 
 
-        // auto-close menus
-        container.find('[menu]').each( (i, el) => {
-            $(el).on('click', e => {
-                el.style.display = 'none'
-            })
-        })
-
-
-        // init field validations
-        container.find('[validate]').each( (i, btn) => {
-            btn.disabled = true
-            const $container = $(btn).parent()
-            const $fields = $container.find('[required]')
-            $fields.each( (i, field) => {
-                let invalid = field.validity && !field.validity.valid
-                field.classList.toggle('error', invalid)
-                $(field).change( e => {
-                    invalid = field.validity && !field.validity.valid
-                    field.classList.toggle('error', invalid)
-                    btn.disabled = $container.find('.error').length
-                })
-            })
-        })
-
-
         // init nav
-        container.find('[nav]').click( e => {
-            const el = e.target
+        container.find('[nav]').on('click', e => {
+            const el = e.currentTarget
             const $el = $(el)
             const page = $el.attr('nav')
             let params = {}
@@ -1690,12 +1672,17 @@ function rasti(name, container) {
                 if ( !$target.length ) return error('Could not find target [%s] declared in [%s] attribute of element:', targetSelector, action, el)
 
                 $el.on('click', e => {
+                    e.stopPropagation()
+                    $target.addClass('target')
+                    container.find('[menu]:not(.target)').hide()
+                    $target.removeClass('target')
                     const target = $target[0]
-                    if (target.hasAttribute('modal')) $page.find('.page-options').toggleClass('backdrop')
+                    if (target.hasAttribute('modal') || $target.hasClass('modal'))
+                        $page.find('.page-options').toggleClass('backdrop')
                     $target[action]()
                     target.style.display != 'none'
-                        ? target.focus()
-                        : target.blur()
+                        ? $target.focus()
+                        : $target.blur()
                 })
             })
         }
@@ -1767,15 +1754,9 @@ function rasti(name, container) {
         if (self.options.history) initHistory()
 
 
-        // restore and persist state (if applicable)
-        let restored
-        if (self.options.persist) {
-            restored = self.state.restore()
-            $(window).on('beforeunload', e => { self.state.save() })
-        }
-
-        if ( !self.options.persist || !restored ) {
-
+        // restore and save state
+        $(window).on('beforeunload', e => { self.state.save() })
+        if ( !self.state.restore() ) {
             // set lang (if applicable and not already set)
             if ( self.options.lang && !self.active.lang ) setLang(self.options.lang)
             // if no lang, generate texts
@@ -1784,10 +1765,8 @@ function rasti(name, container) {
                     $(el).text( $(el).attr('text') )
                 })
             }
-
             // set theme (if not already set)
             if ( !self.active.theme ) setTheme(self.options.theme)
-
             // nav to page in hash or to root or to first page container
             const page = location.hash.substring(1) || self.options.root
             navTo(
@@ -1798,15 +1777,15 @@ function rasti(name, container) {
         }
 
 
-        // init statefull elements
-        container.find('[state]').each( (i, el) => {
+        // init props
+        container.find('[prop]').each( (i, el) => {
             const $el = $(el)
-            const prop = resolveAttr($el, 'state')
+            const prop = $el.attr('prop')
 
             if (!prop) return
 
-            if (el.value !== undefined) {
-                // it's an element
+            if ( exists(el.value) && !el.bound ) {
+                // it's a not-yet-bound element
                 bindElement($el, prop)
             }
             else {
@@ -1817,31 +1796,68 @@ function rasti(name, container) {
                     if (subprop) bindElement($el, prop, subprop)
                 })
             }
-
-            function bindElement($el, prop, subprop){
-                let root = self.state
-
-                if (subprop) {
-                    // go down one level
-                    root[prop] = root[prop] || {}
-                    root = root[prop]
-                    prop = subprop
-                }
-                if ( root[prop] ) {
-                    // update ui from restored state
-                    $el.val( root[prop] ).trigger('change')
-                }
-                else {
-                    // first invocation, create empty (sub)prop
-                    root[prop] = ''
-                }
-
-                $el.on('change', e => {
-                    // update state on ui change
-                    root[prop] = $el.val()
-                })
-            }
         })
+
+        function bindElement($el, prop, subprop){
+            let root = self.props
+
+            if (subprop) {
+                // go down one level
+                root[prop] = root[prop] || {}
+                root = root[prop]
+                prop = subprop
+            }
+            if ( root[prop] && !$el.hasAttr('transient') ) {
+                // update dom from restored state
+                $el.val( root[prop] ).trigger('change')
+            }
+            else {
+                // first invocation, create empty (sub)prop
+                root[prop] = ''
+            }
+
+            // update prop on dom change
+            $el.on('change', (e, params) => {
+                if (params && params.setter) return // change was triggered from setter, no need to update prop (and would cause infinite mutual recursion)
+                root[prop] = $el.val()
+            })
+
+            // update dom on prop change
+            Object.defineProperty(root, prop, {
+                get : _ => this[prop],
+                set : val => {
+                    this[prop] = val
+                    $el[0].nodeName == 'TEXTAREA'
+                        ? $el.text( val ).trigger('change', {setter : true})
+                        : $el.val( val ).trigger('change', {setter : true})
+                }
+            })
+
+
+            // set bound flag to avoid re-binding
+            $el[0].bound = true
+        }
+
+
+        // init field validations
+        container.find('button[validate]').each( (i, btn) => {
+            const $fields = $(btn).parent().find('input[required]')
+            btn.disabled = isAnyFieldInvalid($fields)
+            $fields.each( (i, field) => {
+                $(field).on('input', e => {
+                    btn.disabled = isAnyFieldInvalid($fields)
+                })
+            })
+        })
+
+        function isAnyFieldInvalid($fields) {
+            let valid = true
+            $fields.each( (i, field) => {
+                valid = valid && field.validity.valid
+                return valid
+            })
+            return !valid
+        }
 
 
         // render automatic templates
@@ -1898,19 +1914,22 @@ function rasti(name, container) {
         })
 
 
-        // init move
-        container.find('.movable').each( (i, el) => {
+        // init movable elements
+        container.find('[movable]').each( (i, el) => {
             $(el).move()
         })
 
 
-        // init collapse
-        container.find('.collapsable').on('click', e => {
+        // init foldable elements (must have a header)
+        container.find('[foldable][header]').on('click', e => {
             e.target.classList.toggle('folded')
         })
 
 
         container
+            .on('click', e => {
+                container.find('[menu]').hide()
+            })
             .on('click', '.backdrop', e => {
                 $(e.target).removeClass('backdrop')
                 self.active.page.find('[modal]').hide()
@@ -2013,7 +2032,7 @@ function rasti(name, container) {
         const $el = el.nodeName ? $(el) : el
         el = $el[0]
         const src = $el.attr('bind')
-        const $src = container.find('[name='+ src +']')
+        const $src = container.find('[prop='+ src +']')
         if (!$src.length) return error(errPrefix + 'source element "%s" not found, declared in [bind] attribute of el: ', src, el)
         $el.attr('template', 'bind=' + src)
         $src.on('change', e => render($el, e.target.value))
@@ -2033,7 +2052,6 @@ function rasti(name, container) {
         }
         const errPrefix = 'Cannot render template ['+ name +']: '
         if (!$el.length) return error(errPrefix + 'no element bound to template. Please bind one via [template] attribute.')
-        el = $el[0]
 
         if (!data) {
             const datakey = resolveAttr($el, 'data')
@@ -2043,11 +2061,10 @@ function rasti(name, container) {
         }
         if ( is.string(data) ) data = data.split(', ')
         if ( !is.array(data) ) return error(errPrefix + 'invalid data provided, must be a string or an array')
-        if (!data.length) return $el.html(`<div msg center textc>${ self.options.noData }</div>`)
 
         let template = self.templates[name]
         let html
-        if (!template || is.string(template)) try {
+        if ( !template || is.string(template) ) try {
             html = template || $el.html()
             html = html.trim()
             template = genTemplate(html)
@@ -2057,9 +2074,11 @@ function rasti(name, container) {
         catch(err) {
             return error(errPrefix + 'parsing error: ' + err)
         }
-        if (!is.function(template)) return error(errPrefix + 'template must be a string or a function')
+        if ( !is.function(template) ) return error(errPrefix + 'template must be a string or a function')
 
-        const isCrud = el.hasAttribute('crud')
+        if (!data.length) return $el.html(`<div class="nodata">${ self.options.noData }</div>`).addClass('rendered')
+
+        const isCrud = $el.hasAttr('crud')
         if (isCrud) {
             if (is.object(data[0]) && !data[0].id) data.forEach((el, i) => el.id = i)
             //log('crud data:', data)
@@ -2073,12 +2092,12 @@ function rasti(name, container) {
             template.html = html
         }
 
-        const paging = el.hasAttribute('paging')
-        paging
+        const isPaged = $el.hasAttr('paged')
+        isPaged
             ? initPager($el, template, data, getActiveLang())
             : $el.html( template(data).join('') )
 
-        if (el.hasAttribute('stats')) {
+        if ( $el.hasAttr('stats') ) {
             const stats = $('<div section class="stats">')
             stats.html( self.options.stats.replace('%n', data.length).replace('%t', time) )
             $el.prepend(stats)
@@ -2096,7 +2115,7 @@ function rasti(name, container) {
         }
 
         $el.addClass('rendered')
-        if (!paging) applyFX($el)
+        if (!isPaged) applyFX($el)
 
     }
 
@@ -2198,8 +2217,8 @@ function rasti(name, container) {
         container.find('[bg]').each( (i, el) => {
             colorName = el.getAttribute('bg')
             color = theme.palette[colorName] || baseTheme.palette[colorName]
-            if (color) el.style['background-color'] = color
-            else warn('Invalid color [%s] declared in el:', colorName, el)
+            if (!color) warn('Color [%s] not found in theme palette, using it as is', colorName, el)
+            el.style['background-color'] = color || colorName
         })
     }
 
@@ -2425,7 +2444,7 @@ function rasti(name, container) {
             sizes = `<button icon=rows>${ self.options.page_sizes[0] }</button>`
         }
 
-        if ($el[0].hasAttribute('columns'))
+        if ( $el.hasAttr('columns') )
             columns = `<button icon=columns>1</button>`
 
         $el.html(`
@@ -2433,7 +2452,7 @@ function rasti(name, container) {
             <div class="controls centerx bottom inline_">
                 ${ columns || '' }
                 ${ paging || '' }
-                ${ sizes }
+                ${ sizes || '' }
             </div>
         `)
 
@@ -2499,7 +2518,7 @@ function rasti(name, container) {
         if (!$form.length) return error('No container element bound to ajax method [%s]. Please bind one via [ajax] attribute', method)
 
         var reqdata = {}, prop
-        $form.find('[prop]').each( (i, el) => {
+        $form.find('[prop]:not([private])').each( (i, el) => {
             $el = $(el)
             prop = $el.attr('prop')
             if (prop) {
@@ -2715,26 +2734,37 @@ h1, h2, h3 { margin-top: 0; }
 
 p.big { font-size: 1.5em; }
 
-input, select, textarea {
+ol, ul {
+    padding: 5px 10px 5px 30px;
+    border-radius: 2px;
+}
+
+input, button, select, textarea, .field {
     min-height: 35px;
     width: 100%;
+    padding: 5px 10px;
+    margin: 0 0 15px 0;
     border: 0;
-    margin: 0;
+    border-radius: 4px;
+    outline: none;
+    font-family: inherit !important;
     font-size: inherit;
     vertical-align: text-bottom;
 }
+
+meter, progress {
+    width: 100%;
+    margin: 0 0 15px 0;
+    border-radius: 2px;
+}
+
 input:focus:invalid {
     box-shadow: 0 0 0 2px red;
 }
 input:focus:valid {
     box-shadow: 0 0 0 2px green;
 }
-input, select, textarea, button, .field {
-    padding: 5px 10px;
-    border-radius: 2px;
-    outline: none;
-    font-family: inherit !important;
-}
+
 input[type=range], select, button {
     cursor: pointer;
 }
@@ -2757,13 +2787,6 @@ button:not(:disabled):hover {
 button:disabled {
     filter: contrast(0.5);
     cursor: auto;
-}
-button[icon] {
-    position: relative;
-    padding-left: 50px;
-}
-button[icon]:empty {
-    padding-right: 0;
 }
 
 select {
@@ -2790,7 +2813,6 @@ input.big, button.big,
 input.small, button.small,
 .small_ > input, .small_ > button {
     height: 25px;
-    margin-bottom: 15px;
     font-size: 1em;
 }
 
@@ -2804,7 +2826,7 @@ input[type=checkbox] + label {
     height: 40px;
     max-width: 90%;
     padding: 12px 0;
-    margin-left: 40px;
+    margin-left: 45px;
     overflow: hidden;
     text-overflow: ellipsis;
     cursor: pointer;
@@ -2816,7 +2838,7 @@ input[type=checkbox] + label:before {
     height: 32px;
     width: 32px;
     margin-top: -8px;
-    margin-left: -36px;
+    margin-left: -40px;
     border: 1px solid #999;
     color: transparent;
     background-color: #fff;
@@ -2888,12 +2910,6 @@ nav ~ [page]:not(.hide-nav) {
 }
 
 
-[panel] input, [panel] button, [panel] [label],
-[section] input, [section] button, [section] [label] {
-    margin-bottom: 15px;
-}
-
-
 [header][panel] {
     padding-top: 75px;
 }
@@ -2933,9 +2949,6 @@ nav ~ [page]:not(.hide-nav) {
     padding: 10px;
     line-height: 20px;
     font-size: 1.5em;
-}
-[header].collapse:before {
-    cursor: pointer;
 }
 
 [footer][page]:after {
@@ -3089,12 +3102,6 @@ nav > div, nav > a {
     max-width: 200px;
     transition: all 0.2s;
 }
-nav > div:hover, nav > a:hover {
-    letter-spacing: 4px;
-}
-nav > .active {
-    border-bottom: 5px solid #222;
-}
 [tab-label].active {
     filter: contrast(1.5);
 }
@@ -3130,10 +3137,17 @@ nav > .active {
 [menu] {
     display: none;
     position: fixed;
+    padding: 10px;
     background-color: inherit;
     box-shadow: 0 0 4px 4px rgba(0,0,0,0.2);
     z-index: 7;
     cursor: pointer;
+}
+[menu] > div {
+    padding: 15px 5px;
+    line-height: 1;
+    font-size: 1rem;
+    text-transform: capitalize;
 }
 
 
@@ -3160,7 +3174,7 @@ nav > .active {
 }
 [label]:before {
     margin-top: -35px;
-    margin-left: -10px;
+    left: 0;
 }
 [label].big:before {
     margin-left: 0;
@@ -3169,26 +3183,26 @@ nav > .active {
     margin-top: -30px;
     margin-left: 0;
 }
-.inline[label],
-.inline_ > [label] {
+.inline-label[label],
+.inline-label_ > [label] {
     width: auto;
     margin-top: 0;
     margin-left: calc(40% + 10px);
 }
-.inline[label]:before,
-.inline_ > [label]:before {
+.inline-label[l2bel]:before,
+.inline-label_ > [label]:before {
     width: 80%;
-    left: -80%;
+    left: -85%;
     margin-top: -5px;
     text-align: right;
 }
-.inline[label][fixed]:before,
-.inline_ > [label][fixed]:before {
+.inline-label[label][fixed]:before,
+.inline-label_ > [label][fixed]:before {
     margin-top: 0;
     margin-left: -8px;
 }
-.below[label]:before,
-.below_ > [label]:before {
+.below-label[label]:before,
+.below-label_ > [label]:before {
     bottom: -40px;
     left: 0;
     right: 0;
@@ -3204,9 +3218,39 @@ nav > .active {
 }
 
 
-[nav],
-[show], [hide], [toggle],
-[onclick] {
+[nav] *,
+[show] *, [hide] *, [toggle] *,
+[onclick] * {
+    cursor: pointer;
+}
+
+
+
+/*******************************************************************************
+**************************** FUNCTIONAL ENHANCERS ****************************** 
+*******************************************************************************/
+
+[movable] {
+    user-select: none;
+    cursor: move;
+}
+
+[resizable] {
+    resize: both;
+    overflow: hidden;
+}
+
+[foldable] {
+    animation: foldOut 0.5s;
+    overflow: hidden; 
+}
+[foldable][header].folded {
+    animation: foldIn 0.5s;
+    height: 0;
+    padding-bottom: 0;
+    padding-top: 40px;
+}
+[foldable][header]:before {
     cursor: pointer;
 }
 
@@ -3257,6 +3301,14 @@ nav > .active {
 ********************************** ICONS *************************************** 
 *******************************************************************************/
 
+body [icon] {
+    position: relative;
+    min-height: 50px;
+    padding-left: 50px;
+}
+body [icon]:empty {
+    padding: 0;
+}
 [icon]:before {
     display: block;
     flex-grow: 0;
@@ -3267,7 +3319,7 @@ nav > .active {
     text-align: center;
     text-decoration: none;
 }
-button[icon]:before {
+[icon]:not(:empty):before {
     position: absolute;
     top: 0; left: 0;
 }
@@ -3290,9 +3342,12 @@ button[icon]:before {
 .round[icon]:before, .round_ > [icon]:before {
     border-radius: 50%;
 }
+.floating[icon] {
+    padding-left: 0;
+}
 .floating[icon]:before {
-    position: absolute;
-    margin-top: -8px;
+    top: -6px;
+    left: auto;
 }
 .floating[icon] > input {
     padding-left: 45px;
@@ -3324,11 +3379,11 @@ button[icon]:before {
     letter-spacing: 4px;
 }
 
-.msg {
-    height: 60%;
-    width: 60%;
+.nodata {
     padding: 10% 5%;
-    font-size: large;
+    margin: auto;
+    font-size: 1.5rem;
+    text-align: center;
 }
 
 button.fab {
@@ -3389,34 +3444,6 @@ button.fab {
     background-color: #3498db;
     animation: flip 1s infinite linear;
 }
-
-
-
-/*******************************************************************************
-**************************** FUNCTIONAL ENHANCERS ****************************** 
-*******************************************************************************/
-
-.movable {
-    user-select: none;
-    cursor: move;
-}
-
-.resizable {
-    resize: both;
-    overflow: hidden;
-}
-
-.collapsable {
-    animation: foldOut 0.5s;
-    overflow: hidden; 
-}
-.collapsable[header].folded {
-    animation: foldIn 0.5s;
-    height: 0;
-    padding-bottom: 0;
-    padding-top: 40px;
-}
-
 
 
 /*******************************************************************************
@@ -3768,26 +3795,6 @@ button.fab {
 /* tablet only */
 @media only screen and (min-width: 500px) and (max-width: 800px) {
 
-    .hide-tablet {
-        display: none;
-    }
-    .show-tablet {
-        display: block;
-    }
-
-    [header].hh-tablet:before {
-        display: none;
-    }
-    [header].hh-tablet[page] {
-        padding-top: 0;
-    }
-    [header].hh-tablet[panel] {
-        padding-top: 20px;
-    }
-    [header].hh-tablet[section] {
-        padding-top: 15px;
-    }
-    
     .pad-s-tablet {
         padding-left: 5%;
         padding-right: 5%;
@@ -3812,6 +3819,26 @@ button.fab {
         line-height: 0.8;
     }
 
+    .hide-tablet {
+        display: none;
+    }
+    .show-tablet {
+        display: block;
+    }
+
+    [header].hh-tablet:before {
+        display: none;
+    }
+    [header].hh-tablet[page] {
+        padding-top: 0;
+    }
+    [header].hh-tablet[panel] {
+        padding-top: 20px;
+    }
+    [header].hh-tablet[section] {
+        padding-top: 15px;
+    }
+
 }
 
 
@@ -3821,6 +3848,10 @@ button.fab {
     [page] {
         padding-bottom: 0;
         overflow-y: auto;
+    }
+
+    [panel] {
+        border-radius: 0;
     }
 
     [template] > .controls > .columns,
@@ -3834,6 +3865,10 @@ button.fab {
         right: 0;
         height: 80% !important;
         margin: auto;
+    }
+
+    .row {
+        padding-left: 0;
     }
 
     .hide-phone {
@@ -3941,6 +3976,9 @@ function type(exp) {
 }
 function sameType(exp1, exp2) {
     return type(exp1) === type(exp2)
+}
+function exists(ref) {
+    return ref !== undefined && ref !== null
 }
 
 
@@ -4050,6 +4088,7 @@ module.exports = {
     is,
     type,
     sameType,
+    exists,
     inject,
     checkData,
     html,

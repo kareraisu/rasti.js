@@ -23,26 +23,37 @@ h1, h2, h3 { margin-top: 0; }
 
 p.big { font-size: 1.5em; }
 
-input, select, textarea {
+ol, ul {
+    padding: 5px 10px 5px 30px;
+    border-radius: 2px;
+}
+
+input, button, select, textarea, .field {
     min-height: 35px;
     width: 100%;
+    padding: 5px 10px;
+    margin: 0 0 15px 0;
     border: 0;
-    margin: 0;
+    border-radius: 4px;
+    outline: none;
+    font-family: inherit !important;
     font-size: inherit;
     vertical-align: text-bottom;
 }
+
+meter, progress {
+    width: 100%;
+    margin: 0 0 15px 0;
+    border-radius: 2px;
+}
+
 input:focus:invalid {
     box-shadow: 0 0 0 2px red;
 }
 input:focus:valid {
     box-shadow: 0 0 0 2px green;
 }
-input, select, textarea, button, .field {
-    padding: 5px 10px;
-    border-radius: 2px;
-    outline: none;
-    font-family: inherit !important;
-}
+
 input[type=range], select, button {
     cursor: pointer;
 }
@@ -65,13 +76,6 @@ button:not(:disabled):hover {
 button:disabled {
     filter: contrast(0.5);
     cursor: auto;
-}
-button[icon] {
-    position: relative;
-    padding-left: 50px;
-}
-button[icon]:empty {
-    padding-right: 0;
 }
 
 select {
@@ -98,7 +102,6 @@ input.big, button.big,
 input.small, button.small,
 .small_ > input, .small_ > button {
     height: 25px;
-    margin-bottom: 15px;
     font-size: 1em;
 }
 
@@ -112,7 +115,7 @@ input[type=checkbox] + label {
     height: 40px;
     max-width: 90%;
     padding: 12px 0;
-    margin-left: 40px;
+    margin-left: 45px;
     overflow: hidden;
     text-overflow: ellipsis;
     cursor: pointer;
@@ -124,7 +127,7 @@ input[type=checkbox] + label:before {
     height: 32px;
     width: 32px;
     margin-top: -8px;
-    margin-left: -36px;
+    margin-left: -40px;
     border: 1px solid #999;
     color: transparent;
     background-color: #fff;
@@ -196,12 +199,6 @@ nav ~ [page]:not(.hide-nav) {
 }
 
 
-[panel] input, [panel] button, [panel] [label],
-[section] input, [section] button, [section] [label] {
-    margin-bottom: 15px;
-}
-
-
 [header][panel] {
     padding-top: 75px;
 }
@@ -241,9 +238,6 @@ nav ~ [page]:not(.hide-nav) {
     padding: 10px;
     line-height: 20px;
     font-size: 1.5em;
-}
-[header].collapse:before {
-    cursor: pointer;
 }
 
 [footer][page]:after {
@@ -397,12 +391,6 @@ nav > div, nav > a {
     max-width: 200px;
     transition: all 0.2s;
 }
-nav > div:hover, nav > a:hover {
-    letter-spacing: 4px;
-}
-nav > .active {
-    border-bottom: 5px solid #222;
-}
 [tab-label].active {
     filter: contrast(1.5);
 }
@@ -438,10 +426,17 @@ nav > .active {
 [menu] {
     display: none;
     position: fixed;
+    padding: 10px;
     background-color: inherit;
     box-shadow: 0 0 4px 4px rgba(0,0,0,0.2);
     z-index: 7;
     cursor: pointer;
+}
+[menu] > div {
+    padding: 15px 5px;
+    line-height: 1;
+    font-size: 1rem;
+    text-transform: capitalize;
 }
 
 
@@ -468,7 +463,7 @@ nav > .active {
 }
 [label]:before {
     margin-top: -35px;
-    margin-left: -10px;
+    left: 0;
 }
 [label].big:before {
     margin-left: 0;
@@ -477,26 +472,26 @@ nav > .active {
     margin-top: -30px;
     margin-left: 0;
 }
-.inline[label],
-.inline_ > [label] {
+.inline-label[label],
+.inline-label_ > [label] {
     width: auto;
     margin-top: 0;
     margin-left: calc(40% + 10px);
 }
-.inline[label]:before,
-.inline_ > [label]:before {
+.inline-label[l2bel]:before,
+.inline-label_ > [label]:before {
     width: 80%;
-    left: -80%;
+    left: -85%;
     margin-top: -5px;
     text-align: right;
 }
-.inline[label][fixed]:before,
-.inline_ > [label][fixed]:before {
+.inline-label[label][fixed]:before,
+.inline-label_ > [label][fixed]:before {
     margin-top: 0;
     margin-left: -8px;
 }
-.below[label]:before,
-.below_ > [label]:before {
+.below-label[label]:before,
+.below-label_ > [label]:before {
     bottom: -40px;
     left: 0;
     right: 0;
@@ -512,9 +507,39 @@ nav > .active {
 }
 
 
-[nav],
-[show], [hide], [toggle],
-[onclick] {
+[nav] *,
+[show] *, [hide] *, [toggle] *,
+[onclick] * {
+    cursor: pointer;
+}
+
+
+
+/*******************************************************************************
+**************************** FUNCTIONAL ENHANCERS ****************************** 
+*******************************************************************************/
+
+[movable] {
+    user-select: none;
+    cursor: move;
+}
+
+[resizable] {
+    resize: both;
+    overflow: hidden;
+}
+
+[foldable] {
+    animation: foldOut 0.5s;
+    overflow: hidden; 
+}
+[foldable][header].folded {
+    animation: foldIn 0.5s;
+    height: 0;
+    padding-bottom: 0;
+    padding-top: 40px;
+}
+[foldable][header]:before {
     cursor: pointer;
 }
 
@@ -565,6 +590,14 @@ nav > .active {
 ********************************** ICONS *************************************** 
 *******************************************************************************/
 
+body [icon] {
+    position: relative;
+    min-height: 50px;
+    padding-left: 50px;
+}
+body [icon]:empty {
+    padding: 0;
+}
 [icon]:before {
     display: block;
     flex-grow: 0;
@@ -575,7 +608,7 @@ nav > .active {
     text-align: center;
     text-decoration: none;
 }
-button[icon]:before {
+[icon]:not(:empty):before {
     position: absolute;
     top: 0; left: 0;
 }
@@ -598,9 +631,12 @@ button[icon]:before {
 .round[icon]:before, .round_ > [icon]:before {
     border-radius: 50%;
 }
+.floating[icon] {
+    padding-left: 0;
+}
 .floating[icon]:before {
-    position: absolute;
-    margin-top: -8px;
+    top: -6px;
+    left: auto;
 }
 .floating[icon] > input {
     padding-left: 45px;
@@ -632,11 +668,11 @@ button[icon]:before {
     letter-spacing: 4px;
 }
 
-.msg {
-    height: 60%;
-    width: 60%;
+.nodata {
     padding: 10% 5%;
-    font-size: large;
+    margin: auto;
+    font-size: 1.5rem;
+    text-align: center;
 }
 
 button.fab {
@@ -697,34 +733,6 @@ button.fab {
     background-color: #3498db;
     animation: flip 1s infinite linear;
 }
-
-
-
-/*******************************************************************************
-**************************** FUNCTIONAL ENHANCERS ****************************** 
-*******************************************************************************/
-
-.movable {
-    user-select: none;
-    cursor: move;
-}
-
-.resizable {
-    resize: both;
-    overflow: hidden;
-}
-
-.collapsable {
-    animation: foldOut 0.5s;
-    overflow: hidden; 
-}
-.collapsable[header].folded {
-    animation: foldIn 0.5s;
-    height: 0;
-    padding-bottom: 0;
-    padding-top: 40px;
-}
-
 
 
 /*******************************************************************************
@@ -1076,26 +1084,6 @@ button.fab {
 /* tablet only */
 @media only screen and (min-width: 500px) and (max-width: 800px) {
 
-    .hide-tablet {
-        display: none;
-    }
-    .show-tablet {
-        display: block;
-    }
-
-    [header].hh-tablet:before {
-        display: none;
-    }
-    [header].hh-tablet[page] {
-        padding-top: 0;
-    }
-    [header].hh-tablet[panel] {
-        padding-top: 20px;
-    }
-    [header].hh-tablet[section] {
-        padding-top: 15px;
-    }
-    
     .pad-s-tablet {
         padding-left: 5%;
         padding-right: 5%;
@@ -1120,6 +1108,26 @@ button.fab {
         line-height: 0.8;
     }
 
+    .hide-tablet {
+        display: none;
+    }
+    .show-tablet {
+        display: block;
+    }
+
+    [header].hh-tablet:before {
+        display: none;
+    }
+    [header].hh-tablet[page] {
+        padding-top: 0;
+    }
+    [header].hh-tablet[panel] {
+        padding-top: 20px;
+    }
+    [header].hh-tablet[section] {
+        padding-top: 15px;
+    }
+
 }
 
 
@@ -1129,6 +1137,10 @@ button.fab {
     [page] {
         padding-bottom: 0;
         overflow-y: auto;
+    }
+
+    [panel] {
+        border-radius: 0;
     }
 
     [template] > .controls > .columns,
@@ -1142,6 +1154,10 @@ button.fab {
         right: 0;
         height: 80% !important;
         margin: auto;
+    }
+
+    .row {
+        padding-left: 0;
     }
 
     .hide-phone {

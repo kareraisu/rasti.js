@@ -28,6 +28,7 @@ style : `
         border-radius: 6px;
         border: 2px outset rgba(255, 255, 255, 0.5);
         background-clip: padding-box;
+        text-transform: uppercase;
         cursor: pointer;
     }
     [block=buttons] > div.active {

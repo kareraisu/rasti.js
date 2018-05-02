@@ -67,7 +67,7 @@ class Pager {
             return []
         }
         try {
-            var i = (page -1) * this.page_size
+            const i = (page -1) * this.page_size
             return this.results.slice(i, i + this.page_size)
         }
         catch(err) {
@@ -81,7 +81,7 @@ class Pager {
 
 function state(app) {
     function invalid() {
-        error('Saved state for app [%s] is invalid', app.name)
+        rasti.error('Saved state for app [%s] is invalid', app.name)
     }
 
     return Object.defineProperties({}, {
@@ -89,11 +89,12 @@ function state(app) {
         theme : { get : _ => app.active.theme, enumerable : true },
         lang  : { get : _ => app.active.lang, enumerable : true },
         save : { value : _ => {
+            app.state.props = app.props
             localStorage.setItem('rasti.' + app.name, JSON.stringify(app.state))
             rasti.log('State saved')
         } },
         get : { value : _ => {
-            var state
+            let state
             try {
                 state = JSON.parse( localStorage.getItem('rasti.' + app.name) )
                 if ( !state ) rasti.log('No saved state found for app [%s]', app.name)
@@ -105,12 +106,13 @@ function state(app) {
             }
         } },
         restore : { value : _ => {
-            var state = app.state.get()
+            const state = app.state.get()
             if (state) {
                 rasti.log('Restoring state...')
-                for (let prop in state) {
+                for (let prop in app.state) {
                     app.state[prop] = state[prop]
                 }
+                if (state.props) app.props = state.props
                 if (state.theme) app.setTheme(state.theme)
                 if (state.lang) app.setLang(state.lang)
                 app.navTo(state.page)

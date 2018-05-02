@@ -9,6 +9,9 @@ function type(exp) {
 function sameType(exp1, exp2) {
     return type(exp1) === type(exp2)
 }
+function exists(ref) {
+    return ref !== undefined && ref !== null
+}
 
 
 function inject(sources) {
@@ -117,6 +120,7 @@ module.exports = {
     is,
     type,
     sameType,
+    exists,
     inject,
     checkData,
     html,

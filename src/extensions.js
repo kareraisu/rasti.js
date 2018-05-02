@@ -18,6 +18,10 @@ Object.defineProperties(Array.prototype, {
 
 
 // $ extensions
+$.fn.hasAttr = function(name) {  
+    return this[0].hasAttribute(name)
+}
+
 $.fn.move = function(options) {
     var options = Object.assign({
             handle: this,
@@ -31,7 +35,7 @@ $.fn.move = function(options) {
         move = 'mousemove touchmove',
         release = 'mouseup touchend'
 
-    if (!object[0].hasAttribute('move')) object.attr('move', '')
+    if (!object.hasAttr('move')) object.attr('move', '')
 
     options.handle.on(hold, function(e) {
         if (e.type == 'mousedown' && e.which != 1) return

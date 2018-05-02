@@ -5,7 +5,7 @@ module.exports = {
 template : function(data, $el) {
     $el[0].total = data.length // WARNING : SIDE EFFECTS
 
-    var ret = $el[0].hasAttribute('filter')
+    var ret = $el.hasAttr('filter')
         ? `<input field type="text" placeholder="${ $el.attr('filter') }"/>`
         : ''
 
@@ -83,7 +83,8 @@ init : function($el) {
 
     $options.on('click', 'option', toggleOption)
 
-    $options.on('click', function(e) { $options.find('input').focus() })
+    if ( !utils.onMobile() )
+        $options.on('click', function(e) { $options.find('input').focus() })
 
     $options.on('input', 'input', function(e) {
         this.value
@@ -92,7 +93,7 @@ init : function($el) {
     })
 
     $el.on('change', function(e, params){
-        if (params && params.ui) return // triggered from ui, do nothing
+        if (params && params.ui) return // change triggered from ui, do nothing
         $selected.children().each(function(i, el) {
             $options.append(el)
         })
