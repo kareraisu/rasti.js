@@ -20,10 +20,9 @@ init : function($el) {
         $options = $('<div options>')
 
     // clone original select
-    $.each($el[0].attributes, function() {
-        $wrapper.attr(this.name, this.value);
-    });
-
+    for (var attr of $el[0].attributes) {
+        $wrapper.attr(attr.name, attr.value);
+    }
     // wrap with clone
     $el.wrap($wrapper)
     // regain wrapper ref (it is lost when wrapping)
@@ -33,7 +32,7 @@ init : function($el) {
 
     if (!$el.attr('data')) {
         // clone original options
-        $el.find('option').each(function(opt, i) {
+        $el.find('option').each(function(i, opt) {
             $options.append(`<div value="${opt.value}">${opt.innerHTML}</div>`)
         })
     }
@@ -59,14 +58,16 @@ init : function($el) {
         var $opt = $(this)
         $opt.siblings().removeClass('selected')
         $opt.addClass('selected')
-        var $wrapper = $opt.closest('[select]')
         $wrapper.val($opt.attr('value'))
-        var imgpath = $wrapper.attr('img')
-        if (imgpath) setImg($wrapper, imgpath)
+        setImg($wrapper, imgpath)
     })
 
     // remove original select
     $el.remove()
+
+    function setImg($el, basepath) {
+        $el.css('background-image', 'url('+ basepath + ($el.val() || $el.attr('value')) +'.png)')
+    }
 
 },
 

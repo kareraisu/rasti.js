@@ -3,22 +3,29 @@ Object.defineProperties(Array.prototype, {
     get : { value : function(i) {
        return i < 0 ? this[this.length + i] : this[i]
     }},
+    new : { value : function(el, i) {
+        i = i || this.length
+        var isNew = this.indexOf(el) < 0
+        if (isNew) this.splice(i, 0, el)
+        return isNew
+    }},
     remove : { value : function(el) {
-        var i = this.indexOf(el)
-        if (i >= 0) this.splice(i, 1)
+        this.update(el)
     }},
     update : { value : function(el, newel) {
         var i = this.indexOf(el)
-        if (i >= 0) this.splice(i, 1, newel)
+        var found = i > -1
+        if (found) this.splice(i, 1, newel)
+        return found
     }},
     capitalize : { value : function() {
-       return this.length && this[0].toUpperCase() + this.slice(1).toLowerCase()
+       return typeof this == 'string' && this.length && this[0].toUpperCase() + this.slice(1).toLowerCase()
     }},
 })
 
 
 // $ extensions
-$.fn.hasAttr = function(name) {  
+$.fn.hasAttr = function(name) {
     return this[0].hasAttribute(name)
 }
 

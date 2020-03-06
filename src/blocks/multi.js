@@ -67,7 +67,7 @@ init : function($el) {
 
         if ($opt.parent().attr('options')) {
             // select option
-            $el.find('[selected]').append($opt)
+            $selected.append($opt)
             values.push(val)
         }
         else {

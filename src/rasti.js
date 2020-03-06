@@ -32,10 +32,10 @@ const ACTION_ATTRS = 'show hide toggle'.split(' ')
 const NOCHILD_TAGS = 'input select textarea img'.split(' ')
 
 const log = (...params) => {
-    if (rasti.options.log.search(/debug/i) != -1) console.log.call(this, ...params)
+    if (rasti.options.log.search(/debug/i) > -1) console.log.call(this, ...params)
 }
 const warn = (...params) => {
-    if (rasti.options.log.search(/(warn)|(debug)/i) != -1) console.warn.call(this, ...params)
+    if (rasti.options.log.search(/(warn)|(debug)/i) > -1) console.warn.call(this, ...params)
 }
 const error = (...params) => {
     console.error.call(this, ...params)
@@ -54,11 +54,11 @@ function rasti(name, container) {
         container = $('body')
     }
     else if ( !(container.selector) ) {
-        if ( is.string(container) || (container.tagName && 'BODY DIV'.search(container.tagName) != -1) ) container = $(container)
+        if ( is.string(container) || (container.tagName && 'BODY DIV'.search(container.tagName) > -1) ) container = $(container)
         else return error(errPrefix + 'app container is invalid. Please provide a selector string, a jQuery object ref or a DOM element ref')
     }
     container.attr('rasti', this.name)
-    
+
     const self = this
 
 
@@ -66,6 +66,7 @@ function rasti(name, container) {
 
     const __pagers = new Map()
     const __crud = crud(this)
+    let __history
     let __invalid_data_count = 0
 
 
@@ -138,7 +139,7 @@ function rasti(name, container) {
         Object.keys(self.defaults).forEach( key => {
             if (!self.options[key]) self.options[key] = self.defaults[key]
         })
-        
+
 
         // define lang (if not already defined)
         if (!self.options.lang) {
@@ -193,6 +194,9 @@ function rasti(name, container) {
             })
             .appendTo(el)
         })
+
+
+        // TODO: add modal closure via ESC key
 
 
         // init nav
@@ -256,10 +260,10 @@ function rasti(name, container) {
             if (!method) return error('Missing method in [submit] attribute of el:', this)
 
             if (callback && !isValidCB) error('Undefined method [%s] declared in [then] attribute of el:', callback, this)
-            
+
             $el.addClass('loading').attr('disabled', true)
 
-            submitAjax(method, resdata => { 
+            submitAjax(method, resdata => {
                 const time = Math.floor(window.performance.now() - start) / 1000
                 log('Ajax method [%s] took %s seconds', method, time)
 
@@ -402,17 +406,19 @@ function rasti(name, container) {
 
         // restore and save state
         $(window).on('beforeunload', e => { self.state.save() })
-        if ( !self.state.restore() ) {
-            // set lang (if applicable and not already set)
-            if ( self.options.lang && !self.active.lang ) setLang(self.options.lang)
-            // if no lang, generate texts
-            if ( !self.options.lang ) {
-                container.find('[text]').each( (i, el) => {
-                    $(el).text( $(el).attr('text') )
-                })
-            }
-            // set theme (if not already set)
-            if ( !self.active.theme ) setTheme(self.options.theme)
+        const prev_state = self.state.restore()
+        // set theme (if not already set)
+        if ( !self.active.theme ) setTheme(self.options.theme)
+        // set lang (if applicable and not already set)
+        if ( self.options.lang && !self.active.lang ) setLang(self.options.lang)
+        // if no lang, generate texts
+        if ( !self.options.lang ) {
+            container.find('[text]').each( (i, el) => {
+                $(el).text( $(el).attr('text') )
+            })
+        }
+        if (prev_state) navTo(prev_state.page)
+        else {
             // nav to page in hash or to root or to first page container
             const page = location.hash.substring(1) || self.options.root
             navTo(
@@ -523,15 +529,28 @@ function rasti(name, container) {
             const $el = $(el)
             const template = resolveAttr($el, 'template')
             const datakey = resolveAttr($el, 'data')
+            const crudkey = resolveAttr($el, 'crud')
 
             render(el)
 
             $el.on('click', '.rasti-crud-delete', e => {
                 const $controls = $(e.currentTarget).closest('[data-id]')
                 const id = $controls.attr('data-id')
-                if ( id && __crud.delete(datakey, id) ) {
-                    $controls.parent().detach()
-                    log('Removed element [%s] from template [%s]', id, template)
+                try {
+                    __crud.delete({datakey, crudkey}, id)
+                        .then(
+                            ok => {
+                                $controls.parent().detach()
+                                log('Removed element [%s] from template [%s]', id, template)
+                            },
+                            err => {
+                                __crud.hideInputEl($el)
+                                $el.removeClass('active')
+                            }
+                        )
+                }
+                catch (err) {
+                    rasti.error(err)
                 }
             })
 
@@ -546,11 +565,25 @@ function rasti(name, container) {
 
             $el.on('click', '.rasti-crud-accept', e => {
                 // TODO: finish this
-                const newel = __crud.genDataEl($el)
-                if (newel && __crud.create(datakey, newel) ) {
-                    __crud.persistNewEl($el)
+                let newel
+                try {
+                    newel = __crud.genDataEl($el)
+                    __crud.create({datakey, crudkey}, newel)
+                        .then(
+                            ok => {
+                                __crud.persistNewEl($el)
+                                $el.removeClass('active')
+                            },
+                            err => {
+                                __crud.hideInputEl($el)
+                                $el.removeClass('active')
+                            }
+                        )
                 }
-                $el.removeClass('active')
+                catch (err) {
+                    rasti.error(err)
+                }
+
             })
 
             $el.on('click', '.rasti-crud-cancel', e => {
@@ -595,7 +628,7 @@ function rasti(name, container) {
         return $els
     }
 
-    function set(selector, value) {        
+    function set(selector, value) {
         var $els = get(selector)
         $els.each( (i, el) => {
             el.value = value
@@ -624,7 +657,7 @@ function rasti(name, container) {
         var $prevPage = self.active.page,
             prevPagename = $prevPage && $prevPage.attr('page'),
             prevPage = prevPagename && self.pages[prevPagename]
-        
+
         if (pagename == prevPagename) return
 
         var page = self.pages[pagename],
@@ -662,7 +695,11 @@ function rasti(name, container) {
         container.trigger('rasti-nav')
 
         if (skipPushState) return
-        if (page && page.url) {
+
+        if (self.options.history) {
+            __history.push(pagename)
+        }
+        else if (page && page.url) {
             !is.string(page.url)
                 ? warn('Page [%s] {url} property must be a string!', pagename)
                 : window.history.pushState(pagename, null, '#'+page.url)
@@ -819,7 +856,7 @@ function rasti(name, container) {
 
         log('Setting theme [%s:%s]', themeName, mapName)
         self.active.theme = themeName
-        
+
         // clone themeMap
         themeMap = Object.assign({}, themeMap)
 
@@ -880,14 +917,14 @@ function rasti(name, container) {
         self.active.lang = langName
 
         var $elems = $(), $el, keys, string
-        
+
         TEXT_ATTRS.forEach( attr => {
             $elems = $elems.add('['+attr+']')
         })
 
         $elems.each( (i, el) => {
             if (el.hasAttribute('fixed')) el = el.children[0]
-            $el = $(el)   
+            $el = $(el)
             keys = el.langkeys
 
             if (!keys) {
@@ -921,10 +958,10 @@ function rasti(name, container) {
         var el = $el[0]
         var type = types[el.nodeName] || $el.attr('block')
         if (!type) return error('Missing block type in [block] attribute of element:', el)
-        
+
         var block = rasti.blocks[type]
         if (!block) return error('Undefined block type "%s" resolved for element:', type, el)
-        
+
         if (!data) {
             var datakey = resolveAttr($el, 'data')
             if (!datakey) return
@@ -947,7 +984,7 @@ function rasti(name, container) {
         is.function(data)
             ? data(render, depValues)
             : render(data)
-        
+
         function render(data) {
             if (!data) return warn('Cannot render block: no data available', el)
             if ( is.string(data) ) data = data.split(', ')
@@ -984,7 +1021,7 @@ function rasti(name, container) {
 
     // internal utils
 
-    
+
     function createTabs($el) {
         var el = $el[0],
             $tabs = el.hasAttribute('page')
@@ -1019,7 +1056,7 @@ function rasti(name, container) {
 
             $labels.children().removeClass('active')
             $label.addClass('active')
-            
+
         })
 
         $flow.on('scroll', e => {
@@ -1045,13 +1082,13 @@ function rasti(name, container) {
         }
 
     }
-    
+
 
     function initBlock($el) {
         var el = $el[0]
         var type = el.nodeName == 'SELECT' ? 'select' : $el.attr('block')
         if (!type) return error('Missing block type in [block] attribute of element:', el)
-        
+
         var block = rasti.blocks[type]
         if (!block) return error('Undefined block type "%s" declared in [block] attribute of element:', type, el)
 
@@ -1065,12 +1102,12 @@ function rasti(name, container) {
 
 
     function initHistory() {
-        self._history = new History()
+        __history = new History(self)
 
-        Object.defineProperty(self, 'history', { get: () => self._history.content })
+        Object.defineProperty(self, 'history', { get: () => history.content })
         Object.defineProperties(self.history, {
-            back : { value : self._history.back },
-            forth : { value : self._history.forth },
+            back : { value : history.back },
+            forth : { value : history.forth },
         })
     }
 
@@ -1210,7 +1247,7 @@ function rasti(name, container) {
             ${ns} nav > a.active,
             ${ns} .list > div.active {
                 background-color: ${ values.btn[0] };
-                color: ${ values.btn[1] }; 
+                color: ${ values.btn[1] };
             }
 
             ${ns} [header]:before { color: ${ values.header[0] }; }
@@ -1241,11 +1278,6 @@ function rasti(name, container) {
         var $div = $(`<div icon=${ $el.attr('icon') } class=floating >`)
         $el.wrap($div)
         $el[0].removeAttribute('icon')
-    }
-
-
-    function setImg($el, basepath) {
-        $el.css('background-image', 'url('+ basepath + ($el.val() || $el.attr('value')) +'.png)')
     }
 
 

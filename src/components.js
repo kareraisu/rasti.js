@@ -2,16 +2,17 @@ const { is, resolveAttr } = require('./utils')
 
 class History {
 
-    constructor() {
+    constructor(app) {
+        this.app = app
         this.i = 0
         this.content = []
     }
-    
+
     back() {
-        if (this.i > 0) navTo(this.content[--(this.i)])
+        if (this.i > 0) this.app.navTo(this.content[--(this.i)], true)
     }
     forth() {
-        if (this.i < this.content.length) navTo(this.content[++(this.i)])
+        if (this.i < this.content.length) this.app.navTo(this.content[++(this.i)], true)
     }
     push(page) {
         this.content.splice(this.i, null, page)
@@ -109,13 +110,9 @@ function state(app) {
             const state = app.state.get()
             if (state) {
                 rasti.log('Restoring state...')
-                for (let prop in app.state) {
-                    app.state[prop] = state[prop]
-                }
                 if (state.props) app.props = state.props
                 if (state.theme) app.setTheme(state.theme)
                 if (state.lang) app.setLang(state.lang)
-                app.navTo(state.page)
                 rasti.log('State restored')
             }
             return state
@@ -129,13 +126,32 @@ function state(app) {
 
 function crud(app) {
     function checkDataSource(fn) {
-        return (datakey, ...args) => {
-            const data = app.data[datakey]
+        return (metadata, ...args) => {
+            const data = app.data[metadata.datakey]
             if (!data) {
-                rasti.error('Undefined data source "%s"', datakey)
+                rasti.error('Undefined data source "%s"', metadata.datakey)
                 return false
             }
-            else return fn(data, datakey, ...args)
+            metadata.data = data
+            return fn(metadata, ...args)
+        }
+    }
+
+    function checkCrudMethod(methodname, fn) {
+        return (metadata, ...args) => {
+            // FIXME: app ns is not available here
+            const crudns = app.crud[metadata.crudns]
+            const method = crudns && crudns[methodname]
+            if (method && !is.function(method)) {
+                rasti.error('Illegal crud method "%s", must be a function!', name)
+                return false
+            }
+            if (!method) method = Promise.resolve
+            return method(...args)
+                    .then(
+                        ok => fn(metadata, ...args),
+                        err => rasti.error('Could not %s element in %s', methodname, metadata.datakey)
+                    )
         }
     }
 
@@ -146,35 +162,44 @@ function crud(app) {
     }
 
     return {
-        create : checkDataSource((data, datakey, newel) => {
-            const exists = exists(newel, data)
-            if (exists) {
-                rasti.warn('Element [%s] already exists in data source [%s]', newel.id || newel, datakey)
+        create : checkDataSource(
+            checkCrudMethod('create',
+            (data, datakey, newel) => {
+                const exists = exists(newel, data)
+                if (exists) {
+                    rasti.warn('Element [%s] already exists in data source [%s]', newel.id || newel, datakey)
+                }
+                else {
+                    if (is.object(newel)) newel.id = newel.id || datakey + '-' + Date.now()
+                    data.push(newel)
+                }
+                return !exists
             }
-            else {
-                if (is.object(newel)) newel.id = newel.id || datakey + '-' + Date.now()
-                data.push(newel)
+        )),
+
+        delete : checkDataSource(
+            checkCrudMethod('delete',
+            (data, datakey, id) => {
+                const el = data.length && (is.object(data[0]) ? data.find(el => el.id === id) : id)
+                !el
+                    ? rasti.warn('Element [%s] not found in data source [%s]', id, datakey)
+                    : data.remove(el)
+                return el
             }
-            return !exists
-        }),
+        )),
 
-        delete : checkDataSource((data, datakey, id) => {
-            const el = data.length && (is.object(data[0]) ? data.find(el => el.id === id) : id)
-            !el
-                ? rasti.warn('Element [%s] not found in data source [%s]', id, datakey)
-                : data.remove(el)
-            return el
-        }),
-
-        update : checkDataSource((data, datakey, el, newel) => {
-            const exists_el = exists(el, data)
-            const exists_newel = exists(newel, data)
-            if (!exists_el) rasti.warn('El [%s] not found in data source [%s]', el, datakey)
-            if (exists_newel) rasti.warn('El [%s] already exists in data source [%s]', newel, datakey)
-            const valid = exists_el && !exists_newel
-            if (valid) data.update(el, newel)
-            return valid
-        }),
+        update : checkDataSource(
+            checkCrudMethod('update',
+            (data, datakey, el, newel) => {
+                const exists_el = exists(el, data)
+                const exists_newel = exists(newel, data)
+                if (!exists_el) rasti.warn('El [%s] not found in data source [%s]', el, datakey)
+                if (exists_newel) rasti.warn('El [%s] already exists in data source [%s]', newel, datakey)
+                const valid = exists_el && !exists_newel
+                if (valid) data.update(el, newel)
+                return valid
+            }
+        )),
 
         genInputEl : $el => {
             const template = app.templates[ resolveAttr($el, 'template') ]
@@ -199,21 +224,21 @@ function crud(app) {
             const inputEl = $('<div class=rasti-crud-input contenteditable>' + template( [template.props] ) +'</div>')
 
             // TODO: identify prop elements within the inputEl element and apply [contenteditable] only to them
-            
+
             $el.append(inputEl)
         },
 
         genDataEl : $el => {
             const template = app.templates[ resolveAttr($el, 'template') ]
-            const values = $el.find('.rasti-crud-input').find('[contenteditable]')
+            const values = $el.find('.rasti-crud-input')
             let dataEl
             if ( is.object(template.props) ) {
                 dataEl = {}
                 Object.keys(template.props).forEach( (key, i) => {
-                    dataEl[key] = values[i].html()
+                    dataEl[key] = values[i].innerHTML
                 })
             }
-            else dataEl = values[0].html()
+            else dataEl = values[0].innerHTML
             return dataEl
         },
 
