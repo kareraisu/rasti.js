@@ -1119,9 +1119,9 @@ function rasti(name, container) {
 
         if (pager.total > 1) {
             paging = `<div class="paging inline inline_">
-                <button icon=prev />
+                <button icon=left />
                 <span class=page />
-                <button icon=next />
+                <button icon=right />
             </div>`
 
             sizes = `<button icon=rows>${ self.options.page_sizes[0] }</button>`
@@ -1142,11 +1142,11 @@ function rasti(name, container) {
         $controls = $el.children('.controls')
         $results = $el.children('.results')
 
-        $controls.on('click', '[icon=next]', e => {
+        $controls.on('click', '[icon=right]', e => {
             update( pager.next() )
         })
 
-        $controls.on('click', '[icon=prev]', e => {
+        $controls.on('click', '[icon=left]', e => {
             update( pager.prev() )
         })
 

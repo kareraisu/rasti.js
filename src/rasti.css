@@ -801,6 +801,14 @@ button.fab {
     display: none !important;
 }
 
+.rel, .rel_>* {
+    position: relative;
+}
+
+.fix, .fix_>* {
+    position: fixed;
+}
+
 .inline, .inline_>* {
     display: inline-block;
     margin-top: 0;
@@ -812,10 +820,6 @@ button.fab {
 }
 .floatr, .floatr_>* {
     float: right;
-}
-
-.rel {
-    position: relative;
 }
 
 .left, .left_>* {
@@ -851,19 +855,15 @@ button.fab {
     margin: auto !important;
 }
 
-.fix {
-    position: fixed;
-}
-
-.ccx, .ccx_>* {
+.fcenterx, .fcenterx_>* {
     display: flex;
     justify-content: center;
 }
-.ccy, .ccy_>* {
+.fcentery, .fcentery_>* {
     display: flex;
     align-items: center;
 }
-.cc, .cc_>* {
+.fcenter, .fcenter_>* {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -959,10 +959,10 @@ button.fab {
     border-radius: 50%;
 }
 
-.scale, .scale_>* {
+.scale-up, .scale-up_>* {
     transition: all .2s ease-in-out;
 }
-.scale:hover, .scale_>*:hover {
+.scale-up:hover, .scale-up_>*:hover {
     transform: scale(1.1);
 }
 

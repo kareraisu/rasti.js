@@ -60,6 +60,12 @@ Defines a page of the app. A page is a top-level container. It's value must be a
 **[panel]** and **[section]**  
 Define a container of related content. Panels contain sections.
 
+**[modal]**
+Defines a container as a modal element.
+
+**[menu]**
+Defines a container as a menu element.
+
 **[row]** and **[col-1]** to **[col-12]**  
 Define a responsive grid a la bootstrap (12 columns grid system). Rows contain columns.
 
@@ -154,6 +160,18 @@ Bind an utility method to an element's event. It's value must be the name of a d
 They allow an element's click or hover event to change another element's visibility in a simple fashion. It's value must be a selector string of the form 'attr=value' (the target element, which must be in the same page).
 
 
+### Functional
+
+**[movable]**
+Makes an element freely movable via drag and drop.
+
+**[resizable]**
+Makes an element resizable (adds a small handle in the bottom-right corner).
+
+**[foldable]**
+Makes an element foldable upon clicking on its header (must be used along with the [header] attr).
+
+
 ### Utility Classes
 
 These are classes (values of the [class] attribute), and have two variants:
@@ -161,14 +179,31 @@ These are classes (values of the [class] attribute), and have two variants:
 - container/batch (adding an underscore at the end): they affect all immediate children of the element to which they are applied.
 
 Their names are pretty straight-forward:
-- ib: inline-block
+- rel: relative positioning
+- fix: fixed positioning
+- inline: inline-block display
 - big, small: change the size of [field]s, [btn]s and [icon]s
-- center: common horizontal centering
-- centerx, centery, centerxy: "floating" centering in x, y or both
+- round: make an element round (ie [btn]s and [icon]s)
+- floating: useful for creating [field]s with [icon]s
+- left, right, top, bottom: absolute positioning
+- centerx, centery, center: absolute centering in x, y or both
+- fcenterx, fcentery, fcenter: flex centering in x, y or both
 - fullw, fullh: full width or height
+- halfw, halfh: half width or height
 - autow, autoh: auto width or height
+- autom: auto margin
 - scrollx, scrolly, scroll: scroll in the x axis, y axis or both
-- columns-2, columns-3: arrange elements in 2 or 3 columns, these are meant for containers, thus they don't have an underscore variant
+- columns-2, columns-3: arrange elements in 2 or 3 columns (these are meant for containers, thus they don't have an underscore variant)
+- scale-up: scale a bit upon hover
+
+Besides these, there are some classes that come in handy for tuning element visibility, spacing and structure across different viewport sizes. They are of the form `<name>-<size>`, where the sizes are `phone`, `tablet` and `desktop`:
+- show-<size>: shows the element for some viewport size
+- hide-<size>: hides the element for some viewport size
+- pad-s-<size>: applies a small padding to the element for some viewport size
+- pad-<size>: applies a medium padding to the element for some viewport size
+- pad-l-<size>: applies a large padding to the element for some viewport size
+- hh-<size>: hides any [header] defined on the element for some viewport size
+- tabs-<size>: creates tabs within the element for some viewport size (meant for containers)
 
 Also, you can use any theme's color name as a class to apply the color to an element as the background-color upon setting the theme. For example, a div with the class 'detail' will be applied a background-color: 'darkcyan' when setting the theme 'base' (set by default in app.init()). See the configuration section for more details on adding themes.
 
@@ -276,7 +311,9 @@ Adds blocks available to be used via the [block] attribute. They must have the f
 Adds visual effects available for binding to elements or containers via the [fx] attribute. Visual effects must be functions that take a jquery-wrapped element (the element to which they are bound).
 Rasti comes prepackaged with the following effects to use right out of the box:
 
-* **stack** (container): produces a bottom-to-top stacking effect of the element's children
+* **stack** (container): produces a bottom-to-top stacking effect on the element's children
+
+* **stamp** (container): produces a stamp-like effect on the element's children
 
 * more to come (maybe)
 
@@ -288,36 +325,38 @@ Adds utility methods within the app namespace available for general use and for 
 ## Roadmap
 
 These are some of the things I've got in mind:
-- [ ] sidenav
-- [ ] accordeon
-- [ ] toasts
-- [ ] fullscreen
+
+- [ ] accordeon block
+- [ ] carruosel block
+- [ ] easy toasts
 - [ ] css variables
-- [ ] internal history
-- [ ] keyboard bindings
+- [ ] internal (instance) history
+- [ ] easy keyboard bindings (per page or global)
 - [ ] conditional dependencies
-- [ ] more fx's (fade, slide, twist)
+- [ ] navbar utility classes (top, bottom, side)
+- [ ] fullscreen toggle handle
+- [ ] more fx's (fade, slide, flip, twist)
 
 Done:
 - [x] themes api
 - [x] blocks api
+- [x] templates
 - [x] function data sources
 - [x] url navigation
 - [x] i18n support
+- [x] field validation **(docs pending)**
+- [x] field dependency **(docs pending)**
 - [x] state management and persistence **(docs pending)**
 - [x] paging
 - [x] tabs
 - [x] modals
+- [x] icons **(docs pending)** 
 - [x] attribute fallback
 - [x] app bootstrapping
 - [x] single bundle (js+css+zepto)
 - [x] scrollbar styles
-- [x] field validation **(docs pending)**
-- [x] field dependency **(docs pending)**
 - [x] move & resize
-- [x] icons **(docs pending)** 
 - [x] 'loading' component (circle) **(bar & dots pending)**
-
 
 
 ## Contributing / Dev environment setup
@@ -326,7 +365,7 @@ Done:
 
 2. cd into your local copy : `$ cd rasti.js`
 
-3. Install dependencies : `$ npm install` (install Node.js first if you don't have it)
+3. Install dependencies : `$ npm install` (install [Node.js](https://nodejs.org/) first if you don't have it)
 
 4. Start the live-reload server : `$ gulp` (this also generates the bundles and watches all the files, see the gulpfile.js if curious)
 
@@ -340,7 +379,7 @@ Please let me know of any issues you may find, improvements you may think of or 
 
 ## About the name
 
-Rasti is a block construction toy made in Argentina that resembles Lego, but it's much simpler. This framework was built with simplicity in mind, and includes some "blocks", so the name fits nicely.
+[Rasti](https://en.wikipedia.org/wiki/Rasti) is a block construction toy made in Argentina that resembles Lego, but it's much simpler. This framework was built with simplicity in mind, and includes some "blocks", so the name fits nicely.
 
 
 
