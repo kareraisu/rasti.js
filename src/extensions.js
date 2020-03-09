@@ -1,3 +1,5 @@
+const { is } = require('./utils')
+
 // prototype extensions
 Object.defineProperties(Array.prototype, {
     get : { value : function(i) {
@@ -23,6 +25,16 @@ Object.defineProperties(Array.prototype, {
     }},
 })
 
+Object.filter = (obj, predicate) => {
+    const traverse = (obj, predicate) => Object.fromEntries(
+        Object.entries(obj)
+            .filter(predicate)
+            .map(([k, v]) => 
+                is.object(v) ? [k, traverse(v, predicate)] : [k, v]
+            )
+    )
+    return traverse(obj, predicate)
+}
 
 // $ extensions
 $.fn.hasAttr = function(name) {

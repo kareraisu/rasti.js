@@ -66,6 +66,7 @@ function rasti(name, container) {
 
     const __pagers = new Map()
     const __crud = crud(this)
+    const __state = {}
     let __history
     let __invalid_data_count = 0
 
@@ -164,10 +165,8 @@ function rasti(name, container) {
         })
 
 
-        // create items for selects and lists with data source
-        container.find('select[data]')
-            .add('ol[data]', container)
-            .add('ul[data]', container)
+        // init "incognito" blocks
+        container.find('[data]').not('[block]')
             .each( (i, el) => {
                 updateBlock($(el))
             })
@@ -430,65 +429,7 @@ function rasti(name, container) {
 
 
         // init props
-        container.find('[prop]').each( (i, el) => {
-            const $el = $(el)
-            const prop = $el.attr('prop')
-
-            if (!prop) return
-
-            if ( exists(el.value) && !el.bound ) {
-                // it's a not-yet-bound element
-                bindElement($el, prop)
-            }
-            else {
-                // it's a container
-                $el.find('[prop]').each( (i, el) => {
-                    const $el = $(el)
-                    const subprop = $el.attr('prop')
-                    if (subprop) bindElement($el, prop, subprop)
-                })
-            }
-        })
-
-        function bindElement($el, prop, subprop){
-            let root = self.props
-
-            if (subprop) {
-                // go down one level
-                root[prop] = root[prop] || {}
-                root = root[prop]
-                prop = subprop
-            }
-            if ( root[prop] && !$el.hasAttr('transient') ) {
-                // update dom from restored state
-                $el.val( root[prop] ).trigger('change')
-            }
-            else {
-                // first invocation, create empty (sub)prop
-                root[prop] = ''
-            }
-
-            // update prop on dom change
-            $el.on('change', (e, params) => {
-                if (params && params.setter) return // change was triggered from setter, no need to update prop (and would cause infinite mutual recursion)
-                root[prop] = $el.val()
-            })
-
-            // update dom on prop change
-            Object.defineProperty(root, prop, {
-                get : _ => this[prop],
-                set : val => {
-                    this[prop] = val
-                    $el[0].nodeName == 'TEXTAREA'
-                        ? $el.text( val ).trigger('change', {setter : true})
-                        : $el.val( val ).trigger('change', {setter : true})
-                }
-            })
-
-
-            // set bound flag to avoid re-binding
-            $el[0].bound = true
-        }
+        findProps(container, self.props)
 
 
         // init field validations
@@ -518,9 +459,10 @@ function rasti(name, container) {
         })
 
 
-        // init bound templates
-        container.find('[bind][template]').each( (i, el) => {
-            bind(el)
+        // init prop-bound templates
+        container.find('[prop][template]').each( (i, el) => {
+            const $el = $(el)
+            bindElement($el, $el.attr('prop'), self.props)
         })
 
 
@@ -650,6 +592,77 @@ function rasti(name, container) {
     }
 
 
+    function findProps($container, state) {
+        $container.children().each( (i, el) => {
+            const $el = $(el)
+            const prop = $el.attr('prop')
+
+            if (prop) {
+                if ( $el.attr('transient') ) prop.__trans = true
+                
+                if ( exists(el.value) ) {
+                    // it's an element, so bind it
+                    bindElement($el, prop, state)
+                }
+                else {
+                    // it's a container prop
+                    const defobjval = {}
+                    if (prop.__trans) defobjval.__trans = true
+                    // go down one level in the state tree
+                    state[prop] = state[prop] || defobjval
+                    const newroot = state[prop]
+                    // and keep looking
+                    findProps($el, newroot)
+                }
+            }
+            // else keep looking
+            else if (el.children.length) findProps($el, state)
+        })
+    }
+
+
+    function bindElement($el, prop, state){
+        if ( state[prop] ) {
+            // restored state present, restore transient flag
+            if (prop.__trans) state[prop].__trans = true
+            // then update dom with it
+            updateElement($el, state[prop])
+        }
+        else {
+            // create empty state
+            const defstrval = ''
+            defstrval.__trans = prop.__trans
+            state[prop] = defstrval
+        }
+
+        // update state on dom change
+        $el.on('change', (e, params) => {
+            // unless triggered from setter
+            if (!params || !params.setter)
+                state[prop] = $el.val()
+        })
+
+        // update dom on state change
+        Object.defineProperty(state, prop, {
+            get : function() { return __state[prop] },
+            set : function(value) {
+                __state[prop] = value
+                if (prop.__trans) __state[prop].__trans = true
+                updateElement($el, value, true)
+            }
+        })
+
+    }
+
+    function updateElement($el, value, setter) {
+        $el.hasAttr('template')
+            ? render($el, value)
+            : $el[0].nodeName == 'TEXTAREA'
+                ? $el.text( value ).trigger('change', {setter})
+                : $el.val( value ).trigger('change', {setter})
+    }
+
+
     function navTo(pagename, params, skipPushState) {
 
         if (!pagename) return error('Cannot navigate, page undefined')
@@ -710,19 +723,6 @@ function rasti(name, container) {
     }
 
 
-    function bind(el) {
-        const errPrefix = 'Cannot bind template: '
-        const $el = el.nodeName ? $(el) : el
-        el = $el[0]
-        const src = $el.attr('bind')
-        const $src = container.find('[prop='+ src +']')
-        if (!$src.length) return error(errPrefix + 'source element "%s" not found, declared in [bind] attribute of el: ', src, el)
-        $el.attr('template', 'bind=' + src)
-        $src.on('change', e => render($el, e.target.value))
-            .trigger('change')
-    }
-
-
     function render(el, data, time) {
         let $el, name
         if ( is.string(el) ) {
@@ -732,6 +732,11 @@ function rasti(name, container) {
         else {
             $el = el.nodeName ? $(el) : el
             name = $el.attr('template')
+            if (!name) {
+                // generate one from bound prop and assign it
+                name = $el.attr('prop') + '-' + Date.now()
+                $el.attr('template', name)
+            }
         }
         const errPrefix = 'Cannot render template ['+ name +']: '
         if (!$el.length) return error(errPrefix + 'no element bound to template. Please bind one via [template] attribute.')
@@ -950,13 +955,9 @@ function rasti(name, container) {
 
 
     function updateBlock($el, data) {
-        var types = {
-            SELECT : 'select',
-            OL : 'list',
-            UL : 'list',
-        }
         var el = $el[0]
-        var type = types[el.nodeName] || $el.attr('block')
+        var type = $el.attr('block') || el.nodeName.toLowerCase()
+        if ('ol ul'.includes(type)) type = 'list'
         if (!type) return error('Missing block type in [block] attribute of element:', el)
 
         var block = rasti.blocks[type]
@@ -986,10 +987,12 @@ function rasti(name, container) {
             : render(data)
 
         function render(data) {
-            if (!data) return warn('Cannot render block: no data available', el)
-            if ( is.string(data) ) data = data.split(', ')
-            if ( !is.array(data) ) return error('Cannot render block: invalid data, must be array or string', el)
-            $options.html( block.template(data, $el) )
+            if (!data) warn('Cannot render block: no data available', el)
+            else try {
+                $options.html( block.template(data, $el) )
+            } catch(err) {
+                error('Cannot render block: ' + err, el)
+            }
             // TODO : handle invalid data count side-effect
             /*
             if (invalidData) {
@@ -1086,7 +1089,7 @@ function rasti(name, container) {
 
     function initBlock($el) {
         var el = $el[0]
-        var type = el.nodeName == 'SELECT' ? 'select' : $el.attr('block')
+        var type = $el.attr('block') || el.nodeName.toLowerCase()
         if (!type) return error('Missing block type in [block] attribute of element:', el)
 
         var block = rasti.blocks[type]
@@ -1103,12 +1106,6 @@ function rasti(name, container) {
 
     function initHistory() {
         __history = new History(self)
-
-        Object.defineProperty(self, 'history', { get: () => history.content })
-        Object.defineProperties(self.history, {
-            back : { value : history.back },
-            forth : { value : history.forth },
-        })
     }
 
 
@@ -1119,9 +1116,9 @@ function rasti(name, container) {
 
         if (pager.total > 1) {
             paging = `<div class="paging inline inline_">
-                <button icon=left />
+                <button icon=left3 />
                 <span class=page />
-                <button icon=right />
+                <button icon=right3 />
             </div>`
 
             sizes = `<button icon=rows>${ self.options.page_sizes[0] }</button>`
@@ -1142,11 +1139,11 @@ function rasti(name, container) {
         $controls = $el.children('.controls')
         $results = $el.children('.results')
 
-        $controls.on('click', '[icon=right]', e => {
+        $controls.on('click', '[icon=right3]', e => {
             update( pager.next() )
         })
 
-        $controls.on('click', '[icon=left]', e => {
+        $controls.on('click', '[icon=left3]', e => {
             update( pager.prev() )
         })
 
@@ -1322,6 +1319,14 @@ rasti.fx = {
         setTimeout( _ => {
             $el.removeClass('fx-stamp-container')
         }, $children.length * 40 + 500);
+    },
+
+    toast : $el => {
+        $el.addClass('active')
+        setTimeout( _ => {
+            $el.removeClass('active')
+        }, 4000);
+
     },
 
 }

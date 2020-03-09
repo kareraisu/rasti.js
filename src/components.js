@@ -4,19 +4,37 @@ class History {
 
     constructor(app) {
         this.app = app
-        this.i = 0
-        this.content = []
+        this.clear()
+        app.history = {}
+        Object.defineProperties(app.history, {
+            back : { value : this.back.bind(this) },
+            forward : { value : this.forward.bind(this) },
+            clear : { value : this.clear.bind(this) },
+        })
+    }
+
+    push(page) {
+        this.i += 1
+        this.content.splice(this.i, null, page)
     }
 
     back() {
-        if (this.i > 0) this.app.navTo(this.content[--(this.i)], true)
+        if (this.i > 0) {
+            this.i -= 1
+            this.app.navTo(this.content[this.i], {}, true)
+        }
     }
-    forth() {
-        if (this.i < this.content.length) this.app.navTo(this.content[++(this.i)], true)
+
+    forward() {
+        if (this.i < this.content.length -1) {
+            this.i += 1
+            this.app.navTo(this.content[this.i], {}, true)
+        }
     }
-    push(page) {
-        this.content.splice(this.i, null, page)
-        this.i++
+
+    clear() {
+        this.i = -1
+        this.content = []
     }
 }
 
@@ -90,7 +108,7 @@ function state(app) {
         theme : { get : _ => app.active.theme, enumerable : true },
         lang  : { get : _ => app.active.lang, enumerable : true },
         save : { value : _ => {
-            app.state.props = app.props
+            app.state.props = Object.filter(app.props, ([k, v]) => !(v && v.__trans))
             localStorage.setItem('rasti.' + app.name, JSON.stringify(app.state))
             rasti.log('State saved')
         } },
@@ -110,7 +128,7 @@ function state(app) {
             const state = app.state.get()
             if (state) {
                 rasti.log('Restoring state...')
-                if (state.props) app.props = state.props
+                app.props = state.props
                 if (state.theme) app.setTheme(state.theme)
                 if (state.lang) app.setLang(state.lang)
                 rasti.log('State restored')
