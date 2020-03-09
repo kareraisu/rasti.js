@@ -11,6 +11,7 @@ template : function(data, $el) {
 },
 
 init : function($el) {
+    $el[0].value = ''
     $el.on('click', 'label', function(e) {
         // forward clicks to hidden input
         $(e.currentTarget).prev().click()

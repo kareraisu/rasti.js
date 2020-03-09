@@ -10,6 +10,7 @@ template : function(data, $el) {
 },
 
 init : function($el) {
+    $el[0].value = ''
     $el.on('click', 'div', function(e) {
         $el.val($(e.target).attr('value'))
             .trigger('change')
