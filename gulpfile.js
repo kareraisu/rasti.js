@@ -25,11 +25,12 @@ const s = gulp.series
 const p = gulp.parallel
 
 const paths = {
-    app : 'app',
+    app : 'C:/Users/Ale/Documents/Dev/repos/rasti-demo',
+    dist : 'C:/Users/Ale/Documents/Dev/repos/rasti-demo/dist'
 }
 
 
-function bundle() {
+function bundle(minCss) {
     return browserify({
         entries: ['src/rasti.js'],
         standalone: 'rasti', // create an umd module (which, when loaded in a
@@ -37,8 +38,8 @@ function bundle() {
         debug: true,         // create inline sourcemaps
     })
     .bundle()
-    // extract inline soucemaps to external files
-    .pipe(exorcist('dist/rasti.map'))
+    // extract inline sourcemaps to external files
+    .pipe(exorcist(paths.dist + '/rasti.map'))
     .on('error', function(err) {
         gutil.log(err.stack)
         this.emit('end') // end the errored stream here so gulp doesn't crash
@@ -48,8 +49,11 @@ function bundle() {
     // then turn stream into buffer (expected by some gulp plugins, i.e. babili, concat)
     .pipe(buffer())
     // inject rasti css
-    .pipe( replace('rasti.css', fs.readFileSync('src/rasti.css')) )
-    .pipe(gulp.dest('dist'))
+    .pipe( replace('rasti.css', fs.readFileSync(
+        minCss ? paths.dist + '/rasti.min.css'
+        : 'src/rasti.css'
+    )))
+    .pipe(gulp.dest(paths.dist))
 }
 
 
@@ -67,32 +71,32 @@ function babilize(buffer) {
 }
 
 
-gulp.task('minify-js', () =>
-    babilize(bundle())
-    .pipe(rename('rasti.min.js'))
-    .pipe(gulp.dest('dist'))
-)
-
-
 gulp.task('minify-css', () =>
     gulp.src('src/*.css')
     .pipe(cleanCSS())
     .pipe(rename('rasti.min.css'))
-    .pipe(gulp.dest('dist'))
+    .pipe(gulp.dest(paths.dist))
 )
 
 
 gulp.task('bundle', () =>
-    merge2( gulp.src('lib/zepto.min.js'), bundle() )
+    merge2( gulp.src('lib/zepto.min.js'), bundle(true) )
     .pipe(concat('rasti+zepto.js'))
-    .pipe(gulp.dest('dist'))
+    .pipe(gulp.dest(paths.dist))
 )
+
+
+gulp.task('prod', s('bundle', () =>
+    babilize( gulp.src(paths.dist + '/rasti+zepto.js') )
+    .pipe(rename('rasti+zepto.min.js'))
+    .pipe(gulp.dest(paths.dist))
+))
 
 
 gulp.task('live-reload', (done) => {
     browserSync.init({
         server : true,
-        index  : paths.app + '/index.html',
+        index  : paths.app + '/demos/humans/index.html',
         serveStatic: [{
             route : '',
             dir   : paths.app
@@ -110,7 +114,7 @@ gulp.task('watch-src', (done) => {
 
 
 gulp.task('watch-dist', () => 
-    gulp.watch('dist/**/*.*').on('change', browserSync.reload)
+    gulp.watch(paths.dist + '/**/*.*').on('change', browserSync.reload)
 )
 
 
@@ -123,13 +127,6 @@ gulp.task('watch', p('watch-src', 'watch-dist', 'watch-app'))
 
 
 gulp.task('dev', s('bundle', 'live-reload', 'watch'))
-
-
-gulp.task('prod', () =>
-    babilize(gulp.src('dist/rasti+zepto.js'))
-    .pipe(rename('rasti+zepto.min.js'))
-    .pipe(gulp.dest('dist'))
-)
 
 
 gulp.task('default', s('dev'))
