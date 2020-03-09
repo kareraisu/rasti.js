@@ -28,6 +28,50 @@ ol, ul {
     border-radius: 2px;
 }
 
+table, caption, tbody, tfoot, thead, tr, th, td {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+table {
+    border: 1px solid #000000;
+    width: 100%;
+    text-align: center;
+    border-collapse: collapse;
+}
+table td, table th {
+border: 1px solid #000000;
+padding: 4px 5px;
+}
+table tbody td {
+font-size: 13px;
+}
+table thead {
+background: #CFCFCF;
+background: -moz-linear-gradient(top, #dbdbdb 0%, #d3d3d3 66%, #CFCFCF 100%);
+background: -webkit-linear-gradient(top, #dbdbdb 0%, #d3d3d3 66%, #CFCFCF 100%);
+background: linear-gradient(to bottom, #dbdbdb 0%, #d3d3d3 66%, #CFCFCF 100%);
+border-bottom: 3px solid #000000;
+}
+table thead th {
+font-size: 15px;
+font-weight: bold;
+color: #000000;
+text-align: center;
+}
+table tfoot {
+font-size: 14px;
+font-weight: bold;
+color: #000000;
+border-top: 3px solid #000000;
+}
+table tfoot td {
+font-size: 14px;
+}
+
 input, button, select, textarea, .field {
     min-height: 35px;
     width: 100%;
@@ -462,8 +506,9 @@ nav > div, nav > a {
     text-transform: capitalize;
 }
 [label]:before {
-    margin-top: -35px;
+    top: 0;
     left: 0;
+    margin-top: -35px;
 }
 [label].big:before {
     margin-left: 0;
@@ -478,8 +523,9 @@ nav > div, nav > a {
     margin-top: 0;
     margin-left: calc(40% + 10px);
 }
-.inline-label[l2bel]:before,
+.inline-label[label]:before,
 .inline-label_ > [label]:before {
+    top: auto;
     width: 80%;
     left: -85%;
     margin-top: -5px;
@@ -972,6 +1018,42 @@ button.fab {
 ************************************* FX *************************************** 
 *******************************************************************************/
 
+[fx=toast] {
+    position: fixed;
+    display: flex;
+    left: 0;
+    bottom: -100px;
+    width: 100vw;
+    max-width: 600px;
+    min-height: 100px;
+    max-height: 100px;
+    padding: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    z-index: 10;
+    transition: bottom ease-out 0.25s;
+}
+[fx=toast].active {
+    bottom: 0;
+}
+[fx=toast] [icon]::before {
+    border-radius: 50%;
+    font-size: 2rem;
+    line-height: 1.6;
+    box-shadow: 0 0 0px 1px;
+}
+[fx=toast] [icon=warning]::before {
+    background: yellow;
+    line-height: 1.4;
+}
+[fx=toast] [icon=error]::before {
+    background: red;
+    line-height: 1.4;
+}
+[fx=toast] [icon=accept]::before {
+    background: green;
+}
+
 .fx-stack-container > * {
     transition: margin-top 2s ease; /*FIXME: NOT WORKING*/
     margin-top: 0;
@@ -1160,6 +1242,10 @@ button.fab {
         padding-left: 0;
     }
 
+    [class*=col] {
+        min-width: 100%;
+    }
+
     .hide-phone {
         display: none;
     }
@@ -1192,8 +1278,6 @@ button.fab {
         padding-left: 15%;
         padding-right: 15%;
     }
-    
-
 
 }
 

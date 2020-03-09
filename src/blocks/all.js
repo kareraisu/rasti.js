@@ -1,5 +1,6 @@
 module.exports = {
-    list    : require('./list'),
+	list    : require('./list'),
+	table   : require('./table'),
 	buttons : require('./buttons'),
 	checks  : require('./checks'),
 	radios  : require('./radios'),
