@@ -1,6 +1,6 @@
 const fs = require('fs')
 const gulp = require('gulp')
-const gutil = require('gulp-util')
+const log = require('fancy-log')
 const rename = require('gulp-rename')
 const merge2 = require('merge2')
 const concat = require('gulp-concat')
@@ -10,23 +10,20 @@ const exorcist = require('exorcist')
 
 const source = require('vinyl-source-stream')
 const buffer = require('vinyl-buffer')
-//const vinylize = require('vinyl-transform')
 
-const babili = require('gulp-babili')
+const minify = require("gulp-babel-minify")
 const cleanCSS = require('gulp-clean-css')
 const trimlines = require('gulp-trimlines')
 const replace = require('gulp-replace')
 
 const browserSync = require('browser-sync').create()
 
-//TODO maybe add gulp-changed / gulp-cached for incremental builds
-
 const s = gulp.series
 const p = gulp.parallel
 
 const paths = {
-    app : 'C:/Users/Ale/Documents/Dev/repos/rasti-demo',
-    dist : 'C:/Users/Ale/Documents/Dev/repos/rasti-demo/dist'
+    app : 'C:/Users/ale/Documents/rasti-demo',
+    dist : 'C:/Users/ale/Documents/rasti-demo/dist'
 }
 
 
@@ -39,9 +36,9 @@ function bundle(minCss) {
     })
     .bundle()
     // extract inline sourcemaps to external files
-    .pipe(exorcist(paths.dist + '/rasti.map'))
+    .pipe( exorcist(paths.dist + '/rasti.map') )
     .on('error', function(err) {
-        gutil.log(err.stack)
+        log(err.stack)
         this.emit('end') // end the errored stream here so gulp doesn't crash
     })
     // turn browserify's text stream into gulp's vinyl stream
@@ -53,21 +50,6 @@ function bundle(minCss) {
         minCss ? paths.dist + '/rasti.min.css'
         : 'src/rasti.css'
     )))
-    .pipe(gulp.dest(paths.dist))
-}
-
-
-function babilize(buffer) {
-    return buffer.pipe(babili({
-        mangle: { keepClassNames: true }
-    }))
-    // trim ES6 template strings whitespace
-    .pipe(trimlines({
-        pattern: '\n[ ]+'
-    }))
-    .pipe(trimlines({
-        pattern: '[\n]+'
-    }))
 }
 
 
@@ -79,16 +61,20 @@ gulp.task('minify-css', () =>
 )
 
 
-gulp.task('bundle', () =>
+gulp.task('bundle', s('minify-css', () =>
     merge2( gulp.src('lib/zepto.min.js'), bundle(true) )
-    .pipe(concat('rasti+zepto.js'))
+    .pipe(concat('rasti.js'))
     .pipe(gulp.dest(paths.dist))
-)
+))
 
 
 gulp.task('prod', s('bundle', () =>
-    babilize( gulp.src(paths.dist + '/rasti+zepto.js') )
-    .pipe(rename('rasti+zepto.min.js'))
+    gulp.src(paths.dist + '/rasti.js')
+    .pipe(minify())
+    // trim ES6 template strings whitespace
+    .pipe(trimlines({ pattern: '\n[ ]+' }))
+    .pipe(trimlines({ pattern: '[\n]+'  }))
+    .pipe(rename('rasti.min.js'))
     .pipe(gulp.dest(paths.dist))
 ))
 
