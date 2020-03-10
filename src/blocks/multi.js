@@ -3,6 +3,9 @@ const utils = require('../utils')
 module.exports = {
 
 template : function(data, $el) {
+    if ( utils.is.string(data) ) data = data.split(', ')
+    if ( !utils.is.array(data) ) throw 'invalid data, must be string or array'
+
     $el[0].total = data.length // WARNING : SIDE EFFECTS
 
     var ret = $el.hasAttr('filter')

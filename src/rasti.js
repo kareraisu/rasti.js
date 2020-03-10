@@ -283,15 +283,13 @@ function rasti(name, container) {
         })
 
 
-        // init field dependencies
-        container.find('[prop][bind]').each( (i, el) => {
+        // init element dependencies
+        container.find('[bind]').each( (i, el) => {
             const $el = $(el)
             const deps = $el.attr('bind')
             if (deps) deps.split(' ').forEach( dep => {
                 $el.closest('[page]').find('[prop='+ dep +']')
-                    .change( e => {
-                        updateBlock($el)
-                    })
+                    .change( e => { updateBlock($el) })
             })
         })
 
@@ -384,7 +382,7 @@ function rasti(name, container) {
         })
 
 
-        // fix icons
+        // fix input icons
         container.find('input[icon]').each( (i, el) => {
             fixIcon($(el))
         })
@@ -437,8 +435,9 @@ function rasti(name, container) {
             const $fields = $(btn).parent().find('input[required]')
             btn.disabled = isAnyFieldInvalid($fields)
             $fields.each( (i, field) => {
-                $(field).on('input', e => {
+                $(field).on('keydown', e => {
                     btn.disabled = isAnyFieldInvalid($fields)
+                    if (e.key == 'Enter' && !btn.disabled) btn.click()
                 })
             })
         })
@@ -597,8 +596,8 @@ function rasti(name, container) {
             const $el = $(el)
             const prop = $el.attr('prop')
 
-            if (prop) {
-                if ( $el.attr('transient') ) prop.__trans = true
+            if (prop && !$el.hasAttr('template')) {
+                if ( $el.hasAttr('transient') ) prop.__trans = true
                 
                 if ( exists(el.value) ) {
                     // it's an element, so bind it
@@ -1290,46 +1289,7 @@ rasti.error = error
 rasti.utils = utils
 rasti.blocks = require('./blocks/all')
 rasti.icons = require('./icons')
-rasti.fx = {
-
-    stack : $el => {
-        $el.addClass('fx-stack-container')
-        const $children = $el.children()
-        $children.each( (i, el) => {
-            el.classList.add('fx-stack-el')
-            setTimeout( _ => {
-                el.classList.remove('fx-stack-el')
-            }, i * 50);
-        })
-        setTimeout( _ => {
-            $el.removeClass('fx-stack-container')
-        }, $children.length * 50 + 500);
-
-    },
-
-    stamp : $el => {
-        $el.addClass('fx-stamp-container')
-        const $children = $el.children()
-        $children.each( (i, el) => {
-            el.classList.add('fx-stamp-el')
-            setTimeout( _ => {
-                el.classList.remove('fx-stamp-el')
-            }, i * 40);
-        })
-        setTimeout( _ => {
-            $el.removeClass('fx-stamp-container')
-        }, $children.length * 40 + 500);
-    },
-
-    toast : $el => {
-        $el.addClass('active')
-        setTimeout( _ => {
-            $el.removeClass('active')
-        }, 4000);
-
-    },
-
-}
+rasti.fx = require('./fx')
 rasti.options = {log : 'debug'}
 
 module.exports = Object.freeze(rasti)

@@ -1,13 +1,16 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.rasti = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/* Zepto v1.2.0 - zepto event ajax form ie - zeptojs.com/license */
+!function(t,e){"function"==typeof define&&define.amd?define(function(){return e(t)}):e(t)}(this,function(t){var e=function(){function $(t){return null==t?String(t):S[C.call(t)]||"object"}function F(t){return"function"==$(t)}function k(t){return null!=t&&t==t.window}function M(t){return null!=t&&t.nodeType==t.DOCUMENT_NODE}function R(t){return"object"==$(t)}function Z(t){return R(t)&&!k(t)&&Object.getPrototypeOf(t)==Object.prototype}function z(t){var e=!!t&&"length"in t&&t.length,n=r.type(t);return"function"!=n&&!k(t)&&("array"==n||0===e||"number"==typeof e&&e>0&&e-1 in t)}function q(t){return a.call(t,function(t){return null!=t})}function H(t){return t.length>0?r.fn.concat.apply([],t):t}function I(t){return t.replace(/::/g,"/").replace(/([A-Z]+)([A-Z][a-z])/g,"$1_$2").replace(/([a-z\d])([A-Z])/g,"$1_$2").replace(/_/g,"-").toLowerCase()}function V(t){return t in l?l[t]:l[t]=new RegExp("(^|\\s)"+t+"(\\s|$)")}function _(t,e){return"number"!=typeof e||h[I(t)]?e:e+"px"}function B(t){var e,n;return c[t]||(e=f.createElement(t),f.body.appendChild(e),n=getComputedStyle(e,"").getPropertyValue("display"),e.parentNode.removeChild(e),"none"==n&&(n="block"),c[t]=n),c[t]}function U(t){return"children"in t?u.call(t.children):r.map(t.childNodes,function(t){return 1==t.nodeType?t:void 0})}function X(t,e){var n,r=t?t.length:0;for(n=0;r>n;n++)this[n]=t[n];this.length=r,this.selector=e||""}function J(t,r,i){for(n in r)i&&(Z(r[n])||L(r[n]))?(Z(r[n])&&!Z(t[n])&&(t[n]={}),L(r[n])&&!L(t[n])&&(t[n]=[]),J(t[n],r[n],i)):r[n]!==e&&(t[n]=r[n])}function W(t,e){return null==e?r(t):r(t).filter(e)}function Y(t,e,n,r){return F(e)?e.call(t,n,r):e}function G(t,e,n){null==n?t.removeAttribute(e):t.setAttribute(e,n)}function K(t,n){var r=t.className||"",i=r&&r.baseVal!==e;return n===e?i?r.baseVal:r:void(i?r.baseVal=n:t.className=n)}function Q(t){try{return t?"true"==t||("false"==t?!1:"null"==t?null:+t+""==t?+t:/^[\[\{]/.test(t)?r.parseJSON(t):t):t}catch(e){return t}}function tt(t,e){e(t);for(var n=0,r=t.childNodes.length;r>n;n++)tt(t.childNodes[n],e)}var e,n,r,i,O,P,o=[],s=o.concat,a=o.filter,u=o.slice,f=t.document,c={},l={},h={"column-count":1,columns:1,"font-weight":1,"line-height":1,opacity:1,"z-index":1,zoom:1},p=/^\s*<(\w+|!)[^>]*>/,d=/^<(\w+)\s*\/?>(?:<\/\1>|)$/,m=/<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,g=/^(?:body|html)$/i,v=/([A-Z])/g,y=["val","css","html","text","data","width","height","offset"],x=["after","prepend","before","append"],b=f.createElement("table"),E=f.createElement("tr"),j={tr:f.createElement("tbody"),tbody:b,thead:b,tfoot:b,td:E,th:E,"*":f.createElement("div")},w=/complete|loaded|interactive/,T=/^[\w-]*$/,S={},C=S.toString,N={},A=f.createElement("div"),D={tabindex:"tabIndex",readonly:"readOnly","for":"htmlFor","class":"className",maxlength:"maxLength",cellspacing:"cellSpacing",cellpadding:"cellPadding",rowspan:"rowSpan",colspan:"colSpan",usemap:"useMap",frameborder:"frameBorder",contenteditable:"contentEditable"},L=Array.isArray||function(t){return t instanceof Array};return N.matches=function(t,e){if(!e||!t||1!==t.nodeType)return!1;var n=t.matches||t.webkitMatchesSelector||t.mozMatchesSelector||t.oMatchesSelector||t.matchesSelector;if(n)return n.call(t,e);var r,i=t.parentNode,o=!i;return o&&(i=A).appendChild(t),r=~N.qsa(i,e).indexOf(t),o&&A.removeChild(t),r},O=function(t){return t.replace(/-+(.)?/g,function(t,e){return e?e.toUpperCase():""})},P=function(t){return a.call(t,function(e,n){return t.indexOf(e)==n})},N.fragment=function(t,n,i){var o,s,a;return d.test(t)&&(o=r(f.createElement(RegExp.$1))),o||(t.replace&&(t=t.replace(m,"<$1></$2>")),n===e&&(n=p.test(t)&&RegExp.$1),n in j||(n="*"),a=j[n],a.innerHTML=""+t,o=r.each(u.call(a.childNodes),function(){a.removeChild(this)})),Z(i)&&(s=r(o),r.each(i,function(t,e){y.indexOf(t)>-1?s[t](e):s.attr(t,e)})),o},N.Z=function(t,e){return new X(t,e)},N.isZ=function(t){return t instanceof N.Z},N.init=function(t,n){var i;if(!t)return N.Z();if("string"==typeof t)if(t=t.trim(),"<"==t[0]&&p.test(t))i=N.fragment(t,RegExp.$1,n),t=null;else{if(n!==e)return r(n).find(t);i=N.qsa(f,t)}else{if(F(t))return r(f).ready(t);if(N.isZ(t))return t;if(L(t))i=q(t);else if(R(t))i=[t],t=null;else if(p.test(t))i=N.fragment(t.trim(),RegExp.$1,n),t=null;else{if(n!==e)return r(n).find(t);i=N.qsa(f,t)}}return N.Z(i,t)},r=function(t,e){return N.init(t,e)},r.extend=function(t){var e,n=u.call(arguments,1);return"boolean"==typeof t&&(e=t,t=n.shift()),n.forEach(function(n){J(t,n,e)}),t},N.qsa=function(t,e){var n,r="#"==e[0],i=!r&&"."==e[0],o=r||i?e.slice(1):e,s=T.test(o);return t.getElementById&&s&&r?(n=t.getElementById(o))?[n]:[]:1!==t.nodeType&&9!==t.nodeType&&11!==t.nodeType?[]:u.call(s&&!r&&t.getElementsByClassName?i?t.getElementsByClassName(o):t.getElementsByTagName(e):t.querySelectorAll(e))},r.contains=f.documentElement.contains?function(t,e){return t!==e&&t.contains(e)}:function(t,e){for(;e&&(e=e.parentNode);)if(e===t)return!0;return!1},r.type=$,r.isFunction=F,r.isWindow=k,r.isArray=L,r.isPlainObject=Z,r.isEmptyObject=function(t){var e;for(e in t)return!1;return!0},r.isNumeric=function(t){var e=Number(t),n=typeof t;return null!=t&&"boolean"!=n&&("string"!=n||t.length)&&!isNaN(e)&&isFinite(e)||!1},r.inArray=function(t,e,n){return o.indexOf.call(e,t,n)},r.camelCase=O,r.trim=function(t){return null==t?"":String.prototype.trim.call(t)},r.uuid=0,r.support={},r.expr={},r.noop=function(){},r.map=function(t,e){var n,i,o,r=[];if(z(t))for(i=0;i<t.length;i++)n=e(t[i],i),null!=n&&r.push(n);else for(o in t)n=e(t[o],o),null!=n&&r.push(n);return H(r)},r.each=function(t,e){var n,r;if(z(t)){for(n=0;n<t.length;n++)if(e.call(t[n],n,t[n])===!1)return t}else for(r in t)if(e.call(t[r],r,t[r])===!1)return t;return t},r.grep=function(t,e){return a.call(t,e)},t.JSON&&(r.parseJSON=JSON.parse),r.each("Boolean Number String Function Array Date RegExp Object Error".split(" "),function(t,e){S["[object "+e+"]"]=e.toLowerCase()}),r.fn={constructor:N.Z,length:0,forEach:o.forEach,reduce:o.reduce,push:o.push,sort:o.sort,splice:o.splice,indexOf:o.indexOf,concat:function(){var t,e,n=[];for(t=0;t<arguments.length;t++)e=arguments[t],n[t]=N.isZ(e)?e.toArray():e;return s.apply(N.isZ(this)?this.toArray():this,n)},map:function(t){return r(r.map(this,function(e,n){return t.call(e,n,e)}))},slice:function(){return r(u.apply(this,arguments))},ready:function(t){return w.test(f.readyState)&&f.body?t(r):f.addEventListener("DOMContentLoaded",function(){t(r)},!1),this},get:function(t){return t===e?u.call(this):this[t>=0?t:t+this.length]},toArray:function(){return this.get()},size:function(){return this.length},remove:function(){return this.each(function(){null!=this.parentNode&&this.parentNode.removeChild(this)})},each:function(t){return o.every.call(this,function(e,n){return t.call(e,n,e)!==!1}),this},filter:function(t){return F(t)?this.not(this.not(t)):r(a.call(this,function(e){return N.matches(e,t)}))},add:function(t,e){return r(P(this.concat(r(t,e))))},is:function(t){return this.length>0&&N.matches(this[0],t)},not:function(t){var n=[];if(F(t)&&t.call!==e)this.each(function(e){t.call(this,e)||n.push(this)});else{var i="string"==typeof t?this.filter(t):z(t)&&F(t.item)?u.call(t):r(t);this.forEach(function(t){i.indexOf(t)<0&&n.push(t)})}return r(n)},has:function(t){return this.filter(function(){return R(t)?r.contains(this,t):r(this).find(t).size()})},eq:function(t){return-1===t?this.slice(t):this.slice(t,+t+1)},first:function(){var t=this[0];return t&&!R(t)?t:r(t)},last:function(){var t=this[this.length-1];return t&&!R(t)?t:r(t)},find:function(t){var e,n=this;return e=t?"object"==typeof t?r(t).filter(function(){var t=this;return o.some.call(n,function(e){return r.contains(e,t)})}):1==this.length?r(N.qsa(this[0],t)):this.map(function(){return N.qsa(this,t)}):r()},closest:function(t,e){var n=[],i="object"==typeof t&&r(t);return this.each(function(r,o){for(;o&&!(i?i.indexOf(o)>=0:N.matches(o,t));)o=o!==e&&!M(o)&&o.parentNode;o&&n.indexOf(o)<0&&n.push(o)}),r(n)},parents:function(t){for(var e=[],n=this;n.length>0;)n=r.map(n,function(t){return(t=t.parentNode)&&!M(t)&&e.indexOf(t)<0?(e.push(t),t):void 0});return W(e,t)},parent:function(t){return W(P(this.pluck("parentNode")),t)},children:function(t){return W(this.map(function(){return U(this)}),t)},contents:function(){return this.map(function(){return this.contentDocument||u.call(this.childNodes)})},siblings:function(t){return W(this.map(function(t,e){return a.call(U(e.parentNode),function(t){return t!==e})}),t)},empty:function(){return this.each(function(){this.innerHTML=""})},pluck:function(t){return r.map(this,function(e){return e[t]})},show:function(){return this.each(function(){"none"==this.style.display&&(this.style.display=""),"none"==getComputedStyle(this,"").getPropertyValue("display")&&(this.style.display=B(this.nodeName))})},replaceWith:function(t){return this.before(t).remove()},wrap:function(t){var e=F(t);if(this[0]&&!e)var n=r(t).get(0),i=n.parentNode||this.length>1;return this.each(function(o){r(this).wrapAll(e?t.call(this,o):i?n.cloneNode(!0):n)})},wrapAll:function(t){if(this[0]){r(this[0]).before(t=r(t));for(var e;(e=t.children()).length;)t=e.first();r(t).append(this)}return this},wrapInner:function(t){var e=F(t);return this.each(function(n){var i=r(this),o=i.contents(),s=e?t.call(this,n):t;o.length?o.wrapAll(s):i.append(s)})},unwrap:function(){return this.parent().each(function(){r(this).replaceWith(r(this).children())}),this},clone:function(){return this.map(function(){return this.cloneNode(!0)})},hide:function(){return this.css("display","none")},toggle:function(t){return this.each(function(){var n=r(this);(t===e?"none"==n.css("display"):t)?n.show():n.hide()})},prev:function(t){return r(this.pluck("previousElementSibling")).filter(t||"*")},next:function(t){return r(this.pluck("nextElementSibling")).filter(t||"*")},html:function(t){return 0 in arguments?this.each(function(e){var n=this.innerHTML;r(this).empty().append(Y(this,t,e,n))}):0 in this?this[0].innerHTML:null},text:function(t){return 0 in arguments?this.each(function(e){var n=Y(this,t,e,this.textContent);this.textContent=null==n?"":""+n}):0 in this?this.pluck("textContent").join(""):null},attr:function(t,r){var i;return"string"!=typeof t||1 in arguments?this.each(function(e){if(1===this.nodeType)if(R(t))for(n in t)G(this,n,t[n]);else G(this,t,Y(this,r,e,this.getAttribute(t)))}):0 in this&&1==this[0].nodeType&&null!=(i=this[0].getAttribute(t))?i:e},removeAttr:function(t){return this.each(function(){1===this.nodeType&&t.split(" ").forEach(function(t){G(this,t)},this)})},prop:function(t,e){return t=D[t]||t,1 in arguments?this.each(function(n){this[t]=Y(this,e,n,this[t])}):this[0]&&this[0][t]},removeProp:function(t){return t=D[t]||t,this.each(function(){delete this[t]})},data:function(t,n){var r="data-"+t.replace(v,"-$1").toLowerCase(),i=1 in arguments?this.attr(r,n):this.attr(r);return null!==i?Q(i):e},val:function(t){return 0 in arguments?(null==t&&(t=""),this.each(function(e){this.value=Y(this,t,e,this.value)})):this[0]&&(this[0].multiple?r(this[0]).find("option").filter(function(){return this.selected}).pluck("value"):this[0].value)},offset:function(e){if(e)return this.each(function(t){var n=r(this),i=Y(this,e,t,n.offset()),o=n.offsetParent().offset(),s={top:i.top-o.top,left:i.left-o.left};"static"==n.css("position")&&(s.position="relative"),n.css(s)});if(!this.length)return null;if(f.documentElement!==this[0]&&!r.contains(f.documentElement,this[0]))return{top:0,left:0};var n=this[0].getBoundingClientRect();return{left:n.left+t.pageXOffset,top:n.top+t.pageYOffset,width:Math.round(n.width),height:Math.round(n.height)}},css:function(t,e){if(arguments.length<2){var i=this[0];if("string"==typeof t){if(!i)return;return i.style[O(t)]||getComputedStyle(i,"").getPropertyValue(t)}if(L(t)){if(!i)return;var o={},s=getComputedStyle(i,"");return r.each(t,function(t,e){o[e]=i.style[O(e)]||s.getPropertyValue(e)}),o}}var a="";if("string"==$(t))e||0===e?a=I(t)+":"+_(t,e):this.each(function(){this.style.removeProperty(I(t))});else for(n in t)t[n]||0===t[n]?a+=I(n)+":"+_(n,t[n])+";":this.each(function(){this.style.removeProperty(I(n))});return this.each(function(){this.style.cssText+=";"+a})},index:function(t){return t?this.indexOf(r(t)[0]):this.parent().children().indexOf(this[0])},hasClass:function(t){return t?o.some.call(this,function(t){return this.test(K(t))},V(t)):!1},addClass:function(t){return t?this.each(function(e){if("className"in this){i=[];var n=K(this),o=Y(this,t,e,n);o.split(/\s+/g).forEach(function(t){r(this).hasClass(t)||i.push(t)},this),i.length&&K(this,n+(n?" ":"")+i.join(" "))}}):this},removeClass:function(t){return this.each(function(n){if("className"in this){if(t===e)return K(this,"");i=K(this),Y(this,t,n,i).split(/\s+/g).forEach(function(t){i=i.replace(V(t)," ")}),K(this,i.trim())}})},toggleClass:function(t,n){return t?this.each(function(i){var o=r(this),s=Y(this,t,i,K(this));s.split(/\s+/g).forEach(function(t){(n===e?!o.hasClass(t):n)?o.addClass(t):o.removeClass(t)})}):this},scrollTop:function(t){if(this.length){var n="scrollTop"in this[0];return t===e?n?this[0].scrollTop:this[0].pageYOffset:this.each(n?function(){this.scrollTop=t}:function(){this.scrollTo(this.scrollX,t)})}},scrollLeft:function(t){if(this.length){var n="scrollLeft"in this[0];return t===e?n?this[0].scrollLeft:this[0].pageXOffset:this.each(n?function(){this.scrollLeft=t}:function(){this.scrollTo(t,this.scrollY)})}},position:function(){if(this.length){var t=this[0],e=this.offsetParent(),n=this.offset(),i=g.test(e[0].nodeName)?{top:0,left:0}:e.offset();return n.top-=parseFloat(r(t).css("margin-top"))||0,n.left-=parseFloat(r(t).css("margin-left"))||0,i.top+=parseFloat(r(e[0]).css("border-top-width"))||0,i.left+=parseFloat(r(e[0]).css("border-left-width"))||0,{top:n.top-i.top,left:n.left-i.left}}},offsetParent:function(){return this.map(function(){for(var t=this.offsetParent||f.body;t&&!g.test(t.nodeName)&&"static"==r(t).css("position");)t=t.offsetParent;return t})}},r.fn.detach=r.fn.remove,["width","height"].forEach(function(t){var n=t.replace(/./,function(t){return t[0].toUpperCase()});r.fn[t]=function(i){var o,s=this[0];return i===e?k(s)?s["inner"+n]:M(s)?s.documentElement["scroll"+n]:(o=this.offset())&&o[t]:this.each(function(e){s=r(this),s.css(t,Y(this,i,e,s[t]()))})}}),x.forEach(function(n,i){var o=i%2;r.fn[n]=function(){var n,a,s=r.map(arguments,function(t){var i=[];return n=$(t),"array"==n?(t.forEach(function(t){return t.nodeType!==e?i.push(t):r.zepto.isZ(t)?i=i.concat(t.get()):void(i=i.concat(N.fragment(t)))}),i):"object"==n||null==t?t:N.fragment(t)}),u=this.length>1;return s.length<1?this:this.each(function(e,n){a=o?n:n.parentNode,n=0==i?n.nextSibling:1==i?n.firstChild:2==i?n:null;var c=r.contains(f.documentElement,a);s.forEach(function(e){if(u)e=e.cloneNode(!0);else if(!a)return r(e).remove();a.insertBefore(e,n),c&&tt(e,function(e){if(!(null==e.nodeName||"SCRIPT"!==e.nodeName.toUpperCase()||e.type&&"text/javascript"!==e.type||e.src)){var n=e.ownerDocument?e.ownerDocument.defaultView:t;n.eval.call(n,e.innerHTML)}})})})},r.fn[o?n+"To":"insert"+(i?"Before":"After")]=function(t){return r(t)[n](this),this}}),N.Z.prototype=X.prototype=r.fn,N.uniq=P,N.deserializeValue=Q,r.zepto=N,r}();return t.Zepto=e,void 0===t.$&&(t.$=e),function(e){function h(t){return t._zid||(t._zid=n++)}function p(t,e,n,r){if(e=d(e),e.ns)var i=m(e.ns);return(a[h(t)]||[]).filter(function(t){return t&&(!e.e||t.e==e.e)&&(!e.ns||i.test(t.ns))&&(!n||h(t.fn)===h(n))&&(!r||t.sel==r)})}function d(t){var e=(""+t).split(".");return{e:e[0],ns:e.slice(1).sort().join(" ")}}function m(t){return new RegExp("(?:^| )"+t.replace(" "," .* ?")+"(?: |$)")}function g(t,e){return t.del&&!f&&t.e in c||!!e}function v(t){return l[t]||f&&c[t]||t}function y(t,n,i,o,s,u,f){var c=h(t),p=a[c]||(a[c]=[]);n.split(/\s/).forEach(function(n){if("ready"==n)return e(document).ready(i);var a=d(n);a.fn=i,a.sel=s,a.e in l&&(i=function(t){var n=t.relatedTarget;return!n||n!==this&&!e.contains(this,n)?a.fn.apply(this,arguments):void 0}),a.del=u;var c=u||i;a.proxy=function(e){if(e=T(e),!e.isImmediatePropagationStopped()){e.data=o;var n=c.apply(t,e._args==r?[e]:[e].concat(e._args));return n===!1&&(e.preventDefault(),e.stopPropagation()),n}},a.i=p.length,p.push(a),"addEventListener"in t&&t.addEventListener(v(a.e),a.proxy,g(a,f))})}function x(t,e,n,r,i){var o=h(t);(e||"").split(/\s/).forEach(function(e){p(t,e,n,r).forEach(function(e){delete a[o][e.i],"removeEventListener"in t&&t.removeEventListener(v(e.e),e.proxy,g(e,i))})})}function T(t,n){return(n||!t.isDefaultPrevented)&&(n||(n=t),e.each(w,function(e,r){var i=n[e];t[e]=function(){return this[r]=b,i&&i.apply(n,arguments)},t[r]=E}),t.timeStamp||(t.timeStamp=Date.now()),(n.defaultPrevented!==r?n.defaultPrevented:"returnValue"in n?n.returnValue===!1:n.getPreventDefault&&n.getPreventDefault())&&(t.isDefaultPrevented=b)),t}function S(t){var e,n={originalEvent:t};for(e in t)j.test(e)||t[e]===r||(n[e]=t[e]);return T(n,t)}var r,n=1,i=Array.prototype.slice,o=e.isFunction,s=function(t){return"string"==typeof t},a={},u={},f="onfocusin"in t,c={focus:"focusin",blur:"focusout"},l={mouseenter:"mouseover",mouseleave:"mouseout"};u.click=u.mousedown=u.mouseup=u.mousemove="MouseEvents",e.event={add:y,remove:x},e.proxy=function(t,n){var r=2 in arguments&&i.call(arguments,2);if(o(t)){var a=function(){return t.apply(n,r?r.concat(i.call(arguments)):arguments)};return a._zid=h(t),a}if(s(n))return r?(r.unshift(t[n],t),e.proxy.apply(null,r)):e.proxy(t[n],t);throw new TypeError("expected function")},e.fn.bind=function(t,e,n){return this.on(t,e,n)},e.fn.unbind=function(t,e){return this.off(t,e)},e.fn.one=function(t,e,n,r){return this.on(t,e,n,r,1)};var b=function(){return!0},E=function(){return!1},j=/^([A-Z]|returnValue$|layer[XY]$|webkitMovement[XY]$)/,w={preventDefault:"isDefaultPrevented",stopImmediatePropagation:"isImmediatePropagationStopped",stopPropagation:"isPropagationStopped"};e.fn.delegate=function(t,e,n){return this.on(e,t,n)},e.fn.undelegate=function(t,e,n){return this.off(e,t,n)},e.fn.live=function(t,n){return e(document.body).delegate(this.selector,t,n),this},e.fn.die=function(t,n){return e(document.body).undelegate(this.selector,t,n),this},e.fn.on=function(t,n,a,u,f){var c,l,h=this;return t&&!s(t)?(e.each(t,function(t,e){h.on(t,n,a,e,f)}),h):(s(n)||o(u)||u===!1||(u=a,a=n,n=r),(u===r||a===!1)&&(u=a,a=r),u===!1&&(u=E),h.each(function(r,o){f&&(c=function(t){return x(o,t.type,u),u.apply(this,arguments)}),n&&(l=function(t){var r,s=e(t.target).closest(n,o).get(0);return s&&s!==o?(r=e.extend(S(t),{currentTarget:s,liveFired:o}),(c||u).apply(s,[r].concat(i.call(arguments,1)))):void 0}),y(o,t,u,a,n,l||c)}))},e.fn.off=function(t,n,i){var a=this;return t&&!s(t)?(e.each(t,function(t,e){a.off(t,n,e)}),a):(s(n)||o(i)||i===!1||(i=n,n=r),i===!1&&(i=E),a.each(function(){x(this,t,i,n)}))},e.fn.trigger=function(t,n){return t=s(t)||e.isPlainObject(t)?e.Event(t):T(t),t._args=n,this.each(function(){t.type in c&&"function"==typeof this[t.type]?this[t.type]():"dispatchEvent"in this?this.dispatchEvent(t):e(this).triggerHandler(t,n)})},e.fn.triggerHandler=function(t,n){var r,i;return this.each(function(o,a){r=S(s(t)?e.Event(t):t),r._args=n,r.target=a,e.each(p(a,t.type||t),function(t,e){return i=e.proxy(r),r.isImmediatePropagationStopped()?!1:void 0})}),i},"focusin focusout focus blur load resize scroll unload click dblclick mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave change select keydown keypress keyup error".split(" ").forEach(function(t){e.fn[t]=function(e){return 0 in arguments?this.bind(t,e):this.trigger(t)}}),e.Event=function(t,e){s(t)||(e=t,t=e.type);var n=document.createEvent(u[t]||"Events"),r=!0;if(e)for(var i in e)"bubbles"==i?r=!!e[i]:n[i]=e[i];return n.initEvent(t,r,!0),T(n)}}(e),function(e){function p(t,n,r){var i=e.Event(n);return e(t).trigger(i,r),!i.isDefaultPrevented()}function d(t,e,n,i){return t.global?p(e||r,n,i):void 0}function m(t){t.global&&0===e.active++&&d(t,null,"ajaxStart")}function g(t){t.global&&!--e.active&&d(t,null,"ajaxStop")}function v(t,e){var n=e.context;return e.beforeSend.call(n,t,e)===!1||d(e,n,"ajaxBeforeSend",[t,e])===!1?!1:void d(e,n,"ajaxSend",[t,e])}function y(t,e,n,r){var i=n.context,o="success";n.success.call(i,t,o,e),r&&r.resolveWith(i,[t,o,e]),d(n,i,"ajaxSuccess",[e,n,t]),b(o,e,n)}function x(t,e,n,r,i){var o=r.context;r.error.call(o,n,e,t),i&&i.rejectWith(o,[n,e,t]),d(r,o,"ajaxError",[n,r,t||e]),b(e,n,r)}function b(t,e,n){var r=n.context;n.complete.call(r,e,t),d(n,r,"ajaxComplete",[e,n]),g(n)}function E(t,e,n){if(n.dataFilter==j)return t;var r=n.context;return n.dataFilter.call(r,t,e)}function j(){}function w(t){return t&&(t=t.split(";",2)[0]),t&&(t==c?"html":t==f?"json":a.test(t)?"script":u.test(t)&&"xml")||"text"}function T(t,e){return""==e?t:(t+"&"+e).replace(/[&?]{1,2}/,"?")}function S(t){t.processData&&t.data&&"string"!=e.type(t.data)&&(t.data=e.param(t.data,t.traditional)),!t.data||t.type&&"GET"!=t.type.toUpperCase()&&"jsonp"!=t.dataType||(t.url=T(t.url,t.data),t.data=void 0)}function C(t,n,r,i){return e.isFunction(n)&&(i=r,r=n,n=void 0),e.isFunction(r)||(i=r,r=void 0),{url:t,data:n,success:r,dataType:i}}function O(t,n,r,i){var o,s=e.isArray(n),a=e.isPlainObject(n);e.each(n,function(n,u){o=e.type(u),i&&(n=r?i:i+"["+(a||"object"==o||"array"==o?n:"")+"]"),!i&&s?t.add(u.name,u.value):"array"==o||!r&&"object"==o?O(t,u,r,n):t.add(n,u)})}var i,o,n=+new Date,r=t.document,s=/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,a=/^(?:text|application)\/javascript/i,u=/^(?:text|application)\/xml/i,f="application/json",c="text/html",l=/^\s*$/,h=r.createElement("a");h.href=t.location.href,e.active=0,e.ajaxJSONP=function(i,o){if(!("type"in i))return e.ajax(i);var c,p,s=i.jsonpCallback,a=(e.isFunction(s)?s():s)||"Zepto"+n++,u=r.createElement("script"),f=t[a],l=function(t){e(u).triggerHandler("error",t||"abort")},h={abort:l};return o&&o.promise(h),e(u).on("load error",function(n,r){clearTimeout(p),e(u).off().remove(),"error"!=n.type&&c?y(c[0],h,i,o):x(null,r||"error",h,i,o),t[a]=f,c&&e.isFunction(f)&&f(c[0]),f=c=void 0}),v(h,i)===!1?(l("abort"),h):(t[a]=function(){c=arguments},u.src=i.url.replace(/\?(.+)=\?/,"?$1="+a),r.head.appendChild(u),i.timeout>0&&(p=setTimeout(function(){l("timeout")},i.timeout)),h)},e.ajaxSettings={type:"GET",beforeSend:j,success:j,error:j,complete:j,context:null,global:!0,xhr:function(){return new t.XMLHttpRequest},accepts:{script:"text/javascript, application/javascript, application/x-javascript",json:f,xml:"application/xml, text/xml",html:c,text:"text/plain"},crossDomain:!1,timeout:0,processData:!0,cache:!0,dataFilter:j},e.ajax=function(n){var u,f,s=e.extend({},n||{}),a=e.Deferred&&e.Deferred();for(i in e.ajaxSettings)void 0===s[i]&&(s[i]=e.ajaxSettings[i]);m(s),s.crossDomain||(u=r.createElement("a"),u.href=s.url,u.href=u.href,s.crossDomain=h.protocol+"//"+h.host!=u.protocol+"//"+u.host),s.url||(s.url=t.location.toString()),(f=s.url.indexOf("#"))>-1&&(s.url=s.url.slice(0,f)),S(s);var c=s.dataType,p=/\?.+=\?/.test(s.url);if(p&&(c="jsonp"),s.cache!==!1&&(n&&n.cache===!0||"script"!=c&&"jsonp"!=c)||(s.url=T(s.url,"_="+Date.now())),"jsonp"==c)return p||(s.url=T(s.url,s.jsonp?s.jsonp+"=?":s.jsonp===!1?"":"callback=?")),e.ajaxJSONP(s,a);var P,d=s.accepts[c],g={},b=function(t,e){g[t.toLowerCase()]=[t,e]},C=/^([\w-]+:)\/\//.test(s.url)?RegExp.$1:t.location.protocol,N=s.xhr(),O=N.setRequestHeader;if(a&&a.promise(N),s.crossDomain||b("X-Requested-With","XMLHttpRequest"),b("Accept",d||"*/*"),(d=s.mimeType||d)&&(d.indexOf(",")>-1&&(d=d.split(",",2)[0]),N.overrideMimeType&&N.overrideMimeType(d)),(s.contentType||s.contentType!==!1&&s.data&&"GET"!=s.type.toUpperCase())&&b("Content-Type",s.contentType||"application/x-www-form-urlencoded"),s.headers)for(o in s.headers)b(o,s.headers[o]);if(N.setRequestHeader=b,N.onreadystatechange=function(){if(4==N.readyState){N.onreadystatechange=j,clearTimeout(P);var t,n=!1;if(N.status>=200&&N.status<300||304==N.status||0==N.status&&"file:"==C){if(c=c||w(s.mimeType||N.getResponseHeader("content-type")),"arraybuffer"==N.responseType||"blob"==N.responseType)t=N.response;else{t=N.responseText;try{t=E(t,c,s),"script"==c?(1,eval)(t):"xml"==c?t=N.responseXML:"json"==c&&(t=l.test(t)?null:e.parseJSON(t))}catch(r){n=r}if(n)return x(n,"parsererror",N,s,a)}y(t,N,s,a)}else x(N.statusText||null,N.status?"error":"abort",N,s,a)}},v(N,s)===!1)return N.abort(),x(null,"abort",N,s,a),N;var A="async"in s?s.async:!0;if(N.open(s.type,s.url,A,s.username,s.password),s.xhrFields)for(o in s.xhrFields)N[o]=s.xhrFields[o];for(o in g)O.apply(N,g[o]);return s.timeout>0&&(P=setTimeout(function(){N.onreadystatechange=j,N.abort(),x(null,"timeout",N,s,a)},s.timeout)),N.send(s.data?s.data:null),N},e.get=function(){return e.ajax(C.apply(null,arguments))},e.post=function(){var t=C.apply(null,arguments);return t.type="POST",e.ajax(t)},e.getJSON=function(){var t=C.apply(null,arguments);return t.dataType="json",e.ajax(t)},e.fn.load=function(t,n,r){if(!this.length)return this;var a,i=this,o=t.split(/\s/),u=C(t,n,r),f=u.success;return o.length>1&&(u.url=o[0],a=o[1]),u.success=function(t){i.html(a?e("<div>").html(t.replace(s,"")).find(a):t),f&&f.apply(i,arguments)},e.ajax(u),this};var N=encodeURIComponent;e.param=function(t,n){var r=[];return r.add=function(t,n){e.isFunction(n)&&(n=n()),null==n&&(n=""),this.push(N(t)+"="+N(n))},O(r,t,n),r.join("&").replace(/%20/g,"+")}}(e),function(t){t.fn.serializeArray=function(){var e,n,r=[],i=function(t){return t.forEach?t.forEach(i):void r.push({name:e,value:t})};return this[0]&&t.each(this[0].elements,function(r,o){n=o.type,e=o.name,e&&"fieldset"!=o.nodeName.toLowerCase()&&!o.disabled&&"submit"!=n&&"reset"!=n&&"button"!=n&&"file"!=n&&("radio"!=n&&"checkbox"!=n||o.checked)&&i(t(o).val())}),r},t.fn.serialize=function(){var t=[];return this.serializeArray().forEach(function(e){t.push(encodeURIComponent(e.name)+"="+encodeURIComponent(e.value))}),t.join("&")},t.fn.submit=function(e){if(0 in arguments)this.bind("submit",e);else if(this.length){var n=t.Event("submit");this.eq(0).trigger(n),n.isDefaultPrevented()||this.get(0).submit()}return this}}(e),function(){try{getComputedStyle(void 0)}catch(e){var n=getComputedStyle;t.getComputedStyle=function(t,e){try{return n(t,e)}catch(r){return null}}}}(),e});
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.rasti = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 module.exports = {
-    list    : require('./list'),
+	list    : require('./list'),
+	table   : require('./table'),
 	buttons : require('./buttons'),
 	checks  : require('./checks'),
 	radios  : require('./radios'),
 	multi   : require('./multi'),
 	select  : require('./select'),
 }
-},{"./buttons":2,"./checks":3,"./list":4,"./multi":5,"./radios":6,"./select":7}],2:[function(require,module,exports){
+},{"./buttons":2,"./checks":3,"./list":4,"./multi":5,"./radios":6,"./select":7,"./table":8}],2:[function(require,module,exports){
 const utils = require('../utils')
 
 module.exports = {
@@ -20,6 +23,7 @@ template : function(data, $el) {
 },
 
 init : function($el) {
+    $el[0].value = ''
     $el.on('click', 'div', function(e) {
         $el.val($(e.target).attr('value'))
             .trigger('change')
@@ -51,7 +55,7 @@ style : `
 
 }
 
-},{"../utils":13}],3:[function(require,module,exports){
+},{"../utils":15}],3:[function(require,module,exports){
 const utils = require('../utils')
 
 module.exports = {
@@ -92,12 +96,14 @@ init : function($el) {
 style : ``
 
 }
-},{"../utils":13}],4:[function(require,module,exports){
-const utils = require('../utils')
+},{"../utils":15}],4:[function(require,module,exports){
+const {is} = require('../utils')
 
 module.exports = {
 
 template : function(data, $el) {
+    if ( is.string(data) ) data = data.split(', ')
+    if ( !is.array(data) ) throw 'invalid data, must be string or array'
     return data
         .map( d => `<li>${d}</li>` )
         .join('')
@@ -108,12 +114,15 @@ init : function($el) {},
 style : ''
 
 }
-},{"../utils":13}],5:[function(require,module,exports){
+},{"../utils":15}],5:[function(require,module,exports){
 const utils = require('../utils')
 
 module.exports = {
 
 template : function(data, $el) {
+    if ( utils.is.string(data) ) data = data.split(', ')
+    if ( !utils.is.array(data) ) throw 'invalid data, must be string or array'
+
     $el[0].total = data.length // WARNING : SIDE EFFECTS
 
     var ret = $el.hasAttr('filter')
@@ -178,7 +187,7 @@ init : function($el) {
 
         if ($opt.parent().attr('options')) {
             // select option
-            $el.find('[selected]').append($opt)
+            $selected.append($opt)
             values.push(val)
         }
         else {
@@ -314,7 +323,7 @@ style : `
 `
 
 }
-},{"../utils":13}],6:[function(require,module,exports){
+},{"../utils":15}],6:[function(require,module,exports){
 const utils = require('../utils')
 
 module.exports = {
@@ -328,6 +337,7 @@ template : function(data, $el) {
 },
 
 init : function($el) {
+    $el[0].value = ''
     $el.on('click', 'label', function(e) {
         // forward clicks to hidden input
         $(e.currentTarget).prev().click()
@@ -345,7 +355,7 @@ init : function($el) {
 style : ``
 
 }
-},{"../utils":13}],7:[function(require,module,exports){
+},{"../utils":15}],7:[function(require,module,exports){
 const utils = require('../utils')
 
 module.exports = {
@@ -368,10 +378,9 @@ init : function($el) {
         $options = $('<div options>')
 
     // clone original select
-    $.each($el[0].attributes, function() {
-        $wrapper.attr(this.name, this.value);
-    });
-
+    for (var attr of $el[0].attributes) {
+        $wrapper.attr(attr.name, attr.value);
+    }
     // wrap with clone
     $el.wrap($wrapper)
     // regain wrapper ref (it is lost when wrapping)
@@ -381,7 +390,7 @@ init : function($el) {
 
     if (!$el.attr('data')) {
         // clone original options
-        $el.find('option').each(function(opt, i) {
+        $el.find('option').each(function(i, opt) {
             $options.append(`<div value="${opt.value}">${opt.innerHTML}</div>`)
         })
     }
@@ -407,14 +416,16 @@ init : function($el) {
         var $opt = $(this)
         $opt.siblings().removeClass('selected')
         $opt.addClass('selected')
-        var $wrapper = $opt.closest('[select]')
         $wrapper.val($opt.attr('value'))
-        var imgpath = $wrapper.attr('img')
-        if (imgpath) setImg($wrapper, imgpath)
+        setImg($wrapper, imgpath)
     })
 
     // remove original select
     $el.remove()
+
+    function setImg($el, basepath) {
+        $el.css('background-image', 'url('+ basepath + ($el.val() || $el.attr('value')) +'.png)')
+    }
 
 },
 
@@ -456,25 +467,85 @@ style : `
 
 }
 
-},{"../utils":13}],8:[function(require,module,exports){
+},{"../utils":15}],8:[function(require,module,exports){
+const utils = require('../utils')
+
+module.exports = {
+
+template : function(data, $el) {
+    const first = data[0]
+    let head, body
+    try {
+        if (utils.is.array(data)) {
+            headers = Object.keys(data[0])
+            head = headers.map( h =>`<th>${h}</th>` ).join('')
+            body = data.map( obj => '<tr>'
+                + headers.map( key => `<td>${obj[key]}</td>` ).join('') 
+                + '</tr>' )
+        }
+        else if (utils.is.string(data)) {
+            data = data.split(/[\n]/)
+                .map(row => row.split(','))
+            head = data.shift().map( h =>`<th>${h}</th>` ).join('')
+            body = data.map( row => '<tr>'
+                + row.map( v => `<td>${v}</td>` ).join('') 
+                + '</tr>' )
+        }
+        return '<thead><tr>'
+            + head
+            + '</tr></thead><tbody>'
+            + body
+            + '</tbody>'
+    } catch(err) {
+        utils.rastiError('Error parsing table data: ' + err)
+        return ''
+    }
+        
+},
+
+init : function($el) {},
+
+style : ''
+
+}
+},{"../utils":15}],9:[function(require,module,exports){
 const { is, resolveAttr } = require('./utils')
 
 class History {
 
-    constructor() {
-        this.i = 0
-        this.content = []
+    constructor(app) {
+        this.app = app
+        this.clear()
+        app.history = {}
+        Object.defineProperties(app.history, {
+            back : { value : this.back.bind(this) },
+            forward : { value : this.forward.bind(this) },
+            clear : { value : this.clear.bind(this) },
+        })
     }
-    
-    back() {
-        if (this.i > 0) navTo(this.content[--(this.i)])
-    }
-    forth() {
-        if (this.i < this.content.length) navTo(this.content[++(this.i)])
-    }
+
     push(page) {
+        this.i += 1
         this.content.splice(this.i, null, page)
-        this.i++
+    }
+
+    back() {
+        if (this.i > 0) {
+            this.i -= 1
+            this.app.navTo(this.content[this.i], {}, true)
+        }
+    }
+
+    forward() {
+        if (this.i < this.content.length -1) {
+            this.i += 1
+            this.app.navTo(this.content[this.i], {}, true)
+        }
+    }
+
+    clear() {
+        this.i = -1
+        this.content = []
     }
 }
 
@@ -548,7 +619,7 @@ function state(app) {
         theme : { get : _ => app.active.theme, enumerable : true },
         lang  : { get : _ => app.active.lang, enumerable : true },
         save : { value : _ => {
-            app.state.props = app.props
+            app.state.props = Object.filter(app.props, ([k, v]) => !(v && v.__trans))
             localStorage.setItem('rasti.' + app.name, JSON.stringify(app.state))
             rasti.log('State saved')
         } },
@@ -568,13 +639,9 @@ function state(app) {
             const state = app.state.get()
             if (state) {
                 rasti.log('Restoring state...')
-                for (let prop in app.state) {
-                    app.state[prop] = state[prop]
-                }
-                if (state.props) app.props = state.props
+                app.props = state.props
                 if (state.theme) app.setTheme(state.theme)
                 if (state.lang) app.setLang(state.lang)
-                app.navTo(state.page)
                 rasti.log('State restored')
             }
             return state
@@ -588,13 +655,32 @@ function state(app) {
 
 function crud(app) {
     function checkDataSource(fn) {
-        return (datakey, ...args) => {
-            const data = app.data[datakey]
+        return (metadata, ...args) => {
+            const data = app.data[metadata.datakey]
             if (!data) {
-                rasti.error('Undefined data source "%s"', datakey)
+                rasti.error('Undefined data source "%s"', metadata.datakey)
                 return false
             }
-            else return fn(data, datakey, ...args)
+            metadata.data = data
+            return fn(metadata, ...args)
+        }
+    }
+
+    function checkCrudMethod(methodname, fn) {
+        return (metadata, ...args) => {
+            // FIXME: app ns is not available here
+            const crudns = app.crud[metadata.crudns]
+            const method = crudns && crudns[methodname]
+            if (method && !is.function(method)) {
+                rasti.error('Illegal crud method "%s", must be a function!', name)
+                return false
+            }
+            if (!method) method = Promise.resolve
+            return method(...args)
+                    .then(
+                        ok => fn(metadata, ...args),
+                        err => rasti.error('Could not %s element in %s', methodname, metadata.datakey)
+                    )
         }
     }
 
@@ -605,35 +691,44 @@ function crud(app) {
     }
 
     return {
-        create : checkDataSource((data, datakey, newel) => {
-            const exists = exists(newel, data)
-            if (exists) {
-                rasti.warn('Element [%s] already exists in data source [%s]', newel.id || newel, datakey)
+        create : checkDataSource(
+            checkCrudMethod('create',
+            (data, datakey, newel) => {
+                const exists = exists(newel, data)
+                if (exists) {
+                    rasti.warn('Element [%s] already exists in data source [%s]', newel.id || newel, datakey)
+                }
+                else {
+                    if (is.object(newel)) newel.id = newel.id || datakey + '-' + Date.now()
+                    data.push(newel)
+                }
+                return !exists
             }
-            else {
-                if (is.object(newel)) newel.id = newel.id || datakey + '-' + Date.now()
-                data.push(newel)
+        )),
+
+        delete : checkDataSource(
+            checkCrudMethod('delete',
+            (data, datakey, id) => {
+                const el = data.length && (is.object(data[0]) ? data.find(el => el.id === id) : id)
+                !el
+                    ? rasti.warn('Element [%s] not found in data source [%s]', id, datakey)
+                    : data.remove(el)
+                return el
             }
-            return !exists
-        }),
+        )),
 
-        delete : checkDataSource((data, datakey, id) => {
-            const el = data.length && (is.object(data[0]) ? data.find(el => el.id === id) : id)
-            !el
-                ? rasti.warn('Element [%s] not found in data source [%s]', id, datakey)
-                : data.remove(el)
-            return el
-        }),
-
-        update : checkDataSource((data, datakey, el, newel) => {
-            const exists_el = exists(el, data)
-            const exists_newel = exists(newel, data)
-            if (!exists_el) rasti.warn('El [%s] not found in data source [%s]', el, datakey)
-            if (exists_newel) rasti.warn('El [%s] already exists in data source [%s]', newel, datakey)
-            const valid = exists_el && !exists_newel
-            if (valid) data.update(el, newel)
-            return valid
-        }),
+        update : checkDataSource(
+            checkCrudMethod('update',
+            (data, datakey, el, newel) => {
+                const exists_el = exists(el, data)
+                const exists_newel = exists(newel, data)
+                if (!exists_el) rasti.warn('El [%s] not found in data source [%s]', el, datakey)
+                if (exists_newel) rasti.warn('El [%s] already exists in data source [%s]', newel, datakey)
+                const valid = exists_el && !exists_newel
+                if (valid) data.update(el, newel)
+                return valid
+            }
+        )),
 
         genInputEl : $el => {
             const template = app.templates[ resolveAttr($el, 'template') ]
@@ -658,21 +753,21 @@ function crud(app) {
             const inputEl = $('<div class=rasti-crud-input contenteditable>' + template( [template.props] ) +'</div>')
 
             // TODO: identify prop elements within the inputEl element and apply [contenteditable] only to them
-            
+
             $el.append(inputEl)
         },
 
         genDataEl : $el => {
             const template = app.templates[ resolveAttr($el, 'template') ]
-            const values = $el.find('.rasti-crud-input').find('[contenteditable]')
+            const values = $el.find('.rasti-crud-input')
             let dataEl
             if ( is.object(template.props) ) {
                 dataEl = {}
                 Object.keys(template.props).forEach( (key, i) => {
-                    dataEl[key] = values[i].html()
+                    dataEl[key] = values[i].innerHTML
                 })
             }
-            else dataEl = values[0].html()
+            else dataEl = values[0].innerHTML
             return dataEl
         },
 
@@ -700,28 +795,47 @@ module.exports = {
     crud,
 }
 
-},{"./utils":13}],9:[function(require,module,exports){
+},{"./utils":15}],10:[function(require,module,exports){
+const { is } = require('./utils')
+
 // prototype extensions
 Object.defineProperties(Array.prototype, {
     get : { value : function(i) {
        return i < 0 ? this[this.length + i] : this[i]
     }},
+    new : { value : function(el, i) {
+        i = i || this.length
+        var isNew = this.indexOf(el) < 0
+        if (isNew) this.splice(i, 0, el)
+        return isNew
+    }},
     remove : { value : function(el) {
-        var i = this.indexOf(el)
-        if (i >= 0) this.splice(i, 1)
+        this.update(el)
     }},
     update : { value : function(el, newel) {
         var i = this.indexOf(el)
-        if (i >= 0) this.splice(i, 1, newel)
+        var found = i > -1
+        if (found) this.splice(i, 1, newel)
+        return found
     }},
     capitalize : { value : function() {
-       return this.length && this[0].toUpperCase() + this.slice(1).toLowerCase()
+       return typeof this == 'string' && this.length && this[0].toUpperCase() + this.slice(1).toLowerCase()
     }},
 })
 
+Object.filter = (obj, predicate) => {
+    const traverse = (obj, predicate) => Object.fromEntries(
+        Object.entries(obj)
+            .filter(predicate)
+            .map(([k, v]) => 
+                is.object(v) ? [k, traverse(v, predicate)] : [k, v]
+            )
+    )
+    return traverse(obj, predicate)
+}
 
 // $ extensions
-$.fn.hasAttr = function(name) {  
+$.fn.hasAttr = function(name) {
     return this[0].hasAttribute(name)
 }
 
@@ -779,7 +893,48 @@ $.fn.move = function(options) {
     }
 }
 
-},{}],10:[function(require,module,exports){
+},{"./utils":15}],11:[function(require,module,exports){
+module.exports = {
+
+stack : $el => {
+    $el.addClass('fx-stack-container')
+    const $children = $el.children()
+    $children.each( (i, el) => {
+        el.classList.add('fx-stack-el')
+        setTimeout( _ => {
+            el.classList.remove('fx-stack-el')
+        }, i * 50);
+    })
+    setTimeout( _ => {
+        $el.removeClass('fx-stack-container')
+    }, $children.length * 50 + 500);
+
+},
+
+stamp : $el => {
+    $el.addClass('fx-stamp-container')
+    const $children = $el.children()
+    $children.each( (i, el) => {
+        el.classList.add('fx-stamp-el')
+        setTimeout( _ => {
+            el.classList.remove('fx-stamp-el')
+        }, i * 40);
+    })
+    setTimeout( _ => {
+        $el.removeClass('fx-stamp-container')
+    }, $children.length * 40 + 500);
+},
+
+toast : $el => {
+    $el.addClass('active')
+    setTimeout( _ => {
+        $el.removeClass('active')
+    }, 4000);
+
+},
+
+}
+},{}],12:[function(require,module,exports){
 module.exports = {
 
 app : {
@@ -947,8 +1102,6 @@ vehicles : {
 faces : {
     man : '👨',
     woman : '👩',
-    prince : '🤴',
-    princess : '👸',
     robot : '🤖',
     skull : '💀',
     imp : '👿',
@@ -1207,14 +1360,18 @@ chess : {
 },
 
 arrows : {
-    /*
-    ↑ ↓ ← → 
-    ⬅ ➡ ⬆ ⬇
-    ⇦ ⇨ ⇧ ⇩ 
-    ◀ ▶ ▲ ▼ 
-    ◁ ▷ △ ▽ 
-    ↶ ↷
-    */
+    up: '↑',
+    down: '↓',
+    left: '←',
+    right: '→',
+    up2: '⇧',
+    down2: '⇩',
+    left2: '⇦',
+    right2: '⇨',
+    up3: '△',
+    down3: '▽',
+    left3: '◁',
+    right3: '▷',
 },
 
 keys : {
@@ -1276,6 +1433,7 @@ hieroglyph : {
 },
 
 other : {
+    'hand': '✋',
     'thumbs-up' : '👍',
     'thumbs-down' : '👎',
     cool : '🤙',
@@ -1326,6 +1484,7 @@ other : {
 
 /*
 
+animal faces
 🐼🐻🐺🐮🐷🐭🐹🐰🐱🐶🐵🐴🐯🐲🐨🐸🦄
 
 sports & entertainment
@@ -1342,13 +1501,13 @@ food & drink
 other
 🎐🎏🎎🎋🏯
 🏰🏭🏬🏫🏪🏩🏨🏧🏦🏥🏣🏢
-✋❦
+❦
 
 */
 
 }
 
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 (function (global){
 require('./extensions')
 const { History, Pager, state, crud } = require('./components')
@@ -1384,10 +1543,10 @@ const ACTION_ATTRS = 'show hide toggle'.split(' ')
 const NOCHILD_TAGS = 'input select textarea img'.split(' ')
 
 const log = (...params) => {
-    if (rasti.options.log.search(/debug/i) != -1) console.log.call(this, ...params)
+    if (rasti.options.log.search(/debug/i) > -1) console.log.call(this, ...params)
 }
 const warn = (...params) => {
-    if (rasti.options.log.search(/(warn)|(debug)/i) != -1) console.warn.call(this, ...params)
+    if (rasti.options.log.search(/(warn)|(debug)/i) > -1) console.warn.call(this, ...params)
 }
 const error = (...params) => {
     console.error.call(this, ...params)
@@ -1406,11 +1565,11 @@ function rasti(name, container) {
         container = $('body')
     }
     else if ( !(container.selector) ) {
-        if ( is.string(container) || (container.tagName && 'BODY DIV'.search(container.tagName) != -1) ) container = $(container)
+        if ( is.string(container) || (container.tagName && 'BODY DIV'.search(container.tagName) > -1) ) container = $(container)
         else return error(errPrefix + 'app container is invalid. Please provide a selector string, a jQuery object ref or a DOM element ref')
     }
     container.attr('rasti', this.name)
-    
+
     const self = this
 
 
@@ -1418,6 +1577,8 @@ function rasti(name, container) {
 
     const __pagers = new Map()
     const __crud = crud(this)
+    const __state = {}
+    let __history
     let __invalid_data_count = 0
 
 
@@ -1490,7 +1651,7 @@ function rasti(name, container) {
         Object.keys(self.defaults).forEach( key => {
             if (!self.options[key]) self.options[key] = self.defaults[key]
         })
-        
+
 
         // define lang (if not already defined)
         if (!self.options.lang) {
@@ -1515,10 +1676,8 @@ function rasti(name, container) {
         })
 
 
-        // create items for selects and lists with data source
-        container.find('select[data]')
-            .add('ol[data]', container)
-            .add('ul[data]', container)
+        // init "incognito" blocks
+        container.find('[data]').not('[block]')
             .each( (i, el) => {
                 updateBlock($(el))
             })
@@ -1545,6 +1704,9 @@ function rasti(name, container) {
             })
             .appendTo(el)
         })
+
+
+        // TODO: add modal closure via ESC key
 
 
         // init nav
@@ -1608,10 +1770,10 @@ function rasti(name, container) {
             if (!method) return error('Missing method in [submit] attribute of el:', this)
 
             if (callback && !isValidCB) error('Undefined method [%s] declared in [then] attribute of el:', callback, this)
-            
+
             $el.addClass('loading').attr('disabled', true)
 
-            submitAjax(method, resdata => { 
+            submitAjax(method, resdata => {
                 const time = Math.floor(window.performance.now() - start) / 1000
                 log('Ajax method [%s] took %s seconds', method, time)
 
@@ -1632,15 +1794,13 @@ function rasti(name, container) {
         })
 
 
-        // init field dependencies
-        container.find('[prop][bind]').each( (i, el) => {
+        // init element dependencies
+        container.find('[bind]').each( (i, el) => {
             const $el = $(el)
             const deps = $el.attr('bind')
             if (deps) deps.split(' ').forEach( dep => {
                 $el.closest('[page]').find('[prop='+ dep +']')
-                    .change( e => {
-                        updateBlock($el)
-                    })
+                    .change( e => { updateBlock($el) })
             })
         })
 
@@ -1733,7 +1893,7 @@ function rasti(name, container) {
         })
 
 
-        // fix icons
+        // fix input icons
         container.find('input[icon]').each( (i, el) => {
             fixIcon($(el))
         })
@@ -1754,17 +1914,19 @@ function rasti(name, container) {
 
         // restore and save state
         $(window).on('beforeunload', e => { self.state.save() })
-        if ( !self.state.restore() ) {
-            // set lang (if applicable and not already set)
-            if ( self.options.lang && !self.active.lang ) setLang(self.options.lang)
-            // if no lang, generate texts
-            if ( !self.options.lang ) {
-                container.find('[text]').each( (i, el) => {
-                    $(el).text( $(el).attr('text') )
-                })
-            }
-            // set theme (if not already set)
-            if ( !self.active.theme ) setTheme(self.options.theme)
+        const prev_state = self.state.restore()
+        // set theme (if not already set)
+        if ( !self.active.theme ) setTheme(self.options.theme)
+        // set lang (if applicable and not already set)
+        if ( self.options.lang && !self.active.lang ) setLang(self.options.lang)
+        // if no lang, generate texts
+        if ( !self.options.lang ) {
+            container.find('[text]').each( (i, el) => {
+                $(el).text( $(el).attr('text') )
+            })
+        }
+        if (prev_state) navTo(prev_state.page)
+        else {
             // nav to page in hash or to root or to first page container
             const page = location.hash.substring(1) || self.options.root
             navTo(
@@ -1776,65 +1938,7 @@ function rasti(name, container) {
 
 
         // init props
-        container.find('[prop]').each( (i, el) => {
-            const $el = $(el)
-            const prop = $el.attr('prop')
-
-            if (!prop) return
-
-            if ( exists(el.value) && !el.bound ) {
-                // it's a not-yet-bound element
-                bindElement($el, prop)
-            }
-            else {
-                // it's a container
-                $el.find('[prop]').each( (i, el) => {
-                    const $el = $(el)
-                    const subprop = $el.attr('prop')
-                    if (subprop) bindElement($el, prop, subprop)
-                })
-            }
-        })
-
-        function bindElement($el, prop, subprop){
-            let root = self.props
-
-            if (subprop) {
-                // go down one level
-                root[prop] = root[prop] || {}
-                root = root[prop]
-                prop = subprop
-            }
-            if ( root[prop] && !$el.hasAttr('transient') ) {
-                // update dom from restored state
-                $el.val( root[prop] ).trigger('change')
-            }
-            else {
-                // first invocation, create empty (sub)prop
-                root[prop] = ''
-            }
-
-            // update prop on dom change
-            $el.on('change', (e, params) => {
-                if (params && params.setter) return // change was triggered from setter, no need to update prop (and would cause infinite mutual recursion)
-                root[prop] = $el.val()
-            })
-
-            // update dom on prop change
-            Object.defineProperty(root, prop, {
-                get : _ => this[prop],
-                set : val => {
-                    this[prop] = val
-                    $el[0].nodeName == 'TEXTAREA'
-                        ? $el.text( val ).trigger('change', {setter : true})
-                        : $el.val( val ).trigger('change', {setter : true})
-                }
-            })
-
-
-            // set bound flag to avoid re-binding
-            $el[0].bound = true
-        }
+        findProps(container, self.props)
 
 
         // init field validations
@@ -1842,8 +1946,9 @@ function rasti(name, container) {
             const $fields = $(btn).parent().find('input[required]')
             btn.disabled = isAnyFieldInvalid($fields)
             $fields.each( (i, field) => {
-                $(field).on('input', e => {
+                $(field).on('keydown', e => {
                     btn.disabled = isAnyFieldInvalid($fields)
+                    if (e.key == 'Enter' && !btn.disabled) btn.click()
                 })
             })
         })
@@ -1864,9 +1969,10 @@ function rasti(name, container) {
         })
 
 
-        // init bound templates
-        container.find('[bind][template]').each( (i, el) => {
-            bind(el)
+        // init prop-bound templates
+        container.find('[prop][template]').each( (i, el) => {
+            const $el = $(el)
+            bindElement($el, $el.attr('prop'), self.props)
         })
 
 
@@ -1875,15 +1981,28 @@ function rasti(name, container) {
             const $el = $(el)
             const template = resolveAttr($el, 'template')
             const datakey = resolveAttr($el, 'data')
+            const crudkey = resolveAttr($el, 'crud')
 
             render(el)
 
             $el.on('click', '.rasti-crud-delete', e => {
                 const $controls = $(e.currentTarget).closest('[data-id]')
                 const id = $controls.attr('data-id')
-                if ( id && __crud.delete(datakey, id) ) {
-                    $controls.parent().detach()
-                    log('Removed element [%s] from template [%s]', id, template)
+                try {
+                    __crud.delete({datakey, crudkey}, id)
+                        .then(
+                            ok => {
+                                $controls.parent().detach()
+                                log('Removed element [%s] from template [%s]', id, template)
+                            },
+                            err => {
+                                __crud.hideInputEl($el)
+                                $el.removeClass('active')
+                            }
+                        )
+                }
+                catch (err) {
+                    rasti.error(err)
                 }
             })
 
@@ -1898,11 +2017,25 @@ function rasti(name, container) {
 
             $el.on('click', '.rasti-crud-accept', e => {
                 // TODO: finish this
-                const newel = __crud.genDataEl($el)
-                if (newel && __crud.create(datakey, newel) ) {
-                    __crud.persistNewEl($el)
+                let newel
+                try {
+                    newel = __crud.genDataEl($el)
+                    __crud.create({datakey, crudkey}, newel)
+                        .then(
+                            ok => {
+                                __crud.persistNewEl($el)
+                                $el.removeClass('active')
+                            },
+                            err => {
+                                __crud.hideInputEl($el)
+                                $el.removeClass('active')
+                            }
+                        )
                 }
-                $el.removeClass('active')
+                catch (err) {
+                    rasti.error(err)
+                }
+
             })
 
             $el.on('click', '.rasti-crud-cancel', e => {
@@ -1947,7 +2080,7 @@ function rasti(name, container) {
         return $els
     }
 
-    function set(selector, value) {        
+    function set(selector, value) {
         var $els = get(selector)
         $els.each( (i, el) => {
             el.value = value
@@ -1969,6 +2102,77 @@ function rasti(name, container) {
     }
 
 
+    function findProps($container, state) {
+        $container.children().each( (i, el) => {
+            const $el = $(el)
+            const prop = $el.attr('prop')
+
+            if (prop && !$el.hasAttr('template')) {
+                if ( $el.hasAttr('transient') ) prop.__trans = true
+                
+                if ( exists(el.value) ) {
+                    // it's an element, so bind it
+                    bindElement($el, prop, state)
+                }
+                else {
+                    // it's a container prop
+                    const defobjval = {}
+                    if (prop.__trans) defobjval.__trans = true
+                    // go down one level in the state tree
+                    state[prop] = state[prop] || defobjval
+                    const newroot = state[prop]
+                    // and keep looking
+                    findProps($el, newroot)
+                }
+            }
+            // else keep looking
+            else if (el.children.length) findProps($el, state)
+        })
+    }
+
+
+    function bindElement($el, prop, state){
+        if ( state[prop] ) {
+            // restored state present, restore transient flag
+            if (prop.__trans) state[prop].__trans = true
+            // then update dom with it
+            updateElement($el, state[prop])
+        }
+        else {
+            // create empty state
+            const defstrval = ''
+            defstrval.__trans = prop.__trans
+            state[prop] = defstrval
+        }
+
+        // update state on dom change
+        $el.on('change', (e, params) => {
+            // unless triggered from setter
+            if (!params || !params.setter)
+                state[prop] = $el.val()
+        })
+
+        // update dom on state change
+        Object.defineProperty(state, prop, {
+            get : function() { return __state[prop] },
+            set : function(value) {
+                __state[prop] = value
+                if (prop.__trans) __state[prop].__trans = true
+                updateElement($el, value, true)
+            }
+        })
+
+    }
+
+    function updateElement($el, value, setter) {
+        $el.hasAttr('template')
+            ? render($el, value)
+            : $el[0].nodeName == 'TEXTAREA'
+                ? $el.text( value ).trigger('change', {setter})
+                : $el.val( value ).trigger('change', {setter})
+    }
+
+
     function navTo(pagename, params, skipPushState) {
 
         if (!pagename) return error('Cannot navigate, page undefined')
@@ -1976,7 +2180,7 @@ function rasti(name, container) {
         var $prevPage = self.active.page,
             prevPagename = $prevPage && $prevPage.attr('page'),
             prevPage = prevPagename && self.pages[prevPagename]
-        
+
         if (pagename == prevPagename) return
 
         var page = self.pages[pagename],
@@ -2014,7 +2218,11 @@ function rasti(name, container) {
         container.trigger('rasti-nav')
 
         if (skipPushState) return
-        if (page && page.url) {
+
+        if (self.options.history) {
+            __history.push(pagename)
+        }
+        else if (page && page.url) {
             !is.string(page.url)
                 ? warn('Page [%s] {url} property must be a string!', pagename)
                 : window.history.pushState(pagename, null, '#'+page.url)
@@ -2022,19 +2230,6 @@ function rasti(name, container) {
         else {
             window.history.pushState(pagename, null)
         }
-    }
-
-
-    function bind(el) {
-        const errPrefix = 'Cannot bind template: '
-        const $el = el.nodeName ? $(el) : el
-        el = $el[0]
-        const src = $el.attr('bind')
-        const $src = container.find('[prop='+ src +']')
-        if (!$src.length) return error(errPrefix + 'source element "%s" not found, declared in [bind] attribute of el: ', src, el)
-        $el.attr('template', 'bind=' + src)
-        $src.on('change', e => render($el, e.target.value))
-            .trigger('change')
     }
 
 
@@ -2047,6 +2242,11 @@ function rasti(name, container) {
         else {
             $el = el.nodeName ? $(el) : el
             name = $el.attr('template')
+            if (!name) {
+                // generate one from bound prop and assign it
+                name = $el.attr('prop') + '-' + Date.now()
+                $el.attr('template', name)
+            }
         }
         const errPrefix = 'Cannot render template ['+ name +']: '
         if (!$el.length) return error(errPrefix + 'no element bound to template. Please bind one via [template] attribute.')
@@ -2171,7 +2371,7 @@ function rasti(name, container) {
 
         log('Setting theme [%s:%s]', themeName, mapName)
         self.active.theme = themeName
-        
+
         // clone themeMap
         themeMap = Object.assign({}, themeMap)
 
@@ -2232,14 +2432,14 @@ function rasti(name, container) {
         self.active.lang = langName
 
         var $elems = $(), $el, keys, string
-        
+
         TEXT_ATTRS.forEach( attr => {
             $elems = $elems.add('['+attr+']')
         })
 
         $elems.each( (i, el) => {
             if (el.hasAttribute('fixed')) el = el.children[0]
-            $el = $(el)   
+            $el = $(el)
             keys = el.langkeys
 
             if (!keys) {
@@ -2265,18 +2465,14 @@ function rasti(name, container) {
 
 
     function updateBlock($el, data) {
-        var types = {
-            SELECT : 'select',
-            OL : 'list',
-            UL : 'list',
-        }
         var el = $el[0]
-        var type = types[el.nodeName] || $el.attr('block')
+        var type = $el.attr('block') || el.nodeName.toLowerCase()
+        if ('ol ul'.includes(type)) type = 'list'
         if (!type) return error('Missing block type in [block] attribute of element:', el)
-        
+
         var block = rasti.blocks[type]
         if (!block) return error('Undefined block type "%s" resolved for element:', type, el)
-        
+
         if (!data) {
             var datakey = resolveAttr($el, 'data')
             if (!datakey) return
@@ -2299,12 +2495,14 @@ function rasti(name, container) {
         is.function(data)
             ? data(render, depValues)
             : render(data)
-        
+
         function render(data) {
-            if (!data) return warn('Cannot render block: no data available', el)
-            if ( is.string(data) ) data = data.split(', ')
-            if ( !is.array(data) ) return error('Cannot render block: invalid data, must be array or string', el)
-            $options.html( block.template(data, $el) )
+            if (!data) warn('Cannot render block: no data available', el)
+            else try {
+                $options.html( block.template(data, $el) )
+            } catch(err) {
+                error('Cannot render block: ' + err, el)
+            }
             // TODO : handle invalid data count side-effect
             /*
             if (invalidData) {
@@ -2336,7 +2534,7 @@ function rasti(name, container) {
 
     // internal utils
 
-    
+
     function createTabs($el) {
         var el = $el[0],
             $tabs = el.hasAttribute('page')
@@ -2371,7 +2569,7 @@ function rasti(name, container) {
 
             $labels.children().removeClass('active')
             $label.addClass('active')
-            
+
         })
 
         $flow.on('scroll', e => {
@@ -2397,13 +2595,13 @@ function rasti(name, container) {
         }
 
     }
-    
+
 
     function initBlock($el) {
         var el = $el[0]
-        var type = el.nodeName == 'SELECT' ? 'select' : $el.attr('block')
+        var type = $el.attr('block') || el.nodeName.toLowerCase()
         if (!type) return error('Missing block type in [block] attribute of element:', el)
-        
+
         var block = rasti.blocks[type]
         if (!block) return error('Undefined block type "%s" declared in [block] attribute of element:', type, el)
 
@@ -2417,13 +2615,7 @@ function rasti(name, container) {
 
 
     function initHistory() {
-        self._history = new History()
-
-        Object.defineProperty(self, 'history', { get: () => self._history.content })
-        Object.defineProperties(self.history, {
-            back : { value : self._history.back },
-            forth : { value : self._history.forth },
-        })
+        __history = new History(self)
     }
 
 
@@ -2434,9 +2626,9 @@ function rasti(name, container) {
 
         if (pager.total > 1) {
             paging = `<div class="paging inline inline_">
-                <button icon=prev />
+                <button icon=left3 />
                 <span class=page />
-                <button icon=next />
+                <button icon=right3 />
             </div>`
 
             sizes = `<button icon=rows>${ self.options.page_sizes[0] }</button>`
@@ -2457,11 +2649,11 @@ function rasti(name, container) {
         $controls = $el.children('.controls')
         $results = $el.children('.results')
 
-        $controls.on('click', '[icon=next]', e => {
+        $controls.on('click', '[icon=right3]', e => {
             update( pager.next() )
         })
 
-        $controls.on('click', '[icon=prev]', e => {
+        $controls.on('click', '[icon=left3]', e => {
             update( pager.prev() )
         })
 
@@ -2562,7 +2754,7 @@ function rasti(name, container) {
             ${ns} nav > a.active,
             ${ns} .list > div.active {
                 background-color: ${ values.btn[0] };
-                color: ${ values.btn[1] }; 
+                color: ${ values.btn[1] };
             }
 
             ${ns} [header]:before { color: ${ values.header[0] }; }
@@ -2596,11 +2788,6 @@ function rasti(name, container) {
     }
 
 
-    function setImg($el, basepath) {
-        $el.css('background-image', 'url('+ basepath + ($el.val() || $el.attr('value')) +'.png)')
-    }
-
-
     return this
 
 }
@@ -2613,38 +2800,7 @@ rasti.error = error
 rasti.utils = utils
 rasti.blocks = require('./blocks/all')
 rasti.icons = require('./icons')
-rasti.fx = {
-
-    stack : $el => {
-        $el.addClass('fx-stack-container')
-        const $children = $el.children()
-        $children.each( (i, el) => {
-            el.classList.add('fx-stack-el')
-            setTimeout( _ => {
-                el.classList.remove('fx-stack-el')
-            }, i * 50);
-        })
-        setTimeout( _ => {
-            $el.removeClass('fx-stack-container')
-        }, $children.length * 50 + 500);
-
-    },
-
-    stamp : $el => {
-        $el.addClass('fx-stamp-container')
-        const $children = $el.children()
-        $children.each( (i, el) => {
-            el.classList.add('fx-stamp-el')
-            setTimeout( _ => {
-                el.classList.remove('fx-stamp-el')
-            }, i * 40);
-        })
-        setTimeout( _ => {
-            $el.removeClass('fx-stamp-container')
-        }, $children.length * 40 + 500);
-    },
-
-}
+rasti.fx = require('./fx')
 rasti.options = {log : 'debug'}
 
 module.exports = Object.freeze(rasti)
@@ -2707,1206 +2863,7 @@ function genIconStyles() {
 }
 
 
-$('head').prepend(`<style>/*******************************************************************************
-********************************* ELEMENTS *************************************
-*******************************************************************************/
-
-body {
-    margin: 0;
-    overflow-x: hidden;
-}
-
-*, *:before, *:after {
-    box-sizing: border-box;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    transition: background-color 0.2s;
-}
-
-h1 { font-size: 3em; }
-h2 { font-size: 2em; }
-h3 { font-size: 1.5em; }
-h1, h2, h3 { margin-top: 0; }
-
-p.big { font-size: 1.5em; }
-
-ol, ul {
-    padding: 5px 10px 5px 30px;
-    border-radius: 2px;
-}
-
-input, button, select, textarea, .field {
-    min-height: 35px;
-    width: 100%;
-    padding: 5px 10px;
-    margin: 0 0 15px 0;
-    border: 0;
-    border-radius: 4px;
-    outline: none;
-    font-family: inherit !important;
-    font-size: inherit;
-    vertical-align: text-bottom;
-}
-
-meter, progress {
-    width: 100%;
-    margin: 0 0 15px 0;
-    border-radius: 2px;
-}
-
-input:focus:invalid {
-    box-shadow: 0 0 0 2px red;
-}
-input:focus:valid {
-    box-shadow: 0 0 0 2px green;
-}
-
-input[type=range], select, button {
-    cursor: pointer;
-}
-
-button {
-    display: inline-block;
-    height: 50px;
-    width: auto;
-    min-width: 50px;
-    padding: 10px 20px;
-    border: 1px solid rgba(0,0,0,0.1);
-    font-size: 1.2em;
-    text-align: center;
-    text-decoration: none;
-    text-transform: uppercase;
-}
-button:not(:disabled):hover {
-    filter: contrast(1.5);
-}
-button:disabled {
-    filter: contrast(0.5);
-    cursor: auto;
-}
-
-select {
-    appearance: none;
-    -moz-appearance: none;
-    -webkit-appearance: none;
-}
-option {
-    cursor: pointer;
-}
-
-textarea {
-    height: 70px;
-    resize: none;
-}
-
-input.big, button.big,
-.big_ > input, .big_ > button {
-    min-height: 70px;
-    margin-bottom: 25px;
-    font-size: 1.5em;
-}
-
-input.small, button.small,
-.small_ > input, .small_ > button {
-    height: 25px;
-    font-size: 1em;
-}
-
-input[type=radio],
-input[type=checkbox] {
-    display: none;
-}
-input[type=radio] + label,
-input[type=checkbox] + label {
-    display: block;
-    height: 40px;
-    max-width: 90%;
-    padding: 12px 0;
-    margin-left: 45px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    cursor: pointer;
-}
-input[type=radio] + label:before,
-input[type=checkbox] + label:before {
-    content: '\\2713';
-    position: absolute;
-    height: 32px;
-    width: 32px;
-    margin-top: -8px;
-    margin-left: -40px;
-    border: 1px solid #999;
-    color: transparent;
-    background-color: #fff;
-    font-size: 2.3em;
-    line-height: 1;
-    text-align: center;
-}
-input[type=radio] + label:before {
-    content: '\\25cf';
-    border-radius: 50%;
-    line-height: 0.8;
-}
-input[type=radio]:checked + label:before,
-input[type=checkbox]:checked + label:before {
-    color: #222;
-    animation: stamp 0.4s ease-out;
-}
-input[type=radio] + label:hover,
-input[type=checkbox] + label:hover {
-    font-weight: 600;
-}
-
-
-
-/*******************************************************************************
-********************************* ATTRIBUTES ***********************************
-*******************************************************************************/
-
-[page], [panel], [section] {
-    position: relative;
-    overflow: hidden;    
-}
-
-[page] {
-    min-height: 100vh;
-    width: 100vw !important;
-    padding-bottom: 10px;
-    margin-bottom: -5px;
-    overflow-y: auto;
-}
-[page]:not(.active) {
-	display: none !important;
-}
-nav ~ [page]:not(.hide-nav) {
-    min-height: calc(100vh - 50px);
-    max-height: calc(100vh - 50px);
-}
-.fullh[page] {
-    height: 100vh;
-}
-
-
-[panel] {
-    padding: 25px;
-    border-radius: 4px;
-}
-
-
-[section] {
-    margin-bottom: 15px;
-    padding: 20px;
-    border-radius: 4px;
-}
-[section] [label]:before {
-    text-shadow: 0 0 0 #000;
-}
-[section]>*:first-child:not([label]) {
-    margin-top: 0px;
-}
-
-
-[header][panel] {
-    padding-top: 75px;
-}
-[header][section] {
-    padding-top: 65px;
-}
-[header][page]:before,
-[header][panel]:before,
-[header][section]:before,
-[footer][page]:after {
-    content: attr(header);
-    display: block;
-    height: 70px;
-    width: 100%;
-    padding: 20px;
-    line-height: 30px;
-    font-size: 2.5em;
-    text-align: center;
-    text-transform: uppercase;
-}
-[header][page]:before {
-    margin-bottom: 15px;
-}
-[header][panel]:before,
-[header][section]:before {
-    position: absolute;
-    top: 0; left: 0;
-}
-[header][panel]:before {
-    height: 50px;
-    padding: 10px 20px;
-    line-height: 30px;
-    font-size: 2em;
-}
-[header][section]:before {
-    height: 40px;
-    padding: 10px;
-    line-height: 20px;
-    font-size: 1.5em;
-}
-
-[footer][page]:after {
-    content: attr(footer);
-}
-
-[page][header][fix-header]:before {
-    position: fixed;
-    top: 0;
-}
-[page][footer][fix-footer]:after {
-    position: fixed;
-    bottom: 0;
-}
-
-
-[img] {
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    background-origin: content-box;
-}
-
-
-[template] {
-    visibility: hidden;
-    position: relative;
-}
-[template].rendered {
-    visibility: visible;
-}
-[template] > .results {
-    max-height: calc(100% - 40px);
-    margin: 0 -15px;
-    padding: 0 15px;
-}
-[template][stats] > .results {
-    max-height: calc(100% - 95px);
-}
-[template] > .controls {
-    height: 60px;
-    padding: 5px;
-    color: #fff;
-    text-align: center;
-}
-[template] > .controls * {
-    vertical-align: middle;
-}
-[template] > .stats {
-    height: 40px;
-    padding: 10px;
-    font-size: 1.1em;
-}
-
-
-[crud] > * {
-    position: relative;
-}
-.rasti-crud-create {
-    display: block !important;
-}
-.rasti-crud,
-.rasti-crud-input,
-.rasti-crud-accept,
-.rasti-crud-cancel,
-[crud].active .rasti-crud-create {
-    display: none !important;
-}
-[crud].active .rasti-crud-input,
-[crud].active .rasti-crud-accept,
-[crud].active .rasti-crud-cancel {
-    display: inline-block !important;
-}
-[crud] > .rasti-crud {
-    bottom: -40px;
-    z-index: 1;
-}
-[crud]:hover > .rasti-crud,
-[crud]>*:hover > .rasti-crud {
-    display: block !important;
-}
-
-
-[h-flow] {
-    display: inline-block !important;
-    white-space: nowrap;
-    height: 100%;
-    width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-}
-[h-flow] > * {
-    display: inline-block;
-    white-space: normal;
-    height: 100%;
-    min-width: 100%;
-    border-radius: 0;
-    margin-top: 0;
-    margin-bottom: 0;
-    margin-left: auto !important;
-    margin-right: auto;
-    vertical-align: top;
-}
-.tab-labels + [h-flow] {
-    height: calc(100vh - 50px);
-}
-nav ~ [page] > .tab-labels + [h-flow] {
-    height: calc(100vh - 100px);
-}
-
-nav, .tab-labels {
-    display: flex;
-    position: relative;
-    white-space: nowrap;
-    min-width: 100vw;
-    height: 50px;
-    padding: 0;
-    border-bottom: 1px solid rgba(0,0,0,0.2);
-    border-radius: 0;
-    text-transform: uppercase;
-}
-nav {
-    z-index: 8;
-}
-.tab-labels {
-    justify-content: space-around;
-    z-index: 2;
-}
-.tab-labels > .bar {
-    position: absolute;
-    bottom: 0; left: 0;
-    height: 4px;
-    transition: left 0.2s, width 0.2s;
-}
-nav > div, nav > a,
-[tab-label] {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 1 1 auto;
-    height: 100%;
-    min-width: 50px;
-    padding: 5px;
-    font-size: 1.4em;
-    text-shadow: 0 0 0 #000;
-    text-decoration: none;
-    color: inherit;
-    cursor: pointer;
-}
-nav > div, nav > a {
-    max-width: 200px;
-    transition: all 0.2s;
-}
-[tab-label].active {
-    filter: contrast(1.5);
-}
-
-
-[modal], .modal {
-    display: none;
-    position: fixed;
-    left: 0; right: 0; top: 0; bottom: 0;
-    margin: auto !important;
-    height: auto;
-    width: auto;
-    max-height: 600px;
-    max-width: 400px;
-    overflow-y: auto;
-    animation: zoomIn .4s, fadeIn .4s;
-    z-index: 10;
-}
-[modal].big, .modal.big {
-    max-height: 800px;
-    max-width: 600px;
-}
-[modal].small, .modal.small {
-    max-height: 400px;
-    max-width: 200px;
-}
-[modal] > [icon=close],
-.modal > [icon=close] {
-    cursor: pointer;
-}
-
-
-[menu] {
-    display: none;
-    position: fixed;
-    padding: 10px;
-    background-color: inherit;
-    box-shadow: 0 0 4px 4px rgba(0,0,0,0.2);
-    z-index: 7;
-    cursor: pointer;
-}
-[menu] > div {
-    padding: 15px 5px;
-    line-height: 1;
-    font-size: 1rem;
-    text-transform: capitalize;
-}
-
-
-[label] {
-    position: relative;
-    margin-top: 35px;
-    vertical-align: bottom;
-}
-[label][fixed]>* {
-    margin-bottom: 0;
-}
-[label]>input,
-[label]>select,
-[label]>textarea {
-    margin-top: 0 !important;
-}
-[label]:not([panel]):not([section]):before {
-    content: attr(label);
-    position: absolute;
-    height: 35px;
-       line-height: 35px;
-    font-size: 1.2em;
-    text-transform: capitalize;
-}
-[label]:before {
-    margin-top: -35px;
-    left: 0;
-}
-[label].big:before {
-    margin-left: 0;
-}
-[label][fixed]:before {
-    margin-top: -30px;
-    margin-left: 0;
-}
-.inline-label[label],
-.inline-label_ > [label] {
-    width: auto;
-    margin-top: 0;
-    margin-left: calc(40% + 10px);
-}
-.inline-label[l2bel]:before,
-.inline-label_ > [label]:before {
-    width: 80%;
-    left: -85%;
-    margin-top: -5px;
-    text-align: right;
-}
-.inline-label[label][fixed]:before,
-.inline-label_ > [label][fixed]:before {
-    margin-top: 0;
-    margin-left: -8px;
-}
-.below-label[label]:before,
-.below-label_ > [label]:before {
-    bottom: -40px;
-    left: 0;
-    right: 0;
-    margin-top: 0;
-    margin-left: 0;
-}
-.big [label] {
-    margin-top: 25px;
-    font-size: 1.2em;
-}
-.big [label]:before {
-    margin-top: -27px;
-}
-
-
-[nav] *,
-[show] *, [hide] *, [toggle] *,
-[onclick] * {
-    cursor: pointer;
-}
-
-
-
-/*******************************************************************************
-**************************** FUNCTIONAL ENHANCERS ****************************** 
-*******************************************************************************/
-
-[movable] {
-    user-select: none;
-    cursor: move;
-}
-
-[resizable] {
-    resize: both;
-    overflow: hidden;
-}
-
-[foldable] {
-    animation: foldOut 0.5s;
-    overflow: hidden; 
-}
-[foldable][header].folded {
-    animation: foldIn 0.5s;
-    height: 0;
-    padding-bottom: 0;
-    padding-top: 40px;
-}
-[foldable][header]:before {
-    cursor: pointer;
-}
-
-
-/*******************************************************************************
-******************************* 12 COLUMNS ************************************* 
-*******************************************************************************/
-
-.row {
-    width: 100%;
-    display: flex;
-    flex-flow: row wrap;
-    align-content: flex-start;
-    padding-left: 1%;
-}
-.col {
-    /*min-height: min-content !important;*/
-    display: flex;
-    flex-flow: column nowrap;
-    align-content: flex-start;
-    align-items: center;
-}
-.row > .col-1,  .col > .row-1  { flex-basis: 07.33%; }
-.row > .col-2,  .col > .row-2  { flex-basis: 15.66%; }
-.row > .col-3,  .col > .row-3  { flex-basis: 24.00%; }
-.row > .col-4,  .col > .row-4  { flex-basis: 32.33%; }
-.row > .col-5,  .col > .row-5  { flex-basis: 40.66%; }
-.row > .col-6,  .col > .row-6  { flex-basis: 49.00%; }
-.row > .col-7,  .col > .row-7  { flex-basis: 57.33%; }
-.row > .col-8,  .col > .row-8  { flex-basis: 65.66%; }
-.row > .col-9,  .col > .row-9  { flex-basis: 74.00%; }
-.row > .col-10, .col > .row-10 { flex-basis: 82.33%; }
-.row > .col-11, .col > .row-11 { flex-basis: 90.66%; }
-.row [class*=col-] {
-    margin-left: 0 !important;
-    margin-right: 1% !important;
-}
-.col [class*=row-]{
-    margin-top: 0 !important;
-    margin-bottom: 1vh !important;
-}
-
-.page-options { flex-basis: initial !important; }
-
-
-
-/*******************************************************************************
-********************************** ICONS *************************************** 
-*******************************************************************************/
-
-body [icon] {
-    position: relative;
-    min-height: 50px;
-    padding-left: 50px;
-}
-body [icon]:empty {
-    padding: 0;
-}
-[icon]:before {
-    display: block;
-    flex-grow: 0;
-    height: 50px;
-    width: 50px;
-    font-size: 1.5rem;
-    line-height: 2;
-    text-align: center;
-    text-decoration: none;
-}
-[icon]:not(:empty):before {
-    position: absolute;
-    top: 0; left: 0;
-}
-.small[icon]:before, .small_ > [icon]:before  {
-    height: 35px;
-    width: 35px;
-    font-size: 1.1rem;
-}
-.big[icon]:before, .big_ > [icon]:before {
-    height: 70px;
-    width: 70px;
-    font-size: 2.2rem;
-}
-.huge[icon]:before, .huge_ > [icon]:before {
-    height: 100px;
-    width: 100px;
-    font-size: 3.2rem;
-    line-height: 1.9;
-}
-.round[icon]:before, .round_ > [icon]:before {
-    border-radius: 50%;
-}
-.floating[icon] {
-    padding-left: 0;
-}
-.floating[icon]:before {
-    top: -6px;
-    left: auto;
-}
-.floating[icon] > input {
-    padding-left: 45px;
-}
-
-
-/*******************************************************************************
-****************************** VISUAL ENHANCERS ******************************** 
-*******************************************************************************/
-.list {
-    padding: 0;
-    border: 1px solid rgba(0,0,0,0.2);
-}
-.list[header] {
-    padding-top: 40px;
-}
-.list > div {
-    height: 7vh;
-    padding: 2vh;
-    transition: all 0.2s;
-}
-.list > div:not(:last-child) {
-    border-bottom: 1px solid rgba(0,0,0,0.2);
-}
-.list > div.active {
-    border-left: 7px solid #222;
-}
-.list > div:hover {
-    letter-spacing: 4px;
-}
-
-.nodata {
-    padding: 10% 5%;
-    margin: auto;
-    font-size: 1.5rem;
-    text-align: center;
-}
-
-button.fab {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    width: 50px;
-    margin: 20px;
-    border-radius: 50%;
-    z-index: 5;
-}
-
-.backdrop:before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 100vw;
-    background: rgba(0,0,0,.7);
-    animation: fadeIn .4s;
-    z-index: 9;
-}
-
-.loading {
-    color: transparent !important;
-    position: relative;
-}
-.loading > * {
-    visibility: hidden;
-}
-.loading:after {
-    content: '';
-    position: absolute;
-    top: 0; bottom: 0; left: 0; right: 0;
-    width: 25px; height: 25px;
-    margin: auto;
-    border-radius: 50%;
-    border: 0.25rem solid rgba(255, 255, 255, 0.2);
-    border-top-color: white;
-    animation: spin 1s infinite linear;
-    visibility: visible;
-}
-.big.loading:after {
-    position: fixed;
-    width: 100px; height: 100px;
-    z-index: 10;
-}
-
-.loading2 {
-    perspective: 120px;
-}
-.loading2:after {
-    content: "";
-    position: absolute;
-    left: 25px; top: 25px;
-    width: 50px; height: 50px;
-    background-color: #3498db;
-    animation: flip 1s infinite linear;
-}
-
-
-/*******************************************************************************
-********************************* ANIMATIONS *********************************** 
-*******************************************************************************/
-@keyframes stamp {
-    50% { transform: scale(1.2); }
-}
-@keyframes spin {
-    0%   { transform: rotate(0); }
-    100% { transform: rotate(360deg); }
-}
-@keyframes flip {
-    0%   { transform: rotate(0); }
-    50%  { transform: rotateY(180deg); }
-    100% { transform: rotateY(180deg) rotateX(180deg); }
-}
-@keyframes zoomIn {
-    0%   { transform: scale(0); }
-    100% { transform: scale(1); }
-}
-@keyframes zoomOut {
-    0%   { transform: scale(1); }
-    100% { transform: scale(0); }
-}
-@keyframes fadeIn {
-    0%   { opacity: 0; }
-    100% { opacity: 1; }
-}
-@keyframes fadeOut {
-    0%   { opacity: 1; }
-    100% { opacity: 0; }
-}
-@keyframes foldIn {
-    0% { 
-        height: auto;
-        padding-top: 55px;
-        padding-bottom: 10px;
-    }
-    100% { 
-        height: 0;
-        padding-top: 40px;
-        padding-bottom: 0;
-    }
-}
-@keyframes foldOut {
-    0% { 
-        height: 0;
-        padding-top: 40px;
-        padding-bottom: 0;
-    }
-    100% { 
-        height: auto;
-        padding-top: 55px;
-        padding-bottom: 10px;
-    }
-}
-
-
-
-/*******************************************************************************
-****************************** UTILITY CLASSES ********************************* 
-*******************************************************************************/
-
-[hidden], .hidden {
-    display: none !important;
-}
-
-.inline, .inline_>* {
-    display: inline-block;
-    margin-top: 0;
-    margin-bottom: 0;
-}
-
-.floatl, .floatl_>* {
-    float: left;
-}
-.floatr, .floatr_>* {
-    float: right;
-}
-
-.rel {
-    position: relative;
-}
-
-.left, .left_>* {
-    position: absolute;
-    left: 0;
-}
-.right, .right_>* {
-    position: absolute;
-    right: 0;
-}
-.top, .top_>* {
-    position: absolute;
-    top: 0;
-}
-.bottom, .bottom_>* {
-    position: absolute;
-    bottom: 0;
-}
-
-.centerx, .centerx_>* {
-    position: absolute;
-    left: 0; right: 0;
-    margin: auto !important;
-}
-.centery, .centery_>* {
-    position: absolute;
-    top: 0; bottom: 0;
-    margin: auto !important;
-}
-.center, .center_>* {
-    position: absolute;
-    left: 0; right: 0; top: 0; bottom: 0;
-    margin: auto !important;
-}
-
-.fix {
-    position: fixed;
-}
-
-.ccx, .ccx_>* {
-    display: flex;
-    justify-content: center;
-}
-.ccy, .ccy_>* {
-    display: flex;
-    align-items: center;
-}
-.cc, .cc_>* {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.scrollx, .scrollx_>* {
-    width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-}
-.scrolly, .scrolly_>* {
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-}
-.scroll, .scroll_>* {
-    overflow: auto;
-}
-
-.textl, .textl_>* {
-    text-align: left;
-}
-.textr, .textr_>* {
-    text-align: right;
-}
-.textc, .textc_>* {
-    text-align: center;
-}
-
-.fullw, .fullw_>* {
-    width: 100%;
-}
-.fullh, .fullh_>* {
-    height: 100%;
-}
-.halfw, .halfw_>* {
-    width: 50%;
-}
-.halfh, .halfh_>* {
-    height: 50%;
-}
-.autow, .autow_>* {
-    width: auto;
-}
-.autoh, .autoh_>* {
-    height: auto;
-}
-
-.autom, .autom_>* {
-    margin: auto !important;
-}
-
-.columns-2 {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-}
-.columns-2 > * {
-    width: 49%;
-    margin-right: 2%;
-}
-.columns-2 > *:nth-child(2n){
-    margin-right: 0;
-}
-
-.columns-3 {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-}
-.columns-3 > * {
-    width: 32%;
-    margin-right: 2%;
-}
-.columns-3 > *:nth-child(3n) {
-    margin-right: 0;
-}
-
-.pad-s, .pad-s_>* {
-    padding-left: 5%;
-    padding-right: 5%;
-}
-.pad, .pad_>* {
-    padding-left: 10%;
-    padding-right: 10%;
-}
-.pad-l, .pad-l_>* {
-    padding-left: 15%;
-    padding-right: 15%;
-}
-
-.round, .round_>* {
-    border-radius: 50%;
-}
-
-.scale, .scale_>* {
-    transition: all .2s ease-in-out;
-}
-.scale:hover, .scale_>*:hover {
-    transform: scale(1.1);
-}
-
-
-
-/*******************************************************************************
-************************************* FX *************************************** 
-*******************************************************************************/
-
-.fx-stack-container > * {
-    transition: margin-top 2s ease; /*FIXME: NOT WORKING*/
-    margin-top: 0;
-}
-.fx-stack-el {
-    margin-top: 100px;
-}
-
-.fx-stamp-container > * {
-    transition: opacity 0.3s;
-    animation: stamp 0.3s;
-}
-.fx-stamp-el {
-    opacity: 0;
-    animation: none;
-}
-
-.flip-container {
-    perspective: 1000px;
-    position: relative;
-}
-.flipper {
-    transition: 0.6s;
-    transform-style: preserve-3d;
-    position: absolute;
-}
-.flipper.flip  {
-    transform: rotateY(180deg);
-}
-.flipper .front, .flipper .back {
-    backface-visibility: hidden;
-    top: 0;
-    left: 0;
-}
-.flipper .front {
-    z-index: 2;
-    transform: rotateY(0deg);
-}
-.flipper .back {
-    transform: rotateY(180deg);
-}
-
-
-
-/*******************************************************************************
-********************************* SCROLLBARS *********************************** 
-*******************************************************************************/
-
-/* webkit */
-::-webkit-scrollbar {
-    width: 10px;
-    background: transparent;
-}
-::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.3);
-    background-clip: content-box;
-    border-left: solid transparent 2px;
-    border-right: solid transparent 2px;
-    border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(0, 0, 0, 0.4);
-}
-
-/* mozilla (NOT WORKING) */
-@-moz-document url-prefix(http://), url-prefix(https://) {
-    scrollbar {
-        -moz-appearance: none !important;
-        background: rgb(0,255,0) !important;
-    }
-    thumb, scrollbarbutton {
-        -moz-appearance: none !important;
-        background-color: rgb(0,0,255) !important;
-    }
-    thumb:hover, scrollbarbutton:hover {
-        -moz-appearance: none !important;
-        background-color: rgb(255,0,0) !important;
-    }
-    scrollbarbutton {
-        display: none !important;
-    }
-    scrollbar[orient="vertical"] {
-        min-width: 15px !important;
-    }
-}
-
-
-
-/*******************************************************************************
-****************************** MEDIA QUERIES *********************************** 
-*******************************************************************************/
-
-/* desktop only */
-@media only screen and (min-width: 800px) {
-    .pad-s-desktop {
-        padding-left: 5%;
-        padding-right: 5%;
-    }
-    .pad-desktop {
-        padding-left: 10%;
-        padding-right: 10%;
-    }
-    .pad-l-desktop {
-        padding-left: 15%;
-        padding-right: 15%;
-    }
-}
-
-
-/* tablet only */
-@media only screen and (min-width: 500px) and (max-width: 800px) {
-
-    .pad-s-tablet {
-        padding-left: 5%;
-        padding-right: 5%;
-    }
-    .pad-tablet {
-        padding-left: 10%;
-        padding-right: 10%;
-    }
-    .pad-l-tablet {
-        padding-left: 15%;
-        padding-right: 15%;
-    }
-
-}
-
-
-/* tablet and phone */
-@media only screen and (max-width: 800px) {
-
-    [page][header]:before {
-        padding: 10px;
-        line-height: 0.8;
-    }
-
-    .hide-tablet {
-        display: none;
-    }
-    .show-tablet {
-        display: block;
-    }
-
-    [header].hh-tablet:before {
-        display: none;
-    }
-    [header].hh-tablet[page] {
-        padding-top: 0;
-    }
-    [header].hh-tablet[panel] {
-        padding-top: 20px;
-    }
-    [header].hh-tablet[section] {
-        padding-top: 15px;
-    }
-
-}
-
-
-/* phone only */
-@media only screen and (max-width: 500px) {
-
-    [page] {
-        padding-bottom: 0;
-        overflow-y: auto;
-    }
-
-    [panel] {
-        border-radius: 0;
-    }
-
-    [template] > .controls > .columns,
-    [template] > .controls > .sizes {
-        display: none;
-    }
-
-    [options] {
-        bottom: 0;
-        left: 0 !important;
-        right: 0;
-        height: 80% !important;
-        margin: auto;
-    }
-
-    .row {
-        padding-left: 0;
-    }
-
-    .hide-phone {
-        display: none;
-    }
-    .show-phone {
-        display: block;
-    }
-
-    [header].hh-phone:before {
-        display: none;
-    }
-    [header].hh-phone[page] {
-        padding-top: 0;
-    }
-    [header].hh-phone[panel] {
-        padding-top: 20px;
-    }
-    [header].hh-phone[section] {
-        padding-top: 15px;
-    }
-
-    .pad-s-phone {
-        padding-left: 5%;
-        padding-right: 5%;
-    }
-    .pad-phone {
-        padding-left: 10%;
-        padding-right: 10%;
-    }
-    .pad-l-phone {
-        padding-left: 15%;
-        padding-right: 15%;
-    }
-    
-
-
-}
-
-</style>`)
+$('head').prepend(`<style>body{margin:0;overflow-x:hidden}*,:after,:before{box-sizing:border-box;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;transition:background-color .2s}h1{font-size:3em}h2{font-size:2em}h3{font-size:1.5em}h1,h2,h3{margin-top:0}p.big{font-size:1.5em}ol,ul{padding:5px 10px 5px 30px;border-radius:2px}caption,table,tbody,td,tfoot,th,thead,tr{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline}table{border:1px solid #000;width:100%;text-align:center;border-collapse:collapse}table td,table th{border:1px solid #000;padding:4px 5px}table tbody td{font-size:13px}table thead{background:#cfcfcf;background:-moz-linear-gradient(top,#dbdbdb 0,#d3d3d3 66%,#cfcfcf 100%);background:-webkit-linear-gradient(top,#dbdbdb 0,#d3d3d3 66%,#cfcfcf 100%);background:linear-gradient(to bottom,#dbdbdb 0,#d3d3d3 66%,#cfcfcf 100%);border-bottom:3px solid #000}table thead th{font-size:15px;font-weight:700;color:#000;text-align:center}table tfoot{font-size:14px;font-weight:700;color:#000;border-top:3px solid #000}table tfoot td{font-size:14px}.field,button,input,select,textarea{min-height:35px;width:100%;padding:5px 10px;margin:0 0 15px 0;border:0;border-radius:4px;outline:0;font-family:inherit!important;font-size:inherit;vertical-align:text-bottom}meter,progress{width:100%;margin:0 0 15px 0;border-radius:2px}input:focus:invalid{box-shadow:0 0 0 2px red}input:focus:valid{box-shadow:0 0 0 2px green}button,input[type=range],select{cursor:pointer}button{display:inline-block;height:50px;width:auto;min-width:50px;padding:10px 20px;border:1px solid rgba(0,0,0,.1);font-size:1.2em;text-align:center;text-decoration:none;text-transform:uppercase}button:not(:disabled):hover{filter:contrast(1.5)}button:disabled{filter:contrast(.5);cursor:auto}select{appearance:none;-moz-appearance:none;-webkit-appearance:none}option{cursor:pointer}textarea{height:70px;resize:none}.big_>button,.big_>input,button.big,input.big{min-height:70px;margin-bottom:25px;font-size:1.5em}.small_>button,.small_>input,button.small,input.small{height:25px;font-size:1em}input[type=checkbox],input[type=radio]{display:none}input[type=checkbox]+label,input[type=radio]+label{display:block;height:40px;max-width:90%;padding:12px 0;margin-left:45px;overflow:hidden;text-overflow:ellipsis;cursor:pointer}input[type=checkbox]+label:before,input[type=radio]+label:before{content:'\\2713';position:absolute;height:32px;width:32px;margin-top:-8px;margin-left:-40px;border:1px solid #999;color:transparent;background-color:#fff;font-size:2.3em;line-height:1;text-align:center}input[type=radio]+label:before{content:'\\25cf';border-radius:50%;line-height:.8}input[type=checkbox]:checked+label:before,input[type=radio]:checked+label:before{color:#222;animation:stamp .4s ease-out}input[type=checkbox]+label:hover,input[type=radio]+label:hover{font-weight:600}[page],[panel],[section]{position:relative;overflow:hidden}[page]{min-height:100vh;width:100vw!important;padding-bottom:10px;margin-bottom:-5px;overflow-y:auto}[page]:not(.active){display:none!important}nav~[page]:not(.hide-nav){min-height:calc(100vh - 50px);max-height:calc(100vh - 50px)}.fullh[page]{height:100vh}[panel]{padding:25px;border-radius:4px}[section]{margin-bottom:15px;padding:20px;border-radius:4px}[section] [label]:before{text-shadow:0 0 0 #000}[section]>:first-child:not([label]){margin-top:0}[header][panel]{padding-top:75px}[header][section]{padding-top:65px}[footer][page]:after,[header][page]:before,[header][panel]:before,[header][section]:before{content:attr(header);display:block;height:70px;width:100%;padding:20px;line-height:30px;font-size:2.5em;text-align:center;text-transform:uppercase}[header][page]:before{margin-bottom:15px}[header][panel]:before,[header][section]:before{position:absolute;top:0;left:0}[header][panel]:before{height:50px;padding:10px 20px;line-height:30px;font-size:2em}[header][section]:before{height:40px;padding:10px;line-height:20px;font-size:1.5em}[footer][page]:after{content:attr(footer)}[page][header][fix-header]:before{position:fixed;top:0}[page][footer][fix-footer]:after{position:fixed;bottom:0}[img]{background-repeat:no-repeat;background-position:center;background-size:contain;background-origin:content-box}[template]{visibility:hidden;position:relative}[template].rendered{visibility:visible}[template]>.results{max-height:calc(100% - 40px);margin:0 -15px;padding:0 15px}[template][stats]>.results{max-height:calc(100% - 95px)}[template]>.controls{height:60px;padding:5px;color:#fff;text-align:center}[template]>.controls *{vertical-align:middle}[template]>.stats{height:40px;padding:10px;font-size:1.1em}[crud]>*{position:relative}.rasti-crud-create{display:block!important}.rasti-crud,.rasti-crud-accept,.rasti-crud-cancel,.rasti-crud-input,[crud].active .rasti-crud-create{display:none!important}[crud].active .rasti-crud-accept,[crud].active .rasti-crud-cancel,[crud].active .rasti-crud-input{display:inline-block!important}[crud]>.rasti-crud{bottom:-40px;z-index:1}[crud]:hover>.rasti-crud,[crud]>:hover>.rasti-crud{display:block!important}[h-flow]{display:inline-block!important;white-space:nowrap;height:100%;width:100%;overflow-x:auto;overflow-y:hidden}[h-flow]>*{display:inline-block;white-space:normal;height:100%;min-width:100%;border-radius:0;margin-top:0;margin-bottom:0;margin-left:auto!important;margin-right:auto;vertical-align:top}.tab-labels+[h-flow]{height:calc(100vh - 50px)}nav~[page]>.tab-labels+[h-flow]{height:calc(100vh - 100px)}.tab-labels,nav{display:flex;position:relative;white-space:nowrap;min-width:100vw;height:50px;padding:0;border-bottom:1px solid rgba(0,0,0,.2);border-radius:0;text-transform:uppercase}nav{z-index:8}.tab-labels{justify-content:space-around;z-index:2}.tab-labels>.bar{position:absolute;bottom:0;left:0;height:4px;transition:left .2s,width .2s}[tab-label],nav>a,nav>div{display:flex;justify-content:center;align-items:center;flex:1 1 auto;height:100%;min-width:50px;padding:5px;font-size:1.4em;text-shadow:0 0 0 #000;text-decoration:none;color:inherit;cursor:pointer}nav>a,nav>div{max-width:200px;transition:all .2s}[tab-label].active{filter:contrast(1.5)}.modal,[modal]{display:none;position:fixed;left:0;right:0;top:0;bottom:0;margin:auto!important;height:auto;width:auto;max-height:600px;max-width:400px;overflow-y:auto;animation:zoomIn .4s,fadeIn .4s;z-index:10}.modal.big,[modal].big{max-height:800px;max-width:600px}.modal.small,[modal].small{max-height:400px;max-width:200px}.modal>[icon=close],[modal]>[icon=close]{cursor:pointer}[menu]{display:none;position:fixed;padding:10px;background-color:inherit;box-shadow:0 0 4px 4px rgba(0,0,0,.2);z-index:7;cursor:pointer}[menu]>div{padding:15px 5px;line-height:1;font-size:1rem;text-transform:capitalize}[label]{position:relative;margin-top:35px;vertical-align:bottom}[label][fixed]>*{margin-bottom:0}[label]>input,[label]>select,[label]>textarea{margin-top:0!important}[label]:not([panel]):not([section]):before{content:attr(label);position:absolute;height:35px;line-height:35px;font-size:1.2em;text-transform:capitalize}[label]:before{top:0;left:0;margin-top:-35px}[label].big:before{margin-left:0}[label][fixed]:before{margin-top:-30px;margin-left:0}.inline-label[label],.inline-label_>[label]{width:auto;margin-top:0;margin-left:calc(40% + 10px)}.inline-label[label]:before,.inline-label_>[label]:before{top:auto;width:80%;left:-85%;margin-top:-5px;text-align:right}.inline-label[label][fixed]:before,.inline-label_>[label][fixed]:before{margin-top:0;margin-left:-8px}.below-label[label]:before,.below-label_>[label]:before{bottom:-40px;left:0;right:0;margin-top:0;margin-left:0}.big [label]{margin-top:25px;font-size:1.2em}.big [label]:before{margin-top:-27px}[hide] *,[nav] *,[onclick] *,[show] *,[toggle] *{cursor:pointer}[movable]{user-select:none;cursor:move}[resizable]{resize:both;overflow:hidden}[foldable]{animation:foldOut .5s;overflow:hidden}[foldable][header].folded{animation:foldIn .5s;height:0;padding-bottom:0;padding-top:40px}[foldable][header]:before{cursor:pointer}.row{width:100%;display:flex;flex-flow:row wrap;align-content:flex-start;padding-left:1%}.col{display:flex;flex-flow:column nowrap;align-content:flex-start;align-items:center}.col>.row-1,.row>.col-1{flex-basis:7.33%}.col>.row-2,.row>.col-2{flex-basis:15.66%}.col>.row-3,.row>.col-3{flex-basis:24%}.col>.row-4,.row>.col-4{flex-basis:32.33%}.col>.row-5,.row>.col-5{flex-basis:40.66%}.col>.row-6,.row>.col-6{flex-basis:49%}.col>.row-7,.row>.col-7{flex-basis:57.33%}.col>.row-8,.row>.col-8{flex-basis:65.66%}.col>.row-9,.row>.col-9{flex-basis:74%}.col>.row-10,.row>.col-10{flex-basis:82.33%}.col>.row-11,.row>.col-11{flex-basis:90.66%}.row [class*=col-]{margin-left:0!important;margin-right:1%!important}.col [class*=row-]{margin-top:0!important;margin-bottom:1vh!important}.page-options{flex-basis:initial!important}body [icon]{position:relative;min-height:50px;padding-left:50px}body [icon]:empty{padding:0}[icon]:before{display:block;flex-grow:0;height:50px;width:50px;font-size:1.5rem;line-height:2;text-align:center;text-decoration:none}[icon]:not(:empty):before{position:absolute;top:0;left:0}.small[icon]:before,.small_>[icon]:before{height:35px;width:35px;font-size:1.1rem}.big[icon]:before,.big_>[icon]:before{height:70px;width:70px;font-size:2.2rem}.huge[icon]:before,.huge_>[icon]:before{height:100px;width:100px;font-size:3.2rem;line-height:1.9}.round[icon]:before,.round_>[icon]:before{border-radius:50%}.floating[icon]{padding-left:0}.floating[icon]:before{top:-6px;left:auto}.floating[icon]>input{padding-left:45px}.list{padding:0;border:1px solid rgba(0,0,0,.2)}.list[header]{padding-top:40px}.list>div{height:7vh;padding:2vh;transition:all .2s}.list>div:not(:last-child){border-bottom:1px solid rgba(0,0,0,.2)}.list>div.active{border-left:7px solid #222}.list>div:hover{letter-spacing:4px}.nodata{padding:10% 5%;margin:auto;font-size:1.5rem;text-align:center}button.fab{position:fixed;bottom:0;right:0;width:50px;margin:20px;border-radius:50%;z-index:5}.backdrop:before{content:'';position:fixed;top:0;left:0;height:100vh;width:100vw;background:rgba(0,0,0,.7);animation:fadeIn .4s;z-index:9}.loading{color:transparent!important;position:relative}.loading>*{visibility:hidden}.loading:after{content:'';position:absolute;top:0;bottom:0;left:0;right:0;width:25px;height:25px;margin:auto;border-radius:50%;border:.25rem solid rgba(255,255,255,.2);border-top-color:#fff;animation:spin 1s infinite linear;visibility:visible}.big.loading:after{position:fixed;width:100px;height:100px;z-index:10}.loading2{perspective:120px}.loading2:after{content:"";position:absolute;left:25px;top:25px;width:50px;height:50px;background-color:#3498db;animation:flip 1s infinite linear}@keyframes stamp{50%{transform:scale(1.2)}}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}@keyframes flip{0%{transform:rotate(0)}50%{transform:rotateY(180deg)}100%{transform:rotateY(180deg) rotateX(180deg)}}@keyframes zoomIn{0%{transform:scale(0)}100%{transform:scale(1)}}@keyframes zoomOut{0%{transform:scale(1)}100%{transform:scale(0)}}@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}@keyframes fadeOut{0%{opacity:1}100%{opacity:0}}@keyframes foldIn{0%{height:auto;padding-top:55px;padding-bottom:10px}100%{height:0;padding-top:40px;padding-bottom:0}}@keyframes foldOut{0%{height:0;padding-top:40px;padding-bottom:0}100%{height:auto;padding-top:55px;padding-bottom:10px}}.hidden,[hidden]{display:none!important}.rel,.rel_>*{position:relative}.fix,.fix_>*{position:fixed}.inline,.inline_>*{display:inline-block;margin-top:0;margin-bottom:0}.floatl,.floatl_>*{float:left}.floatr,.floatr_>*{float:right}.left,.left_>*{position:absolute;left:0}.right,.right_>*{position:absolute;right:0}.top,.top_>*{position:absolute;top:0}.bottom,.bottom_>*{position:absolute;bottom:0}.centerx,.centerx_>*{position:absolute;left:0;right:0;margin:auto!important}.centery,.centery_>*{position:absolute;top:0;bottom:0;margin:auto!important}.center,.center_>*{position:absolute;left:0;right:0;top:0;bottom:0;margin:auto!important}.fcenterx,.fcenterx_>*{display:flex;justify-content:center}.fcentery,.fcentery_>*{display:flex;align-items:center}.fcenter,.fcenter_>*{display:flex;justify-content:center;align-items:center}.scrollx,.scrollx_>*{width:100%;overflow-x:auto;overflow-y:hidden}.scrolly,.scrolly_>*{height:100%;overflow-x:hidden;overflow-y:auto}.scroll,.scroll_>*{overflow:auto}.textl,.textl_>*{text-align:left}.textr,.textr_>*{text-align:right}.textc,.textc_>*{text-align:center}.fullw,.fullw_>*{width:100%}.fullh,.fullh_>*{height:100%}.halfw,.halfw_>*{width:50%}.halfh,.halfh_>*{height:50%}.autow,.autow_>*{width:auto}.autoh,.autoh_>*{height:auto}.autom,.autom_>*{margin:auto!important}.columns-2{display:flex;flex-wrap:wrap;align-content:flex-start}.columns-2>*{width:49%;margin-right:2%}.columns-2>:nth-child(2n){margin-right:0}.columns-3{display:flex;flex-wrap:wrap;align-content:flex-start}.columns-3>*{width:32%;margin-right:2%}.columns-3>:nth-child(3n){margin-right:0}.pad-s,.pad-s_>*{padding-left:5%;padding-right:5%}.pad,.pad_>*{padding-left:10%;padding-right:10%}.pad-l,.pad-l_>*{padding-left:15%;padding-right:15%}.round,.round_>*{border-radius:50%}.scale-up,.scale-up_>*{transition:all .2s ease-in-out}.scale-up:hover,.scale-up_>:hover{transform:scale(1.1)}[fx=toast]{position:fixed;display:flex;left:0;bottom:-100px;width:100vw;max-width:600px;min-height:100px;max-height:100px;padding:20px;overflow:hidden;text-overflow:ellipsis;z-index:10;transition:bottom ease-out .25s}[fx=toast].active{bottom:0}[fx=toast] [icon]::before{border-radius:50%;font-size:2rem;line-height:1.6;box-shadow:0 0 0 1px}[fx=toast] [icon=warning]::before{background:#ff0;line-height:1.4}[fx=toast] [icon=error]::before{background:red;line-height:1.4}[fx=toast] [icon=accept]::before{background:green}.fx-stack-container>*{transition:margin-top 2s ease;margin-top:0}.fx-stack-el{margin-top:100px}.fx-stamp-container>*{transition:opacity .3s;animation:stamp .3s}.fx-stamp-el{opacity:0;animation:none}.flip-container{perspective:1000px;position:relative}.flipper{transition:.6s;transform-style:preserve-3d;position:absolute}.flipper.flip{transform:rotateY(180deg)}.flipper .back,.flipper .front{backface-visibility:hidden;top:0;left:0}.flipper .front{z-index:2;transform:rotateY(0)}.flipper .back{transform:rotateY(180deg)}::-webkit-scrollbar{width:10px;background:0 0}::-webkit-scrollbar-thumb{background-color:rgba(0,0,0,.3);background-clip:content-box;border-left:solid transparent 2px;border-right:solid transparent 2px;border-radius:4px}::-webkit-scrollbar-thumb:hover{background-color:rgba(0,0,0,.4)}@-moz-document url-prefix(http://),url-prefix(https://){scrollbar{-moz-appearance:none!important;background:#0f0!important}scrollbarbutton,thumb{-moz-appearance:none!important;background-color:#00f!important}scrollbarbutton:hover,thumb:hover{-moz-appearance:none!important;background-color:red!important}scrollbarbutton{display:none!important}scrollbar[orient=vertical]{min-width:15px!important}}@media only screen and (min-width:800px){.pad-s-desktop{padding-left:5%;padding-right:5%}.pad-desktop{padding-left:10%;padding-right:10%}.pad-l-desktop{padding-left:15%;padding-right:15%}}@media only screen and (min-width:500px) and (max-width:800px){.pad-s-tablet{padding-left:5%;padding-right:5%}.pad-tablet{padding-left:10%;padding-right:10%}.pad-l-tablet{padding-left:15%;padding-right:15%}}@media only screen and (max-width:800px){[page][header]:before{padding:10px;line-height:.8}.hide-tablet{display:none}.show-tablet{display:block}[header].hh-tablet:before{display:none}[header].hh-tablet[page]{padding-top:0}[header].hh-tablet[panel]{padding-top:20px}[header].hh-tablet[section]{padding-top:15px}}@media only screen and (max-width:500px){[page]{padding-bottom:0;overflow-y:auto}[panel]{border-radius:0}[template]>.controls>.columns,[template]>.controls>.sizes{display:none}[options]{bottom:0;left:0!important;right:0;height:80%!important;margin:auto}.row{padding-left:0}[class*=col]{min-width:100%}.hide-phone{display:none}.show-phone{display:block}[header].hh-phone:before{display:none}[header].hh-phone[page]{padding-top:0}[header].hh-phone[panel]{padding-top:20px}[header].hh-phone[section]{padding-top:15px}.pad-s-phone{padding-left:5%;padding-right:5%}.pad-phone{padding-left:10%;padding-right:10%}.pad-l-phone{padding-left:15%;padding-right:15%}}</style>`)
 
 genBlockStyles()
 
@@ -3916,7 +2873,7 @@ bootstrap()
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./blocks/all":1,"./components":8,"./extensions":9,"./icons":10,"./themes":12,"./utils":13}],12:[function(require,module,exports){
+},{"./blocks/all":1,"./components":9,"./extensions":10,"./fx":11,"./icons":12,"./themes":14,"./utils":15}],14:[function(require,module,exports){
 exports.themes = {
 
     base : {
@@ -3963,7 +2920,7 @@ exports.themeMaps = {
     },
     
 }
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 const is = {}
 'object function array string number regex boolean'.split(' ').forEach(function(t){
     is[t] = function(exp){ return type(exp) === t }
@@ -4096,6 +3053,6 @@ module.exports = {
     rastiError,
 }
 
-},{}]},{},[11])(11)
+},{}]},{},[13])(13)
 });
 //# sourceMappingURL=rasti.map

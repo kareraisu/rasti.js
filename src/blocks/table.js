@@ -1,4 +1,4 @@
-const {is} = require('../utils')
+const utils = require('../utils')
 
 module.exports = {
 
@@ -6,14 +6,14 @@ template : function(data, $el) {
     const first = data[0]
     let head, body
     try {
-        if (is.array(data)) {
+        if (utils.is.array(data)) {
             headers = Object.keys(data[0])
             head = headers.map( h =>`<th>${h}</th>` ).join('')
             body = data.map( obj => '<tr>'
                 + headers.map( key => `<td>${obj[key]}</td>` ).join('') 
                 + '</tr>' )
         }
-        else if (is.string(data)) {
+        else if (utils.is.string(data)) {
             data = data.split(/[\n]/)
                 .map(row => row.split(','))
             head = data.shift().map( h =>`<th>${h}</th>` ).join('')
