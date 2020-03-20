@@ -150,8 +150,11 @@ function rasti(name, container) {
 
 
         // append theme style container
-        container.append('<style theme>')
+        container.append('<style class=rs-theme>')
 
+        // append backdrop container
+        container.append('<div class=rs-backdrop>')
+        const backdrop = container.find('.rs-backdrop')
 
         // append page-options containers
         container.find('[page]').each( (i, el) => {
@@ -189,7 +192,7 @@ function rasti(name, container) {
             $('<div icon=close class="top right" />')
             .on('click', e => {
                 el.style.display = 'none'
-                self.active.page.find('.backdrop').removeClass('backdrop')
+                backdrop.removeClass('backdrop')
             })
             .appendTo(el)
         })
@@ -199,7 +202,7 @@ function rasti(name, container) {
 
 
         // init nav
-        container.find('[nav]').on('click', e => {
+        container.on('click', '[nav]', e => {
             const el = e.currentTarget
             const $el = $(el)
             const page = $el.attr('nav')
@@ -248,7 +251,7 @@ function rasti(name, container) {
 
 
         // init submit
-        container.find('[submit]').click( e => {
+        container.on('click', '[submit]', e => {
             const $el = $(e.target)
             const method = $el.attr('submit')
             const callback = $el.attr('then')
@@ -323,13 +326,14 @@ function rasti(name, container) {
                     $target.addClass('target')
                     container.find('[menu]:not(.target)').hide()
                     $target.removeClass('target')
-                    const target = $target[0]
-                    if (target.hasAttribute('modal') || $target.hasClass('modal'))
-                        $page.find('.page-options').toggleClass('backdrop')
                     $target[action]()
-                    target.style.display != 'none'
-                        ? $target.focus()
-                        : $target.blur()
+                    const isVisible = $target[0].style.display != 'none'
+                    const hasBackdrop = $target.hasAttr('menu') || $target.hasAttr('modal') || $target.hasClass('modal')
+                    if (isVisible) {
+                        $target.focus()
+                        if (hasBackdrop) backdrop.addClass('backdrop')
+                    }
+                    else $target.blur()
                 })
             })
         }
@@ -547,11 +551,9 @@ function rasti(name, container) {
 
 
         container
-            .on('click', e => {
-                container.find('[menu]').hide()
-            })
             .on('click', '.backdrop', e => {
                 $(e.target).removeClass('backdrop')
+                container.find('[menu]').hide()
                 self.active.page.find('[modal]').hide()
             })
             .removeClass('big loading backdrop')
@@ -677,6 +679,9 @@ function rasti(name, container) {
 
         if (!$page.length) return error('Cannot navigate to page [%s]: page container not found', pagename)
 
+        container.find('[menu]').hide()
+        container.find('.rs-backdrop').removeClass('backdrop')
+
         if ($prevPage) $prevPage.removeClass('active')
 
         if (prevPage && prevPage.out) {
@@ -695,8 +700,8 @@ function rasti(name, container) {
         }
 
         $page.hasClass('hide-nav')
-            ? $('nav').hide()
-            : $('nav').show()
+            ? container.find('nav').hide()
+            : container.find('nav').show()
 
         $page.addClass('active')
 
@@ -897,7 +902,7 @@ function rasti(name, container) {
         if (invalidKeys.length) warn('Ignored %s invalid theme map keys:', invalidKeys.length, invalidKeys)
 
         // generate theme style and apply it
-        container.find('style[theme]').html( getThemeStyle(values) )
+        container.find('.rs-theme').html( getThemeStyle(values) )
 
         // apply bg colors
         var colorName, color
@@ -1127,7 +1132,7 @@ function rasti(name, container) {
             columns = `<button icon=columns>1</button>`
 
         $el.html(`
-            <div class="results scrolly"></div>
+            <div class="results scrolly rigid"></div>
             <div class="controls centerx bottom inline_">
                 ${ columns || '' }
                 ${ paging || '' }
@@ -1138,31 +1143,29 @@ function rasti(name, container) {
         $controls = $el.children('.controls')
         $results = $el.children('.results')
 
-        $controls.on('click', '[icon=right3]', e => {
-            update( pager.next() )
-        })
-
-        $controls.on('click', '[icon=left3]', e => {
-            update( pager.prev() )
-        })
-
-        $controls.on('click', '[icon=rows]', e => {
-            size += 1
-            var newSize = pager.sizes[size % pager.sizes.length]
-            pager.setPageSize(newSize)
-            $(e.target).html(newSize)
-            update( pager.next() )
-            pager.total > 1
-                ? $controls.find('.paging').show()
-                : $controls.find('.paging').hide()
-        })
-
-        $controls.on('click', '[icon=columns]', e => {
-            col = col+1 > 3 ? 1 : col+1
-            $(e.target).html(col)
-            $results.removeClass('columns-1 columns-2 columns-3')
-                .addClass('columns-' + col)
-        })
+        $controls
+            .on('click', '[icon=right3]', e => {
+                update( pager.next() )
+            })
+            .on('click', '[icon=left3]', e => {
+                update( pager.prev() )
+            })
+            .on('click', '[icon=rows]', e => {
+                size += 1
+                var newSize = pager.sizes[size % pager.sizes.length]
+                pager.setPageSize(newSize)
+                $(e.target).html(newSize)
+                update( pager.next() )
+                pager.total > 1
+                    ? $controls.find('.paging').show()
+                    : $controls.find('.paging').hide()
+            })
+            .on('click', '[icon=columns]', e => {
+                col = col+1 > 3 ? 1 : col+1
+                $(e.target).html(col)
+                $results.removeClass('columns-1 columns-2 columns-3')
+                    .addClass('columns-' + col)
+            })
 
         update( pager.next() )
 

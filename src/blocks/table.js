@@ -14,12 +14,13 @@ template : function(data, $el) {
                 + '</tr>' )
         }
         else if (utils.is.string(data)) {
+            const separator = $el.attr('separator') || ','
             data = data.split(/[\n]/)
-                .map(row => row.split(','))
-            head = data.shift().map( h =>`<th>${h}</th>` ).join('')
+                .map(row => row.split(separator))
+            head = data.shift().map( h =>`<th>${h.trim()}</th>` ).join('')
             body = data.map( row => '<tr>'
-                + row.map( v => `<td>${v}</td>` ).join('') 
-                + '</tr>' )
+                + row.map( v => `<td>${v.trim()}</td>` ).join('') 
+                + '</tr>' ).join('')
         }
         return '<thead><tr>'
             + head
