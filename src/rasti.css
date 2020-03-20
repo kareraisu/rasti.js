@@ -27,6 +27,9 @@ ol, ul {
     padding: 5px 10px 5px 30px;
     border-radius: 2px;
 }
+li:not(:last-child) {
+    margin-bottom: 5px;
+}
 
 table, caption, tbody, tfoot, thead, tr, th, td {
     margin: 0;
@@ -92,10 +95,14 @@ meter, progress {
 }
 
 input:focus:invalid {
-    box-shadow: 0 0 0 2px red;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    box-shadow: -4px 0 0 0 red;
 }
 input:focus:valid {
-    box-shadow: 0 0 0 2px green;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    box-shadow: -4px 0 0 0 green;
 }
 
 input[type=range], select, button {
@@ -175,7 +182,7 @@ input[type=checkbox] + label:before {
     border: 1px solid #999;
     color: transparent;
     background-color: #fff;
-    font-size: 2.3em;
+    font-size: 2em;
     line-height: 1;
     text-align: center;
 }
@@ -254,12 +261,14 @@ nav ~ [page]:not(.hide-nav) {
 [header][section]:before,
 [footer][page]:after {
     content: attr(header);
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     height: 70px;
     width: 100%;
     padding: 20px;
     line-height: 30px;
-    font-size: 2.5em;
+    font-size: 2.4em;
     text-align: center;
     text-transform: uppercase;
 }
@@ -473,7 +482,7 @@ nav > div, nav > a {
     padding: 10px;
     background-color: inherit;
     box-shadow: 0 0 4px 4px rgba(0,0,0,0.2);
-    z-index: 7;
+    z-index: 10;
     cursor: pointer;
 }
 [menu] > div {
@@ -681,8 +690,10 @@ body [icon]:empty {
     padding-left: 0;
 }
 .floating[icon]:before {
-    top: -6px;
-    left: auto;
+    left: 4px;
+    height: 35px;
+    width: 35px;
+    font-size: 1.1rem;
 }
 .floating[icon] > input {
     padding-left: 45px;
@@ -1021,13 +1032,14 @@ button.fab {
 [fx=toast] {
     position: fixed;
     display: flex;
-    left: 0;
+    left: 0; right: 0;
     bottom: -100px;
     width: 100vw;
     max-width: 600px;
-    min-height: 100px;
-    max-height: 100px;
+    min-height: 90px;
+    max-height: 90px;
     padding: 20px;
+    margin: auto;
     overflow: hidden;
     text-overflow: ellipsis;
     z-index: 10;
@@ -1242,7 +1254,8 @@ button.fab {
         padding-left: 0;
     }
 
-    [class*=col] {
+    .row:not(.rigid) > [class*=col],
+    [class*=columns-]:not(.rigid) > * {
         min-width: 100%;
     }
 

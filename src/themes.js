@@ -33,14 +33,14 @@ exports.themeMaps = {
     },
 
     light : {
-        page    : 'lighter darken',
+        page    : 'light darken',
         panel   : 'mid lighten',
         section : 'light darken',
         field   : 'lighter dark',
-        btn     : 'detail light',
+        btn     : 'detail dark',
         header  : 'dark',
-        label   : 'mid',
-        text    : 'darker',
+        label   : 'dark',
+        text    : 'dark',
     },
     
 }
