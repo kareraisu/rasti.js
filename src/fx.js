@@ -7,12 +7,11 @@ stack : $el => {
         el.classList.add('fx-stack-el')
         setTimeout( _ => {
             el.classList.remove('fx-stack-el')
-        }, i * 50);
+        }, i * 50)
     })
     setTimeout( _ => {
         $el.removeClass('fx-stack-container')
-    }, $children.length * 50 + 500);
-
+    }, $children.length * 50 + 500)
 },
 
 stamp : $el => {
@@ -22,19 +21,19 @@ stamp : $el => {
         el.classList.add('fx-stamp-el')
         setTimeout( _ => {
             el.classList.remove('fx-stamp-el')
-        }, i * 40);
+        }, i * 40)
     })
     setTimeout( _ => {
         $el.removeClass('fx-stamp-container')
-    }, $children.length * 40 + 500);
+    }, $children.length * 40 + 500)
 },
 
 toast : $el => {
     $el.addClass('active')
     setTimeout( _ => {
         $el.removeClass('active')
-    }, 4000);
-
+    }, 4000)
 },
+
 
 }

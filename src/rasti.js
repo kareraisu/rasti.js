@@ -5,10 +5,12 @@ const { is, sameType, exists, resolveAttr, html } = utils
 const { themes, themeMaps } = require('./themes')
 
 const options = {
-    history : false,
+    history : true,
+    persist : true,
     root    : '',
     theme   : 'base',
     lang    : '',
+    separator : ';',
     stats   : '%n results in %t seconds',
     noData  : 'No data available',
     newEl   : 'New element',
@@ -21,13 +23,15 @@ const breakpoints = {
     phone : 500,
     tablet : 800,
 }
-const media = {}
+const media = {on:{}}
 for (let device in breakpoints) {
-    media[device] = window.matchMedia(`(max-width: ${ breakpoints[device] }px)`).matches
+    const query = window.matchMedia(`(max-width: ${ breakpoints[device] }px)`)
+    media[device] = query.matches
+    media.on[device] = handler => query.addListener(handler)
 }
 
 const TEXT_ATTRS = 'label header text placeholder'.split(' ')
-const EVENT_ATTRS = 'click change hover load'.split(' ')
+const EVENT_ATTRS = 'click change hover input keydown submit load'.split(' ')
 const ACTION_ATTRS = 'show hide toggle'.split(' ')
 const NOCHILD_TAGS = 'input select textarea img'.split(' ')
 
@@ -44,26 +48,22 @@ const error = (...params) => {
 
 function rasti(name, container) {
 
+    const self = this
     const errPrefix = 'Cannot create rasti app: '
-
     if ( !is.string(name) ) return error(errPrefix + 'app must have a name!')
+    name = name.replace(' ', '')
 
-    this.name = name.replace(' ', '')
-
-    if ( !container ) {
-        container = $('body')
-    }
+    if ( !container ) container = $('body')
     else if ( !(container.selector) ) {
         if ( is.string(container) || (container.tagName && 'BODY DIV'.search(container.tagName) > -1) ) container = $(container)
         else return error(errPrefix + 'app container is invalid. Please provide a selector string, a jQuery object ref or a DOM element ref')
     }
-    container.attr('rasti', this.name)
-
-    const self = this
+    container.attr('rasti', name)
 
 
     // private properties
 
+    const __name = name
     const __pagers = new Map()
     const __crud = crud(this)
     const __state = {}
@@ -83,7 +83,7 @@ function rasti(name, container) {
         theme : '',
         lang  : '',
     }
-    this.state = state(this)
+    this.state = state(this, __name)
     this.props = {}
     this.methods = {}
     this.pages = {}
@@ -92,6 +92,7 @@ function rasti(name, container) {
     this.langs = {}
     this.themes = themes
     this.themeMaps = themeMaps
+    this.sidemenu = null
 
 
     // public methods
@@ -106,19 +107,26 @@ function rasti(name, container) {
     this.toggleFullScreen = toggleFullScreen
 
 
-
     function extend(props) {
         if (!props || !is.object(props)) return error('Cannot extend app: no properties found')
         for (let key in self) {
-            if ( is.object(self[key]) && is.object(props[key]) )
+            if ( is.object(self[key]) && is.object(props[key]) && key !== 'methods' )
                 Object.assign(self[key], props[key])
         }
+        key = 'methods'
+        for (let name in props[key]) {
+            const method = props[key][name]
+            if ( is.function(method) )
+                self[key][name] = method.bind(self)
+            else warn('cannot extend method [%s], must be a function', name)
+        }
+        return self
     }
 
 
     function init(options) {
         const initStart = window.performance.now()
-        log('Initializing app [%s]...', self.name)
+        log('Initializing app [%s]...', __name)
 
         container
             .addClass('big loading backdrop')
@@ -128,7 +136,7 @@ function rasti(name, container) {
         if (options) {
             if ( !is.object(options) ) warn('Init options must be an object!')
             else Object.keys(self.options).forEach( key => {
-                if (options[key]) {
+                if ( exists(options[key]) ) {
                     if ( !sameType(self.options[key], options[key])  ) warn('Init option [%s] is invalid', key)
                     else self.options[key] = options[key]
                 }
@@ -138,11 +146,11 @@ function rasti(name, container) {
 
         // apply defaults
         Object.keys(self.defaults).forEach( key => {
-            if (!self.options[key]) self.options[key] = self.defaults[key]
+            //if (!self.options[key]) self.options[key] = self.defaults[key]
         })
 
 
-        // define lang (if not already defined)
+        // define lang (if applicable)
         if (!self.options.lang) {
             const keys = Object.keys(self.langs)
             if (keys.length) self.options.lang = keys[0]
@@ -169,117 +177,37 @@ function rasti(name, container) {
 
 
         // init "incognito" blocks
-        container.find('[data]').not('[block]')
-            .each( (i, el) => {
-                updateBlock($(el))
-            })
-
-
-        // create tabs
-        container.find('.tabs').each( (i, el) => {
-            createTabs($(el))
-        })
-        if (media.tablet || media.phone) container.find('.tabs-tablet').each( (i, el) => {
-            createTabs($(el))
-        })
-        if (media.phone) container.find('.tabs-phone').each( (i, el) => {
-            createTabs($(el))
+        container.find('[data]:not([block]):not([template])').each( (i, el) => {
+            updateBlock($(el))
         })
 
 
-        // add close btn to modals
-        container.find('[modal]').each( (i, el) => {
-            $('<div icon=close class="top right" />')
-            .on('click', e => {
-                el.style.display = 'none'
-                backdrop.removeClass('backdrop')
-            })
-            .appendTo(el)
-        })
+        initSideMenu(backdrop)
 
 
-        // TODO: add modal closure via ESC key
+        initModals(backdrop)
+        
+        
+        // init tabs
+        function initTabs(selector) {
+            container.find(selector).each( (i, el) => { createTabs(el) })
+        }
+        initTabs('.tabs')
+        if (media.tablet || media.phone) initTabs('.tabs-tablet')
+        if (media.phone) initTabs('.tabs-phone')
 
 
-        // init nav
-        container.on('click', '[nav]', e => {
+        // init [nav] bindings
+        initNav()
+
+
+        // init [submit] bindings
+        initSubmit()
+
+
+        // init [render] bindings
+        container.on('click change', '[render]:not([submit])', e => {
             const el = e.currentTarget
-            const $el = $(el)
-            const page = $el.attr('nav')
-            let params = {}
-
-            if (!page) return error('Missing page name in [nav] attribute of element:', el)
-
-            if (el.hasAttribute('params')) {
-                const $page = self.active.page
-                let navparams = $el.attr('params')
-                let $paramEl
-
-                if (navparams) {
-                    // check to see if params is an object
-                    if (navparams[0]=='{') {
-                        try {
-                            params = JSON.parse(navparams)
-                        }
-                        catch(err){
-                            error('Invalid JSON in [params] attribute of element:', el)
-                            error('Tip: be sure to use double quotes ("") for both keys and values')
-                            return
-                        }
-                    }
-                    else {
-                        // get values of specified navparams
-                        navparams = params.split(' ')
-                        navparams.forEach( key => {
-                            $paramEl = $page.find('[navparam='+ key +']')
-                            if ($paramEl.length) params[key] = $paramEl.val()
-                            else warn('Could not find navparam element [%s]', key)
-                        })
-                    }
-                }
-                else {
-                    // get values of all navparams in page
-                    $page.find('[navparam]').each( (i, el) => {
-                        const $el = $(el)
-                        const key = resolveAttr($el, 'navparam')
-                        if (key) params[key] = $el.val()
-                    })
-                }
-            }
-            navTo(page, params)
-        })
-
-
-        // init submit
-        container.on('click', '[submit]', e => {
-            const $el = $(e.target)
-            const method = $el.attr('submit')
-            const callback = $el.attr('then')
-            const template = $el.attr('render')
-            const isValidCB = callback && is.function(self.methods[callback])
-            const start = window.performance.now()
-
-            if (!method) return error('Missing method in [submit] attribute of el:', this)
-
-            if (callback && !isValidCB) error('Undefined method [%s] declared in [then] attribute of el:', callback, this)
-
-            $el.addClass('loading').attr('disabled', true)
-
-            submitAjax(method, resdata => {
-                const time = Math.floor(window.performance.now() - start) / 1000
-                log('Ajax method [%s] took %s seconds', method, time)
-
-                if (isValidCB) self.methods[callback](resdata)
-                if (template) render(template, resdata, time)
-
-                $el.removeClass('loading').removeAttr('disabled')
-            })
-        })
-
-
-        // init render
-        container.find('[render]').not('[submit]').click( e => {
-            const el = e.target
             const template = el.getAttribute('render')
             if (!template) return error('Missing template name in [render] attribute of element:', el)
             render(template)
@@ -297,66 +225,7 @@ function rasti(name, container) {
         })
 
 
-        // init actions
-        for (let action of EVENT_ATTRS) {
-            container.find('[on-'+ action +']').each( (i, el) => {
-                const $el = $(el)
-                const methodName = $el.attr('on-' + action)
-                if ( !methodName ) return error('Missing utility method in [on-%s] attribute of element:', action, el)
-                const method = self.methods[methodName]
-                if ( !method ) return error('Undefined utility method "%s" declared in [on-%s] attribute of element:', methodName, action, el)
-                $el.on(action, method)
-                   .removeAttr('on-' + action)
-                if (action == 'click') el.style.cursor = 'pointer'
-            })
-        }
-        for (let action of ACTION_ATTRS) {
-            container.find('['+ action +']').each( (i, el) => {
-                const $el = $(el)
-                const $page = $el.closest('[page]')
-                const targetSelector = $el.attr(action)
-
-                if ( !targetSelector ) return error('Missing target selector in [%s] attribute of element:', action, el)
-                let $target = $page.find('['+targetSelector+']')
-                if ( !$target.length ) $target = container.find('['+targetSelector+']')
-                if ( !$target.length ) return error('Could not find target [%s] declared in [%s] attribute of element:', targetSelector, action, el)
-
-                $el.on('click', e => {
-                    e.stopPropagation()
-                    $target.addClass('target')
-                    container.find('[menu]:not(.target)').hide()
-                    $target.removeClass('target')
-                    $target[action]()
-                    const isVisible = $target[0].style.display != 'none'
-                    const hasBackdrop = $target.hasAttr('menu') || $target.hasAttr('modal') || $target.hasClass('modal')
-                    if (isVisible) {
-                        $target.focus()
-                        if (hasBackdrop) backdrop.addClass('backdrop')
-                    }
-                    else $target.blur()
-                })
-            })
-        }
-
-
-        // init pages
-        let page
-        let $page
-        for (let name in self.pages) {
-            page = self.pages[name]
-            if ( !is.object(page) ) return error('pages.%s must be an object!', name)
-            $page = container.find('[page='+ name +']')
-            if ( !$page.length ) return error('No container found for page "%s". Please bind one via [page] attribute', name)
-            if (page.init) {
-                if ( !is.function(page.init) ) return error('pages.%s.init must be a function!', name)
-                else {
-                    log('Initializing page [%s]', name)
-                    self.active.page = $page // to allow app.get() etc in page.init
-                    page.init()
-                }
-            }
-        }
-        self.active.page = null // must clear it in case it was assigned
+        initPages()
 
 
         // resolve empty attributes
@@ -392,46 +261,36 @@ function rasti(name, container) {
         })
 
 
-        // bind nav handler to popstate event
-        window.onpopstate = e => {
-            var page = e.state || location.hash.substring(1)
-            page
-                ? e.state ? navTo(page, null, true) : navTo(page)
-                : navTo(self.options.root)
+        // fix checkboxes
+        container.on('click', '[type=checkbox]+label', e => {
+            // forward clicks to hidden input
+            $(e.currentTarget).prev().click()
+        })
+
+
+        // init internal history (if applicable)
+        if (self.options.history) {
+            __history = new History(self)
+            // bind nav handler to popstate event
+            window.onpopstate = e => {
+                var page = e.state || location.hash.substring(1)
+                page
+                    ? e.state ? navTo(page, null, true) : navTo(page)
+                    : navTo(self.options.root)
+            }
         }
 
 
-        // init history (if applicable)
-        if (self.options.history) initHistory()
+        initState()
 
 
-        // restore and save state
-        $(window).on('beforeunload', e => { self.state.save() })
-        const prev_state = self.state.restore()
-        // set theme (if not already set)
-        if ( !self.active.theme ) setTheme(self.options.theme)
-        // set lang (if applicable and not already set)
-        if ( self.options.lang && !self.active.lang ) setLang(self.options.lang)
-        // if no lang, generate texts
-        if ( !self.options.lang ) {
-            container.find('[text]').each( (i, el) => {
-                $(el).text( $(el).attr('text') )
-            })
-        }
-        if (prev_state) navTo(prev_state.page)
-        else {
-            // nav to page in hash or to root or to first page container
-            const page = location.hash.substring(1) || self.options.root
-            navTo(
-                page && self.pages[page]
-                ? page
-                : container.find('[page]').first().attr('page')
-            )
-        }
+        bindProps(container, self.props)
 
 
-        // init props
-        findProps(container, self.props)
+        initEvents()
+
+
+        initActions()
 
 
         // init field validations
@@ -456,8 +315,8 @@ function rasti(name, container) {
         }
 
 
-        // render automatic templates
-        container.find('[auto][template]').each( (i, el) => {
+        // render data templates
+        container.find('[data][template]').each( (i, el) => {
             render(el)
         })
 
@@ -470,72 +329,7 @@ function rasti(name, container) {
 
 
         // init crud templates
-        container.find('[crud][template]').each( (i, el) => {
-            const $el = $(el)
-            const template = resolveAttr($el, 'template')
-            const datakey = resolveAttr($el, 'data')
-            const crudkey = resolveAttr($el, 'crud')
-
-            render(el)
-
-            $el.on('click', '.rasti-crud-delete', e => {
-                const $controls = $(e.currentTarget).closest('[data-id]')
-                const id = $controls.attr('data-id')
-                try {
-                    __crud.delete({datakey, crudkey}, id)
-                        .then(
-                            ok => {
-                                $controls.parent().detach()
-                                log('Removed element [%s] from template [%s]', id, template)
-                            },
-                            err => {
-                                __crud.hideInputEl($el)
-                                $el.removeClass('active')
-                            }
-                        )
-                }
-                catch (err) {
-                    rasti.error(err)
-                }
-            })
-
-            $el.on('click', '.rasti-crud-update', e => {
-                // TODO: add update logic
-            })
-
-            $el.on('click', '.rasti-crud-create', e => {
-                __crud.showInputEl($el)
-                $el.addClass('active')
-            })
-
-            $el.on('click', '.rasti-crud-accept', e => {
-                // TODO: finish this
-                let newel
-                try {
-                    newel = __crud.genDataEl($el)
-                    __crud.create({datakey, crudkey}, newel)
-                        .then(
-                            ok => {
-                                __crud.persistNewEl($el)
-                                $el.removeClass('active')
-                            },
-                            err => {
-                                __crud.hideInputEl($el)
-                                $el.removeClass('active')
-                            }
-                        )
-                }
-                catch (err) {
-                    rasti.error(err)
-                }
-
-            })
-
-            $el.on('click', '.rasti-crud-cancel', e => {
-                __crud.hideInputEl($el)
-                $el.removeClass('active')
-            })
-        })
+        initCrud()
 
 
         // init movable elements
@@ -544,8 +338,8 @@ function rasti(name, container) {
         })
 
 
-        // init foldable elements (must have a header)
-        container.find('[foldable][header]').on('click', e => {
+        // init foldable elements
+        container.find('[foldable]').on('click', e => {
             e.target.classList.toggle('folded')
         })
 
@@ -553,114 +347,16 @@ function rasti(name, container) {
         container
             .on('click', '.backdrop', e => {
                 $(e.target).removeClass('backdrop')
-                container.find('[menu]').hide()
-                self.active.page.find('[modal]').hide()
+                container.find('[menu].open').hide()
+                container.find('[modal].open').hide()
+                if (self.sidemenu.visible) self.sidemenu.hide()
             })
             .removeClass('big loading backdrop')
 
         const initTime = Math.floor(window.performance.now() - initStart) / 1000
-        log('App [%s] initialized in %ss', self.name, initTime)
+        log('App [%s] initialized in %ss', __name, initTime)
 
-    }
-
-
-    function get(selector) {
-        var $els = self.active.page && self.active.page.find('['+ selector +']')
-        if (!$els || !$els.length) $els = container.find('['+ selector +']')
-        if (!$els.length) warn('No elements found for selector [%s]', selector)
-        return $els
-    }
-
-    function set(selector, value) {
-        var $els = get(selector)
-        $els.each( (i, el) => {
-            el.value = value
-            $(el).change()
-        })
-        return $els
-    }
-
-    function add(selector, ...values) {
-        var $els = get(selector)
-        $els.each( (i, el) => {
-            values.forEach( val => {
-                if (is.array(val)) el.value = el.value.concat(val)
-                else el.value.push(val)
-            })
-            $(el).change()
-        })
-        return $els
-    }
-
-
-    function findProps($container, state) {
-        $container.children().each( (i, el) => {
-            const $el = $(el)
-            const prop = $el.attr('prop')
-
-            if (prop && !$el.hasAttr('template')) {
-                if ( $el.hasAttr('transient') ) prop.__trans = true
-                
-                if ( exists(el.value) ) {
-                    // it's an element, so bind it
-                    bindElement($el, prop, state)
-                }
-                else {
-                    // it's a container prop
-                    const defobjval = {}
-                    if (prop.__trans) defobjval.__trans = true
-                    // go down one level in the state tree
-                    state[prop] = state[prop] || defobjval
-                    const newroot = state[prop]
-                    // and keep looking
-                    findProps($el, newroot)
-                }
-            }
-            // else keep looking
-            else if (el.children.length) findProps($el, state)
-        })
-    }
-
-
-    function bindElement($el, prop, state){
-        if ( state[prop] ) {
-            // restored state present, restore transient flag
-            if (prop.__trans) state[prop].__trans = true
-            // then update dom with it
-            updateElement($el, state[prop])
-        }
-        else {
-            // create empty state
-            const defstrval = ''
-            defstrval.__trans = prop.__trans
-            state[prop] = defstrval
-        }
-
-        // update state on dom change
-        $el.on('change', (e, params) => {
-            // unless triggered from setter
-            if (!params || !params.setter)
-                state[prop] = $el.val()
-        })
-
-        // update dom on state change
-        Object.defineProperty(state, prop, {
-            get : function() { return __state[prop] },
-            set : function(value) {
-                __state[prop] = value
-                if (prop.__trans) __state[prop].__trans = true
-                updateElement($el, value, true)
-            }
-        })
-
-    }
-
-    function updateElement($el, value, setter) {
-        $el.hasAttr('template')
-            ? render($el, value)
-            : $el[0].nodeName == 'TEXTAREA'
-                ? $el.text( value ).trigger('change', {setter})
-                : $el.val( value ).trigger('change', {setter})
+        return self
     }
 
 
@@ -713,46 +409,50 @@ function rasti(name, container) {
 
         if (skipPushState) return
 
-        if (self.options.history) {
+        if (self.options.history)
             __history.push(pagename)
-        }
-        else if (page && page.url) {
-            !is.string(page.url)
-                ? warn('Page [%s] {url} property must be a string!', pagename)
-                : window.history.pushState(pagename, null, '#'+page.url)
-        }
-        else {
-            window.history.pushState(pagename, null)
-        }
+        
+        let hash
+        if (page && page.url)
+            is.string(page.url)
+                ? hash = '#' + page.url
+                : warn('Page [%s] {url} property must be a string!', pagename)
+        
+        window.history.pushState(pagename, null, hash)
+
+        return self
     }
 
 
     function render(el, data, time) {
         let $el, name
+        let errPrefix = 'Cannot render template'
         if ( is.string(el) ) {
             name = el
+            errPrefix += ' ['+ name +']: '
             $el = container.find('[template='+ name +']')
+            if (!$el.length) return error(errPrefix + 'no element bound to template. Please bind one via [template] attribute.')
         }
         else {
             $el = el.nodeName ? $(el) : el
             name = $el.attr('template')
             if (!name) {
-                // generate one from bound prop and assign it
-                name = $el.attr('prop') + '-' + Date.now()
-                $el.attr('template', name)
+                name = $el.attr('data') || $el.attr('prop')
+                if (name) name += '-' 
+                // assign hashed name
+                $el.attr('template', name + Date.now())
             }
         }
-        const errPrefix = 'Cannot render template ['+ name +']: '
-        if (!$el.length) return error(errPrefix + 'no element bound to template. Please bind one via [template] attribute.')
-
+        
         if (!data) {
-            const datakey = resolveAttr($el, 'data')
-            if (!datakey) return error(errPrefix + 'no data found for template. Please provide in ajax response or via [data] attribute in element:', el)
-            data = self.data[datakey]
-            if (!data) return error(errPrefix + 'undefined data source "%s" resolved for element:', datakey, el)
+            const datakey = $el.attr('data')
+            if (datakey) {
+                data = self.data[datakey]
+                if (!data) return error(errPrefix + 'undefined data source "%s" resolved for element:', datakey, el)
+                if ( is.string(data) ) data = data.split( $el.attr('separator') || self.options.separator )
+                if ( !is.array(data) ) data = [data]
+            }
         }
-        if ( is.string(data) ) data = data.split(', ')
-        if ( !is.array(data) ) return error(errPrefix + 'invalid data provided, must be a string or an array')
 
         let template = self.templates[name]
         let html
@@ -768,7 +468,7 @@ function rasti(name, container) {
         }
         if ( !is.function(template) ) return error(errPrefix + 'template must be a string or a function')
 
-        if (!data.length) return $el.html(`<div class="nodata">${ self.options.noData }</div>`).addClass('rendered')
+        if ( data && !data.length ) return $el.html(`<div class="nodata">${ self.options.noData }</div>`).addClass('rendered')
 
         const isCrud = $el.hasAttr('crud')
         if (isCrud) {
@@ -787,11 +487,12 @@ function rasti(name, container) {
         const isPaged = $el.hasAttr('paged')
         isPaged
             ? initPager($el, template, data, getActiveLang())
-            : $el.html( template(data).join('') )
+            : $el.html( template(data) )
 
         if ( $el.hasAttr('stats') ) {
-            const stats = $('<div section class="stats">')
-            stats.html( self.options.stats.replace('%n', data.length).replace('%t', time) )
+            const stats = '<div section class="stats">'
+                + self.options.stats.replace('%n', data.length).replace('%t', time)
+                + '</div>'
             $el.prepend(stats)
         }
 
@@ -809,40 +510,52 @@ function rasti(name, container) {
         $el.addClass('rendered')
         if (!isPaged) applyFX($el)
 
+        return self
     }
 
 
-    function genTemplate(html) {
-        return data => evalTemplate(html, data, self.props, self.methods, getActiveLang())
-    }
+    function setLang(langName) {
+        var lang = self.langs[ langName ],
+            errPrefix = 'Cannot set lang [%s]: '
 
-    function evalTemplate(string, dataArray, props, methods, lang) {
-        return dataArray.map(data => eval('html`'+string+'`'))
-    }
+        if (!lang) return error(errPrefix + 'lang not found', langName)
+        if ( !is.object(lang) ) return error(errPrefix + 'lang must be an object!', langName)
 
-    function wrap(template, wrapper) {
-        return (data, props, methods, lang) => template(data, props, methods, lang).map(html => wrapper.replace('{{content}}', html))
-    }
+        log('Setting lang [%s]', langName)
+        self.active.lang = langName
 
-    function append(html, appendix) {
-        return html.substring(0, html.length-6).concat(appendix + '</div>')
-    }
+        var $elems = $(), $el, keys, string
 
-    function applyFX($el, selector) {
-        const el = $el[0]
-        const fxkey = $el.attr('fx')
-        if (!fxkey) return
-        const fx = rasti.fx[fxkey]
-        if (!fx) return warn('Undefined fx "%s" declared in [fx] attribute of element', fxkey, el)
-        if ( !is.function(fx) ) return error('fx.%s must be a function!', fxkey)
-        if ( selector && !is.string(selector) ) return error('Cannot apply fx, invalid selector provided for el', el)
-        const $target = selector ? $el.find(selector) : $el
-        if (!$target.length) return warn('Cannot apply fx, cannot find target "%s" in el', target, el)
-        fx($target)
-    }
+        TEXT_ATTRS.forEach( attr => {
+            $elems = $elems.add('['+attr+']')
+        })
 
-    function getActiveLang() {
-        return self.langs && self.langs[self.active.lang]
+        $elems.each( (i, el) => {
+            if (el.hasAttribute('fixed')) el = el.children[0]
+            $el = $(el)
+            keys = el.langkeys
+
+            if (!keys) {
+                keys = {}
+                TEXT_ATTRS.forEach( attr => {
+                    if ($el.attr(attr)) keys[attr] = $el.attr(attr)
+                })
+                el.langkeys = keys
+            }
+
+            for (let attr in keys) {
+                string = getString(langName, keys[attr])
+                attr === 'text'
+                    ? $el.text(string || keys[attr])
+                    : string ? $el.attr(attr, string) : null
+            }
+        })
+
+        Object.keys(self.defaults).forEach( key => {
+            self.options[key] = lang['rasti_'+key] || self.defaults[key]
+        })
+
+        return self
     }
 
 
@@ -867,7 +580,7 @@ function rasti(name, container) {
         self.active.theme = themeName
 
         // clone themeMap
-        themeMap = Object.assign({}, themeMap)
+        themeMap = {...themeMap}
 
         var values = { font : theme.font || baseTheme.font, },
             colorNames, colors, c1, c2, defaultColorName
@@ -912,49 +625,8 @@ function rasti(name, container) {
             if (!color) warn('Color [%s] not found in theme palette, using it as is', colorName, el)
             el.style['background-color'] = color || colorName
         })
-    }
 
-
-    function setLang(langName) {
-        var lang = self.langs[ langName ],
-            errPrefix = 'Cannot set lang [%s]: '
-
-        if (!lang) return error(errPrefix + 'lang not found', langName)
-        if ( !is.object(lang) ) return error(errPrefix + 'lang must be an object!', langName)
-
-        log('Setting lang [%s]', langName)
-        self.active.lang = langName
-
-        var $elems = $(), $el, keys, string
-
-        TEXT_ATTRS.forEach( attr => {
-            $elems = $elems.add('['+attr+']')
-        })
-
-        $elems.each( (i, el) => {
-            if (el.hasAttribute('fixed')) el = el.children[0]
-            $el = $(el)
-            keys = el.langkeys
-
-            if (!keys) {
-                keys = {}
-                TEXT_ATTRS.forEach( attr => {
-                    if ($el.attr(attr)) keys[attr] = $el.attr(attr)
-                })
-                el.langkeys = keys
-            }
-
-            for (let attr in keys) {
-                string = getString(langName, keys[attr])
-                attr === 'text'
-                    ? $el.text(string || keys[attr])
-                    : string ? $el.attr(attr, string) : null
-            }
-        })
-
-        Object.keys(self.defaults).forEach( key => {
-            self.options[key] = lang['rasti_'+key] || self.defaults[key]
-        })
+        return self
     }
 
 
@@ -1008,7 +680,7 @@ function rasti(name, container) {
             */
         }
 
-
+        return self
     }
 
 
@@ -1023,17 +695,373 @@ function rasti(name, container) {
                 document[ p + 'CancelFullScreen' ]();
             }
         })
+        return self
     }
 
 
     // internal utils
 
+    function genTemplate(tmp_string) {
+        return tmp_data => evalTemplate(
+            tmp_string,
+            tmp_data,
+            self.data,
+            self.props,
+            self.methods,
+            getActiveLang(),
+        )
+    }
 
-    function createTabs($el) {
-        var el = $el[0],
-            $tabs = el.hasAttribute('page')
+    function evalTemplate(tmp_string, tmp_data, data, props, methods, lang) {
+        try {
+            return tmp_data
+                ? tmp_data.map(el => eval('html`'+tmp_string+'`'))
+                : eval('html`'+tmp_string+'`')
+        } catch (err) {
+            error('Error evaluating template string\n%s:', tmp_string, err.message)
+        }
+    }
+
+    function append(html, appendix) {
+        return html.substring(0, html.length-6).concat(appendix + '</div>')
+    }
+
+    function applyFX($el, selector) {
+        const el = $el[0]
+        const fxkey = $el.attr('fx')
+        if (!fxkey) return
+        const fx = rasti.fx[fxkey]
+        if (!fx) return warn('Undefined fx "%s" declared in [fx] attribute of element', fxkey, el)
+        if ( !is.function(fx) ) return error('fx.%s must be a function!', fxkey)
+        if ( selector && !is.string(selector) ) return error('Cannot apply fx, invalid selector provided for el', el)
+        const $target = selector ? $el.find(selector) : $el
+        if (!$target.length) return warn('Cannot apply fx, cannot find target "%s" in el', target, el)
+        fx($target)
+    }
+
+    function getActiveLang() {
+        return self.langs && self.langs[self.active.lang]
+    }
+
+    
+    function bindProps($container, state) {
+        $container.children().each( (i, el) => {
+            const $el = $(el)
+            const prop = $el.attr('prop')
+
+            if (prop && !$el.hasAttr('template')) {
+                if ( $el.hasAttr('transient') ) prop.__trans = true
+                
+                if ( exists(el.value) ) {
+                    // it's an element, so bind it
+                    bindElement($el, prop, state)
+                }
+                else {
+                    // it's a container prop
+                    const defobjval = {}
+                    if (prop.__trans) defobjval.__trans = true
+                    // go down one level in the state tree
+                    state[prop] = state[prop] || defobjval
+                    const newroot = state[prop]
+                    // and keep looking
+                    bindProps($el, newroot)
+                }
+            }
+            // else keep looking
+            else if (el.children.length) bindProps($el, state)
+        })
+    }
+
+    function bindElement($el, prop, state){
+        if ( state[prop] ) {
+            // restored state present, restore transient flag
+            if (prop.__trans) state[prop].__trans = true
+            // then update dom with it
+            updateElement($el, state[prop])
+        }
+        else {
+            // create empty state
+            const defstrval = ''
+            defstrval.__trans = prop.__trans
+            state[prop] = defstrval
+        }
+
+        // update state on dom change
+        // (unless triggered from state _setter)
+        $el.on('change', (e, params) => {
+            if ( !(params && params._setter) ) state[prop] = $el.val()
+        })
+
+        // update dom on state change
+        Object.defineProperty(state, prop, {
+            get : function() { return __state[prop] },
+            set : function(value) {
+                __state[prop] = value
+                if (prop.__trans) __state[prop].__trans = true
+                updateElement($el, value, true)
+            }
+        })
+
+    }
+
+    function updateElement($el, value, _setter) {
+        $el.hasAttr('template')
+            ? render($el, value)
+            : $el[0].nodeName == 'TEXTAREA'
+                ? $el.text( value ).trigger('change', {_setter})
+                : $el.val( value ).trigger('change', {_setter})
+    }
+
+
+    function initPages() {
+        let page, $page
+        for (let name in self.pages) {
+            page = self.pages[name]
+            if ( !is.object(page) ) return error('pages.%s must be an object!', name)
+            $page = container.find('[page='+ name +']')
+            if ( !$page.length ) return error('No container found for page "%s". Please bind one via [page] attribute', name)
+            if (page.init) {
+                if ( !is.function(page.init) ) return error('pages.%s.init must be a function!', name)
+                else {
+                    log('Initializing page [%s]', name)
+                    self.active.page = $page // to allow app.get() etc in page.init
+                    page.init()
+                }
+            }
+        }
+        self.active.page = null // must clear it in case it was assigned
+    }
+
+
+    function initState() {
+        // persist state (if applicable)
+        let prev_state
+        if (self.options.persist) {
+            $(window).on('beforeunload', e => { self.state.save() })
+            prev_state = self.state.restore()
+        }
+        // set theme (if not already set)
+        if (!self.active.theme)
+            setTheme(self.options.theme)
+        // set lang (if applicable and not already set)
+        if (self.options.lang && !self.active.lang)
+            setLang(self.options.lang)
+        // if no lang, generate texts
+        if (!self.options.lang) {
+            container.find('[text]').each((i, el) => {
+                $(el).text($(el).attr('text'))
+            })
+        }
+        if (prev_state)
+            navTo(prev_state.page)
+        else {
+            // nav to page in hash or to root or to first page container
+            const page = location.hash.substring(1) || self.options.root
+            navTo(page && self.pages[page]
+                ? page
+                : container.find('[page]').first().attr('page'))
+        }
+    }
+
+
+    function initNav() {
+        container.on('click', '[nav]', e => {
+            const el = e.currentTarget
+            const $el = $(el)
+            const page = $el.attr('nav')
+            let params = {}
+            if (!page)
+                return error('Missing page name in [nav] attribute of element:', el)
+            if ($el.hasAttr('params')) {
+                const $page = self.active.page
+                let navparams = $el.attr('params')
+                let $paramEl
+                if (navparams) {
+                    // check to see if params is an object
+                    if (navparams[0] == '{') {
+                        try {
+                            params = JSON.parse(navparams)
+                        }
+                        catch (err) {
+                            error('Invalid JSON in [params] attribute of element:', el)
+                            error('Tip: be sure to use double quotes ("") for both keys and values')
+                            return
+                        }
+                    }
+                    else {
+                        // get values of specified navparams
+                        navparams = params.split(' ')
+                        navparams.forEach(key => {
+                            $paramEl = $page.find('[navparam=' + key + ']')
+                            if ($paramEl.length)
+                                params[key] = $paramEl.val()
+                            else
+                                warn('Could not find navparam element [%s]', key)
+                        })
+                    }
+                }
+                else {
+                    // get values of all navparams in page
+                    $page.find('[navparam]').each((i, el) => {
+                        const $el = $(el)
+                        const key = resolveAttr($el, 'navparam')
+                        if (key)
+                            params[key] = $el.val()
+                    })
+                }
+            }
+            navTo(page, params)
+        })
+    }
+
+
+    function initSubmit() {
+        container.on('click', '[submit]', e => {
+            const $el = $(e.target)
+            const method = $el.attr('submit')
+            const callback = $el.attr('then')
+            const template = $el.attr('render')
+            const isValidCB = callback && is.function(self.methods[callback])
+            const start = window.performance.now()
+            if (!method)
+                return error('Missing method in [submit] attribute of el:', this)
+            if (callback && !isValidCB)
+                error('Undefined method [%s] declared in [then] attribute of el:', callback, this)
+            $el.addClass('loading').attr('disabled', true)
+            submitAjax(method, resdata => {
+                const time = Math.floor(window.performance.now() - start) / 1000
+                log('Ajax method [%s] took %s seconds', method, time)
+                if (isValidCB)
+                    self.methods[callback](resdata)
+                if (template)
+                    render(template, resdata, time)
+                $el.removeClass('loading').removeAttr('disabled')
+            })
+        })
+    }
+
+
+    function initEvents() {
+        for (let action of EVENT_ATTRS) {
+            container.find('[on-'+ action +']').each( (i, el) => {
+                const $el = $(el)
+                const methodName = $el.attr('on-' + action)
+                if ( !methodName ) return error('Missing method in [on-%s] attribute of element:', action, el)
+                const method = self.methods[methodName]
+                if ( !method ) return error('Undefined method "%s" declared in [on-%s] attribute of element:', methodName, action, el)
+                const $template = $el.closest('[template]')
+                $template.length && !$el.hasAttr('template')
+                    ? $template.on(action, `[on-${action}=${methodName}]`, method)
+                    : $el.on(action, method)
+                if (action == 'click') $el.addClass('clickable')
+            })
+        }
+    }
+
+
+    function initActions() {
+        for (let action of ACTION_ATTRS) {
+            container.find('['+ action +']').each( (i, el) => {
+                const $el = $(el)
+                const $page = $el.closest('[page]')
+                const targetSelector = $el.attr(action)
+
+                if ( !targetSelector ) return error('Missing target selector in [%s] attribute of element:', action, el)
+                let $target = $page.find('['+targetSelector+']')
+                if ( !$target.length ) $target = container.find('['+targetSelector+']')
+                if ( !$target.length ) return error('Could not find target [%s] declared in [%s] attribute of element:', targetSelector, action, el)
+
+                const target = $target[0]
+
+                $el.on('click', e => {
+                    e.stopPropagation()
+                    $target.addClass('target')
+                    container.find('[menu]:not(.target)').hide()
+                    $target.removeClass('target')
+                    is.function(target[action]) ? target[action]() : $target[action]()
+                    const isVisible = target.style.display != 'none'
+                    const hasBackdrop = $target.hasAttr('menu') || $target.hasAttr('modal') || $target.hasClass('modal')
+                    if (isVisible) {
+                        $target.focus()
+                        if (hasBackdrop) backdrop.addClass('backdrop')
+                    }
+                    else $target.blur()
+                })
+            })
+        }
+    }
+
+
+    function initModals(backdrop) {
+        container.find('[modal]').each((i, el) => {
+            // add close btn
+            $('<div icon=close class="top right" />')
+                .on('click', e => {
+                    el.style.display = 'none'
+                    backdrop.removeClass('backdrop')
+                })
+                .appendTo(el)
+        })
+    }
+
+
+    function initSideMenu(backdrop) {
+        self.sidemenu = (function (el) {
+            const nil = ()=>{}
+
+            if (!el) return {
+                show: nil,
+                hide: nil,
+                toggle: nil,
+                enable: nil,
+                disable: nil,
+            }
+
+            el.enabled = false
+            el.visible = false
+
+            el.show = () => {
+                el.classList.add('open')
+                backdrop.addClass('backdrop')
+                el.visible = true
+            }
+            el.hide = () => {
+                el.className = el.className.replace('open', 'close')
+                backdrop.removeClass('backdrop')
+                el.visible = false
+                setTimeout( () => {
+                    el.classList.remove('close')
+                }, 500)
+            }
+            el.toggle = () => {
+                el.visible ? el.hide() : el.show()
+            }
+
+            el.enable = () => {
+                el.enabled = true
+                el.classList.add('enabled')
+            }
+            el.disable = () => {
+                el.enabled = false
+                el.classList.remove('enabled')
+            }
+            el.switch = () => {
+                el.enabled ? el.disable() : el.enable()
+            }
+
+            return el
+
+        })( container.find('[sidemenu]')[0] )
+
+        if (media.phone) self.sidemenu.enable()
+        media.on.phone(() => { self.sidemenu.switch() })
+    }
+
+    function createTabs(el) {
+        var $el = $(el),
+            $tabs = $el.hasAttr('page')
                 ? $el.children('[panel]:not([modal])')
-                : el.hasAttribute('panel')
+                : $el.hasAttr('panel')
                     ? $el.children('[section]:not([modal])')
                     : undefined
         if (!$tabs) return error('Cannot create tabs: container must be a [page] or a [panel]', el)
@@ -1108,8 +1136,60 @@ function rasti(name, container) {
     }
 
 
-    function initHistory() {
-        __history = new History(self)
+    function initCrud() {
+        container.find('[crud][template]').each((i, el) => {
+            const $el = $(el)
+            const template = resolveAttr($el, 'template')
+            const datakey = resolveAttr($el, 'data')
+            const crudkey = resolveAttr($el, 'crud')
+            render(el)
+            $el.on('click', '.rasti-crud-delete', e => {
+                const $controls = $(e.currentTarget).closest('[data-id]')
+                const id = $controls.attr('data-id')
+                try {
+                    __crud.delete({ datakey, crudkey }, id)
+                        .then(ok => {
+                            $controls.parent().detach()
+                            log('Removed element [%s] from template [%s]', id, template)
+                        }, err => {
+                            __crud.hideInputEl($el)
+                            $el.removeClass('active')
+                        })
+                }
+                catch (err) {
+                    rasti.error(err)
+                }
+            })
+            $el.on('click', '.rasti-crud-update', e => {
+                // TODO: add update logic
+            })
+            $el.on('click', '.rasti-crud-create', e => {
+                __crud.showInputEl($el)
+                $el.addClass('active')
+            })
+            $el.on('click', '.rasti-crud-accept', e => {
+                // TODO: finish this
+                let newel
+                try {
+                    newel = __crud.genDataEl($el)
+                    __crud.create({ datakey, crudkey }, newel)
+                        .then(ok => {
+                            __crud.persistNewEl($el)
+                            $el.removeClass('active')
+                        }, err => {
+                            __crud.hideInputEl($el)
+                            $el.removeClass('active')
+                        })
+                }
+                catch (err) {
+                    rasti.error(err)
+                }
+            })
+            $el.on('click', '.rasti-crud-cancel', e => {
+                __crud.hideInputEl($el)
+                $el.removeClass('active')
+            })
+        })
     }
 
 
@@ -1119,7 +1199,7 @@ function rasti(name, container) {
         let paging, sizes, columns, size=0, col=1
 
         if (pager.total > 1) {
-            paging = `<div class="paging inline inline_">
+            paging = `<div class="paging fcenter small_ inline_">
                 <button icon=left3 />
                 <span class=page />
                 <button icon=right3 />
@@ -1133,7 +1213,7 @@ function rasti(name, container) {
 
         $el.html(`
             <div class="results scrolly rigid"></div>
-            <div class="controls centerx bottom inline_">
+            <div class="controls fcenter small_ inline_">
                 ${ columns || '' }
                 ${ paging || '' }
                 ${ sizes || '' }
@@ -1213,7 +1293,7 @@ function rasti(name, container) {
 
 
     function getThemeStyle(values) {
-        var ns = `[rasti=${ self.name }]`
+        var ns = `[rasti=${ __name }]`
         return `
             ${ns} {
                 font: ${ values.font };
@@ -1232,23 +1312,37 @@ function rasti(name, container) {
             ${ns} .tab-labels        { background-color: ${ values.panel[0] }; }
             ${ns} .tab-labels > .bar { background-color: ${ values.btn[0] }; }
 
-            ${ns} input:not([type=radio]):not([type=checkbox]),
+            ${ns} input:not([type]),
+            ${ns} input[type=text],
+            ${ns} input[type=password],
+            ${ns} input[type=email],
+            ${ns} input[type=tel],
             ${ns} select,
             ${ns} textarea,
             ${ns} .field {
                 background-color: ${ values.field[0] };
                 color: ${ values.field[1] };
             }
+            ${ns} input[type=radio] + label:before,
+            ${ns} input[type=checkbox] + label:before {
+                border: 1px solid ${ values.field[1] };
+            }
+            ${ns} input[type=radio]:checked + label:before {
+                background-color: ${ values.btn[0] };
+            }
 
             ${ns} button,
-            ${ns} [block=buttons] > div,
+            ${ns} [block=buttons] > div.active,
             ${ns} nav > div.active,
             ${ns} nav > a.active,
             ${ns} .list > div.active {
                 background-color: ${ values.btn[0] };
                 color: ${ values.btn[1] };
             }
-
+            ${ns} [block=buttons] > div {
+                border: 1px solid ${ values.field[1] };
+            }
+            
             ${ns} [header]:before { color: ${ values.header[0] }; }
             ${ns} [label]:not([header]):before  { color: ${ values.label[0] }; }
         `
@@ -1280,12 +1374,42 @@ function rasti(name, container) {
     }
 
 
+    function get(selector) {
+        var $els = self.active.page && self.active.page.find('['+ selector +']')
+        if (!$els || !$els.length) $els = container.find('['+ selector +']')
+        if (!$els.length) warn('No elements found for selector [%s]', selector)
+        return $els
+    }
+
+    function set(selector, value) {
+        var $els = get(selector)
+        $els.each( (i, el) => {
+            el.value = value
+            $(el).change()
+        })
+        return $els
+    }
+
+    function add(selector, ...values) {
+        var $els = get(selector)
+        $els.each( (i, el) => {
+            values.forEach( val => {
+                if (is.array(val)) el.value = el.value.concat(val)
+                else el.value.push(val)
+            })
+            $(el).change()
+        })
+        return $els
+    }
+
+
     return this
 
 }
 
 
 // static properties and methods
+
 rasti.log = log
 rasti.warn = warn
 rasti.error = error
@@ -1299,10 +1423,12 @@ module.exports = Object.freeze(rasti)
 
 
 
-// bootstrap any apps declared via rasti attribute
+/*
+ * bootstraps any apps declared via [rasti] attribute
+ */
 function bootstrap() {
     var appContainers = $(document).find('[rasti]'),
-        appName, app, extendProps
+        appName, app
 
     if (appContainers.length) appContainers.forEach( container => {
         appName = container.getAttribute('rasti')
@@ -1336,7 +1462,7 @@ function genBlockStyles() {
         if (style) styles.push(style)
     }
     styles.push('</style>')
-    $('head').prepend(styles.join(''))
+    return styles.join('')
 }
 
 
@@ -1350,15 +1476,40 @@ function genIconStyles() {
             styles.push(style)
         }
     }
+    styles = styles.concat( genIconFixesStyles() )
     styles.push('</style>')
-    $('head').prepend(styles.join(''))
+    return styles.join('')
 }
 
 
-$('head').prepend(`<style>rasti.css</style>`)
+function genIconFixesStyles() {
+    const fixes = [
+        [`=error =sync =reload =remove =restore =stereo =img-file
+            =latin2 =celtic =ankh =comunism =health ^=hg-`,
+            { base: '2', small: '1.5', big: '3', huge: '4.4' } ],
+        [`=close =network =pommee =diamonds`,
+            { base: '2.5', small: '1.8', big: '3.3', huge: '4.9' } ],
+    ]
+    
+    const result = []
+    let temp, mod
+    fixes.forEach(([selectors, sizes]) => {
+        Object.entries(sizes).forEach(([modifier, size]) => {
+            mod = modifier == 'base' ? null : modifier
+            temp = selectors.split(/[\s\n]+/)
+                .map(sel =>
+                    mod ? `.${mod}[icon${sel}]:before,
+                        .${mod}_>[icon${sel}]:before`
+                    : `[icon${sel}]:before`
+                ).join(',')
+            temp += `{ font-size: ${size}rem; }`
+            result.push(temp)
+        })
+    })
+    return result
+}
 
-genBlockStyles()
 
-genIconStyles()
+$('head').prepend( genBlockStyles() + `<style>rasti.css</style>` + genIconStyles() )
 
 bootstrap()

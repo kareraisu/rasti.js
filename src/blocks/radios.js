@@ -6,7 +6,7 @@ template : function(data, $el) {
     var uid = utils.random()
     return data
         .map( d => utils.checkData(d) )
-        .map( d => `<input type="radio" name="${uid}" value="${d.value}"/><label>${d.label}</label>` )
+        .map( d => `<div><input type="radio" name="${uid}" value="${d.value}"/><label>${d.label}</label></div>` )
         .join('')
 },
 

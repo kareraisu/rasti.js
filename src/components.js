@@ -98,9 +98,9 @@ class Pager {
 }
 
 
-function state(app) {
+function state(app, app_id) {
     function invalid() {
-        rasti.error('Saved state for app [%s] is invalid', app.name)
+        rasti.error('Saved state for app [%s] is invalid', app_id)
     }
 
     return Object.defineProperties({}, {
@@ -109,14 +109,14 @@ function state(app) {
         lang  : { get : _ => app.active.lang, enumerable : true },
         save : { value : _ => {
             app.state.props = Object.filter(app.props, ([k, v]) => !(v && v.__trans))
-            localStorage.setItem('rasti.' + app.name, JSON.stringify(app.state))
+            localStorage.setItem('rasti.' + app_id, JSON.stringify(app.state))
             rasti.log('State saved')
         } },
         get : { value : _ => {
             let state
             try {
-                state = JSON.parse( localStorage.getItem('rasti.' + app.name) )
-                if ( !state ) rasti.log('No saved state found for app [%s]', app.name)
+                state = JSON.parse( localStorage.getItem('rasti.' + app_id) )
+                if ( !state ) rasti.log('No saved state found for app [%s]', app_id)
                 else if ( !is.object(state) ) invalid()
                 else return state
             }
@@ -136,7 +136,7 @@ function state(app) {
             return state
         } },
         clear : { value : _ => {
-            window.localStorage.removeItem('rasti.' + app.name)
+            window.localStorage.removeItem('rasti.' + app_id)
         } },
     })
 }
