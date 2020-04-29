@@ -97,7 +97,7 @@ function rasti(name, container) {
 
     // public methods
 
-    this.extend = extend
+    this.config = config
     this.init = init
     this.navTo = navTo
     this.render = render
@@ -107,8 +107,8 @@ function rasti(name, container) {
     this.toggleFullScreen = toggleFullScreen
 
 
-    function extend(props) {
-        if (!props || !is.object(props)) return error('Cannot extend app: no properties found')
+    function config(props) {
+        if (!props || !is.object(props)) return error('Cannot configure app [%s]: no properties found', __name)
         for (let key in self) {
             if ( is.object(self[key]) && is.object(props[key]) && key !== 'methods' )
                 Object.assign(self[key], props[key])
@@ -118,7 +118,7 @@ function rasti(name, container) {
             const method = props[key][name]
             if ( is.function(method) )
                 self[key][name] = method.bind(self)
-            else warn('cannot extend method [%s], must be a function', name)
+            else warn('Invalid method [%s], must be a function', name)
         }
         return self
     }
@@ -162,7 +162,6 @@ function rasti(name, container) {
 
         // append backdrop container
         container.append('<div class=rs-backdrop>')
-        const backdrop = container.find('.rs-backdrop')
 
         // append page-options containers
         container.find('[page]').each( (i, el) => {
@@ -182,10 +181,10 @@ function rasti(name, container) {
         })
 
 
-        initSideMenu(backdrop)
+        initSideMenu()
 
 
-        initModals(backdrop)
+        initModals()
         
         
         // init tabs
@@ -261,13 +260,6 @@ function rasti(name, container) {
         })
 
 
-        // fix checkboxes
-        container.on('click', '[type=checkbox]+label', e => {
-            // forward clicks to hidden input
-            $(e.currentTarget).prev().click()
-        })
-
-
         // init internal history (if applicable)
         if (self.options.history) {
             __history = new History(self)
@@ -280,13 +272,13 @@ function rasti(name, container) {
             }
         }
 
-
-        initState()
-
-
+        
         bindProps(container, self.props)
 
+        
+        initState()
 
+        
         initEvents()
 
 
@@ -324,7 +316,8 @@ function rasti(name, container) {
         // init prop-bound templates
         container.find('[prop][template]').each( (i, el) => {
             const $el = $(el)
-            bindElement($el, $el.attr('prop'), self.props)
+            const prop = $el.attr('prop')
+            bindElement($el, {prop}, self.props)
         })
 
 
@@ -338,18 +331,35 @@ function rasti(name, container) {
         })
 
 
-        // init foldable elements
-        container.find('[foldable]').on('click', e => {
-            e.target.classList.toggle('folded')
+        // cache height of foldable elements
+        container.find('[foldable]').add('[menu]').each( (i, el) => {
+            el.orig_h = el.clientHeight + 'px'
         })
 
 
         container
+            .on('click', '[type=checkbox]+label', e => {
+                // forward clicks to hidden input
+                $(e.currentTarget).prev().click()
+            })
+            .on('click', '[foldable]', e => {
+                const el = e.target
+                if (!el.hasAttribute('foldable')) return
+                const isOpen = el.clientHeight > 30
+                document.body.style.setProperty("--elem-h", el.orig_h)
+                if (isOpen) {
+                    el.classList.remove('open')
+                    el.classList.add('folded')
+                }
+                else {
+                    el.classList.remove('folded')
+                    el.classList.add('open')
+                }
+            })
             .on('click', '.backdrop', e => {
-                $(e.target).removeClass('backdrop')
                 container.find('[menu].open').hide()
                 container.find('[modal].open').hide()
-                if (self.sidemenu.visible) self.sidemenu.hide()
+                if (self.sidemenu && self.sidemenu.visible) self.sidemenu.hide()
             })
             .removeClass('big loading backdrop')
 
@@ -360,7 +370,7 @@ function rasti(name, container) {
     }
 
 
-    function navTo(pagename, params, skipPushState) {
+    function navTo(pagename, params = {}, skipPushState) {
 
         if (!pagename) return error('Cannot navigate, page undefined')
 
@@ -437,10 +447,9 @@ function rasti(name, container) {
             $el = el.nodeName ? $(el) : el
             name = $el.attr('template')
             if (!name) {
-                name = $el.attr('data') || $el.attr('prop')
-                if (name) name += '-' 
                 // assign hashed name
-                $el.attr('template', name + Date.now())
+                name = ($el.attr('data') || $el.attr('prop')) + '-' + Date.now()
+                $el.attr('template', name)
             }
         }
         
@@ -449,10 +458,10 @@ function rasti(name, container) {
             if (datakey) {
                 data = self.data[datakey]
                 if (!data) return error(errPrefix + 'undefined data source "%s" resolved for element:', datakey, el)
-                if ( is.string(data) ) data = data.split( $el.attr('separator') || self.options.separator )
-                if ( !is.array(data) ) data = [data]
             }
         }
+        if ( is.string(data) ) data = data.split( $el.attr('separator') || self.options.separator )
+        if ( !is.array(data) ) data = [data]
 
         let template = self.templates[name]
         let html
@@ -487,7 +496,7 @@ function rasti(name, container) {
         const isPaged = $el.hasAttr('paged')
         isPaged
             ? initPager($el, template, data, getActiveLang())
-            : $el.html( template(data) )
+            : $el.html( template(data) )[0].scrollTo(0,0)
 
         if ( $el.hasAttr('stats') ) {
             const stats = '<div section class="stats">'
@@ -748,18 +757,19 @@ function rasti(name, container) {
         $container.children().each( (i, el) => {
             const $el = $(el)
             const prop = $el.attr('prop')
+            let trans
 
             if (prop && !$el.hasAttr('template')) {
-                if ( $el.hasAttr('transient') ) prop.__trans = true
+                if ( $el.hasAttr('transient') ) trans = true
                 
                 if ( exists(el.value) ) {
                     // it's an element, so bind it
-                    bindElement($el, prop, state)
+                    bindElement($el, {prop, trans}, state)
                 }
                 else {
                     // it's a container prop
                     const defobjval = {}
-                    if (prop.__trans) defobjval.__trans = true
+                    if (trans) defobjval.__trans = true
                     // go down one level in the state tree
                     state[prop] = state[prop] || defobjval
                     const newroot = state[prop]
@@ -772,32 +782,35 @@ function rasti(name, container) {
         })
     }
 
-    function bindElement($el, prop, state){
+    function bindElement($el, {prop, trans}, state){
         if ( state[prop] ) {
-            // restored state present, restore transient flag
-            if (prop.__trans) state[prop].__trans = true
             // then update dom with it
             updateElement($el, state[prop])
         }
         else {
             // create empty state
-            const defstrval = ''
-            defstrval.__trans = prop.__trans
+            const defstrval = new String('')
+            if (trans) defstrval.__trans = true
             state[prop] = defstrval
         }
 
         // update state on dom change
         // (unless triggered from state _setter)
         $el.on('change', (e, params) => {
-            if ( !(params && params._setter) ) state[prop] = $el.val()
+            if ( !(params && params._setter) )
+                state[prop] = $el.is('[type=checkbox]') ? $el[0].checked : $el.val()
         })
 
         // update dom on state change
         Object.defineProperty(state, prop, {
             get : function() { return __state[prop] },
             set : function(value) {
-                __state[prop] = value
-                if (prop.__trans) __state[prop].__trans = true
+                if (trans) {
+                    const val = is.string(value) ? new String(value) : value
+                    val.__trans = true
+                    __state[prop] = val
+                }
+                else __state[prop] = value
                 updateElement($el, value, true)
             }
         })
@@ -805,11 +818,17 @@ function rasti(name, container) {
     }
 
     function updateElement($el, value, _setter) {
-        $el.hasAttr('template')
-            ? render($el, value)
-            : $el[0].nodeName == 'TEXTAREA'
-                ? $el.text( value ).trigger('change', {_setter})
-                : $el.val( value ).trigger('change', {_setter})
+        if ( $el.is('[template]') )
+            render($el, value)
+        else {
+            $el.is('textarea')
+                ? $el.text( value )
+            : $el.is('[type=checkbox]')
+                ? $el[0].checked = !!value
+            : $el.val( value )
+
+            $el.trigger('change', {_setter})
+        }
     }
 
 
@@ -980,70 +999,55 @@ function rasti(name, container) {
                     $target.removeClass('target')
                     is.function(target[action]) ? target[action]() : $target[action]()
                     const isVisible = target.style.display != 'none'
-                    const hasBackdrop = $target.hasAttr('menu') || $target.hasAttr('modal') || $target.hasClass('modal')
-                    if (isVisible) {
-                        $target.focus()
-                        if (hasBackdrop) backdrop.addClass('backdrop')
-                    }
-                    else $target.blur()
+                    isVisible ? $target.focus() : $target.blur()
                 })
             })
         }
     }
 
-
-    function initModals(backdrop) {
+   
+    function initModals() {
         container.find('[modal]').each((i, el) => {
             // add close btn
-            $('<div icon=close class="top right" />')
+            $('<div icon=close class="top right clickable" />')
                 .on('click', e => {
-                    el.style.display = 'none'
-                    backdrop.removeClass('backdrop')
+                    $(el).hide()
                 })
                 .appendTo(el)
         })
     }
 
 
-    function initSideMenu(backdrop) {
+    function initSideMenu() {
         self.sidemenu = (function (el) {
-            const nil = ()=>{}
-
-            if (!el) return {
-                show: nil,
-                hide: nil,
-                toggle: nil,
-                enable: nil,
-                disable: nil,
-            }
+            
+            if (!el) return
 
             el.enabled = false
             el.visible = false
 
             el.show = () => {
-                el.classList.add('open')
-                backdrop.addClass('backdrop')
+                if (!el.enabled) return
+                $(el).show()
                 el.visible = true
             }
             el.hide = () => {
-                el.className = el.className.replace('open', 'close')
-                backdrop.removeClass('backdrop')
+                if (!el.enabled) return
+                $(el).hide()
                 el.visible = false
-                setTimeout( () => {
-                    el.classList.remove('close')
-                }, 500)
             }
             el.toggle = () => {
+                if (!el.enabled) return
                 el.visible ? el.hide() : el.show()
             }
 
             el.enable = () => {
-                el.enabled = true
                 el.classList.add('enabled')
+                el.enabled = true
             }
             el.disable = () => {
-                el.enabled = false
                 el.classList.remove('enabled')
+                el.enabled = false
             }
             el.switch = () => {
                 el.enabled ? el.disable() : el.enable()
@@ -1053,9 +1057,12 @@ function rasti(name, container) {
 
         })( container.find('[sidemenu]')[0] )
 
-        if (media.phone) self.sidemenu.enable()
-        media.on.phone(() => { self.sidemenu.switch() })
+        if (self.sidemenu) {
+            if (media.phone) self.sidemenu.enable()
+            media.on.phone(() => { self.sidemenu.switch() })
+        }
     }
+
 
     function createTabs(el) {
         var $el = $(el),
@@ -1220,8 +1227,11 @@ function rasti(name, container) {
             </div>
         `)
 
-        $controls = $el.children('.controls')
-        $results = $el.children('.results')
+        const $results = $el.find('.results'),
+            $controls = $el.find('.controls'),
+            $page = $controls.find('.page'),
+            $prev = $controls.find('[icon=left3]'),
+            $next = $controls.find('[icon=right3]')
 
         $controls
             .on('click', '[icon=right3]', e => {
@@ -1251,7 +1261,10 @@ function rasti(name, container) {
 
         function update(data){
             $results.html( template(data).join('') )
-            $controls.find('.page').html(pager.page + '/' + pager.total)
+                [0].scrollTo(0,0)
+            $page.html(pager.page + '/' + pager.total)
+            $prev[0].disabled = !pager.hasPrev()
+            $next[0].disabled = !pager.hasNext()
             applyFX($el, '.results')
         }
     }
@@ -1323,11 +1336,12 @@ function rasti(name, container) {
                 background-color: ${ values.field[0] };
                 color: ${ values.field[1] };
             }
-            ${ns} input[type=radio] + label:before,
-            ${ns} input[type=checkbox] + label:before {
+            ${ns} input[type=radio],
+            ${ns} input[type=checkbox] {
                 border: 1px solid ${ values.field[1] };
             }
-            ${ns} input[type=radio]:checked + label:before {
+            ${ns} input[type=radio]:checked,
+            ${ns} input[type=checkbox]:checked {
                 background-color: ${ values.btn[0] };
             }
 
@@ -1419,23 +1433,22 @@ rasti.icons = require('./icons')
 rasti.fx = require('./fx')
 rasti.options = {log : 'debug'}
 
-module.exports = Object.freeze(rasti)
+module.exports = global.rasti = Object.freeze(rasti)
 
 
 
 /*
- * bootstraps any apps declared via [rasti] attribute
+ * instantiates any apps declared via [rasti] attribute
  */
 function bootstrap() {
-    var appContainers = $(document).find('[rasti]'),
-        appName, app
+    const appContainers = $(document).find('[rasti]')
+    let appName, app
 
-    if (appContainers.length) appContainers.forEach( container => {
+    appContainers.forEach( container => {
         appName = container.getAttribute('rasti')
         if (!appName) error('Missing app name in [rasti] attribute of app container:', container)
         else if (global[appName]) error('Name [%s] already taken, please choose another name for app in container:', appName, container)
         else {
-            log('Creating app [%s]...', appName)
             global[appName] = app = new rasti(appName, container)
             Object.keys(app.options).forEach( key => {
                 if (container.hasAttribute(key)) {
