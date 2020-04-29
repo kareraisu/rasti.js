@@ -38,8 +38,37 @@ Object.filter = (obj, predicate) => {
 
 // $ extensions
 $.fn.hasAttr = function(name) {
-    return this[0].hasAttribute(name)
+    return this[0] && this[0].hasAttribute(name)
 }
+
+;['show', 'hide'].forEach(method => {
+    var origFn = $.fn[method]
+    $.fn[method] = function() {
+        const isSpecial = this.hasAttr('menu') || this.hasAttr('modal') || this.hasAttr('sidemenu')
+        if (isSpecial) {
+            document.body.style.setProperty("--elem-h", this[0].orig_h)
+            const backdrop = this.closest('[rasti]').find('.rs-backdrop')
+            if (method == 'show') {
+                this.addClass('open')
+                backdrop.addClass('backdrop')
+                this[0].visible = true
+                origFn.call(this)
+            }
+            if (method == 'hide') {
+                this.removeClass('open')
+                this.addClass('close')
+                backdrop.removeClass('backdrop')
+                this[0].visible = false
+                setTimeout( () => {
+                    this.removeClass('close')
+                    origFn.call(this)
+                }, 500)
+            }
+        }
+        else origFn.call(this)
+        return this
+    }
+})
 
 $.fn.move = function(options) {
     var options = Object.assign({
