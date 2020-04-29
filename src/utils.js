@@ -15,16 +15,22 @@ function exists(ref) {
 
 
 function inject(sources) {
-    if (is.string(sources)) sources = sources.split(' ')
+    if (is.string(sources)) sources = sources.split(',')
     if (!is.array(sources)) return rasti.error('Invalid sources, must be an array or a string')
-    var script,
-        body = $('body'),
-        inject = (sources) => {
-            script = $('<script>').attr('src', sources.shift())
-            if (sources.length) script.attr('onload', () => inject(sources))
-            body.append(script)
+    const body = $('body')
+    function do_inject(sources) {
+        const src = sources.shift().trim()
+        const script = $('<script>').attr('src', src)
+        script[0].onload = () => {
+            rasti.log('> Loaded %s', src)
+            sources.length
+                ? do_inject(sources)
+                : rasti.log('All sources loaded')
         }
-    inject(sources)
+        rasti.log('> Loading %s ...', src)
+        body.append(script)
+    }
+    do_inject(sources)
 }
 
 
@@ -91,18 +97,10 @@ function htmlEscape(str) {
 }
 
 
-
 function resolveAttr($el, name) {
     var value = $el.attr(name) || $el.attr('name') || $el.attr('prop') || $el.attr('nav') || $el.attr('section') || $el.attr('panel') || $el.attr('page') || $el.attr('template')
     if (!value) rasti.warn('Could not resolve value of [%s] attribute in el:', name, $el[0])
     return value
-}
-
-
-function rastiError(msg, ...args){
-    this.msg = msg
-    this.el = args.pop()
-    this.args = args
 }
 
 
@@ -127,5 +125,4 @@ module.exports = {
     resolveAttr,
     random,
     onMobile,
-    rastiError,
 }

@@ -28,7 +28,7 @@ template : function(data, $el) {
             + body
             + '</tbody>'
     } catch(err) {
-        utils.rastiError('Error parsing table data: ' + err)
+        rasti.error('Error parsing table data: ' + err)
         return ''
     }
         
