@@ -1,14 +1,10 @@
-const utils = require('../utils')
+const { prepTemplate } = require('../utils')
 
 module.exports = {
 
-template : function(data, $el) {
-    var ret = ''
-    for (var d of data) {
-        d = utils.checkData(d)
-        ret += `<option value="${d.value}">${d.label}</option>`
-    }
-    return ret
+render : function(data, $el) {
+    const template = prepTemplate(d => `<option value="${d.value}">${d.label}</option>`)
+    $el.html( template(data) )
 },
 
 init : function($el) {

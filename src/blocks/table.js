@@ -2,8 +2,7 @@ const utils = require('../utils')
 
 module.exports = {
 
-template : function(data, $el) {
-    const first = data[0]
+render : function(data, $el) {
     let head, body
     try {
         if (utils.is.array(data)) {
@@ -22,20 +21,17 @@ template : function(data, $el) {
                 + row.map( v => `<td>${v.trim()}</td>` ).join('') 
                 + '</tr>' ).join('')
         }
-        return '<thead><tr>'
+        $el.html(
+            '<thead><tr>'
             + head
             + '</tr></thead><tbody>'
             + body
             + '</tbody>'
+        )
     } catch(err) {
-        rasti.error('Error parsing table data: ' + err)
-        return ''
+        throw 'Error parsing table data: ' + err
     }
         
 },
-
-init : function($el) {},
-
-style : ''
 
 }

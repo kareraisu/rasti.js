@@ -1,21 +1,26 @@
-const utils = require('../utils')
+const { is, onMobile, prepTemplate } = require('../utils')
 
 module.exports = {
 
-template : function(data, $el) {
-    if ( utils.is.string(data) ) data = data.split(', ')
-    if ( !utils.is.array(data) ) throw 'invalid data, must be string or array'
+render : function(data, $el) {
+    var el = $el[0]
+    var name = $el.attr('prop') || $el.attr('name')
+
+    if (!name) return rasti.error('Could not resolve name of element:', el)
+
+    if ( is.string(data) ) data = data.split(', ')
+    if ( !is.array(data) ) throw 'invalid data, must be string or array'
 
     $el[0].total = data.length // WARNING : SIDE EFFECTS
 
-    var ret = $el.hasAttr('filter')
+    const filter = $el.hasAttr('filter')
         ? `<input field type="text" placeholder="${ $el.attr('filter') }"/>`
         : ''
 
-    return ret + data
-        .map( d => utils.checkData(d) )
-        .map( d => `<option value="${d.value}" alias="${d.alias}">${d.label}</option>` )
-        .join('')
+    const template = prepTemplate(d => `<option value="${d.value}" alias="${d.alias}">${d.label}</option>`)
+
+    $el.closest('[page]').find('[options='+ name +']')
+        .html( filter + template(data) )
 },
 
 init : function($el) {
@@ -49,7 +54,7 @@ init : function($el) {
     $el.on('click', function(e) {
         e.stopPropagation()
         $options.siblings('[options]').hide() // hide other options
-        if ( utils.onMobile() ) $options.parent().addClass('backdrop')
+        if ( onMobile() ) $options.parent().addClass('backdrop')
         $options.css('left', this.getBoundingClientRect().right).show()
         $options.find('input').focus()
     })
@@ -57,7 +62,7 @@ init : function($el) {
     $el.closest('[page]').on('click', '*:not(option)', function(e) {
         if ( $(e.target).attr('name') === name
           || $(e.target).parent().attr('name') === name ) return
-        if ( utils.onMobile() ) $options.parent().removeClass('backdrop')
+        if ( onMobile() ) $options.parent().removeClass('backdrop')
         $options.hide()
     })
 
@@ -86,7 +91,7 @@ init : function($el) {
 
     $options.on('click', 'option', toggleOption)
 
-    if ( !utils.onMobile() )
+    if ( !onMobile() )
         $options.on('click', function(e) { $options.find('input').focus() })
 
     $options.on('input', 'input', function(e) {
@@ -117,7 +122,7 @@ init : function($el) {
                 rasti.warn('Dropped %s overflowed values in el:', dif, el)
             }
             $el.addClass('full')
-            if ( utils.onMobile() ) $options.parent().removeClass('backdrop')
+            if ( onMobile() ) $options.parent().removeClass('backdrop')
             $options.hide()
         }
         else {

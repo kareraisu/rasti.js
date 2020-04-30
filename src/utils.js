@@ -1,17 +1,27 @@
-const is = {}
-'object function array string number regex boolean'.split(' ').forEach(function(t){
-    is[t] = function(exp){ return type(exp) === t }
-})
 function type(exp) {
-        var clazz = Object.prototype.toString.call(exp)
-        return clazz.substring(8, clazz.length-1).toLowerCase()
+    const clazz = Object.prototype.toString.call(exp)
+    return clazz.substring(8, clazz.length-1).toLowerCase()
 }
-function sameType(exp1, exp2) {
-    return type(exp1) === type(exp2)
-}
-function exists(ref) {
-    return ref !== undefined && ref !== null
-}
+
+const is = {}
+'object function array string number regex boolean'.split(' ')
+    .forEach(t => {
+        is[t] = exp => type(exp) === t
+    })
+is.empty = exp =>
+    (is.array(exp) || is.string(exp)) ? exp.length === 0
+    : is.object(exp) ? Object.keys(exp).length === 0
+    : false
+
+const sameType = (exp1, exp2) => type(exp1) === type(exp2)
+
+const exists = ref => ref !== undefined && ref !== null
+
+
+const compose = (...funcs) => funcs.reduce((prev, curr) => (...args) => curr(prev(...args)))
+
+
+const prepTemplate = tmpl_func => data => data.map( compose( checkData, tmpl_func )).join('')
 
 
 function inject(sources) {
@@ -104,14 +114,10 @@ function resolveAttr($el, name) {
 }
 
 
-function random() {
-    return (Math.random() * 6 | 0) + 1
-}
+const random = () => (Math.random() * 6 | 0) + 1
 
 
-function onMobile() {
-    return window.innerWidth < 500
-}
+const onMobile = () => window.innerWidth < 500
 
 
 module.exports = {
@@ -119,6 +125,8 @@ module.exports = {
     type,
     sameType,
     exists,
+    compose,
+    prepTemplate,
     inject,
     checkData,
     html,

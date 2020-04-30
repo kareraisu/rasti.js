@@ -1,13 +1,11 @@
-const utils = require('../utils')
+const { random, prepTemplate } = require('../utils')
 
 module.exports = {
 
-template : function(data, $el) {
-    var uid = utils.random()
-    return data
-        .map( d => utils.checkData(d) )
-        .map( d => `<div><input type="radio" name="${uid}" value="${d.value}"/><label>${d.label}</label></div>` )
-        .join('')
+render : function(data, $el) {
+    const uid = random()
+    const template = prepTemplate(d => `<div><input type="radio" name="${uid}" value="${d.value}"/><label>${d.label}</label></div>`)
+    $el.html( template(data) )
 },
 
 init : function($el) {
@@ -25,7 +23,5 @@ init : function($el) {
         $el.find('[value="'+ $el.val() +'"]').prop('checked', true)
     })
 },
-
-style : ``
 
 }

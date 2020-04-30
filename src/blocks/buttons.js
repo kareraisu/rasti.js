@@ -1,12 +1,10 @@
-const utils = require('../utils')
+const { prepTemplate } = require('../utils')
 
 module.exports = {
 
-template : function(data, $el) {
-    return data
-        .map( d => utils.checkData(d) )
-        .map( d => `<div value="${d.value}">${d.label}</div>` )
-        .join('')
+render : function(data, $el) {
+    const template = prepTemplate(d => `<div value="${d.value}">${d.label}</div>`)
+    $el.html( template(data) )
 },
 
 init : function($el) {

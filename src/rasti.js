@@ -109,16 +109,27 @@ function rasti(name, container) {
 
     function config(props) {
         if (!props || !is.object(props)) return error('Cannot configure app [%s]: no properties found', __name)
-        for (let key in self) {
-            if ( is.object(self[key]) && is.object(props[key]) && key !== 'methods' )
-                Object.assign(self[key], props[key])
-        }
-        key = 'methods'
-        for (let name in props[key]) {
-            const method = props[key][name]
-            if ( is.function(method) )
-                self[key][name] = method.bind(self)
-            else warn('Invalid method [%s], must be a function', name)
+        for (let key in props) {
+            const known = is.object(self[key])
+            const valid = is.object(props[key])
+            if (!known) {
+                warn('Unknown config prop [%s]', key)
+                continue
+            }
+            if (!valid) {
+                warn('Invalid config prop [%s], must be an object', key)
+                continue
+            }
+            if ('data methods'.includes(key)) {
+                for (let name in props[key]) {
+                    const value = props[key][name]
+                    if (key == 'methods' && !is.function(value))
+                        warn('Invalid method [%s], must be a function', name)
+                    else
+                        self[key][name] = is.function(value) ? value.bind(self) : value
+                }
+            }
+            else Object.assign(self[key], props[key])
         }
         return self
     }
@@ -646,7 +657,7 @@ function rasti(name, container) {
         if (!type) return error('Missing block type in [block] attribute of element:', el)
 
         var block = rasti.blocks[type]
-        if (!block) return error('Undefined block type "%s" resolved for element:', type, el)
+        if (!block) return error('Unknown block type "%s" resolved for element:', type, el)
 
         if (!data) {
             var datakey = resolveAttr($el, 'data')
@@ -655,11 +666,6 @@ function rasti(name, container) {
             data = self.data[datakey]
             if (!data) return error('Undefined data source "%s" resolved for element:', datakey, el)
         }
-
-        // TODO: this should be in multi block, not here
-        var $options = type === 'multi'
-            ? $el.closest('[page]').find('[options='+ $el.attr('prop') +']')
-            : $el
 
         var deps = $el.attr('bind')
         var depValues = {}
@@ -674,7 +680,7 @@ function rasti(name, container) {
         function render(data) {
             if (!data) warn('Cannot render block: no data available', el)
             else try {
-                $options.html( block.template(data, $el) )
+                block.render(data, $el)
             } catch(err) {
                 error('Cannot render block: ' + err, el)
             }
@@ -1134,9 +1140,9 @@ function rasti(name, container) {
         var block = rasti.blocks[type]
         if (!block) return error('Undefined block type "%s" declared in [block] attribute of element:', type, el)
 
-        if (!is.function(block.init)) return error('Invalid or missing init function in block type "%s" declared in [block] attribute of element:', type, el)
+        if (!!block.init && !is.function(block.init)) return error('Invalid init function in block type "%s" declared in [block] attribute of element:', type, el)
 
-        block.init($el)
+        if (is.function(block.init)) block.init($el)
 
         // if applicable, create options from data source
         if ( resolveAttr($el, 'data') ) updateBlock($el)
