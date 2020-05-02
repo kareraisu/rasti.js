@@ -2,6 +2,10 @@
 ********************************* ELEMENTS *************************************
 *******************************************************************************/
 
+:root {
+    --pad: 20px;
+}
+
 body {
     margin: 0;
     overflow-x: hidden;
@@ -72,17 +76,11 @@ input, button, select, textarea, .field {
     padding: 5px 10px;
     margin: 0 0 15px 0;
     border: 0;
-    border-radius: 4px;
+    border-radius: 2px;
     outline: none;
     font-family: inherit !important;
     font-size: inherit;
     vertical-align: text-bottom;
-}
-
-meter, progress {
-    width: 100%;
-    margin: 0 0 15px 0;
-    border-radius: 2px;
 }
 
 input[type=text]:focus:invalid,
@@ -239,6 +237,27 @@ input[type="checkbox"].toggle:checked::before {
     left: 20px;
 }
 
+meter, progress {
+    width: 100%;
+    margin: 0;
+    border-radius: 2px;
+}
+meter {
+    height: 8px;
+    border: 1px solid #ccc;
+}
+meter::-webkit-meter-bar {
+    background: #FFF;
+}
+meter::-webkit-meter-optimum-value {
+    background: linear-gradient(to bottom, #62c462, #51a351);
+}
+meter::-webkit-meter-suboptimum-value {
+    background: linear-gradient(to bottom, #fbb450, #f89406);
+}
+meter::-webkit-meter-even-less-good-value {
+    background: linear-gradient(to bottom, #ee5f5b, #bd362f);
+}
 
 /*******************************************************************************
 ********************************* ATTRIBUTES ***********************************
@@ -505,6 +524,7 @@ nav > div, nav > a {
     position: absolute;
     top: 0;
     left: -80vw;
+    height: 100%;
     min-width: 80vw !important;
     max-width: 80vw;
     z-index: 10;
@@ -1147,17 +1167,15 @@ button.fab {
 }
 
 .pad-s, .pad-s_>* {
-    padding-left: 5%;
-    padding-right: 5%;
+    padding: calc(var(--pad) * 0.5);
 }
 .pad, .pad_>* {
-    padding-left: 10%;
-    padding-right: 10%;
+    padding: var(--pad);
 }
 .pad-l, .pad-l_>* {
-    padding-left: 15%;
-    padding-right: 15%;
+    padding: calc(var(--pad) * 1.5);
 }
+
 .p0 {
     padding: 0 !important;
 }
