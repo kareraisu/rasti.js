@@ -435,12 +435,10 @@ function rasti(name, container) {
             }
         }
         
-        if (!data) {
-            const datakey = $el.attr('data')
-            if (datakey) {
-                data = self.data[datakey]
-                if (!data) return error(errPrefix + 'undefined data source "%s" resolved for element:', datakey, el)
-            }
+        if ( !data && $el.hasAttr('data') ) {
+            const datakey = resolveAttr($el, 'data')
+            data = self.data[datakey]
+            if (!data) return error(errPrefix + 'undefined data source "%s" resolved for element:', datakey, el)
         }
         if ( is.string(data) ) data = data.split( $el.attr('separator') || self.options.separator )
         if ( !is.array(data) ) data = [data]
@@ -551,6 +549,8 @@ function rasti(name, container) {
 
 
     function setTheme(themeString) {
+        if (!themeString) return warn('Call to setTheme() with no argument')
+
         var themeName = themeString.split(' ')[0],
             theme = self.themes[themeName],
             baseTheme = self.themes.base,

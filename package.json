@@ -1,11 +1,11 @@
 {
-  "name": "rasti.js",
-  "version": "1.0.0",
+  "name": "@kareraisu/rasti",
+  "version": "0.0.0",
   "description": "a simple webapp prototyping framework",
   "scripts": {
     "start": "gulp",
-    "deploy": "gulp prod && git a src/* dist/* test/* && git m && git push -f",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "gulp prod",
+    "test": "echo \"No test specified\""
   },
   "repository": {
     "type": "git",
@@ -38,5 +38,10 @@
     "merge2": "^1.0.3",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
+  },
+  "main": "dist/rasti.min.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
   }
 }

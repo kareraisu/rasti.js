@@ -534,7 +534,7 @@ nav > div, nav > a {
 
 
 [sidemenu].enabled {
-    position: absolute;
+    position: fixed !important;
     top: 0;
     left: -80vw;
     height: 100%;
@@ -1065,7 +1065,7 @@ button.fab {
 ****************************** UTILITY CLASSES ********************************* 
 *******************************************************************************/
 
-[hidden], .hidden {
+.hidden {
     position: absolute;
     visibility: hidden;
 }
@@ -1416,17 +1416,19 @@ input[type=range]::-ms-track {
 /* desktop only */
 @media only screen and (min-width: 800px) {
 
-    .pad-s-desktop {
-        padding-left: 5%;
-        padding-right: 5%;
+    .show-phone, .show-tablet {
+        position: absolute;
+        visibility: hidden;
     }
-    .pad-desktop {
-        padding-left: 10%;
-        padding-right: 10%;
+
+    .pad-s-desktop, .pad-s-desktop_>* {
+        padding: calc(var(--pad) * 0.5);
     }
-    .pad-l-desktop {
-        padding-left: 15%;
-        padding-right: 15%;
+    .pad-desktop, .pad-desktop_>* {
+        padding: var(--pad);
+    }
+    .pad-l-desktop, .pad-l-desktop_>* {
+        padding: calc(var(--pad) * 1.5);
     }
     .p0-desktop {
         padding: 0;
@@ -1438,17 +1440,14 @@ input[type=range]::-ms-track {
 /* tablet only */
 @media only screen and (min-width: 500px) and (max-width: 800px) {
 
-    .pad-s-tablet {
-        padding-left: 5%;
-        padding-right: 5%;
+    .pad-s-tablet, .pad-s-tablet_>* {
+        padding: calc(var(--pad) * 0.5);
     }
-    .pad-tablet {
-        padding-left: 10%;
-        padding-right: 10%;
+    .pad-tablet, .pad-tablet_>* {
+        padding: var(--pad);
     }
-    .pad-l-tablet {
-        padding-left: 15%;
-        padding-right: 15%;
+    .pad-l-tablet, .pad-l-tablet_>* {
+        padding: calc(var(--pad) * 1.5);
     }
     .p0-tablet {
         padding: 0;
