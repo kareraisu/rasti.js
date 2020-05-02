@@ -11,7 +11,7 @@ const exorcist = require('exorcist')
 const source = require('vinyl-source-stream')
 const buffer = require('vinyl-buffer')
 
-const minify = require("gulp-babel-minify")
+const minify = require('gulp-babel-minify')
 const cleanCSS = require('gulp-clean-css')
 const trimlines = require('gulp-trimlines')
 const replace = require('gulp-replace')
@@ -23,7 +23,7 @@ const p = gulp.parallel
 
 const paths = {
     app : 'C:/Users/ale/Documents/rasti-demo',
-    dist : 'C:/Users/ale/Documents/rasti-demo/dist'
+    dist : process.env.PROD ? 'dist' : 'C:/Users/ale/Documents/rasti-demo/dist'
 }
 
 
