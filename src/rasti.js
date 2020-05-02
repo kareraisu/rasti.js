@@ -623,7 +623,7 @@ function rasti(name, container) {
 
     function updateBlock($el, data) {
         const el = $el[0]
-        const type = $el.attr('block') || el.nodeName.toLowerCase()
+        let type = $el.attr('block') || el.nodeName.toLowerCase()
         if ('ol ul'.includes(type)) type = 'list'
         if (!type) return error('Missing block type in [block] attribute of element:', el)
 
@@ -1306,6 +1306,7 @@ function rasti(name, container) {
                 color: ${ values.text[0] };
                 background-color: ${ values.page[0] };
             }
+            ${ns} nav       { background-color: ${ values.page[1] }; }
             ${ns} [page]    { background-color: ${ values.page[0] }; }
             ${ns} [panel]   { background-color: ${ values.panel[0] }; }
             ${ns} [section] { background-color: ${ values.section[0] }; }

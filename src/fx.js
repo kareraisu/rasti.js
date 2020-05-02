@@ -21,11 +21,11 @@ stamp : $el => {
         el.classList.add('fx-stamp-el')
         setTimeout( _ => {
             el.classList.remove('fx-stamp-el')
-        }, i * 40)
+        }, i * 60)
     })
     setTimeout( _ => {
         $el.removeClass('fx-stamp-container')
-    }, $children.length * 40 + 500)
+    }, $children.length * 60 + 500)
 },
 
 toast : $el => {
