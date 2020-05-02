@@ -180,14 +180,22 @@ function rasti(name, container) {
         })
 
 
-        // init rasti blocks
-        container.find('[block]').each( (i, el) => {
-            initBlock($(el))
+        // fix labels
+        NOCHILD_TAGS.forEach( tag => {
+            container.find(tag + '[label]').each( (i, el) => {
+                fixLabel($(el))
+            })
         })
 
 
-        // init "incognito" blocks
-        container.find('[data]:not([block]):not([template])').each( (i, el) => {
+        // fix input icons
+        container.find('input[icon]').each( (i, el) => {
+            fixIcon($(el))
+        })
+
+
+        // init blocks
+        container.find('[data]:not([template])').each( (i, el) => {
             updateBlock($(el))
         })
 
@@ -257,20 +265,6 @@ function rasti(name, container) {
         })
 
 
-        // fix labels
-        NOCHILD_TAGS.forEach( tag => {
-            container.find(tag + '[label]').each( (i, el) => {
-                fixLabel($(el))
-            })
-        })
-
-
-        // fix input icons
-        container.find('input[icon]').each( (i, el) => {
-            fixIcon($(el))
-        })
-
-
         // init internal history (if applicable)
         if (self.options.history) {
             __history = new History(self)
@@ -288,34 +282,6 @@ function rasti(name, container) {
 
         
         initState()
-
-        
-        initEvents()
-
-
-        initActions()
-
-
-        // init field validations
-        container.find('button[validate]').each( (i, btn) => {
-            const $fields = $(btn).parent().find('input[required]')
-            btn.disabled = isAnyFieldInvalid($fields)
-            $fields.each( (i, field) => {
-                $(field).on('keydown', e => {
-                    btn.disabled = isAnyFieldInvalid($fields)
-                    if (e.key == 'Enter' && !btn.disabled) btn.click()
-                })
-            })
-        })
-
-        function isAnyFieldInvalid($fields) {
-            let valid = true
-            $fields.each( (i, field) => {
-                valid = valid && field.validity.valid
-                return valid
-            })
-            return !valid
-        }
 
 
         // render data templates
@@ -335,6 +301,15 @@ function rasti(name, container) {
         // init crud templates
         initCrud()
 
+        
+        initEvents()
+
+
+        initActions()
+
+
+        initFieldValidations()
+
 
         // init movable elements
         container.find('[movable]').each( (i, el) => {
@@ -349,10 +324,6 @@ function rasti(name, container) {
 
 
         container
-            .on('click', '[type=checkbox]+label', e => {
-                // forward clicks to hidden input
-                $(e.currentTarget).prev().click()
-            })
             .on('click', '[foldable]', e => {
                 const el = e.target
                 if (!el.hasAttribute('foldable')) return
@@ -651,24 +622,33 @@ function rasti(name, container) {
 
 
     function updateBlock($el, data) {
-        var el = $el[0]
-        var type = $el.attr('block') || el.nodeName.toLowerCase()
+        const el = $el[0]
+        const type = $el.attr('block') || el.nodeName.toLowerCase()
         if ('ol ul'.includes(type)) type = 'list'
         if (!type) return error('Missing block type in [block] attribute of element:', el)
 
-        var block = rasti.blocks[type]
-        if (!block) return error('Unknown block type "%s" resolved for element:', type, el)
+        const block = rasti.blocks[type]
+        if (!block) return error('Undefined block type "%s" declared in [block] attribute of element:', type, el)
+
+        if (!el.initialized) {
+            if (exists(block.init) && !is.function(block.init))
+                return error('Invalid "init" prop defined in block type "%s", must be a function', type)
+            if (is.function(block.init))
+                block.init($el)
+            el.initialized = true
+        }
 
         if (!data) {
-            var datakey = resolveAttr($el, 'data')
+            const datakey = resolveAttr($el, 'data')
             if (!datakey) return
 
             data = self.data[datakey]
-            if (!data) return error('Undefined data source "%s" resolved for element:', datakey, el)
+            if (!exists(data)) return warn('Detected non-existant data ref in data source "%s" declared in [data] attribute of element:', datakey, el)
+            if (is.empty(data)) return
         }
 
-        var deps = $el.attr('bind')
-        var depValues = {}
+        const deps = $el.attr('bind')
+        const depValues = {}
         if (deps) deps.split(' ').forEach( prop => {
             depValues[prop] = $('[prop='+ prop +']').val()
         })
@@ -678,7 +658,8 @@ function rasti(name, container) {
             : render(data)
 
         function render(data) {
-            if (!data) warn('Cannot render block: no data available', el)
+            if (!exists(data)) warn('Detected non-existant data ref when trying to render element', el)
+            if (is.empty(data)) return
             else try {
                 block.render(data, $el)
             } catch(err) {
@@ -1011,7 +992,30 @@ function rasti(name, container) {
         }
     }
 
+
+    function initFieldValidations() {
+        container.find('button[validate]').each( (i, btn) => {
+            const $fields = $(btn).parent().find('input[required]')
+            btn.disabled = isAnyFieldInvalid($fields)
+            $fields.each( (i, field) => {
+                $(field).on('keydown', e => {
+                    btn.disabled = isAnyFieldInvalid($fields)
+                    if (e.key == 'Enter' && !btn.disabled) btn.click()
+                })
+            })
+        })
+
+        function isAnyFieldInvalid($fields) {
+            let valid = true
+            $fields.each( (i, field) => {
+                valid = valid && field.validity.valid
+                return valid
+            })
+            return !valid
+        }
+    }
    
+
     function initModals() {
         container.find('[modal]').each((i, el) => {
             // add close btn
@@ -1129,23 +1133,6 @@ function rasti(name, container) {
                 || self.active.page.attr('page') === $el.attr('page')
         }
 
-    }
-
-
-    function initBlock($el) {
-        var el = $el[0]
-        var type = $el.attr('block') || el.nodeName.toLowerCase()
-        if (!type) return error('Missing block type in [block] attribute of element:', el)
-
-        var block = rasti.blocks[type]
-        if (!block) return error('Undefined block type "%s" declared in [block] attribute of element:', type, el)
-
-        if (!!block.init && !is.function(block.init)) return error('Invalid init function in block type "%s" declared in [block] attribute of element:', type, el)
-
-        if (is.function(block.init)) block.init($el)
-
-        // if applicable, create options from data source
-        if ( resolveAttr($el, 'data') ) updateBlock($el)
     }
 
 
@@ -1381,15 +1368,20 @@ function rasti(name, container) {
 
 
     function fixLabel($el) {
-        var $div = $(`<div fixed label="${ $el.attr('label') }" >`)
-        $el.wrap($div)
+        const label = resolveAttr($el, 'label')
+        $el.wrap( $(`<div fixed label="${ label }" >`) )
         $el[0].removeAttribute('label')
     }
 
 
     function fixIcon($el) {
-        var $div = $(`<div icon=${ $el.attr('icon') } class=floating >`)
-        $el.wrap($div)
+        const $parent = $el.parent()
+        if ($parent.hasAttr('fixed')) {
+            $parent.attr(icon, $el.attr('icon')).addClass('floating')
+        }
+        else {
+            $el.wrap( $(`<div fixed icon=${ $el.attr('icon') } class=floating >`) )
+        }
         $el[0].removeAttribute('icon')
     }
 
