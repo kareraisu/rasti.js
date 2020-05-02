@@ -5,7 +5,8 @@
   "scripts": {
     "start": "gulp",
     "build": "gulp prod",
-    "test": "echo \"No test specified\""
+    "test": "echo \"No test specified\"",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
