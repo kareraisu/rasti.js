@@ -9,6 +9,7 @@
 body {
     margin: 0;
     overflow-x: hidden;
+    text-shadow: 0 0 0;
 }
 
 *, *:before, *:after {
@@ -18,6 +19,11 @@ body {
     -ms-user-select: none;
     user-select: none;
     transition: background-color 0.2s;
+}
+
+a {
+    text-decoration: none;
+    font-weight: 600;
 }
 
 h1 { font-size: 3em; }
@@ -62,12 +68,8 @@ table thead th {
     text-align: center;
 }
 table tfoot {
-    font-size: 14px;
     font-weight: bold;
     border-top: 3px solid #0003;
-}
-table tfoot td {
-font-size: 14px;
 }
 
 input, button, select, textarea, .field {
@@ -218,6 +220,7 @@ input[type=checkbox] + label:hover {
 
 input[type="checkbox"].toggle {
     position: relative;
+    height: 26px;
     width: 44px;
     border-radius: 12px;
     transition: background-color 0.4s;
@@ -259,6 +262,20 @@ meter::-webkit-meter-even-less-good-value {
     background: linear-gradient(to bottom, #ee5f5b, #bd362f);
 }
 
+hr {
+    display: flex;
+    align-items: center;
+    height: 30px;
+    border: none;
+}
+hr::before {
+    content: '';
+    display: block;
+    height: 2px;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
 /*******************************************************************************
 ********************************* ATTRIBUTES ***********************************
 *******************************************************************************/
@@ -278,9 +295,8 @@ meter::-webkit-meter-even-less-good-value {
 [page]:not(.active) {
 	display: none !important;
 }
-nav ~ [page]:not(.hide-nav) {
+nav:not([hidden]) ~ [page]:not(.hide-nav) {
     min-height: calc(100vh - 50px);
-    max-height: calc(100vh - 50px);
 }
 .fullh[page] {
     height: 100vh;
@@ -356,10 +372,6 @@ nav ~ [page]:not(.hide-nav) {
     padding: 10px;
     font-size: 1.2em;
     line-height: 20px;
-}
-
-[foldable]:before {
-    content: attr(foldable);
 }
 
 [footer][page]:after {
@@ -474,6 +486,7 @@ nav ~ [page] > .tab-labels + [h-flow] {
 
 nav, .tab-labels {
     display: flex;
+    align-items: center;
     position: relative;
     white-space: nowrap;
     min-width: 100vw;
@@ -691,9 +704,14 @@ nav > div, nav > a {
     animation: fold-in .2s;
     height: 30px !important;
     overflow: hidden;
+    padding-bottom: 0;
 }
 [foldable]:before {
+    content: attr(foldable)'  △';
     cursor: pointer;
+}
+[foldable].folded:before {
+    content: attr(foldable)'  ▽';
 }
 
 
@@ -879,6 +897,10 @@ nav > div, nav > a {
 }
 [icon=pinch]:before {
     transform: rotate(90deg);
+}
+[icon=moon]:before,
+[icon=crescent-moon]:before {
+    filter: grayscale(1);
 }
 
 
@@ -1202,6 +1224,9 @@ button.fab {
     margin-right: 0;
 }
 
+.wrap {
+    flex-wrap: wrap;
+}
 .nowrap {
     flex-wrap: nowrap;
 }
