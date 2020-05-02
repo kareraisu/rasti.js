@@ -2,7 +2,7 @@ const { is, onMobile, prepTemplate } = require('../utils')
 
 module.exports = {
 
-render : function(data, $el) {
+render(data, $el) {
     var el = $el[0]
     var name = $el.attr('prop') || $el.attr('name')
 
@@ -23,7 +23,7 @@ render : function(data, $el) {
         .html( filter + template(data) )
 },
 
-init : function($el) {
+init($el) {
     var el = $el[0]
     var name = $el.attr('prop') || $el.attr('name')
 

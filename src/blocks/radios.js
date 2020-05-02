@@ -2,13 +2,13 @@ const { random, prepTemplate } = require('../utils')
 
 module.exports = {
 
-render : function(data, $el) {
+render(data, $el) {
     const uid = random()
     const template = prepTemplate(d => `<div><input type="radio" name="${uid}" value="${d.value}"/><label>${d.label}</label></div>`)
     $el.html( template(data) )
 },
 
-init : function($el) {
+init($el) {
     $el[0].value = ''
     $el.on('click', 'label', function(e) {
         // forward clicks to hidden input

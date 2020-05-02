@@ -2,7 +2,7 @@ const { is } = require('../utils')
 
 module.exports = {
 
-render : function(data, $el) {
+render(data, $el) {
     if ( is.string(data) ) {
         const separator = $el.attr('separator') || ','
         data = data.split(separator)

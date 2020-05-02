@@ -2,12 +2,12 @@ const { prepTemplate } = require('../utils')
 
 module.exports = {
 
-render : function(data, $el) {
+render(data, $el) {
     const template = prepTemplate(d => `<option value="${d.value}">${d.label}</option>`)
     $el.html( template(data) )
 },
 
-init : function($el) {
+init($el) {
     var imgpath = $el.attr('img')
     if (!imgpath) return
 

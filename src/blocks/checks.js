@@ -2,13 +2,13 @@ const { random, prepTemplate } = require('../utils')
 
 module.exports = {
 
-render : function(data, $el) {
+render(data, $el) {
     const uid = random()
     const template = prepTemplate(d => `<input type="checkbox" name="${uid}[]" value="${d.value}"/><label>${d.label}</label>`)
     $el.html( template(data) )
 },
 
-init : function($el) {
+init($el) {
     const values = $el[0].value = []
 
     $el.on('change', 'input', function(e) {

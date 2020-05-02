@@ -1,18 +1,18 @@
-const utils = require('../utils')
+const { is } = require('../utils')
 
 module.exports = {
 
-render : function(data, $el) {
+render(data, $el) {
     let head, body
     try {
-        if (utils.is.array(data)) {
+        if (is.array(data)) {
             headers = Object.keys(data[0])
             head = headers.map( h =>`<th>${h}</th>` ).join('')
             body = data.map( obj => '<tr>'
                 + headers.map( key => `<td>${obj[key]}</td>` ).join('') 
                 + '</tr>' )
         }
-        else if (utils.is.string(data)) {
+        else if (is.string(data)) {
             const separator = $el.attr('separator') || ','
             data = data.split(/[\n]/)
                 .map(row => row.split(separator))
@@ -21,6 +21,7 @@ render : function(data, $el) {
                 + row.map( v => `<td>${v.trim()}</td>` ).join('') 
                 + '</tr>' ).join('')
         }
+        else throw 'invalid data, must be array or string'
         $el.html(
             '<thead><tr>'
             + head
@@ -29,7 +30,7 @@ render : function(data, $el) {
             + '</tbody>'
         )
     } catch(err) {
-        throw 'Error parsing table data: ' + err
+        throw 'Parsing error: ' + err
     }
         
 },

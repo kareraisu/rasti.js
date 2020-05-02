@@ -2,12 +2,12 @@ const { prepTemplate } = require('../utils')
 
 module.exports = {
 
-render : function(data, $el) {
+render(data, $el) {
     const template = prepTemplate(d => `<div value="${d.value}">${d.label}</div>`)
     $el.html( template(data) )
 },
 
-init : function($el) {
+init($el) {
     $el[0].value = ''
     $el.on('click', 'div', function(e) {
         $el.val($(e.target).attr('value'))
