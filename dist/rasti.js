@@ -4,25 +4,24 @@
 module.exports = {
 	list    : require('./list'),
 	table   : require('./table'),
-	buttons : require('./buttons'),
+	input   : require('./input'),
 	checks  : require('./checks'),
 	radios  : require('./radios'),
+	buttons : require('./buttons'),
 	multi   : require('./multi'),
 	select  : require('./select'),
 }
-},{"./buttons":2,"./checks":3,"./list":4,"./multi":5,"./radios":6,"./select":7,"./table":8}],2:[function(require,module,exports){
-const utils = require('../utils')
+},{"./buttons":2,"./checks":3,"./input":4,"./list":5,"./multi":6,"./radios":7,"./select":8,"./table":9}],2:[function(require,module,exports){
+const { prepTemplate } = require('../utils')
 
 module.exports = {
 
-template : function(data, $el) {
-    return data
-        .map( d => utils.checkData(d) )
-        .map( d => `<div value="${d.value}">${d.label}</div>` )
-        .join('')
+render(data, $el) {
+    const template = prepTemplate(d => `<div value="${d.value}">${d.label}</div>`)
+    $el.html( template(data) )
 },
 
-init : function($el) {
+init($el) {
     $el[0].value = ''
     $el.on('click', 'div', function(e) {
         $el.val($(e.target).attr('value'))
@@ -39,52 +38,41 @@ style : `
         display: inline-block;
         margin: 5px !important;
         padding: 5px 10px;
-        border-radius: 6px;
-        border: 2px outset rgba(255, 255, 255, 0.5);
+        border-radius: 4px;
         background-clip: padding-box;
         text-transform: uppercase;
         cursor: pointer;
-    }
-    [block=buttons] > div.active {
-        filter: contrast(1.5);
-        border-style: inset;
-        padding: 4px 11px 6px 9px;
-        transform: translateY(-1px);
     }
 `
 
 }
 
-},{"../utils":15}],3:[function(require,module,exports){
-const utils = require('../utils')
+},{"../utils":16}],3:[function(require,module,exports){
+const { random, prepTemplate } = require('../utils')
 
 module.exports = {
 
-template : function(data, $el) {
-    var uid = utils.random()
-    return data
-        .map( d => utils.checkData(d) )
-        .map( d => `<input type="checkbox" name="${uid}[]" value="${d.value}"><label>${d.label}</label>` )
-        .join('')
+render(data, $el) {
+    const uid = random()
+    const template = prepTemplate(d => `<input type="checkbox" name="${uid}[]" value="${d.value}"/><label>${d.label}</label>`)
+    $el.html( template(data) )
 },
 
-init : function($el) {
-    var values = $el[0].value = []
-    $el.on('click', 'label', function(e) {
-        // forward clicks to hidden input
-        $(e.currentTarget).prev().click()
-    })
+init($el) {
+    const values = $el[0].value = []
+
     $el.on('change', 'input', function(e) {
         // update component value
-        var $input = $(e.currentTarget),
+        const $input = $(e.currentTarget),
             val = $input.attr('value')
         $input.prop('checked')
             ? values.push(val)
             : values.remove(val)
     })
+    
     $el.on('change', function(e) {
         // update component ui
-        var $input, checked
+        let $input, checked
         $el.find('input').each(function(i, input){
             $input = $(input)
             checked = values.includes( $input.attr('value') )
@@ -93,49 +81,78 @@ init : function($el) {
     })
 },
 
-style : ``
-
 }
-},{"../utils":15}],4:[function(require,module,exports){
-const {is} = require('../utils')
+},{"../utils":16}],4:[function(require,module,exports){
+const { is, random } = require('../utils')
 
 module.exports = {
 
-template : function(data, $el) {
-    if ( is.string(data) ) data = data.split(', ')
+render(data, $el) {
+    if ( is.string(data) ) {
+        const separator = $el.attr('separator') || ','
+        data = data.split(separator)
+    }
     if ( !is.array(data) ) throw 'invalid data, must be string or array'
-    return data
-        .map( d => `<li>${d}</li>` )
+    const html = data
+        .map( d => `<option value="${d.trim()}"></option>` )
         .join('')
+    $el.next('datalist').html(html)
 },
 
-init : function($el) {},
+init($el) {
+    const id = random()
+    $el.attr('list', id)
+    $el.after(`<datalist id=${id}>`)
 
-style : ''
+    $el.click(e => $el.val(''))
+},
 
 }
-},{"../utils":15}],5:[function(require,module,exports){
-const utils = require('../utils')
+},{"../utils":16}],5:[function(require,module,exports){
+const { is } = require('../utils')
 
 module.exports = {
 
-template : function(data, $el) {
-    if ( utils.is.string(data) ) data = data.split(', ')
-    if ( !utils.is.array(data) ) throw 'invalid data, must be string or array'
+render(data, $el) {
+    if ( is.string(data) ) {
+        const separator = $el.attr('separator') || ','
+        data = data.split(separator)
+    }
+    if ( !is.array(data) ) throw 'invalid data, must be string or array'
+    const html = data
+        .map( d => `<li>${d.trim()}</li>` )
+        .join('')
+    $el.html(html)
+},
+
+}
+},{"../utils":16}],6:[function(require,module,exports){
+const { is, onMobile, prepTemplate } = require('../utils')
+
+module.exports = {
+
+render(data, $el) {
+    var el = $el[0]
+    var name = $el.attr('prop') || $el.attr('name')
+
+    if (!name) return rasti.error('Could not resolve name of element:', el)
+
+    if ( is.string(data) ) data = data.split(', ')
+    if ( !is.array(data) ) throw 'invalid data, must be string or array'
 
     $el[0].total = data.length // WARNING : SIDE EFFECTS
 
-    var ret = $el.hasAttr('filter')
+    const filter = $el.hasAttr('filter')
         ? `<input field type="text" placeholder="${ $el.attr('filter') }"/>`
         : ''
 
-    return ret + data
-        .map( d => utils.checkData(d) )
-        .map( d => `<option value="${d.value}" alias="${d.alias}">${d.label}</option>` )
-        .join('')
+    const template = prepTemplate(d => `<option value="${d.value}" alias="${d.alias}">${d.label}</option>`)
+
+    $el.closest('[page]').find('[options='+ name +']')
+        .html( filter + template(data) )
 },
 
-init : function($el) {
+init($el) {
     var el = $el[0]
     var name = $el.attr('prop') || $el.attr('name')
 
@@ -166,7 +183,7 @@ init : function($el) {
     $el.on('click', function(e) {
         e.stopPropagation()
         $options.siblings('[options]').hide() // hide other options
-        if ( utils.onMobile() ) $options.parent().addClass('backdrop')
+        if ( onMobile() ) $options.parent().addClass('backdrop')
         $options.css('left', this.getBoundingClientRect().right).show()
         $options.find('input').focus()
     })
@@ -174,7 +191,7 @@ init : function($el) {
     $el.closest('[page]').on('click', '*:not(option)', function(e) {
         if ( $(e.target).attr('name') === name
           || $(e.target).parent().attr('name') === name ) return
-        if ( utils.onMobile() ) $options.parent().removeClass('backdrop')
+        if ( onMobile() ) $options.parent().removeClass('backdrop')
         $options.hide()
     })
 
@@ -203,7 +220,7 @@ init : function($el) {
 
     $options.on('click', 'option', toggleOption)
 
-    if ( !utils.onMobile() )
+    if ( !onMobile() )
         $options.on('click', function(e) { $options.find('input').focus() })
 
     $options.on('input', 'input', function(e) {
@@ -234,7 +251,7 @@ init : function($el) {
                 rasti.warn('Dropped %s overflowed values in el:', dif, el)
             }
             $el.addClass('full')
-            if ( utils.onMobile() ) $options.parent().removeClass('backdrop')
+            if ( onMobile() ) $options.parent().removeClass('backdrop')
             $options.hide()
         }
         else {
@@ -323,20 +340,18 @@ style : `
 `
 
 }
-},{"../utils":15}],6:[function(require,module,exports){
-const utils = require('../utils')
+},{"../utils":16}],7:[function(require,module,exports){
+const { random, prepTemplate } = require('../utils')
 
 module.exports = {
 
-template : function(data, $el) {
-    var uid = utils.random()
-    return data
-        .map( d => utils.checkData(d) )
-        .map( d => `<input type="radio" name="${uid}" value="${d.value}"/><label>${d.label}</label>` )
-        .join('')
+render(data, $el) {
+    const uid = random()
+    const template = prepTemplate(d => `<div><input type="radio" name="${uid}" value="${d.value}"/><label>${d.label}</label></div>`)
+    $el.html( template(data) )
 },
 
-init : function($el) {
+init($el) {
     $el[0].value = ''
     $el.on('click', 'label', function(e) {
         // forward clicks to hidden input
@@ -352,24 +367,18 @@ init : function($el) {
     })
 },
 
-style : ``
-
 }
-},{"../utils":15}],7:[function(require,module,exports){
-const utils = require('../utils')
+},{"../utils":16}],8:[function(require,module,exports){
+const { prepTemplate } = require('../utils')
 
 module.exports = {
 
-template : function(data, $el) {
-    var ret = ''
-    for (var d of data) {
-        d = utils.checkData(d)
-        ret += `<option value="${d.value}">${d.label}</option>`
-    }
-    return ret
+render(data, $el) {
+    const template = prepTemplate(d => `<option value="${d.value}">${d.label}</option>`)
+    $el.html( template(data) )
 },
 
-init : function($el) {
+init($el) {
     var imgpath = $el.attr('img')
     if (!imgpath) return
 
@@ -467,48 +476,46 @@ style : `
 
 }
 
-},{"../utils":15}],8:[function(require,module,exports){
-const utils = require('../utils')
+},{"../utils":16}],9:[function(require,module,exports){
+const { is } = require('../utils')
 
 module.exports = {
 
-template : function(data, $el) {
-    const first = data[0]
+render(data, $el) {
     let head, body
     try {
-        if (utils.is.array(data)) {
+        if (is.array(data)) {
             headers = Object.keys(data[0])
             head = headers.map( h =>`<th>${h}</th>` ).join('')
             body = data.map( obj => '<tr>'
                 + headers.map( key => `<td>${obj[key]}</td>` ).join('') 
                 + '</tr>' )
         }
-        else if (utils.is.string(data)) {
+        else if (is.string(data)) {
+            const separator = $el.attr('separator') || ','
             data = data.split(/[\n]/)
-                .map(row => row.split(','))
-            head = data.shift().map( h =>`<th>${h}</th>` ).join('')
+                .map(row => row.split(separator))
+            head = data.shift().map( h =>`<th>${h.trim()}</th>` ).join('')
             body = data.map( row => '<tr>'
-                + row.map( v => `<td>${v}</td>` ).join('') 
-                + '</tr>' )
+                + row.map( v => `<td>${v.trim()}</td>` ).join('') 
+                + '</tr>' ).join('')
         }
-        return '<thead><tr>'
+        else throw 'invalid data, must be array or string'
+        $el.html(
+            '<thead><tr>'
             + head
             + '</tr></thead><tbody>'
             + body
             + '</tbody>'
+        )
     } catch(err) {
-        utils.rastiError('Error parsing table data: ' + err)
-        return ''
+        throw 'Parsing error: ' + err
     }
         
 },
 
-init : function($el) {},
-
-style : ''
-
 }
-},{"../utils":15}],9:[function(require,module,exports){
+},{"../utils":16}],10:[function(require,module,exports){
 const { is, resolveAttr } = require('./utils')
 
 class History {
@@ -609,9 +616,9 @@ class Pager {
 }
 
 
-function state(app) {
+function state(app, app_id) {
     function invalid() {
-        rasti.error('Saved state for app [%s] is invalid', app.name)
+        rasti.error('Saved state for app [%s] is invalid', app_id)
     }
 
     return Object.defineProperties({}, {
@@ -620,14 +627,14 @@ function state(app) {
         lang  : { get : _ => app.active.lang, enumerable : true },
         save : { value : _ => {
             app.state.props = Object.filter(app.props, ([k, v]) => !(v && v.__trans))
-            localStorage.setItem('rasti.' + app.name, JSON.stringify(app.state))
+            localStorage.setItem('rasti.' + app_id, JSON.stringify(app.state))
             rasti.log('State saved')
         } },
         get : { value : _ => {
             let state
             try {
-                state = JSON.parse( localStorage.getItem('rasti.' + app.name) )
-                if ( !state ) rasti.log('No saved state found for app [%s]', app.name)
+                state = JSON.parse( localStorage.getItem('rasti.' + app_id) )
+                if ( !state ) rasti.log('No saved state found for app [%s]', app_id)
                 else if ( !is.object(state) ) invalid()
                 else return state
             }
@@ -647,7 +654,7 @@ function state(app) {
             return state
         } },
         clear : { value : _ => {
-            window.localStorage.removeItem('rasti.' + app.name)
+            window.localStorage.removeItem('rasti.' + app_id)
         } },
     })
 }
@@ -795,7 +802,7 @@ module.exports = {
     crud,
 }
 
-},{"./utils":15}],10:[function(require,module,exports){
+},{"./utils":16}],11:[function(require,module,exports){
 const { is } = require('./utils')
 
 // prototype extensions
@@ -836,8 +843,37 @@ Object.filter = (obj, predicate) => {
 
 // $ extensions
 $.fn.hasAttr = function(name) {
-    return this[0].hasAttribute(name)
+    return this[0] && this[0].hasAttribute(name)
 }
+
+;['show', 'hide'].forEach(method => {
+    var origFn = $.fn[method]
+    $.fn[method] = function() {
+        const isSpecial = this.hasAttr('menu') || this.hasAttr('modal') || this.hasAttr('sidemenu')
+        if (isSpecial) {
+            document.body.style.setProperty("--elem-h", this[0].orig_h)
+            const backdrop = this.closest('[rasti]').find('.rs-backdrop')
+            if (method == 'show') {
+                this.addClass('open')
+                backdrop.addClass('backdrop')
+                this[0].visible = true
+                origFn.call(this)
+            }
+            if (method == 'hide') {
+                this.removeClass('open')
+                this.addClass('close')
+                backdrop.removeClass('backdrop')
+                this[0].visible = false
+                setTimeout( () => {
+                    this.removeClass('close')
+                    origFn.call(this)
+                }, 500)
+            }
+        }
+        else origFn.call(this)
+        return this
+    }
+})
 
 $.fn.move = function(options) {
     var options = Object.assign({
@@ -893,7 +929,7 @@ $.fn.move = function(options) {
     }
 }
 
-},{"./utils":15}],11:[function(require,module,exports){
+},{"./utils":16}],12:[function(require,module,exports){
 module.exports = {
 
 stack : $el => {
@@ -903,12 +939,11 @@ stack : $el => {
         el.classList.add('fx-stack-el')
         setTimeout( _ => {
             el.classList.remove('fx-stack-el')
-        }, i * 50);
+        }, i * 50)
     })
     setTimeout( _ => {
         $el.removeClass('fx-stack-container')
-    }, $children.length * 50 + 500);
-
+    }, $children.length * 50 + 500)
 },
 
 stamp : $el => {
@@ -918,23 +953,23 @@ stamp : $el => {
         el.classList.add('fx-stamp-el')
         setTimeout( _ => {
             el.classList.remove('fx-stamp-el')
-        }, i * 40);
+        }, i * 60)
     })
     setTimeout( _ => {
         $el.removeClass('fx-stamp-container')
-    }, $children.length * 40 + 500);
+    }, $children.length * 60 + 500)
 },
 
 toast : $el => {
     $el.addClass('active')
     setTimeout( _ => {
         $el.removeClass('active')
-    }, 4000);
-
+    }, 4000)
 },
 
+
 }
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 module.exports = {
 
 app : {
@@ -948,43 +983,65 @@ app : {
     exit : '🚪',
     call : '📞',
     search : '🔍',
-    battery : '🔋',
-    'power-plug' : '🔌',
-    alarm : '🔔',
-    'volume-min' : '🔈',
-    'volume-mid' : '🔉',
-    'volume-max' : '🔊',
-    'dim' : '🔅',
-    'bright' : '🔆',
-    access : '♿',
+    add : '✚',
+    remove : '🗕',
+    undo : '↶',
+    redo : '↷',
+    reload : '⟳',
+    sync : '🗘',
+    minimize : '🗕',
+    restore : '🗗',
+    maximize : '🗖',
+    close : '⨯',
+    copy : '🗇',
+    accept : '✔️',
+    cancel : '✖️',
+    play : '▲',
+    stop : '■',
+    rec : '●',
+    select : '⛶',
+    select2 : '⬚',
+    contrast : '◐',
+    contrast2 : '◧',
+    contrast3 : '◩',
     bars : '☰',
     'h-dots' : '⋯',
     'v-dots' : '⋮',
     rows : '▤',
     columns : '▥',
     grid : '▦',
-    'spaced-grid' : '𝍖',
+    grid2 : '𝍖',
     warning : '⚠',
     error : '⨂',
     ban : '🛇',
+    network : '🖧',
+    alarm : '🔔',
+    'volume-min' : '🔈',
+    'volume-mid' : '🔉',
+    'volume-max' : '🔊',
+    'dim' : '🔅',
+    'bright' : '🔆',
     mute : '🔇',
     'alarm-off' : '🔕',
 },
 
 office : {
     file : '📄',
-    file2 : '🖻',
-    file3 : '🖺',
+    'img-file' : '🖻',
+    chart : '📈',
+    chart2 : '📊',
     folder : '📂',
-    edit : '✏️',
-    pen : '🖊️',
-    pen2 : '🖋️',
+    pen : '🖋️',
+    pencil : '✏️',
+    ballpen : '🖊️',
+    crayon : '🖍',
     paintbrush : '🖌️',
-    cut : '✂️',
-    clip : '📎',
+    scissors : '✂️',
     clipboard : '📋',
+    clip : '📎',
     link : '🔗',
     ruler : '📏',
+    ruler2: '📐',
     pin : '📌',
     'safety-pin' : '🧷',
     card : '💳',
@@ -998,6 +1055,7 @@ office : {
     notebook : '📓',
     notepad : '🗒️',
     calendar : '📅',
+    calendar2 : '📆',
     envelope : '✉️',
     email : '📧',
     mailbox : '📫',
@@ -1034,12 +1092,18 @@ electronics : {
     minidisc : '💽',
     floppy : '💾',
     tape : '📼',
+    battery : '🔋',
+    'power-plug' : '🔌',
+    level : '🎚',
+    knobs : '🎛',
 },
 
 tools : {
+    bricks : '🧱',
     wrench : '🔧',
     hammer : '🔨',
     pick : '⛏️',
+    axe : '🪓',
     tools : '🛠️',
     tools2 : '⚒️',
     toolbox : '🧰',
@@ -1052,25 +1116,33 @@ tools : {
     compass : '🧭',
     magnet : '🧲',
     abacus : '🧮',
+    candle : '🕯',
     bulb : '💡',
     flashlight : '🔦',
     microscope : '🔬',
     telescope : '🔭',
     antenna : '📡',
     satellite : '🛰️',
+    stethoscope : '🩺',
+    syringe : '💉',
+    'test-tube': '🧪',
+    alembic : '⚗️',
+    'petri-dish' : '🧫',
     watch : '⌚',
     stopwatch : '⏱️',
     clock : '⏰',
     hourglass : '⌛',
+    razor : '🪒',
     dagger : '🗡️',
     swords : '⚔️',
     shield : '🛡️',
     bow : '🏹',
     gun : '🔫',
+    bomb : '💣',
 },
 
 vehicles : {
-    skate : '🛹',
+    skateboard : '🛹',
     scooter : '🛴',
     bicycle : '🚲',
     motorscooter : '🛵',
@@ -1099,6 +1171,60 @@ vehicles : {
     ufo : '🛸',
 },
 
+buildings : {
+    ecastle : '🏯',
+    wcastle : '🏰',
+    etemple : '⛩',
+    wtemple : '🏛', 
+    factory : '🏭',
+    building : '🏢',
+    mall : '🏬',
+    school : '🏫',
+    hospital : '🏥',
+    mail : '🏣',
+    store : '🏪',
+    hotel : '🏨',
+    'love-hotel' : '🏩',
+    bank : '🏦',
+    atm : '🏧',
+},
+
+characters : {
+    teacherm : '👨‍🏫',
+    teacherw : '👩‍🏫',
+    scientistm : '👨‍🔬',
+    scientistw : '👩‍🔬',
+    hackerm : '👨‍💻',
+    hackerw : '👩‍💻',
+    artistm : '👨‍🎨',
+    artistw : '👩‍🎨',
+    doctorm : '👨‍⚕️',
+    doctorw : '👩‍⚕️',
+    astronautm : '👨‍🚀',
+    astronautw : '👩‍🚀',
+    elfm : '🧝‍♂️',
+    elfw : '🧝‍♀️',
+    fairym : '🧚‍♂️',
+    fairyw : '🧚',
+    merman : '🧜‍♂️',
+    mermaid : '🧜‍♀️',
+    magem : '🧙‍♂️',
+    magew : '🧙‍♀️',
+    geniem : '🧞‍♂️',
+    geniew : '🧞‍♀️',
+    superherom : '🦸‍♂️',
+    superherow : '🦸‍♀️',
+    supervillainm : '🦹‍♂️',
+    supervillainw : '🦹‍♀️',
+    vampirem : '🧛‍♂️',
+    vampirew : '🧛‍♀️',
+    zombiem : '🧟‍♂️',
+    zombiew : '🧟‍♀️',
+    jack : '⛄️',
+    jack2 : '☃️',
+    teddy : '🧸',
+},
+
 faces : {
     man : '👨',
     woman : '👩',
@@ -1112,51 +1238,32 @@ faces : {
     ogre : '👹',
 },
 
-characters : {
-    teacher : '👨‍🏫',
-    teacherw : '👩‍🏫',
-    scientist : '👨‍🔬',
-    scientistw : '👩‍🔬',
-    hacker : '👨‍💻',
-    hackerw : '👩‍💻',
-    artist : '👨‍🎨',
-    artistw : '👩‍🎨',
-    doctor : '👨‍⚕️',
-    doctorw : '👩‍⚕️',
-    astronaut : '👨‍🚀',
-    astronautw : '👩‍🚀',
-    elf : '🧝‍♂️',
-    elfw : '🧝‍♀️',
-    mage : '🧙‍♂️',
-    magew : '🧙‍♀️',
-    genie : '🧞‍♂️',
-    geniew : '🧞‍♀️',
-    fairy : '🧚',
-    fairym : '🧚‍♂️',
-    vampire : '🧛‍♂️',
-    vampirew : '🧛‍♀️',
-    zombie : '🧟‍♂️',
-    zombiew : '🧟‍♀️',
-},
-
 animals : {
+    hippo : '🦛',
     elefant : '🐘',
     rhino : '🦏',
     monkey : '🐒',
     gorilla : '🦍',
+    orangutan : '🦧',
+    kangaroo : '🦘',
+    sloth : '🦥',
+    otter : '🦦',
     sheep : '🐑',
     ram : '🐏',
     goat : '🐐',
     deer : '🦌',
     camel : '🐪',
     horse : '🐎',
+    llama : '🦙',
     pig : '🐖',
     cow : '🐄',
     turtle : '🐢',
     rabbit : '🐇',
     squirrel : '🐿️',
     hedgehog : '🦔',
+    raccoon : '🦝',
     badger : '🦡',
+    skank : '🦨',
     mouse : '🐁',
     rat : '🐀',
     cat : '🐈',
@@ -1176,7 +1283,6 @@ animals : {
     fugu : '🐡',
     nemo : '🐟',
     dori : '🐠',
-    shrimp : '🦐',
     crab : '🦀',
     lobster : '🦞',
     squid : '🦑',
@@ -1184,10 +1290,12 @@ animals : {
     penguin : '🐧',
     bird : '🐦',
     dove : '🕊️',
-    parrot : '🦜',
     eagle : '🦅',
+    parrot : '🦜',
+    peacock : '🦚',
     duck : '🦆',
     swan : '🦢',
+    flamingo : '🦩',
     owl : '🦉',
     bat : '🦇',
     turkey : '🦃',
@@ -1197,6 +1305,7 @@ animals : {
     chick3: '🐣',
     snail : '🐌',
     butterfly : '🦋',
+    mosquito : '🦟',
     bee : '🐝',
     ant : '🐜',
     cricket : '🦗',
@@ -1214,7 +1323,7 @@ plants : {
     shamrock : '☘️',
     luck : '🍀',
     wheat : '🌾',
-    corn : '🌽',
+    bamboo : '🎋',
     flower : '🌼',
     sunflower : '🌻',
     rose : '🌹',
@@ -1226,7 +1335,6 @@ plants : {
     'palm-tree' : '🌴',
     cactus : '🌵',
     sprout : '🌱',
-    mushroom : '🍄',
     nut : '🌰',
 },
 
@@ -1238,64 +1346,187 @@ nature : {
     fire : '🔥',
     water : '💧',
     wave : '🌊',
-    ice : '❄',
+    ice : '🧊',
+    snowflake : '❄️',
     wind : '💨',
     cloud : '☁️',
     mountain : '⛰️',
     volcano : '🌋',
     rainbow : '🌈',
+    globe : '🌏',
+    globe2 : '🌎',
+    globe3 : '🌍',
     comet : '☄️',
-    asiania : '🌏',
-    americas : '🌎',
-    eurafrica : '🌍',
+    planet : '🪐',
     galaxy : '🌌',
     dna : '🧬',
+    cloudy : '⛅️',
+    cloudy2 : '🌥',
+    rainwsun : '🌦',
+    rain : '🌧',
+    storm : '⛈',
+    thunder : '🌩',
+    snow : '🌨',
+    tornado : '🌪',
 },
 
-actions : {
-    add : '✚',
-    remove : '─',
-    undo : '↶',
-    redo : '↷',
-    reload : '⟳',
-    sync : '🗘',
-    minimize : '🗕',
-    restore : '🗗',
-    maximize : '🗖',
-    close : '⨯',
-    copy : '🗇',
-    accept : '✔️',
-    cancel : '✖️',
-    eject : '⏏',
-    play : '▶',
-    pause : 'Ⅱ',
-    'play-pause' : '⏯',
-    stop : '■',
-    prev : '⏮',
-    next : '⏭',
-    rec : '⚫',
-    'rec-on' : '🔴',
-    select : '⛶',
-    select2 : '⬚',
+'food & drink' : {
+    sandwich : '🥪',
+    kebab : '🥙',
+    taco : '🌮',
+    burrito : '🌯',
+    salad : '🥗',
+    paella : '🥘',
+    burger : '🍔',
+    pizza : '🍕',
+    'hot-dog' : '🌭',
+    fries : '🍟',
+    spaghetti : '🍝',
+    falafel : '🧆',
+    bread : '🍞',
+    bread2 : '🥖',
+    croissant : '🥐',
+    bagel : '🥯',
+    pretzel : '🥨',
+    butter : '🧈',
+    cheese : '🧀',
+    egg : '🥚',
+    'fried-egg' : '🍳',
+    meat : '🥩',
+    meat2 : '🍖',
+    'chicken-leg' : '🍗',
+    bacon : '🥓',
+    onigiri : '🍙',
+    gohan : '🍚',
+    kare : '🍛',
+    ramen : '🍜',
+    dango : '🍡',
+    sashimi : '🍣',
+    shrimp : '🍤',
+    oyster : '🦪',
+    lobster : '🦞',
+    soup : '🍲',
+    bento : '🍱',
+    takeout :'🥡',
+    candy : '🍬',
+    lollipop : '🍭',
+    chocolate : '🍫',
+    popcorn : '🍿',
+    cookie : '🍪',
+    donut : '🍩',
+    waffle : '🧇',
+    pancakes : '🥞',
+    icecream : '🍨',
+    icecream2 : '🍦',
+    frosty : '🍧',
+    pie : '🥧',
+    cake : '🍰',
+    cupcake : '🧁',
+    'moon-cake': '🥮',
+    custard : '🍮',
+    banana : '🍌',
+    strawberry : '🍓',
+    cherry : '🍒',
+    plum : '🍑',
+    pear : '🍐',
+    apple : '🍎',
+    apple2 : '🍏',
+    pineapple : '🍍',
+    lemon : '🍋',
+    orange : '🍊',
+    melon : '🍈',
+    watermelon : '🍉',
+    mango : '🥭',
+    coconut : '🥥',
+    kiwi : '🥝',
+    grapes : '🍇',
+    tomato : '🍅',
+    eggplant : '🍆',
+    avocado : '🥑',
+    broccoli : '🥦',
+    cucumber : '🥒',
+    greeny : '🥬',
+    chili : '🌶',
+    corn : '🌽',
+    carrot : '🥕',
+    potato : '🥔',
+    'sweet-potato' : '🍠',
+    garlic : '🧄',
+    onion : '🧅',
+    mushroom : '🍄',
+    peanut : '🥜',
+    honey : '🍯',
+    juice : '🧃',
+    tea : '🍵',
+    coffee : '☕️',
+    milk : '🥛',
+    beer : '🍺',
+    beers : '🍻',
+    cheers : '🥂',
+    daikiri : '🍹',
+    martini : '🍸',
+    whiskey : '🥃',
+    wine : '🍷',
+    sake : '🍶',
+    mate : '🧉',
+    forknife : '🍴',
+    chopsticks : '🥢',
 },
 
-culture : {
-    pommee : '🕂',
-    maltese : '✠',
-    latin : '✝',
-    latin2 : '🕇',
-    celtic : '🕈',
-    jew : '✡',
-    ankh : '☥',
-    peace : '☮',
-    om : '🕉',
-    'ying-yang' : '☯',
-    atom : '⚛️',
-    comunism : '☭',
-    'moon-star' : '☪',
-    health : '⛨',
-    darpa : '☸',
-    diamonds : '❖',
+'sports & fun' : {
+    running : '🏃',
+    biking : '🚴‍♂️',
+    climbing : '🧗‍♂️',
+    swimming : '🏊',
+    surfing : '🏄',
+    rowing : '🚣‍♂️',
+    diving : '🤿',
+    skating : '⛸',
+    skiing : '⛷',
+    snowboard : '🏂',
+    horseride : '🏇',
+    yoga : '🧘‍♂️',
+    rolling : '🤸‍♂️',
+    juggling : '🤹‍♂️',
+    basketball : '🏀',
+    soccer : '⚽',
+    football : '🏈',
+    rugby : '🏉',
+    volleyball : '🏐',
+    beisball : '⚾',
+    tennis : '🎾',
+    badminton : '🏸',
+    'ping-pong' : '🏓',
+    hockey: '🏑',
+    'ice-hockey': '🏒',
+    lacrosse : '🥍',
+    'cricket-game' : '🏏',
+    golf : '⛳️',
+    fishing : '🎣',
+    box : '🥊',
+    martial : '🥋', 
+    frisbee : '🥏',
+    bowling : '🎳',
+    pool : '🎱',
+    die : '🎲',
+    puzzle : '🧩',
+    slot : '🎰',
+    darts : '🎯',
+    theatre : '🎭',
+    palette : '🎨',
+    movie : '🎬',
+    party : '🎉',
+    party2 : '🎊',
+    baloon : '🎈',
+    yoyo : '🪀',
+    kite : '🪁',
+    fireworks : '🎇',
+    fireworks2 : '🎆',
+    santa : '🎅',
+    xmas : '🎄',
+    haloween : '🎃',
+    birthday : '🎂',
+    gift : '🎁',
 },
 
 music : {
@@ -1308,6 +1539,7 @@ music : {
     'cleff-f' : '𝄢',
     'cleff-c' : '𝄡',
     guitar : '🎸',
+    banjo : '🪕',
     piano : '🎹',
     violin : '🎻',
     saxophone : '🎷',
@@ -1315,7 +1547,126 @@ music : {
     drum : '🥁',
 },
 
-astro : {
+clothing : {
+    shirt : '👕',
+    't-shirt' : '👔',
+    shorts : '🩳',
+    pants : '👖',
+    blouse : '👚',
+    dress : '👗',
+    sari : '🥻',
+    'swim-suit' : '🩱',
+    bikini : '👙',
+    yukata : '👘',
+    vest : '🦺',
+    coat : '🧥',
+    'lab-coat' : '🥼',
+    heels : '👠',
+    sandal : '👡',
+    ballet : '🩰',
+    texan : '👢',
+    shoe : '👞',
+    snicker : '👟',
+    boot : '🥾',
+    flats : '🥿',
+    socks : '🧦',
+    briefs : '🩲',
+    gloves : '🧤',
+    scarf : '🧣',
+    hat : '👒',
+    'top-hat' : '🎩',
+    cap : '🧢',
+    'grad-cap' : '🎓',
+    helmet : '⛑',
+    crown : '👑',
+    pouch : '👝',
+    purse : '👛',
+    handbag : '👜',
+    suitcase : '💼',
+    backpack : '🎒',
+    glasses : '👓',
+    sunglasses : '🕶️',
+    goggles : '🥽',
+    ribbon : '🎀',
+},
+
+other : {
+    hand: '✋',
+    'thumbs-up' : '👍',
+    'thumbs-down' : '👎',
+    cool : '🤙',
+    metal : '🤘',
+    spock : '🖖',
+    pinch : '🤏',
+    arm : '💪',
+    'bionic-arm' : '🦾',
+    leg : '🦵',
+    'bionic-leg' : '🦿',
+    foot : '🦶',
+    eye : '👁️',
+    ear : '👂',
+    'bionic-ear' : '🦻',
+    tooth : '🦷',
+    bone : '🦴',
+    brain : '🧠',
+    blood : '🩸',
+    'band-aid' : '🩹',
+    poo : '💩',
+    heart : '❤️',
+    hearts : '💕',
+    'broken-heart' : '💔',
+    star : '⭐',
+    trophy : '🏆',
+    diamond : '💎',
+    jar : '⚱️',
+    jar2 : '🏺',
+    broom : '🧹',
+    cart : '🛒',
+    chair : '🪑',
+    pill : '💊',
+    globe : '🌐',
+    flag : '⚑',
+    film : '🎞️',
+    newbie : '🔰',
+    trident : '🔱',
+    japan : '🗾',
+    fuji : '🗻',
+    'tokyo-tower' : '🗼',
+    liberty : '🗽',
+    picture : '🖼️',
+    'crystal-ball' : '🔮',
+    recycle : '♻',
+    access : '♿',
+    hot : '♨️',
+    poison : '☠️',
+    tension : '⚡',
+    radioactive : '☢️',
+    biohazard : '☣️',
+    bisexual : '⚥',
+    trans : '⚧',
+    bitcoin : '₿',
+},
+
+culture : {
+    pommee : '🕂',
+    maltese : '✠',
+    latin : '✝',
+    latin2 : '🕇',
+    celtic : '🕈',
+    jew : '✡',
+    ankh : '☥',
+    peace : '☮',
+    ohm : '🕉',
+    'ying-yang' : '☯',
+    atom : '⚛️',
+    communism : '☭',
+    'moon-star' : '☪',
+    health : '⛨',
+    darpa : '☸',
+    diamonds : '❖',
+},
+
+astrology : {
     aries : '♈',
     tauro : '♉',
     gemini : '♊',
@@ -1374,7 +1725,7 @@ arrows : {
     right3: '▷',
 },
 
-keys : {
+'keys & shapes' : {
     command : '⌘',
     option : '⌥',
     shift : '⇧',
@@ -1384,9 +1735,8 @@ keys : {
     enter : '⎆',
     escape : '⎋',
     tab : '↹',
-},
-
-geometric : {
+    power : '⏻',
+    sleep : '⏾',
     triangle : '▲',
     square : '■',
     pentagon : '⬟',
@@ -1396,90 +1746,36 @@ geometric : {
     'curved-square' : '▢',
     'square-quadrant' : '◰',
     'round-quadrant' : '◴',
-    contrast : '◐',
-    contrast2 : '◧',
-    contrast3 : '◩',
 },
 
-hieroglyph : {
-    'an-eye' : '𓁹',
-    'tear-eye' : '𓂀',
-    'an-ear' : '𓂈',
-    'writing-arm' : '𓃈',
-    'a-leg' : '𓂾',
-    'watering-leg' : '𓃂',
-    'closed-hand' : '𓂧',
-    'open-hand' : '𓂩',
-    'a-finger' : '𓂭',
-    'crying-blank-eye' : '𓂍',
-    'arms-hat-spear' : '𓂙',
-    'a-staff' : '𓋈',
-    'a-fan' : '𓇬',
-    'a-jar' : '𓄣',
-    'a-beetle' : '𓆣',
-    'a-wasp' : '𓆤',
-    'a-fairy' : '𓋏',
-    'sitting-man' : '𓀀',
-    'happy-sitting-man' : '𓁏',
-    'exited-sitting-man' : '𓁕',
-    'sitting-woman' : '𓁑',
-    'sitting-bird-man' : '𓁟',
-    'sitting-wolf-man' : '𓁢',
-    'dancing-man' : '𓀤',
-    'broken-arms-man' : '𓀣',
-    'upside-down-man' : '𓀡',
-    'dead-guy' : '𓀿',
-    'three-leg-guy' : '𓁲',
-},
-
-other : {
-    'hand': '✋',
-    'thumbs-up' : '👍',
-    'thumbs-down' : '👎',
-    cool : '🤙',
-    metal : '🤘',
-    spock : '🖖',
-    strong : '💪',
-    eye : '👁️',
-    ear : '👂',
-    brain : '🧠',
-    glasses : '👓',
-    sunglasses : '🕶️',
-    goggles : '🥽',
-    ribbon : '🎀',
-    backpack : '🎒',
-    cart : '🛒',
-    poo : '💩',
-    heart : '❤️',
-    hearts : '💕',
-    'broken-heart' : '💔',
-    star : '⭐',
-    crown : '👑',
-    trophy : '🏆',
-    diamond : '💎',
-    jar : '🏺',
-    pill : '💊',
-    globe : '🌐',
-    voltage : '⚡',
-    flag : '⚑',
-    film : '🎞️',
-    recycle : '♻',
-    network : '🖧',
-    newbie : '🔰',
-    trident : '🔱',
-    japan : '🗾',
-    fuji : '🗻',
-    'tokyo-tower' : '🗼',
-    liberty : '🗽',
-    die : '🎲',
-    palette : '🎨',
-    frame : '🖼️',
-    'crystal-ball' : '🔮',
-    bomb : '💣',
-    poison : '☠️',
-    bitcoin : '₿',
-    bisexual : '⚥',
-    pansexual : '⚧',
+hieroglyphs : {
+    'hg-eye' : '𓁹',
+    'hg-tear-eye' : '𓂀',
+    'hg-ear' : '𓂈',
+    'hg-writing-arm' : '𓃈',
+    'hg-leg' : '𓂾',
+    'hg-watering-leg' : '𓃂',
+    'hg-hand' : '𓂧',
+    'hg-hand-2' : '𓂩',
+    'hg-finger' : '𓂭',
+    'hg-open-wound' : '𓂍',
+    'hg-arms-hat-spear' : '𓂙',
+    'hg-staff' : '𓋈',
+    'hg-fan' : '𓇬',
+    'hg-jar' : '𓄣',
+    'hg-beetle' : '𓆣',
+    'hg-wasp' : '𓆤',
+    'hg-fairy' : '𓋏',
+    'hg-sitting-man' : '𓀀',
+    'hg-happy-sitting-man' : '𓁏',
+    'hg-sitting-woman' : '𓁑',
+    'hg-sitting-bird-man' : '𓁟',
+    'hg-sitting-wolf-man' : '𓁢',
+    'hg-dancing-man' : '𓀤',
+    'hg-broken-arms-man' : '𓀣',
+    'hg-upside-down-man' : '𓀡',
+    'hg-dead-guy' : '𓀿',
+    'hg-three-legged-guy' : '𓁲',
 },
 
 /*
@@ -1487,27 +1783,11 @@ other : {
 animal faces
 🐼🐻🐺🐮🐷🐭🐹🐰🐱🐶🐵🐴🐯🐲🐨🐸🦄
 
-sports & entertainment
-🏄🏃🏂🏇🏊🏀⚽⚾🎾⛷⛸⛵⛵
-🎳🎲🎱🎰🎯🎭🎬🎩
-🎊🎉🎈🎇🎆🎅🎄🎃🎂🎁
-
-food & drink
-🍔🍕🍝🍞🍟🍖🍗🍙🍚🍛🍜🍡🍣🍤
-🍲🍱🍰🍮🍬🍫🍪🍩🍨🍧🍦
-🍓🍒🍑🍐🍏🍎🍍🍌🍋🍊🍉🍈🍇🍅🍄
-🍻🍺🍹🍸🍷🍶🍴🍳
-
-other
-🎐🎏🎎🎋🏯
-🏰🏭🏬🏫🏪🏩🏨🏧🏦🏥🏣🏢
-❦
-
 */
 
 }
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function (global){
 require('./extensions')
 const { History, Pager, state, crud } = require('./components')
@@ -1516,10 +1796,12 @@ const { is, sameType, exists, resolveAttr, html } = utils
 const { themes, themeMaps } = require('./themes')
 
 const options = {
-    history : false,
+    history : true,
+    persist : true,
     root    : '',
     theme   : 'base',
     lang    : '',
+    separator : ';',
     stats   : '%n results in %t seconds',
     noData  : 'No data available',
     newEl   : 'New element',
@@ -1532,13 +1814,15 @@ const breakpoints = {
     phone : 500,
     tablet : 800,
 }
-const media = {}
+const media = {on:{}}
 for (let device in breakpoints) {
-    media[device] = window.matchMedia(`(max-width: ${ breakpoints[device] }px)`).matches
+    const query = window.matchMedia(`(max-width: ${ breakpoints[device] }px)`)
+    media[device] = query.matches
+    media.on[device] = handler => query.addListener(handler)
 }
 
 const TEXT_ATTRS = 'label header text placeholder'.split(' ')
-const EVENT_ATTRS = 'click change hover load'.split(' ')
+const EVENT_ATTRS = 'click change hover input keydown submit load'.split(' ')
 const ACTION_ATTRS = 'show hide toggle'.split(' ')
 const NOCHILD_TAGS = 'input select textarea img'.split(' ')
 
@@ -1555,26 +1839,22 @@ const error = (...params) => {
 
 function rasti(name, container) {
 
+    const self = this
     const errPrefix = 'Cannot create rasti app: '
-
     if ( !is.string(name) ) return error(errPrefix + 'app must have a name!')
+    name = name.replace(' ', '')
 
-    this.name = name.replace(' ', '')
-
-    if ( !container ) {
-        container = $('body')
-    }
+    if ( !container ) container = $('body')
     else if ( !(container.selector) ) {
         if ( is.string(container) || (container.tagName && 'BODY DIV'.search(container.tagName) > -1) ) container = $(container)
         else return error(errPrefix + 'app container is invalid. Please provide a selector string, a jQuery object ref or a DOM element ref')
     }
-    container.attr('rasti', this.name)
-
-    const self = this
+    container.attr('rasti', name)
 
 
     // private properties
 
+    const __name = name
     const __pagers = new Map()
     const __crud = crud(this)
     const __state = {}
@@ -1594,7 +1874,7 @@ function rasti(name, container) {
         theme : '',
         lang  : '',
     }
-    this.state = state(this)
+    this.state = state(this, __name)
     this.props = {}
     this.methods = {}
     this.pages = {}
@@ -1603,11 +1883,12 @@ function rasti(name, container) {
     this.langs = {}
     this.themes = themes
     this.themeMaps = themeMaps
+    this.sidemenu = null
 
 
     // public methods
 
-    this.extend = extend
+    this.config = config
     this.init = init
     this.navTo = navTo
     this.render = render
@@ -1617,19 +1898,37 @@ function rasti(name, container) {
     this.toggleFullScreen = toggleFullScreen
 
 
-
-    function extend(props) {
-        if (!props || !is.object(props)) return error('Cannot extend app: no properties found')
-        for (let key in self) {
-            if ( is.object(self[key]) && is.object(props[key]) )
-                Object.assign(self[key], props[key])
+    function config(props) {
+        if (!props || !is.object(props)) return error('Cannot configure app [%s]: no properties found', __name)
+        for (let key in props) {
+            const known = is.object(self[key])
+            const valid = is.object(props[key])
+            if (!known) {
+                warn('Unknown config prop [%s]', key)
+                continue
+            }
+            if (!valid) {
+                warn('Invalid config prop [%s], must be an object', key)
+                continue
+            }
+            if ('data methods'.includes(key)) {
+                for (let name in props[key]) {
+                    const value = props[key][name]
+                    if (key == 'methods' && !is.function(value))
+                        warn('Invalid method [%s], must be a function', name)
+                    else
+                        self[key][name] = is.function(value) ? value.bind(self) : value
+                }
+            }
+            else Object.assign(self[key], props[key])
         }
+        return self
     }
 
 
     function init(options) {
         const initStart = window.performance.now()
-        log('Initializing app [%s]...', self.name)
+        log('Initializing app [%s]...', __name)
 
         container
             .addClass('big loading backdrop')
@@ -1639,7 +1938,7 @@ function rasti(name, container) {
         if (options) {
             if ( !is.object(options) ) warn('Init options must be an object!')
             else Object.keys(self.options).forEach( key => {
-                if (options[key]) {
+                if ( exists(options[key]) ) {
                     if ( !sameType(self.options[key], options[key])  ) warn('Init option [%s] is invalid', key)
                     else self.options[key] = options[key]
                 }
@@ -1649,11 +1948,11 @@ function rasti(name, container) {
 
         // apply defaults
         Object.keys(self.defaults).forEach( key => {
-            if (!self.options[key]) self.options[key] = self.defaults[key]
+            //if (!self.options[key]) self.options[key] = self.defaults[key]
         })
 
 
-        // define lang (if not already defined)
+        // define lang (if applicable)
         if (!self.options.lang) {
             const keys = Object.keys(self.langs)
             if (keys.length) self.options.lang = keys[0]
@@ -1661,8 +1960,10 @@ function rasti(name, container) {
 
 
         // append theme style container
-        container.append('<style theme>')
+        container.append('<style class=rs-theme>')
 
+        // append backdrop container
+        container.append('<div class=rs-backdrop>')
 
         // append page-options containers
         container.find('[page]').each( (i, el) => {
@@ -1670,124 +1971,52 @@ function rasti(name, container) {
         })
 
 
-        // init rasti blocks
-        container.find('[block]').each( (i, el) => {
-            initBlock($(el))
-        })
-
-
-        // init "incognito" blocks
-        container.find('[data]').not('[block]')
-            .each( (i, el) => {
-                updateBlock($(el))
+        // fix labels
+        NOCHILD_TAGS.forEach( tag => {
+            container.find(tag + '[label]').each( (i, el) => {
+                fixLabel($(el))
             })
-
-
-        // create tabs
-        container.find('.tabs').each( (i, el) => {
-            createTabs($(el))
-        })
-        if (media.tablet || media.phone) container.find('.tabs-tablet').each( (i, el) => {
-            createTabs($(el))
-        })
-        if (media.phone) container.find('.tabs-phone').each( (i, el) => {
-            createTabs($(el))
         })
 
 
-        // add close btn to modals
-        container.find('[modal]').each( (i, el) => {
-            $('<div icon=close class="top right" />')
-            .on('click', e => {
-                el.style.display = 'none'
-                self.active.page.find('.backdrop').removeClass('backdrop')
-            })
-            .appendTo(el)
+        // fix input icons
+        container.find('input[icon]').each( (i, el) => {
+            fixIcon($(el))
         })
 
 
-        // TODO: add modal closure via ESC key
+        // init blocks
+        container.find('[data]:not([template])').each( (i, el) => {
+            updateBlock($(el))
+        })
 
 
-        // init nav
-        container.find('[nav]').on('click', e => {
+        initSideMenu()
+
+
+        initModals()
+        
+        
+        // init tabs
+        function initTabs(selector) {
+            container.find(selector).each( (i, el) => { createTabs(el) })
+        }
+        initTabs('.tabs')
+        if (media.tablet || media.phone) initTabs('.tabs-tablet')
+        if (media.phone) initTabs('.tabs-phone')
+
+
+        // init [nav] bindings
+        initNav()
+
+
+        // init [submit] bindings
+        initSubmit()
+
+
+        // init [render] bindings
+        container.on('click change', '[render]:not([submit])', e => {
             const el = e.currentTarget
-            const $el = $(el)
-            const page = $el.attr('nav')
-            let params = {}
-
-            if (!page) return error('Missing page name in [nav] attribute of element:', el)
-
-            if (el.hasAttribute('params')) {
-                const $page = self.active.page
-                let navparams = $el.attr('params')
-                let $paramEl
-
-                if (navparams) {
-                    // check to see if params is an object
-                    if (navparams[0]=='{') {
-                        try {
-                            params = JSON.parse(navparams)
-                        }
-                        catch(err){
-                            error('Invalid JSON in [params] attribute of element:', el)
-                            error('Tip: be sure to use double quotes ("") for both keys and values')
-                            return
-                        }
-                    }
-                    else {
-                        // get values of specified navparams
-                        navparams = params.split(' ')
-                        navparams.forEach( key => {
-                            $paramEl = $page.find('[navparam='+ key +']')
-                            if ($paramEl.length) params[key] = $paramEl.val()
-                            else warn('Could not find navparam element [%s]', key)
-                        })
-                    }
-                }
-                else {
-                    // get values of all navparams in page
-                    $page.find('[navparam]').each( (i, el) => {
-                        const $el = $(el)
-                        const key = resolveAttr($el, 'navparam')
-                        if (key) params[key] = $el.val()
-                    })
-                }
-            }
-            navTo(page, params)
-        })
-
-
-        // init submit
-        container.find('[submit]').click( e => {
-            const $el = $(e.target)
-            const method = $el.attr('submit')
-            const callback = $el.attr('then')
-            const template = $el.attr('render')
-            const isValidCB = callback && is.function(self.methods[callback])
-            const start = window.performance.now()
-
-            if (!method) return error('Missing method in [submit] attribute of el:', this)
-
-            if (callback && !isValidCB) error('Undefined method [%s] declared in [then] attribute of el:', callback, this)
-
-            $el.addClass('loading').attr('disabled', true)
-
-            submitAjax(method, resdata => {
-                const time = Math.floor(window.performance.now() - start) / 1000
-                log('Ajax method [%s] took %s seconds', method, time)
-
-                if (isValidCB) self.methods[callback](resdata)
-                if (template) render(template, resdata, time)
-
-                $el.removeClass('loading').removeAttr('disabled')
-            })
-        })
-
-
-        // init render
-        container.find('[render]').not('[submit]').click( e => {
-            const el = e.target
             const template = el.getAttribute('render')
             if (!template) return error('Missing template name in [render] attribute of element:', el)
             render(template)
@@ -1805,65 +2034,7 @@ function rasti(name, container) {
         })
 
 
-        // init actions
-        for (let action of EVENT_ATTRS) {
-            container.find('[on-'+ action +']').each( (i, el) => {
-                const $el = $(el)
-                const methodName = $el.attr('on-' + action)
-                if ( !methodName ) return error('Missing utility method in [on-%s] attribute of element:', action, el)
-                const method = self.methods[methodName]
-                if ( !method ) return error('Undefined utility method "%s" declared in [on-%s] attribute of element:', methodName, action, el)
-                $el.on(action, method)
-                   .removeAttr('on-' + action)
-                if (action == 'click') el.style.cursor = 'pointer'
-            })
-        }
-        for (let action of ACTION_ATTRS) {
-            container.find('['+ action +']').each( (i, el) => {
-                const $el = $(el)
-                const $page = $el.closest('[page]')
-                const targetSelector = $el.attr(action)
-
-                if ( !targetSelector ) return error('Missing target selector in [%s] attribute of element:', action, el)
-                let $target = $page.find('['+targetSelector+']')
-                if ( !$target.length ) $target = container.find('['+targetSelector+']')
-                if ( !$target.length ) return error('Could not find target [%s] declared in [%s] attribute of element:', targetSelector, action, el)
-
-                $el.on('click', e => {
-                    e.stopPropagation()
-                    $target.addClass('target')
-                    container.find('[menu]:not(.target)').hide()
-                    $target.removeClass('target')
-                    const target = $target[0]
-                    if (target.hasAttribute('modal') || $target.hasClass('modal'))
-                        $page.find('.page-options').toggleClass('backdrop')
-                    $target[action]()
-                    target.style.display != 'none'
-                        ? $target.focus()
-                        : $target.blur()
-                })
-            })
-        }
-
-
-        // init pages
-        let page
-        let $page
-        for (let name in self.pages) {
-            page = self.pages[name]
-            if ( !is.object(page) ) return error('pages.%s must be an object!', name)
-            $page = container.find('[page='+ name +']')
-            if ( !$page.length ) return error('No container found for page "%s". Please bind one via [page] attribute', name)
-            if (page.init) {
-                if ( !is.function(page.init) ) return error('pages.%s.init must be a function!', name)
-                else {
-                    log('Initializing page [%s]', name)
-                    self.active.page = $page // to allow app.get() etc in page.init
-                    page.init()
-                }
-            }
-        }
-        self.active.page = null // must clear it in case it was assigned
+        initPages()
 
 
         // resolve empty attributes
@@ -1885,86 +2056,27 @@ function rasti(name, container) {
         })
 
 
-        // fix labels
-        NOCHILD_TAGS.forEach( tag => {
-            container.find(tag + '[label]').each( (i, el) => {
-                fixLabel($(el))
-            })
-        })
-
-
-        // fix input icons
-        container.find('input[icon]').each( (i, el) => {
-            fixIcon($(el))
-        })
-
-
-        // bind nav handler to popstate event
-        window.onpopstate = e => {
-            var page = e.state || location.hash.substring(1)
-            page
-                ? e.state ? navTo(page, null, true) : navTo(page)
-                : navTo(self.options.root)
+        // init internal history (if applicable)
+        if (self.options.history) {
+            __history = new History(self)
+            // bind nav handler to popstate event
+            window.onpopstate = e => {
+                var page = e.state || location.hash.substring(1)
+                page
+                    ? e.state ? navTo(page, null, true) : navTo(page)
+                    : navTo(self.options.root)
+            }
         }
 
+        
+        bindProps(container, self.props)
 
-        // init history (if applicable)
-        if (self.options.history) initHistory()
-
-
-        // restore and save state
-        $(window).on('beforeunload', e => { self.state.save() })
-        const prev_state = self.state.restore()
-        // set theme (if not already set)
-        if ( !self.active.theme ) setTheme(self.options.theme)
-        // set lang (if applicable and not already set)
-        if ( self.options.lang && !self.active.lang ) setLang(self.options.lang)
-        // if no lang, generate texts
-        if ( !self.options.lang ) {
-            container.find('[text]').each( (i, el) => {
-                $(el).text( $(el).attr('text') )
-            })
-        }
-        if (prev_state) navTo(prev_state.page)
-        else {
-            // nav to page in hash or to root or to first page container
-            const page = location.hash.substring(1) || self.options.root
-            navTo(
-                page && self.pages[page]
-                ? page
-                : container.find('[page]').first().attr('page')
-            )
-        }
+        
+        initState()
 
 
-        // init props
-        findProps(container, self.props)
-
-
-        // init field validations
-        container.find('button[validate]').each( (i, btn) => {
-            const $fields = $(btn).parent().find('input[required]')
-            btn.disabled = isAnyFieldInvalid($fields)
-            $fields.each( (i, field) => {
-                $(field).on('keydown', e => {
-                    btn.disabled = isAnyFieldInvalid($fields)
-                    if (e.key == 'Enter' && !btn.disabled) btn.click()
-                })
-            })
-        })
-
-        function isAnyFieldInvalid($fields) {
-            let valid = true
-            $fields.each( (i, field) => {
-                valid = valid && field.validity.valid
-                return valid
-            })
-            return !valid
-        }
-
-
-        // render automatic templates
-        container.find('[auto][template]').each( (i, el) => {
+        // render data templates
+        container.find('[data][template]').each( (i, el) => {
             render(el)
         })
 
@@ -1972,77 +2084,22 @@ function rasti(name, container) {
         // init prop-bound templates
         container.find('[prop][template]').each( (i, el) => {
             const $el = $(el)
-            bindElement($el, $el.attr('prop'), self.props)
+            const prop = $el.attr('prop')
+            bindElement($el, {prop}, self.props)
         })
 
 
         // init crud templates
-        container.find('[crud][template]').each( (i, el) => {
-            const $el = $(el)
-            const template = resolveAttr($el, 'template')
-            const datakey = resolveAttr($el, 'data')
-            const crudkey = resolveAttr($el, 'crud')
+        initCrud()
 
-            render(el)
+        
+        initEvents()
 
-            $el.on('click', '.rasti-crud-delete', e => {
-                const $controls = $(e.currentTarget).closest('[data-id]')
-                const id = $controls.attr('data-id')
-                try {
-                    __crud.delete({datakey, crudkey}, id)
-                        .then(
-                            ok => {
-                                $controls.parent().detach()
-                                log('Removed element [%s] from template [%s]', id, template)
-                            },
-                            err => {
-                                __crud.hideInputEl($el)
-                                $el.removeClass('active')
-                            }
-                        )
-                }
-                catch (err) {
-                    rasti.error(err)
-                }
-            })
 
-            $el.on('click', '.rasti-crud-update', e => {
-                // TODO: add update logic
-            })
+        initActions()
 
-            $el.on('click', '.rasti-crud-create', e => {
-                __crud.showInputEl($el)
-                $el.addClass('active')
-            })
 
-            $el.on('click', '.rasti-crud-accept', e => {
-                // TODO: finish this
-                let newel
-                try {
-                    newel = __crud.genDataEl($el)
-                    __crud.create({datakey, crudkey}, newel)
-                        .then(
-                            ok => {
-                                __crud.persistNewEl($el)
-                                $el.removeClass('active')
-                            },
-                            err => {
-                                __crud.hideInputEl($el)
-                                $el.removeClass('active')
-                            }
-                        )
-                }
-                catch (err) {
-                    rasti.error(err)
-                }
-
-            })
-
-            $el.on('click', '.rasti-crud-cancel', e => {
-                __crud.hideInputEl($el)
-                $el.removeClass('active')
-            })
-        })
+        initFieldValidations()
 
 
         // init movable elements
@@ -2051,129 +2108,42 @@ function rasti(name, container) {
         })
 
 
-        // init foldable elements (must have a header)
-        container.find('[foldable][header]').on('click', e => {
-            e.target.classList.toggle('folded')
+        // cache height of foldable elements
+        container.find('[foldable]').add('[menu]').each( (i, el) => {
+            el.orig_h = el.clientHeight + 'px'
         })
 
 
         container
-            .on('click', e => {
-                container.find('[menu]').hide()
+            .on('click', '[foldable]', e => {
+                const el = e.target
+                if (!el.hasAttribute('foldable')) return
+                const isOpen = el.clientHeight > 30
+                document.body.style.setProperty("--elem-h", el.orig_h)
+                if (isOpen) {
+                    el.classList.remove('open')
+                    el.classList.add('folded')
+                }
+                else {
+                    el.classList.remove('folded')
+                    el.classList.add('open')
+                }
             })
             .on('click', '.backdrop', e => {
-                $(e.target).removeClass('backdrop')
-                self.active.page.find('[modal]').hide()
+                container.find('[menu].open').hide()
+                container.find('[modal].open').hide()
+                if (self.sidemenu && self.sidemenu.visible) self.sidemenu.hide()
             })
             .removeClass('big loading backdrop')
 
         const initTime = Math.floor(window.performance.now() - initStart) / 1000
-        log('App [%s] initialized in %ss', self.name, initTime)
+        log('App [%s] initialized in %ss', __name, initTime)
 
+        return self
     }
 
 
-    function get(selector) {
-        var $els = self.active.page && self.active.page.find('['+ selector +']')
-        if (!$els || !$els.length) $els = container.find('['+ selector +']')
-        if (!$els.length) warn('No elements found for selector [%s]', selector)
-        return $els
-    }
-
-    function set(selector, value) {
-        var $els = get(selector)
-        $els.each( (i, el) => {
-            el.value = value
-            $(el).change()
-        })
-        return $els
-    }
-
-    function add(selector, ...values) {
-        var $els = get(selector)
-        $els.each( (i, el) => {
-            values.forEach( val => {
-                if (is.array(val)) el.value = el.value.concat(val)
-                else el.value.push(val)
-            })
-            $(el).change()
-        })
-        return $els
-    }
-
-
-    function findProps($container, state) {
-        $container.children().each( (i, el) => {
-            const $el = $(el)
-            const prop = $el.attr('prop')
-
-            if (prop && !$el.hasAttr('template')) {
-                if ( $el.hasAttr('transient') ) prop.__trans = true
-                
-                if ( exists(el.value) ) {
-                    // it's an element, so bind it
-                    bindElement($el, prop, state)
-                }
-                else {
-                    // it's a container prop
-                    const defobjval = {}
-                    if (prop.__trans) defobjval.__trans = true
-                    // go down one level in the state tree
-                    state[prop] = state[prop] || defobjval
-                    const newroot = state[prop]
-                    // and keep looking
-                    findProps($el, newroot)
-                }
-            }
-            // else keep looking
-            else if (el.children.length) findProps($el, state)
-        })
-    }
-
-
-    function bindElement($el, prop, state){
-        if ( state[prop] ) {
-            // restored state present, restore transient flag
-            if (prop.__trans) state[prop].__trans = true
-            // then update dom with it
-            updateElement($el, state[prop])
-        }
-        else {
-            // create empty state
-            const defstrval = ''
-            defstrval.__trans = prop.__trans
-            state[prop] = defstrval
-        }
-
-        // update state on dom change
-        $el.on('change', (e, params) => {
-            // unless triggered from setter
-            if (!params || !params.setter)
-                state[prop] = $el.val()
-        })
-
-        // update dom on state change
-        Object.defineProperty(state, prop, {
-            get : function() { return __state[prop] },
-            set : function(value) {
-                __state[prop] = value
-                if (prop.__trans) __state[prop].__trans = true
-                updateElement($el, value, true)
-            }
-        })
-
-    }
-
-    function updateElement($el, value, setter) {
-        $el.hasAttr('template')
-            ? render($el, value)
-            : $el[0].nodeName == 'TEXTAREA'
-                ? $el.text( value ).trigger('change', {setter})
-                : $el.val( value ).trigger('change', {setter})
-    }
-
-
-    function navTo(pagename, params, skipPushState) {
+    function navTo(pagename, params = {}, skipPushState) {
 
         if (!pagename) return error('Cannot navigate, page undefined')
 
@@ -2187,6 +2157,9 @@ function rasti(name, container) {
             $page = container.find('[page='+ pagename +']')
 
         if (!$page.length) return error('Cannot navigate to page [%s]: page container not found', pagename)
+
+        container.find('[menu]').hide()
+        container.find('.rs-backdrop').removeClass('backdrop')
 
         if ($prevPage) $prevPage.removeClass('active')
 
@@ -2206,8 +2179,8 @@ function rasti(name, container) {
         }
 
         $page.hasClass('hide-nav')
-            ? $('nav').hide()
-            : $('nav').show()
+            ? container.find('nav').hide()
+            : container.find('nav').show()
 
         $page.addClass('active')
 
@@ -2219,46 +2192,47 @@ function rasti(name, container) {
 
         if (skipPushState) return
 
-        if (self.options.history) {
+        if (self.options.history)
             __history.push(pagename)
-        }
-        else if (page && page.url) {
-            !is.string(page.url)
-                ? warn('Page [%s] {url} property must be a string!', pagename)
-                : window.history.pushState(pagename, null, '#'+page.url)
-        }
-        else {
-            window.history.pushState(pagename, null)
-        }
+        
+        let hash
+        if (page && page.url)
+            is.string(page.url)
+                ? hash = '#' + page.url
+                : warn('Page [%s] {url} property must be a string!', pagename)
+        
+        window.history.pushState(pagename, null, hash)
+
+        return self
     }
 
 
     function render(el, data, time) {
         let $el, name
+        let errPrefix = 'Cannot render template'
         if ( is.string(el) ) {
             name = el
+            errPrefix += ' ['+ name +']: '
             $el = container.find('[template='+ name +']')
+            if (!$el.length) return error(errPrefix + 'no element bound to template. Please bind one via [template] attribute.')
         }
         else {
             $el = el.nodeName ? $(el) : el
             name = $el.attr('template')
             if (!name) {
-                // generate one from bound prop and assign it
-                name = $el.attr('prop') + '-' + Date.now()
+                // assign hashed name
+                name = ($el.attr('data') || $el.attr('prop')) + '-' + Date.now()
                 $el.attr('template', name)
             }
         }
-        const errPrefix = 'Cannot render template ['+ name +']: '
-        if (!$el.length) return error(errPrefix + 'no element bound to template. Please bind one via [template] attribute.')
-
-        if (!data) {
+        
+        if ( !data && $el.hasAttr('data') ) {
             const datakey = resolveAttr($el, 'data')
-            if (!datakey) return error(errPrefix + 'no data found for template. Please provide in ajax response or via [data] attribute in element:', el)
             data = self.data[datakey]
             if (!data) return error(errPrefix + 'undefined data source "%s" resolved for element:', datakey, el)
         }
-        if ( is.string(data) ) data = data.split(', ')
-        if ( !is.array(data) ) return error(errPrefix + 'invalid data provided, must be a string or an array')
+        if ( is.string(data) ) data = data.split( $el.attr('separator') || self.options.separator )
+        if ( !is.array(data) ) data = [data]
 
         let template = self.templates[name]
         let html
@@ -2274,7 +2248,7 @@ function rasti(name, container) {
         }
         if ( !is.function(template) ) return error(errPrefix + 'template must be a string or a function')
 
-        if (!data.length) return $el.html(`<div class="nodata">${ self.options.noData }</div>`).addClass('rendered')
+        if ( data && !data.length ) return $el.html(`<div class="nodata">${ self.options.noData }</div>`).addClass('rendered')
 
         const isCrud = $el.hasAttr('crud')
         if (isCrud) {
@@ -2293,11 +2267,12 @@ function rasti(name, container) {
         const isPaged = $el.hasAttr('paged')
         isPaged
             ? initPager($el, template, data, getActiveLang())
-            : $el.html( template(data).join('') )
+            : $el.html( template(data) )[0].scrollTo(0,0)
 
         if ( $el.hasAttr('stats') ) {
-            const stats = $('<div section class="stats">')
-            stats.html( self.options.stats.replace('%n', data.length).replace('%t', time) )
+            const stats = '<div section class="stats">'
+                + self.options.stats.replace('%n', data.length).replace('%t', time)
+                + '</div>'
             $el.prepend(stats)
         }
 
@@ -2315,109 +2290,7 @@ function rasti(name, container) {
         $el.addClass('rendered')
         if (!isPaged) applyFX($el)
 
-    }
-
-
-    function genTemplate(html) {
-        return data => evalTemplate(html, data, self.props, self.methods, getActiveLang())
-    }
-
-    function evalTemplate(string, dataArray, props, methods, lang) {
-        return dataArray.map(data => eval('html`'+string+'`'))
-    }
-
-    function wrap(template, wrapper) {
-        return (data, props, methods, lang) => template(data, props, methods, lang).map(html => wrapper.replace('{{content}}', html))
-    }
-
-    function append(html, appendix) {
-        return html.substring(0, html.length-6).concat(appendix + '</div>')
-    }
-
-    function applyFX($el, selector) {
-        const el = $el[0]
-        const fxkey = $el.attr('fx')
-        if (!fxkey) return
-        const fx = rasti.fx[fxkey]
-        if (!fx) return warn('Undefined fx "%s" declared in [fx] attribute of element', fxkey, el)
-        if ( !is.function(fx) ) return error('fx.%s must be a function!', fxkey)
-        if ( selector && !is.string(selector) ) return error('Cannot apply fx, invalid selector provided for el', el)
-        const $target = selector ? $el.find(selector) : $el
-        if (!$target.length) return warn('Cannot apply fx, cannot find target "%s" in el', target, el)
-        fx($target)
-    }
-
-    function getActiveLang() {
-        return self.langs && self.langs[self.active.lang]
-    }
-
-
-    function setTheme(themeString) {
-        var themeName = themeString.split(' ')[0],
-            theme = self.themes[themeName],
-            baseTheme = self.themes.base,
-            baseMap = self.themeMaps.dark
-
-        if (!theme) return error('Cannot set theme [%s]: theme not found', themeName)
-
-        var mapName = themeString.split(' ')[1] || ( is.object(theme.maps) && Object.keys(theme.maps)[0] ) || 'dark',
-            themeMap = ( is.object(theme.maps) && theme.maps[mapName] ) || self.themeMaps[mapName]
-
-        if (!themeMap) {
-            warn('Theme map [%s] not found, using default theme map [dark]', mapName)
-            themeMap = baseMap
-            mapName = 'dark'
-        }
-
-        log('Setting theme [%s:%s]', themeName, mapName)
-        self.active.theme = themeName
-
-        // clone themeMap
-        themeMap = Object.assign({}, themeMap)
-
-        var values = { font : theme.font || baseTheme.font, },
-            colorNames, colors, c1, c2, defaultColorName
-
-        // map palette colors to attributes
-        for (let attr of Object.keys(baseMap)) {
-            colorNames = themeMap[attr] || baseMap[attr]
-            colorNames = [c1, c2] = colorNames.split(' ')
-            colors = [theme.palette[ c1 ], theme.palette[ c2 ]]
-
-            for (let i in colors) {
-                defaultColorName = baseMap[attr].split(' ')[i]
-                if (defaultColorName && !colors[i]) {
-                    // look for color in base palette
-                    colors[i] = baseTheme.palette[ colorNames[i] ]
-                    if (!colors[i]) {
-                        warn('Color [%s] not found in theme nor base palette, using it as is', colorNames[i])
-                        colors[i] = colorNames[i]
-                        /*
-                        warn('Mapping error in theme [%s] for attribute [%s]. Color [%s] not found. Falling back to default color [%s].', themeName, attr, colorNames[i], defaultColorName)
-                        colors[i] = baseTheme.palette[ defaultColorName ]
-                        */
-                    }
-                }
-            }
-
-            values[attr] = colors
-            if (themeMap[attr]) delete themeMap[attr]
-        }
-
-        var invalidKeys = Object.keys(themeMap)
-        if (invalidKeys.length) warn('Ignored %s invalid theme map keys:', invalidKeys.length, invalidKeys)
-
-        // generate theme style and apply it
-        container.find('style[theme]').html( getThemeStyle(values) )
-
-        // apply bg colors
-        var colorName, color
-        container.find('[bg]').each( (i, el) => {
-            colorName = el.getAttribute('bg')
-            color = theme.palette[colorName] || baseTheme.palette[colorName]
-            if (!color) warn('Color [%s] not found in theme palette, using it as is', colorName, el)
-            el.style['background-color'] = color || colorName
-        })
+        return self
     }
 
 
@@ -2461,33 +2334,112 @@ function rasti(name, container) {
         Object.keys(self.defaults).forEach( key => {
             self.options[key] = lang['rasti_'+key] || self.defaults[key]
         })
+
+        return self
+    }
+
+
+    function setTheme(themeString) {
+        if (!themeString) return warn('Call to setTheme() with no argument')
+
+        var themeName = themeString.split(' ')[0],
+            theme = self.themes[themeName],
+            baseTheme = self.themes.base,
+            baseMap = self.themeMaps.dark
+
+        if (!theme) return error('Cannot set theme [%s]: theme not found', themeName)
+
+        var mapName = themeString.split(' ')[1] || ( is.object(theme.maps) && Object.keys(theme.maps)[0] ) || 'dark',
+            themeMap = ( is.object(theme.maps) && theme.maps[mapName] ) || self.themeMaps[mapName]
+
+        if (!themeMap) {
+            warn('Theme map [%s] not found, using default theme map [dark]', mapName)
+            themeMap = baseMap
+            mapName = 'dark'
+        }
+
+        log('Setting theme [%s:%s]', themeName, mapName)
+        self.active.theme = themeName
+
+        // clone themeMap
+        themeMap = {...themeMap}
+
+        var values = { font : theme.font || baseTheme.font, },
+            colorNames, colors, c1, c2, defaultColorName
+
+        // map palette colors to attributes
+        for (let attr of Object.keys(baseMap)) {
+            colorNames = themeMap[attr] || baseMap[attr]
+            colorNames = [c1, c2] = colorNames.split(' ')
+            colors = [theme.palette[ c1 ], theme.palette[ c2 ]]
+
+            for (let i in colors) {
+                defaultColorName = baseMap[attr].split(' ')[i]
+                if (defaultColorName && !colors[i]) {
+                    // look for color in base palette
+                    colors[i] = baseTheme.palette[ colorNames[i] ]
+                    if (!colors[i]) {
+                        warn('Color [%s] not found in theme nor base palette, using it as is', colorNames[i])
+                        colors[i] = colorNames[i]
+                        /*
+                        warn('Mapping error in theme [%s] for attribute [%s]. Color [%s] not found. Falling back to default color [%s].', themeName, attr, colorNames[i], defaultColorName)
+                        colors[i] = baseTheme.palette[ defaultColorName ]
+                        */
+                    }
+                }
+            }
+
+            values[attr] = colors
+            if (themeMap[attr]) delete themeMap[attr]
+        }
+
+        var invalidKeys = Object.keys(themeMap)
+        if (invalidKeys.length) warn('Ignored %s invalid theme map keys:', invalidKeys.length, invalidKeys)
+
+        // generate theme style and apply it
+        container.find('.rs-theme').html( getThemeStyle(values) )
+
+        // apply bg colors
+        var colorName, color
+        container.find('[bg]').each( (i, el) => {
+            colorName = el.getAttribute('bg')
+            color = theme.palette[colorName] || baseTheme.palette[colorName]
+            if (!color) warn('Color [%s] not found in theme palette, using it as is', colorName, el)
+            el.style['background-color'] = color || colorName
+        })
+
+        return self
     }
 
 
     function updateBlock($el, data) {
-        var el = $el[0]
-        var type = $el.attr('block') || el.nodeName.toLowerCase()
+        const el = $el[0]
+        let type = $el.attr('block') || el.nodeName.toLowerCase()
         if ('ol ul'.includes(type)) type = 'list'
         if (!type) return error('Missing block type in [block] attribute of element:', el)
 
-        var block = rasti.blocks[type]
-        if (!block) return error('Undefined block type "%s" resolved for element:', type, el)
+        const block = rasti.blocks[type]
+        if (!block) return error('Undefined block type "%s" declared in [block] attribute of element:', type, el)
+
+        if (!el.initialized) {
+            if (exists(block.init) && !is.function(block.init))
+                return error('Invalid "init" prop defined in block type "%s", must be a function', type)
+            if (is.function(block.init))
+                block.init($el)
+            el.initialized = true
+        }
 
         if (!data) {
-            var datakey = resolveAttr($el, 'data')
+            const datakey = resolveAttr($el, 'data')
             if (!datakey) return
 
             data = self.data[datakey]
-            if (!data) return error('Undefined data source "%s" resolved for element:', datakey, el)
+            if (!exists(data)) return warn('Detected non-existant data ref in data source "%s" declared in [data] attribute of element:', datakey, el)
+            if (is.empty(data)) return
         }
 
-        // TODO: this should be in multi block, not here
-        var $options = type === 'multi'
-            ? $el.closest('[page]').find('[options='+ $el.attr('prop') +']')
-            : $el
-
-        var deps = $el.attr('bind')
-        var depValues = {}
+        const deps = $el.attr('bind')
+        const depValues = {}
         if (deps) deps.split(' ').forEach( prop => {
             depValues[prop] = $('[prop='+ prop +']').val()
         })
@@ -2497,9 +2449,10 @@ function rasti(name, container) {
             : render(data)
 
         function render(data) {
-            if (!data) warn('Cannot render block: no data available', el)
+            if (!exists(data)) warn('Detected non-existant data ref when trying to render element', el)
+            if (is.empty(data)) return
             else try {
-                $options.html( block.template(data, $el) )
+                block.render(data, $el)
             } catch(err) {
                 error('Cannot render block: ' + err, el)
             }
@@ -2514,7 +2467,7 @@ function rasti(name, container) {
             */
         }
 
-
+        return self
     }
 
 
@@ -2529,17 +2482,394 @@ function rasti(name, container) {
                 document[ p + 'CancelFullScreen' ]();
             }
         })
+        return self
     }
 
 
     // internal utils
 
+    function genTemplate(tmp_string) {
+        return tmp_data => evalTemplate(
+            tmp_string,
+            tmp_data,
+            self.data,
+            self.props,
+            self.methods,
+            getActiveLang(),
+        )
+    }
 
-    function createTabs($el) {
-        var el = $el[0],
-            $tabs = el.hasAttribute('page')
+    function evalTemplate(tmp_string, tmp_data, data, props, methods, lang) {
+        try {
+            return tmp_data
+                ? tmp_data.map(el => eval('html`'+tmp_string+'`'))
+                : eval('html`'+tmp_string+'`')
+        } catch (err) {
+            error('Error evaluating template string\n%s:', tmp_string, err.message)
+        }
+    }
+
+    function append(html, appendix) {
+        return html.substring(0, html.length-6).concat(appendix + '</div>')
+    }
+
+    function applyFX($el, selector) {
+        const el = $el[0]
+        const fxkey = $el.attr('fx')
+        if (!fxkey) return
+        const fx = rasti.fx[fxkey]
+        if (!fx) return warn('Undefined fx "%s" declared in [fx] attribute of element', fxkey, el)
+        if ( !is.function(fx) ) return error('fx.%s must be a function!', fxkey)
+        if ( selector && !is.string(selector) ) return error('Cannot apply fx, invalid selector provided for el', el)
+        const $target = selector ? $el.find(selector) : $el
+        if (!$target.length) return warn('Cannot apply fx, cannot find target "%s" in el', target, el)
+        fx($target)
+    }
+
+    function getActiveLang() {
+        return self.langs && self.langs[self.active.lang]
+    }
+
+    
+    function bindProps($container, state) {
+        $container.children().each( (i, el) => {
+            const $el = $(el)
+            const prop = $el.attr('prop')
+            let trans
+
+            if (prop && !$el.hasAttr('template')) {
+                if ( $el.hasAttr('transient') ) trans = true
+                
+                if ( exists(el.value) ) {
+                    // it's an element, so bind it
+                    bindElement($el, {prop, trans}, state)
+                }
+                else {
+                    // it's a container prop
+                    const defobjval = {}
+                    if (trans) defobjval.__trans = true
+                    // go down one level in the state tree
+                    state[prop] = state[prop] || defobjval
+                    const newroot = state[prop]
+                    // and keep looking
+                    bindProps($el, newroot)
+                }
+            }
+            // else keep looking
+            else if (el.children.length) bindProps($el, state)
+        })
+    }
+
+    function bindElement($el, {prop, trans}, state){
+        if ( state[prop] ) {
+            // then update dom with it
+            updateElement($el, state[prop])
+        }
+        else {
+            // create empty state
+            const defstrval = new String('')
+            if (trans) defstrval.__trans = true
+            state[prop] = defstrval
+        }
+
+        // update state on dom change
+        // (unless triggered from state _setter)
+        $el.on('change', (e, params) => {
+            if ( !(params && params._setter) )
+                state[prop] = $el.is('[type=checkbox]') ? $el[0].checked : $el.val()
+        })
+
+        // update dom on state change
+        Object.defineProperty(state, prop, {
+            get : function() { return __state[prop] },
+            set : function(value) {
+                if (trans) {
+                    const val = is.string(value) ? new String(value) : value
+                    val.__trans = true
+                    __state[prop] = val
+                }
+                else __state[prop] = value
+                updateElement($el, value, true)
+            }
+        })
+
+    }
+
+    function updateElement($el, value, _setter) {
+        if ( $el.is('[template]') )
+            render($el, value)
+        else {
+            $el.is('textarea')
+                ? $el.text( value )
+            : $el.is('[type=checkbox]')
+                ? $el[0].checked = !!value
+            : $el.val( value )
+
+            $el.trigger('change', {_setter})
+        }
+    }
+
+
+    function initPages() {
+        let page, $page
+        for (let name in self.pages) {
+            page = self.pages[name]
+            if ( !is.object(page) ) return error('pages.%s must be an object!', name)
+            $page = container.find('[page='+ name +']')
+            if ( !$page.length ) return error('No container found for page "%s". Please bind one via [page] attribute', name)
+            if (page.init) {
+                if ( !is.function(page.init) ) return error('pages.%s.init must be a function!', name)
+                else {
+                    log('Initializing page [%s]', name)
+                    self.active.page = $page // to allow app.get() etc in page.init
+                    page.init()
+                }
+            }
+        }
+        self.active.page = null // must clear it in case it was assigned
+    }
+
+
+    function initState() {
+        // persist state (if applicable)
+        let prev_state
+        if (self.options.persist) {
+            $(window).on('beforeunload', e => { self.state.save() })
+            prev_state = self.state.restore()
+        }
+        // set theme (if not already set)
+        if (!self.active.theme)
+            setTheme(self.options.theme)
+        // set lang (if applicable and not already set)
+        if (self.options.lang && !self.active.lang)
+            setLang(self.options.lang)
+        // if no lang, generate texts
+        if (!self.options.lang) {
+            container.find('[text]').each((i, el) => {
+                $(el).text($(el).attr('text'))
+            })
+        }
+        if (prev_state)
+            navTo(prev_state.page)
+        else {
+            // nav to page in hash or to root or to first page container
+            const page = location.hash.substring(1) || self.options.root
+            navTo(page && self.pages[page]
+                ? page
+                : container.find('[page]').first().attr('page'))
+        }
+    }
+
+
+    function initNav() {
+        container.on('click', '[nav]', e => {
+            const el = e.currentTarget
+            const $el = $(el)
+            const page = $el.attr('nav')
+            let params = {}
+            if (!page)
+                return error('Missing page name in [nav] attribute of element:', el)
+            if ($el.hasAttr('params')) {
+                const $page = self.active.page
+                let navparams = $el.attr('params')
+                let $paramEl
+                if (navparams) {
+                    // check to see if params is an object
+                    if (navparams[0] == '{') {
+                        try {
+                            params = JSON.parse(navparams)
+                        }
+                        catch (err) {
+                            error('Invalid JSON in [params] attribute of element:', el)
+                            error('Tip: be sure to use double quotes ("") for both keys and values')
+                            return
+                        }
+                    }
+                    else {
+                        // get values of specified navparams
+                        navparams = params.split(' ')
+                        navparams.forEach(key => {
+                            $paramEl = $page.find('[navparam=' + key + ']')
+                            if ($paramEl.length)
+                                params[key] = $paramEl.val()
+                            else
+                                warn('Could not find navparam element [%s]', key)
+                        })
+                    }
+                }
+                else {
+                    // get values of all navparams in page
+                    $page.find('[navparam]').each((i, el) => {
+                        const $el = $(el)
+                        const key = resolveAttr($el, 'navparam')
+                        if (key)
+                            params[key] = $el.val()
+                    })
+                }
+            }
+            navTo(page, params)
+        })
+    }
+
+
+    function initSubmit() {
+        container.on('click', '[submit]', e => {
+            const $el = $(e.target)
+            const method = $el.attr('submit')
+            const callback = $el.attr('then')
+            const template = $el.attr('render')
+            const isValidCB = callback && is.function(self.methods[callback])
+            const start = window.performance.now()
+            if (!method)
+                return error('Missing method in [submit] attribute of el:', this)
+            if (callback && !isValidCB)
+                error('Undefined method [%s] declared in [then] attribute of el:', callback, this)
+            $el.addClass('loading').attr('disabled', true)
+            submitAjax(method, resdata => {
+                const time = Math.floor(window.performance.now() - start) / 1000
+                log('Ajax method [%s] took %s seconds', method, time)
+                if (isValidCB)
+                    self.methods[callback](resdata)
+                if (template)
+                    render(template, resdata, time)
+                $el.removeClass('loading').removeAttr('disabled')
+            })
+        })
+    }
+
+
+    function initEvents() {
+        for (let action of EVENT_ATTRS) {
+            container.find('[on-'+ action +']').each( (i, el) => {
+                const $el = $(el)
+                const methodName = $el.attr('on-' + action)
+                if ( !methodName ) return error('Missing method in [on-%s] attribute of element:', action, el)
+                const method = self.methods[methodName]
+                if ( !method ) return error('Undefined method "%s" declared in [on-%s] attribute of element:', methodName, action, el)
+                const $template = $el.closest('[template]')
+                $template.length && !$el.hasAttr('template')
+                    ? $template.on(action, `[on-${action}=${methodName}]`, method)
+                    : $el.on(action, method)
+                if (action == 'click') $el.addClass('clickable')
+            })
+        }
+    }
+
+
+    function initActions() {
+        for (let action of ACTION_ATTRS) {
+            container.find('['+ action +']').each( (i, el) => {
+                const $el = $(el)
+                const $page = $el.closest('[page]')
+                const targetSelector = $el.attr(action)
+
+                if ( !targetSelector ) return error('Missing target selector in [%s] attribute of element:', action, el)
+                let $target = $page.find('['+targetSelector+']')
+                if ( !$target.length ) $target = container.find('['+targetSelector+']')
+                if ( !$target.length ) return error('Could not find target [%s] declared in [%s] attribute of element:', targetSelector, action, el)
+
+                const target = $target[0]
+
+                $el.on('click', e => {
+                    e.stopPropagation()
+                    $target.addClass('target')
+                    container.find('[menu]:not(.target)').hide()
+                    $target.removeClass('target')
+                    is.function(target[action]) ? target[action]() : $target[action]()
+                    const isVisible = target.style.display != 'none'
+                    isVisible ? $target.focus() : $target.blur()
+                })
+            })
+        }
+    }
+
+
+    function initFieldValidations() {
+        container.find('button[validate]').each( (i, btn) => {
+            const $fields = $(btn).parent().find('input[required]')
+            btn.disabled = isAnyFieldInvalid($fields)
+            $fields.each( (i, field) => {
+                $(field).on('keydown', e => {
+                    btn.disabled = isAnyFieldInvalid($fields)
+                    if (e.key == 'Enter' && !btn.disabled) btn.click()
+                })
+            })
+        })
+
+        function isAnyFieldInvalid($fields) {
+            let valid = true
+            $fields.each( (i, field) => {
+                valid = valid && field.validity.valid
+                return valid
+            })
+            return !valid
+        }
+    }
+   
+
+    function initModals() {
+        container.find('[modal]').each((i, el) => {
+            // add close btn
+            $('<div icon=close class="top right clickable" />')
+                .on('click', e => {
+                    $(el).hide()
+                })
+                .appendTo(el)
+        })
+    }
+
+
+    function initSideMenu() {
+        self.sidemenu = (function (el) {
+            
+            if (!el) return
+
+            el.enabled = false
+            el.visible = false
+
+            el.show = () => {
+                if (!el.enabled) return
+                $(el).show()
+                el.visible = true
+            }
+            el.hide = () => {
+                if (!el.enabled) return
+                $(el).hide()
+                el.visible = false
+            }
+            el.toggle = () => {
+                if (!el.enabled) return
+                el.visible ? el.hide() : el.show()
+            }
+
+            el.enable = () => {
+                el.classList.add('enabled')
+                el.enabled = true
+            }
+            el.disable = () => {
+                el.classList.remove('enabled')
+                el.enabled = false
+            }
+            el.switch = () => {
+                el.enabled ? el.disable() : el.enable()
+            }
+
+            return el
+
+        })( container.find('[sidemenu]')[0] )
+
+        if (self.sidemenu) {
+            if (media.phone) self.sidemenu.enable()
+            media.on.phone(() => { self.sidemenu.switch() })
+        }
+    }
+
+
+    function createTabs(el) {
+        var $el = $(el),
+            $tabs = $el.hasAttr('page')
                 ? $el.children('[panel]:not([modal])')
-                : el.hasAttribute('panel')
+                : $el.hasAttr('panel')
                     ? $el.children('[section]:not([modal])')
                     : undefined
         if (!$tabs) return error('Cannot create tabs: container must be a [page] or a [panel]', el)
@@ -2597,25 +2927,60 @@ function rasti(name, container) {
     }
 
 
-    function initBlock($el) {
-        var el = $el[0]
-        var type = $el.attr('block') || el.nodeName.toLowerCase()
-        if (!type) return error('Missing block type in [block] attribute of element:', el)
-
-        var block = rasti.blocks[type]
-        if (!block) return error('Undefined block type "%s" declared in [block] attribute of element:', type, el)
-
-        if (!is.function(block.init)) return error('Invalid or missing init function in block type "%s" declared in [block] attribute of element:', type, el)
-
-        block.init($el)
-
-        // if applicable, create options from data source
-        if ( resolveAttr($el, 'data') ) updateBlock($el)
-    }
-
-
-    function initHistory() {
-        __history = new History(self)
+    function initCrud() {
+        container.find('[crud][template]').each((i, el) => {
+            const $el = $(el)
+            const template = resolveAttr($el, 'template')
+            const datakey = resolveAttr($el, 'data')
+            const crudkey = resolveAttr($el, 'crud')
+            render(el)
+            $el.on('click', '.rasti-crud-delete', e => {
+                const $controls = $(e.currentTarget).closest('[data-id]')
+                const id = $controls.attr('data-id')
+                try {
+                    __crud.delete({ datakey, crudkey }, id)
+                        .then(ok => {
+                            $controls.parent().detach()
+                            log('Removed element [%s] from template [%s]', id, template)
+                        }, err => {
+                            __crud.hideInputEl($el)
+                            $el.removeClass('active')
+                        })
+                }
+                catch (err) {
+                    rasti.error(err)
+                }
+            })
+            $el.on('click', '.rasti-crud-update', e => {
+                // TODO: add update logic
+            })
+            $el.on('click', '.rasti-crud-create', e => {
+                __crud.showInputEl($el)
+                $el.addClass('active')
+            })
+            $el.on('click', '.rasti-crud-accept', e => {
+                // TODO: finish this
+                let newel
+                try {
+                    newel = __crud.genDataEl($el)
+                    __crud.create({ datakey, crudkey }, newel)
+                        .then(ok => {
+                            __crud.persistNewEl($el)
+                            $el.removeClass('active')
+                        }, err => {
+                            __crud.hideInputEl($el)
+                            $el.removeClass('active')
+                        })
+                }
+                catch (err) {
+                    rasti.error(err)
+                }
+            })
+            $el.on('click', '.rasti-crud-cancel', e => {
+                __crud.hideInputEl($el)
+                $el.removeClass('active')
+            })
+        })
     }
 
 
@@ -2625,7 +2990,7 @@ function rasti(name, container) {
         let paging, sizes, columns, size=0, col=1
 
         if (pager.total > 1) {
-            paging = `<div class="paging inline inline_">
+            paging = `<div class="paging fcenter small_ inline_">
                 <button icon=left3 />
                 <span class=page />
                 <button icon=right3 />
@@ -2638,48 +3003,52 @@ function rasti(name, container) {
             columns = `<button icon=columns>1</button>`
 
         $el.html(`
-            <div class="results scrolly"></div>
-            <div class="controls centerx bottom inline_">
+            <div class="results scrolly rigid"></div>
+            <div class="controls fcenter small_ inline_">
                 ${ columns || '' }
                 ${ paging || '' }
                 ${ sizes || '' }
             </div>
         `)
 
-        $controls = $el.children('.controls')
-        $results = $el.children('.results')
+        const $results = $el.find('.results'),
+            $controls = $el.find('.controls'),
+            $page = $controls.find('.page'),
+            $prev = $controls.find('[icon=left3]'),
+            $next = $controls.find('[icon=right3]')
 
-        $controls.on('click', '[icon=right3]', e => {
-            update( pager.next() )
-        })
-
-        $controls.on('click', '[icon=left3]', e => {
-            update( pager.prev() )
-        })
-
-        $controls.on('click', '[icon=rows]', e => {
-            size += 1
-            var newSize = pager.sizes[size % pager.sizes.length]
-            pager.setPageSize(newSize)
-            $(e.target).html(newSize)
-            update( pager.next() )
-            pager.total > 1
-                ? $controls.find('.paging').show()
-                : $controls.find('.paging').hide()
-        })
-
-        $controls.on('click', '[icon=columns]', e => {
-            col = col+1 > 3 ? 1 : col+1
-            $(e.target).html(col)
-            $results.removeClass('columns-1 columns-2 columns-3')
-                .addClass('columns-' + col)
-        })
+        $controls
+            .on('click', '[icon=right3]', e => {
+                update( pager.next() )
+            })
+            .on('click', '[icon=left3]', e => {
+                update( pager.prev() )
+            })
+            .on('click', '[icon=rows]', e => {
+                size += 1
+                var newSize = pager.sizes[size % pager.sizes.length]
+                pager.setPageSize(newSize)
+                $(e.target).html(newSize)
+                update( pager.next() )
+                pager.total > 1
+                    ? $controls.find('.paging').show()
+                    : $controls.find('.paging').hide()
+            })
+            .on('click', '[icon=columns]', e => {
+                col = col+1 > 3 ? 1 : col+1
+                $(e.target).html(col)
+                $results.removeClass('columns-1 columns-2 columns-3')
+                    .addClass('columns-' + col)
+            })
 
         update( pager.next() )
 
         function update(data){
             $results.html( template(data).join('') )
-            $controls.find('.page').html(pager.page + '/' + pager.total)
+                [0].scrollTo(0,0)
+            $page.html(pager.page + '/' + pager.total)
+            $prev[0].disabled = !pager.hasPrev()
+            $next[0].disabled = !pager.hasNext()
             applyFX($el, '.results')
         }
     }
@@ -2721,13 +3090,14 @@ function rasti(name, container) {
 
 
     function getThemeStyle(values) {
-        var ns = `[rasti=${ self.name }]`
+        var ns = `[rasti=${ __name }]`
         return `
             ${ns} {
                 font: ${ values.font };
                 color: ${ values.text[0] };
                 background-color: ${ values.page[0] };
             }
+            ${ns} nav       { background-color: ${ values.page[1] }; }
             ${ns} [page]    { background-color: ${ values.page[0] }; }
             ${ns} [panel]   { background-color: ${ values.panel[0] }; }
             ${ns} [section] { background-color: ${ values.section[0] }; }
@@ -2740,23 +3110,38 @@ function rasti(name, container) {
             ${ns} .tab-labels        { background-color: ${ values.panel[0] }; }
             ${ns} .tab-labels > .bar { background-color: ${ values.btn[0] }; }
 
-            ${ns} input:not([type=radio]):not([type=checkbox]),
+            ${ns} input:not([type]),
+            ${ns} input[type=text],
+            ${ns} input[type=password],
+            ${ns} input[type=email],
+            ${ns} input[type=tel],
             ${ns} select,
             ${ns} textarea,
             ${ns} .field {
                 background-color: ${ values.field[0] };
                 color: ${ values.field[1] };
             }
+            ${ns} input[type=radio],
+            ${ns} input[type=checkbox] {
+                border: 1px solid ${ values.field[1] };
+            }
+            ${ns} input[type=radio]:checked,
+            ${ns} input[type=checkbox]:checked {
+                background-color: ${ values.btn[0] };
+            }
 
             ${ns} button,
-            ${ns} [block=buttons] > div,
+            ${ns} [block=buttons] > div.active,
             ${ns} nav > div.active,
             ${ns} nav > a.active,
             ${ns} .list > div.active {
                 background-color: ${ values.btn[0] };
                 color: ${ values.btn[1] };
             }
-
+            ${ns} [block=buttons] > div {
+                border: 1px solid ${ values.field[1] };
+            }
+            
             ${ns} [header]:before { color: ${ values.header[0] }; }
             ${ns} [label]:not([header]):before  { color: ${ values.label[0] }; }
         `
@@ -2775,16 +3160,50 @@ function rasti(name, container) {
 
 
     function fixLabel($el) {
-        var $div = $(`<div fixed label="${ $el.attr('label') }" >`)
-        $el.wrap($div)
+        const label = resolveAttr($el, 'label')
+        $el.wrap( $(`<div fixed label="${ label }" >`) )
         $el[0].removeAttribute('label')
     }
 
 
     function fixIcon($el) {
-        var $div = $(`<div icon=${ $el.attr('icon') } class=floating >`)
-        $el.wrap($div)
+        const $parent = $el.parent()
+        if ($parent.hasAttr('fixed')) {
+            $parent.attr(icon, $el.attr('icon')).addClass('floating')
+        }
+        else {
+            $el.wrap( $(`<div fixed icon=${ $el.attr('icon') } class=floating >`) )
+        }
         $el[0].removeAttribute('icon')
+    }
+
+
+    function get(selector) {
+        var $els = self.active.page && self.active.page.find('['+ selector +']')
+        if (!$els || !$els.length) $els = container.find('['+ selector +']')
+        if (!$els.length) warn('No elements found for selector [%s]', selector)
+        return $els
+    }
+
+    function set(selector, value) {
+        var $els = get(selector)
+        $els.each( (i, el) => {
+            el.value = value
+            $(el).change()
+        })
+        return $els
+    }
+
+    function add(selector, ...values) {
+        var $els = get(selector)
+        $els.each( (i, el) => {
+            values.forEach( val => {
+                if (is.array(val)) el.value = el.value.concat(val)
+                else el.value.push(val)
+            })
+            $(el).change()
+        })
+        return $els
     }
 
 
@@ -2794,6 +3213,7 @@ function rasti(name, container) {
 
 
 // static properties and methods
+
 rasti.log = log
 rasti.warn = warn
 rasti.error = error
@@ -2803,21 +3223,22 @@ rasti.icons = require('./icons')
 rasti.fx = require('./fx')
 rasti.options = {log : 'debug'}
 
-module.exports = Object.freeze(rasti)
+module.exports = global.rasti = Object.freeze(rasti)
 
 
 
-// bootstrap any apps declared via rasti attribute
+/*
+ * instantiates any apps declared via [rasti] attribute
+ */
 function bootstrap() {
-    var appContainers = $(document).find('[rasti]'),
-        appName, app, extendProps
+    const appContainers = $(document).find('[rasti]')
+    let appName, app
 
-    if (appContainers.length) appContainers.forEach( container => {
+    appContainers.forEach( container => {
         appName = container.getAttribute('rasti')
         if (!appName) error('Missing app name in [rasti] attribute of app container:', container)
         else if (global[appName]) error('Name [%s] already taken, please choose another name for app in container:', appName, container)
         else {
-            log('Creating app [%s]...', appName)
             global[appName] = app = new rasti(appName, container)
             Object.keys(app.options).forEach( key => {
                 if (container.hasAttribute(key)) {
@@ -2844,7 +3265,7 @@ function genBlockStyles() {
         if (style) styles.push(style)
     }
     styles.push('</style>')
-    $('head').prepend(styles.join(''))
+    return styles.join('')
 }
 
 
@@ -2858,36 +3279,61 @@ function genIconStyles() {
             styles.push(style)
         }
     }
+    styles = styles.concat( genIconFixesStyles() )
     styles.push('</style>')
-    $('head').prepend(styles.join(''))
+    return styles.join('')
 }
 
 
-$('head').prepend(`<style>body{margin:0;overflow-x:hidden}*,:after,:before{box-sizing:border-box;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;transition:background-color .2s}h1{font-size:3em}h2{font-size:2em}h3{font-size:1.5em}h1,h2,h3{margin-top:0}p.big{font-size:1.5em}ol,ul{padding:5px 10px 5px 30px;border-radius:2px}caption,table,tbody,td,tfoot,th,thead,tr{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline}table{border:1px solid #000;width:100%;text-align:center;border-collapse:collapse}table td,table th{border:1px solid #000;padding:4px 5px}table tbody td{font-size:13px}table thead{background:#cfcfcf;background:-moz-linear-gradient(top,#dbdbdb 0,#d3d3d3 66%,#cfcfcf 100%);background:-webkit-linear-gradient(top,#dbdbdb 0,#d3d3d3 66%,#cfcfcf 100%);background:linear-gradient(to bottom,#dbdbdb 0,#d3d3d3 66%,#cfcfcf 100%);border-bottom:3px solid #000}table thead th{font-size:15px;font-weight:700;color:#000;text-align:center}table tfoot{font-size:14px;font-weight:700;color:#000;border-top:3px solid #000}table tfoot td{font-size:14px}.field,button,input,select,textarea{min-height:35px;width:100%;padding:5px 10px;margin:0 0 15px 0;border:0;border-radius:4px;outline:0;font-family:inherit!important;font-size:inherit;vertical-align:text-bottom}meter,progress{width:100%;margin:0 0 15px 0;border-radius:2px}input:focus:invalid{box-shadow:0 0 0 2px red}input:focus:valid{box-shadow:0 0 0 2px green}button,input[type=range],select{cursor:pointer}button{display:inline-block;height:50px;width:auto;min-width:50px;padding:10px 20px;border:1px solid rgba(0,0,0,.1);font-size:1.2em;text-align:center;text-decoration:none;text-transform:uppercase}button:not(:disabled):hover{filter:contrast(1.5)}button:disabled{filter:contrast(.5);cursor:auto}select{appearance:none;-moz-appearance:none;-webkit-appearance:none}option{cursor:pointer}textarea{height:70px;resize:none}.big_>button,.big_>input,button.big,input.big{min-height:70px;margin-bottom:25px;font-size:1.5em}.small_>button,.small_>input,button.small,input.small{height:25px;font-size:1em}input[type=checkbox],input[type=radio]{display:none}input[type=checkbox]+label,input[type=radio]+label{display:block;height:40px;max-width:90%;padding:12px 0;margin-left:45px;overflow:hidden;text-overflow:ellipsis;cursor:pointer}input[type=checkbox]+label:before,input[type=radio]+label:before{content:'\\2713';position:absolute;height:32px;width:32px;margin-top:-8px;margin-left:-40px;border:1px solid #999;color:transparent;background-color:#fff;font-size:2.3em;line-height:1;text-align:center}input[type=radio]+label:before{content:'\\25cf';border-radius:50%;line-height:.8}input[type=checkbox]:checked+label:before,input[type=radio]:checked+label:before{color:#222;animation:stamp .4s ease-out}input[type=checkbox]+label:hover,input[type=radio]+label:hover{font-weight:600}[page],[panel],[section]{position:relative;overflow:hidden}[page]{min-height:100vh;width:100vw!important;padding-bottom:10px;margin-bottom:-5px;overflow-y:auto}[page]:not(.active){display:none!important}nav~[page]:not(.hide-nav){min-height:calc(100vh - 50px);max-height:calc(100vh - 50px)}.fullh[page]{height:100vh}[panel]{padding:25px;border-radius:4px}[section]{margin-bottom:15px;padding:20px;border-radius:4px}[section] [label]:before{text-shadow:0 0 0 #000}[section]>:first-child:not([label]){margin-top:0}[header][panel]{padding-top:75px}[header][section]{padding-top:65px}[footer][page]:after,[header][page]:before,[header][panel]:before,[header][section]:before{content:attr(header);display:block;height:70px;width:100%;padding:20px;line-height:30px;font-size:2.5em;text-align:center;text-transform:uppercase}[header][page]:before{margin-bottom:15px}[header][panel]:before,[header][section]:before{position:absolute;top:0;left:0}[header][panel]:before{height:50px;padding:10px 20px;line-height:30px;font-size:2em}[header][section]:before{height:40px;padding:10px;line-height:20px;font-size:1.5em}[footer][page]:after{content:attr(footer)}[page][header][fix-header]:before{position:fixed;top:0}[page][footer][fix-footer]:after{position:fixed;bottom:0}[img]{background-repeat:no-repeat;background-position:center;background-size:contain;background-origin:content-box}[template]{visibility:hidden;position:relative}[template].rendered{visibility:visible}[template]>.results{max-height:calc(100% - 40px);margin:0 -15px;padding:0 15px}[template][stats]>.results{max-height:calc(100% - 95px)}[template]>.controls{height:60px;padding:5px;color:#fff;text-align:center}[template]>.controls *{vertical-align:middle}[template]>.stats{height:40px;padding:10px;font-size:1.1em}[crud]>*{position:relative}.rasti-crud-create{display:block!important}.rasti-crud,.rasti-crud-accept,.rasti-crud-cancel,.rasti-crud-input,[crud].active .rasti-crud-create{display:none!important}[crud].active .rasti-crud-accept,[crud].active .rasti-crud-cancel,[crud].active .rasti-crud-input{display:inline-block!important}[crud]>.rasti-crud{bottom:-40px;z-index:1}[crud]:hover>.rasti-crud,[crud]>:hover>.rasti-crud{display:block!important}[h-flow]{display:inline-block!important;white-space:nowrap;height:100%;width:100%;overflow-x:auto;overflow-y:hidden}[h-flow]>*{display:inline-block;white-space:normal;height:100%;min-width:100%;border-radius:0;margin-top:0;margin-bottom:0;margin-left:auto!important;margin-right:auto;vertical-align:top}.tab-labels+[h-flow]{height:calc(100vh - 50px)}nav~[page]>.tab-labels+[h-flow]{height:calc(100vh - 100px)}.tab-labels,nav{display:flex;position:relative;white-space:nowrap;min-width:100vw;height:50px;padding:0;border-bottom:1px solid rgba(0,0,0,.2);border-radius:0;text-transform:uppercase}nav{z-index:8}.tab-labels{justify-content:space-around;z-index:2}.tab-labels>.bar{position:absolute;bottom:0;left:0;height:4px;transition:left .2s,width .2s}[tab-label],nav>a,nav>div{display:flex;justify-content:center;align-items:center;flex:1 1 auto;height:100%;min-width:50px;padding:5px;font-size:1.4em;text-shadow:0 0 0 #000;text-decoration:none;color:inherit;cursor:pointer}nav>a,nav>div{max-width:200px;transition:all .2s}[tab-label].active{filter:contrast(1.5)}.modal,[modal]{display:none;position:fixed;left:0;right:0;top:0;bottom:0;margin:auto!important;height:auto;width:auto;max-height:600px;max-width:400px;overflow-y:auto;animation:zoomIn .4s,fadeIn .4s;z-index:10}.modal.big,[modal].big{max-height:800px;max-width:600px}.modal.small,[modal].small{max-height:400px;max-width:200px}.modal>[icon=close],[modal]>[icon=close]{cursor:pointer}[menu]{display:none;position:fixed;padding:10px;background-color:inherit;box-shadow:0 0 4px 4px rgba(0,0,0,.2);z-index:7;cursor:pointer}[menu]>div{padding:15px 5px;line-height:1;font-size:1rem;text-transform:capitalize}[label]{position:relative;margin-top:35px;vertical-align:bottom}[label][fixed]>*{margin-bottom:0}[label]>input,[label]>select,[label]>textarea{margin-top:0!important}[label]:not([panel]):not([section]):before{content:attr(label);position:absolute;height:35px;line-height:35px;font-size:1.2em;text-transform:capitalize}[label]:before{top:0;left:0;margin-top:-35px}[label].big:before{margin-left:0}[label][fixed]:before{margin-top:-30px;margin-left:0}.inline-label[label],.inline-label_>[label]{width:auto;margin-top:0;margin-left:calc(40% + 10px)}.inline-label[label]:before,.inline-label_>[label]:before{top:auto;width:80%;left:-85%;margin-top:-5px;text-align:right}.inline-label[label][fixed]:before,.inline-label_>[label][fixed]:before{margin-top:0;margin-left:-8px}.below-label[label]:before,.below-label_>[label]:before{bottom:-40px;left:0;right:0;margin-top:0;margin-left:0}.big [label]{margin-top:25px;font-size:1.2em}.big [label]:before{margin-top:-27px}[hide] *,[nav] *,[onclick] *,[show] *,[toggle] *{cursor:pointer}[movable]{user-select:none;cursor:move}[resizable]{resize:both;overflow:hidden}[foldable]{animation:foldOut .5s;overflow:hidden}[foldable][header].folded{animation:foldIn .5s;height:0;padding-bottom:0;padding-top:40px}[foldable][header]:before{cursor:pointer}.row{width:100%;display:flex;flex-flow:row wrap;align-content:flex-start;padding-left:1%}.col{display:flex;flex-flow:column nowrap;align-content:flex-start;align-items:center}.col>.row-1,.row>.col-1{flex-basis:7.33%}.col>.row-2,.row>.col-2{flex-basis:15.66%}.col>.row-3,.row>.col-3{flex-basis:24%}.col>.row-4,.row>.col-4{flex-basis:32.33%}.col>.row-5,.row>.col-5{flex-basis:40.66%}.col>.row-6,.row>.col-6{flex-basis:49%}.col>.row-7,.row>.col-7{flex-basis:57.33%}.col>.row-8,.row>.col-8{flex-basis:65.66%}.col>.row-9,.row>.col-9{flex-basis:74%}.col>.row-10,.row>.col-10{flex-basis:82.33%}.col>.row-11,.row>.col-11{flex-basis:90.66%}.row [class*=col-]{margin-left:0!important;margin-right:1%!important}.col [class*=row-]{margin-top:0!important;margin-bottom:1vh!important}.page-options{flex-basis:initial!important}body [icon]{position:relative;min-height:50px;padding-left:50px}body [icon]:empty{padding:0}[icon]:before{display:block;flex-grow:0;height:50px;width:50px;font-size:1.5rem;line-height:2;text-align:center;text-decoration:none}[icon]:not(:empty):before{position:absolute;top:0;left:0}.small[icon]:before,.small_>[icon]:before{height:35px;width:35px;font-size:1.1rem}.big[icon]:before,.big_>[icon]:before{height:70px;width:70px;font-size:2.2rem}.huge[icon]:before,.huge_>[icon]:before{height:100px;width:100px;font-size:3.2rem;line-height:1.9}.round[icon]:before,.round_>[icon]:before{border-radius:50%}.floating[icon]{padding-left:0}.floating[icon]:before{top:-6px;left:auto}.floating[icon]>input{padding-left:45px}.list{padding:0;border:1px solid rgba(0,0,0,.2)}.list[header]{padding-top:40px}.list>div{height:7vh;padding:2vh;transition:all .2s}.list>div:not(:last-child){border-bottom:1px solid rgba(0,0,0,.2)}.list>div.active{border-left:7px solid #222}.list>div:hover{letter-spacing:4px}.nodata{padding:10% 5%;margin:auto;font-size:1.5rem;text-align:center}button.fab{position:fixed;bottom:0;right:0;width:50px;margin:20px;border-radius:50%;z-index:5}.backdrop:before{content:'';position:fixed;top:0;left:0;height:100vh;width:100vw;background:rgba(0,0,0,.7);animation:fadeIn .4s;z-index:9}.loading{color:transparent!important;position:relative}.loading>*{visibility:hidden}.loading:after{content:'';position:absolute;top:0;bottom:0;left:0;right:0;width:25px;height:25px;margin:auto;border-radius:50%;border:.25rem solid rgba(255,255,255,.2);border-top-color:#fff;animation:spin 1s infinite linear;visibility:visible}.big.loading:after{position:fixed;width:100px;height:100px;z-index:10}.loading2{perspective:120px}.loading2:after{content:"";position:absolute;left:25px;top:25px;width:50px;height:50px;background-color:#3498db;animation:flip 1s infinite linear}@keyframes stamp{50%{transform:scale(1.2)}}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}@keyframes flip{0%{transform:rotate(0)}50%{transform:rotateY(180deg)}100%{transform:rotateY(180deg) rotateX(180deg)}}@keyframes zoomIn{0%{transform:scale(0)}100%{transform:scale(1)}}@keyframes zoomOut{0%{transform:scale(1)}100%{transform:scale(0)}}@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}@keyframes fadeOut{0%{opacity:1}100%{opacity:0}}@keyframes foldIn{0%{height:auto;padding-top:55px;padding-bottom:10px}100%{height:0;padding-top:40px;padding-bottom:0}}@keyframes foldOut{0%{height:0;padding-top:40px;padding-bottom:0}100%{height:auto;padding-top:55px;padding-bottom:10px}}.hidden,[hidden]{display:none!important}.rel,.rel_>*{position:relative}.fix,.fix_>*{position:fixed}.inline,.inline_>*{display:inline-block;margin-top:0;margin-bottom:0}.floatl,.floatl_>*{float:left}.floatr,.floatr_>*{float:right}.left,.left_>*{position:absolute;left:0}.right,.right_>*{position:absolute;right:0}.top,.top_>*{position:absolute;top:0}.bottom,.bottom_>*{position:absolute;bottom:0}.centerx,.centerx_>*{position:absolute;left:0;right:0;margin:auto!important}.centery,.centery_>*{position:absolute;top:0;bottom:0;margin:auto!important}.center,.center_>*{position:absolute;left:0;right:0;top:0;bottom:0;margin:auto!important}.fcenterx,.fcenterx_>*{display:flex;justify-content:center}.fcentery,.fcentery_>*{display:flex;align-items:center}.fcenter,.fcenter_>*{display:flex;justify-content:center;align-items:center}.scrollx,.scrollx_>*{width:100%;overflow-x:auto;overflow-y:hidden}.scrolly,.scrolly_>*{height:100%;overflow-x:hidden;overflow-y:auto}.scroll,.scroll_>*{overflow:auto}.textl,.textl_>*{text-align:left}.textr,.textr_>*{text-align:right}.textc,.textc_>*{text-align:center}.fullw,.fullw_>*{width:100%}.fullh,.fullh_>*{height:100%}.halfw,.halfw_>*{width:50%}.halfh,.halfh_>*{height:50%}.autow,.autow_>*{width:auto}.autoh,.autoh_>*{height:auto}.autom,.autom_>*{margin:auto!important}.columns-2{display:flex;flex-wrap:wrap;align-content:flex-start}.columns-2>*{width:49%;margin-right:2%}.columns-2>:nth-child(2n){margin-right:0}.columns-3{display:flex;flex-wrap:wrap;align-content:flex-start}.columns-3>*{width:32%;margin-right:2%}.columns-3>:nth-child(3n){margin-right:0}.pad-s,.pad-s_>*{padding-left:5%;padding-right:5%}.pad,.pad_>*{padding-left:10%;padding-right:10%}.pad-l,.pad-l_>*{padding-left:15%;padding-right:15%}.round,.round_>*{border-radius:50%}.scale-up,.scale-up_>*{transition:all .2s ease-in-out}.scale-up:hover,.scale-up_>:hover{transform:scale(1.1)}[fx=toast]{position:fixed;display:flex;left:0;bottom:-100px;width:100vw;max-width:600px;min-height:100px;max-height:100px;padding:20px;overflow:hidden;text-overflow:ellipsis;z-index:10;transition:bottom ease-out .25s}[fx=toast].active{bottom:0}[fx=toast] [icon]::before{border-radius:50%;font-size:2rem;line-height:1.6;box-shadow:0 0 0 1px}[fx=toast] [icon=warning]::before{background:#ff0;line-height:1.4}[fx=toast] [icon=error]::before{background:red;line-height:1.4}[fx=toast] [icon=accept]::before{background:green}.fx-stack-container>*{transition:margin-top 2s ease;margin-top:0}.fx-stack-el{margin-top:100px}.fx-stamp-container>*{transition:opacity .3s;animation:stamp .3s}.fx-stamp-el{opacity:0;animation:none}.flip-container{perspective:1000px;position:relative}.flipper{transition:.6s;transform-style:preserve-3d;position:absolute}.flipper.flip{transform:rotateY(180deg)}.flipper .back,.flipper .front{backface-visibility:hidden;top:0;left:0}.flipper .front{z-index:2;transform:rotateY(0)}.flipper .back{transform:rotateY(180deg)}::-webkit-scrollbar{width:10px;background:0 0}::-webkit-scrollbar-thumb{background-color:rgba(0,0,0,.3);background-clip:content-box;border-left:solid transparent 2px;border-right:solid transparent 2px;border-radius:4px}::-webkit-scrollbar-thumb:hover{background-color:rgba(0,0,0,.4)}@-moz-document url-prefix(http://),url-prefix(https://){scrollbar{-moz-appearance:none!important;background:#0f0!important}scrollbarbutton,thumb{-moz-appearance:none!important;background-color:#00f!important}scrollbarbutton:hover,thumb:hover{-moz-appearance:none!important;background-color:red!important}scrollbarbutton{display:none!important}scrollbar[orient=vertical]{min-width:15px!important}}@media only screen and (min-width:800px){.pad-s-desktop{padding-left:5%;padding-right:5%}.pad-desktop{padding-left:10%;padding-right:10%}.pad-l-desktop{padding-left:15%;padding-right:15%}}@media only screen and (min-width:500px) and (max-width:800px){.pad-s-tablet{padding-left:5%;padding-right:5%}.pad-tablet{padding-left:10%;padding-right:10%}.pad-l-tablet{padding-left:15%;padding-right:15%}}@media only screen and (max-width:800px){[page][header]:before{padding:10px;line-height:.8}.hide-tablet{display:none}.show-tablet{display:block}[header].hh-tablet:before{display:none}[header].hh-tablet[page]{padding-top:0}[header].hh-tablet[panel]{padding-top:20px}[header].hh-tablet[section]{padding-top:15px}}@media only screen and (max-width:500px){[page]{padding-bottom:0;overflow-y:auto}[panel]{border-radius:0}[template]>.controls>.columns,[template]>.controls>.sizes{display:none}[options]{bottom:0;left:0!important;right:0;height:80%!important;margin:auto}.row{padding-left:0}[class*=col]{min-width:100%}.hide-phone{display:none}.show-phone{display:block}[header].hh-phone:before{display:none}[header].hh-phone[page]{padding-top:0}[header].hh-phone[panel]{padding-top:20px}[header].hh-phone[section]{padding-top:15px}.pad-s-phone{padding-left:5%;padding-right:5%}.pad-phone{padding-left:10%;padding-right:10%}.pad-l-phone{padding-left:15%;padding-right:15%}}</style>`)
+function genIconFixesStyles() {
+    const fixes = [
+        [`=error =sync =reload =remove =restore =stereo =img-file
+            =latin2 =celtic =ankh =comunism =health ^=hg-`,
+            { base: '2', small: '1.5', big: '3', huge: '4.4' } ],
+        [`=close =network =pommee =diamonds`,
+            { base: '2.5', small: '1.8', big: '3.3', huge: '4.9' } ],
+    ]
+    
+    const result = []
+    let temp, mod
+    fixes.forEach(([selectors, sizes]) => {
+        Object.entries(sizes).forEach(([modifier, size]) => {
+            mod = modifier == 'base' ? null : modifier
+            temp = selectors.split(/[\s\n]+/)
+                .map(sel =>
+                    mod ? `.${mod}[icon${sel}]:before,
+                        .${mod}_>[icon${sel}]:before`
+                    : `[icon${sel}]:before`
+                ).join(',')
+            temp += `{ font-size: ${size}rem; }`
+            result.push(temp)
+        })
+    })
+    return result
+}
 
-genBlockStyles()
 
-genIconStyles()
+$('head').prepend( genBlockStyles() + `<style>:root{--pad:20px}body{margin:0;overflow-x:hidden;text-shadow:0 0 0}*,:after,:before{box-sizing:border-box;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;transition:background-color .2s}a{text-decoration:none;font-weight:600}h1{font-size:3em}h2{font-size:2em}h3{font-size:1.5em}h1,h2,h3{margin-top:0}p.big{font-size:1.5em}ol,ul{padding:5px 10px 5px 30px;border-radius:2px}li:not(:last-child){margin-bottom:5px}caption,table,tbody,td,tfoot,th,thead,tr{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline}table{border:1px solid #0003;width:100%;text-align:center;border-collapse:collapse}table td,table th{border:1px solid #0003;padding:4px 5px}table thead{background:#ddd;border-bottom:3px solid #0003}table thead th{font-weight:700;text-align:center}table tfoot{font-weight:700;border-top:3px solid #0003}.field,button,input,select,textarea{min-height:35px;width:100%;padding:5px 10px;margin:0 0 15px 0;border:0;border-radius:2px;outline:0;font-family:inherit!important;font-size:inherit;vertical-align:text-bottom}input[type=email]:focus:invalid,input[type=password]:focus:invalid,input[type=tel]:focus:invalid,input[type=text]:focus:invalid{border-top-left-radius:0;border-bottom-left-radius:0;box-shadow:-4px 0 0 0 red}input[type=email]:focus:valid,input[type=password]:focus:valid,input[type=tel]:focus:valid,input[type=text]:focus:valid{border-top-left-radius:0;border-bottom-left-radius:0;box-shadow:-4px 0 0 0 green}button,input[type=range],select{cursor:pointer}button{display:inline-block;height:50px;width:auto;min-width:50px;padding:10px 20px;border:1px solid rgba(0,0,0,.1);font-size:1.2em;text-align:center;text-decoration:none;text-transform:uppercase}button:not(:disabled):hover{filter:contrast(1.5)}button:disabled{filter:contrast(.5);cursor:auto}button[icon]{display:flex;align-items:center;justify-content:center;padding:0}select{appearance:none;-moz-appearance:none;-webkit-appearance:none}option{cursor:pointer}textarea{height:70px;resize:none}.big_>button,.big_>input,button.big,input.big{min-height:70px;margin-bottom:25px;font-size:1.5em}.small_>button,.small_>input,button.small,input.small{min-height:25px;max-height:25px;font-size:1em}input[type=checkbox],input[type=radio]{-webkit-appearance:none;appearance:none;min-height:25px;width:25px;margin:5px;font-size:2em;line-height:.6;text-align:center;vertical-align:middle;cursor:pointer}input[type=radio]{border-radius:50%}input[type=checkbox]+label,input[type=radio]+label{height:40px;max-width:90%;overflow:hidden;text-overflow:ellipsis;vertical-align:middle;cursor:pointer}input[type=checkbox]:checked::before{content:'⨯';display:inline-block;position:absolute;color:#222}input[type=radio]:checked::after{display:inline-block;position:absolute;height:16px;width:16px;margin-left:-33px;background-color:#000;border-radius:50%}input[type=checkbox]:checked,input[type=checkbox]:focus,input[type=checkbox]:hover,input[type=radio]:checked,input[type=radio]:focus,input[type=radio]:hover{box-shadow:inset 0 0 4px #000}input[type=checkbox]+label:hover,input[type=checkbox]:focus+label,input[type=checkbox]:hover+label,input[type=radio]+label:hover,input[type=radio]:focus+label,input[type=radio]:hover+label{font-weight:600}input[type=checkbox].toggle{position:relative;height:26px;width:44px;border-radius:12px;transition:background-color .4s}input[type=checkbox].toggle::before{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background-color:#000;transition:left .4s}input[type=checkbox].toggle:checked::before{left:20px}meter,progress{width:100%;margin:0;border-radius:2px}meter{height:8px;border:1px solid #ccc}meter::-webkit-meter-bar{background:#fff}meter::-webkit-meter-optimum-value{background:linear-gradient(to bottom,#62c462,#51a351)}meter::-webkit-meter-suboptimum-value{background:linear-gradient(to bottom,#fbb450,#f89406)}meter::-webkit-meter-even-less-good-value{background:linear-gradient(to bottom,#ee5f5b,#bd362f)}hr{display:flex;align-items:center;height:30px;border:none}hr::before{content:'';display:block;height:2px;width:100%;background-color:rgba(0,0,0,.5)}[page],[panel],[section]{position:relative;overflow:hidden}[page]{min-height:100vh;width:100vw!important;padding-bottom:10px;margin-bottom:-5px;overflow-y:auto}[page]:not(.active){display:none!important}nav:not([hidden])~[page]:not(.hide-nav){min-height:calc(100vh - 50px)}.fullh[page]{height:100vh}[panel]{padding:25px;border-radius:2px}[section]{padding:20px;border-radius:2px}[section] [label]:before{text-shadow:0 0 0 #000}[section]>:first-child:not([label]){margin-top:0}[section]:not(:last-child){margin-bottom:15px}[foldable],[header]{position:relative}[foldable]{padding-top:30px}[header]:not([page]){padding-top:45px}[foldable][panel],[header][panel]{padding-top:65px}[foldable]:before,[footer][page]:after,[header][page]:before,[header][panel]:before,[header][section]:before{content:attr(header);display:flex;align-items:center;justify-content:center;width:100%;text-transform:uppercase}[header][page]:before{height:50px;margin-bottom:15px;font-size:1.8em;line-height:30px}[foldable]:not([page]):before,[header]:not([page]):before{position:absolute;top:0;left:0}[header][panel]:before{height:40px;padding:10px;font-size:1.5em;line-height:20px}[foldable]:before,[header]:before{height:30px;padding:10px;font-size:1.2em;line-height:20px}[footer][page]:after{content:attr(footer)}[page][header][fix-header]:before{position:fixed;top:0}[page][footer][fix-footer]:after{position:fixed;bottom:0}[img]{background-repeat:no-repeat;background-position:center;background-size:contain;background-origin:content-box}[template]{position:relative;visibility:hidden}[template].rendered{visibility:visible}[template]>.results{max-height:calc(100% - 60px);margin:0 -15px;padding:0 15px}[template][stats]>.results{max-height:calc(100% - 95px)}[template]>.controls{height:60px;padding:10px;color:#fff}[template]>.controls *{margin:0 2px}[template]>.stats{height:40px;padding:10px;font-size:1.1em}[paged]{padding-bottom:0!important}[crud]>*{position:relative}.rasti-crud-create{display:block!important}.rasti-crud,.rasti-crud-accept,.rasti-crud-cancel,.rasti-crud-input,[crud].active .rasti-crud-create{display:none!important}[crud].active .rasti-crud-accept,[crud].active .rasti-crud-cancel,[crud].active .rasti-crud-input{display:inline-block!important}[crud]>.rasti-crud{bottom:-40px;z-index:1}[crud]:hover>.rasti-crud,[crud]>:hover>.rasti-crud{display:block!important}[h-flow]{display:inline-block!important;white-space:nowrap;height:100%;width:100%;overflow-x:auto;overflow-y:hidden}[h-flow]>*{display:inline-block;white-space:normal;height:100%;min-width:100%;border-radius:0;margin-top:0;margin-bottom:0;margin-left:auto!important;margin-right:auto;vertical-align:top}.tab-labels+[h-flow]{height:calc(100vh - 50px)}nav~[page]>.tab-labels+[h-flow]{height:calc(100vh - 100px)}.tab-labels,nav{display:flex;align-items:center;position:relative;white-space:nowrap;min-width:100vw;height:50px;padding:0;border-bottom:1px solid rgba(0,0,0,.2);border-radius:0;text-transform:uppercase}nav{z-index:8}.tab-labels{justify-content:space-around;z-index:2}.tab-labels>.bar{position:absolute;bottom:0;left:0;height:4px;transition:left .2s,width .2s}[tab-label],nav>a,nav>div{display:flex;justify-content:center;align-items:center;flex:1 1 auto;height:100%;min-width:50px;padding:5px;font-size:1.4em;text-shadow:0 0 0 #000;text-decoration:none;border-right:1px solid #0003;color:inherit;cursor:pointer}nav>a,nav>div{transition:all .2s}[tab-label].active{filter:contrast(1.5)}[sidemenu].enabled{position:fixed!important;top:0;left:-80vw;height:100%;min-width:80vw!important;max-width:80vw;z-index:10}[sidemenu].enabled.open{left:0;animation:slide-in .2s}[sidemenu].enabled.close{animation:slide-out .2s}.modal,[modal]{visibility:hidden;position:fixed;left:0;right:0;top:0;bottom:0;margin:auto!important;height:auto;width:auto;max-height:600px;max-width:400px;overflow-y:auto;z-index:10}.modal.big,[modal].big{max-height:800px;max-width:600px}.modal.small,[modal].small{max-height:400px;max-width:200px}[modal].open{visibility:visible;animation:zoom-in .2s,fade-in .2s}[modal].close{animation:zoom-out .2s,fade-out .2s}[menu]{visibility:hidden;position:fixed;background-color:inherit;box-shadow:0 0 4px 4px rgba(0,0,0,.2);z-index:10;cursor:pointer}[menu]>div{padding:10px;margin-bottom:0;text-transform:capitalize}[menu]>div:not(:last-child){border-bottom:1px solid #0003}[menu].open{visibility:visible;animation:fold .2s reverse}[menu].close{animation:fold .2s}[label]{position:relative;margin-top:35px;margin-bottom:15px;vertical-align:bottom}[label][fixed]>*{margin-bottom:0}[label]>input,[label]>select,[label]>textarea{margin-top:0!important}[label]:not([panel]):not([section]):before{content:attr(label);position:absolute;height:35px;line-height:35px;font-size:1.2em;text-transform:capitalize}[label]:before{top:0;left:0;margin-top:-35px}[label].big:before{margin-left:0}[label][fixed]:before{margin-top:-30px;margin-left:0}.inline-label[label],.inline-label_>[label]{width:auto;margin-top:0;padding-left:calc(40% + 10px)}.inline-label[label]:before,.inline-label_>[label]:before{top:auto;width:80%;left:-40%;margin-top:0;text-align:right}.inline-label[label][fixed]:before,.inline-label_>[label][fixed]:before{margin-top:0;margin-left:-8px}.below-label[label]:before,.below-label_>[label]:before{bottom:-40px;left:0;right:0;margin-top:0;margin-left:0}.big [label]{margin-top:25px;font-size:1.2em}.big [label]:before{margin-top:-27px}.clickable,[hide],[onclick],[show],[toggle]{cursor:pointer}[movable]{user-select:none;cursor:move}[resizable]{resize:both;overflow:hidden}[foldable].open{animation:fold-out .2s}[foldable].folded{animation:fold-in .2s;height:30px!important;overflow:hidden;padding-bottom:0}[foldable]:before{content:attr(foldable) '  △';cursor:pointer}[foldable].folded:before{content:attr(foldable) '  ▽'}.row{width:100%;display:flex;flex-flow:row wrap;align-content:flex-start;padding-left:1%}.col{display:flex;flex-flow:column nowrap;align-content:flex-start;align-items:center}.col>.row-1,.row>.col-1{flex-basis:7.33%}.col>.row-2,.row>.col-2{flex-basis:15.66%}.col>.row-3,.row>.col-3{flex-basis:24%}.col>.row-4,.row>.col-4{flex-basis:32.33%}.col>.row-5,.row>.col-5{flex-basis:40.66%}.col>.row-6,.row>.col-6{flex-basis:49%}.col>.row-7,.row>.col-7{flex-basis:57.33%}.col>.row-8,.row>.col-8{flex-basis:65.66%}.col>.row-9,.row>.col-9{flex-basis:74%}.col>.row-10,.row>.col-10{flex-basis:82.33%}.col>.row-11,.row>.col-11{flex-basis:90.66%}.row [class*=col-]{margin-left:0!important}.row [class*=col-]:not(:last-child){margin-right:1%!important}.col [class*=row-]{margin-top:0!important;margin-bottom:1vh!important}.page-options{flex-basis:initial!important}[icon]{min-height:50px}[icon]:empty{padding:0}[icon]:before{display:inline-block;flex-grow:0;height:50px;width:50px;font-size:1.5rem;line-height:2;text-align:center;text-decoration:none}.small[icon],.small_>[icon]{min-height:35px}.small[icon]:before,.small_>[icon]:before{height:35px;width:35px;font-size:1.2rem;line-height:1.7}.big[icon]:before,.big_>[icon]:before{height:70px;width:70px;font-size:2.2rem;line-height:1.9}.huge[icon]:before,.huge_>[icon]:before{height:100px;width:100px;font-size:3.2rem;line-height:1.9}.round[icon]:before,.round_>[icon]:before{border-radius:50%}.floating[icon]{position:relative;padding-left:0}.floating[icon]:before{position:absolute;top:0;left:4px;height:35px;width:35px;font-size:1.1rem}.floating[icon]>input{padding-left:45px}[icon=remove]:before{line-height:.6!important;font-weight:600}[icon=close]:before,[icon=network]:before{line-height:1!important}[icon=diamonds]:before{line-height:1.1!important}[icon=pommee]:before,[icon=restore]:before{line-height:1.2!important}[icon=ankh]:before,[icon=celtic]:before,[icon=comunism]:before,[icon=img-file]:before,[icon=latin2]:before,[icon=reload]:before,[icon=stereo]:before,[icon^=hg-]:before{line-height:1.3!important}[icon=sync]:before{line-height:1.3!important;transform:rotate(90deg)}[icon=error]:before{line-height:1.35!important;font-weight:600}[icon=copy]:before{line-height:1.5!important;font-weight:600;font-size:1.7rem}[icon=health]:before{line-height:1.5!important}[icon=warning]:before{line-height:1.6!important}[icon=maximize]:before,[icon=minimize]:before{line-height:1.7!important}[icon=play]:before,[icon=undo]:before{line-height:1.7!important;transform:rotate(90deg)}[icon=redo]:before{line-height:1.7!important;transform:rotate(-90deg)}[icon=caps-lock]:before,[icon=return]:before,[icon=shift]:before{font-family:auto;font-weight:600}[icon=candle]:before,[icon=desktop]:before,[icon=printer]:before,[icon=stopwatch]:before,[icon=studio-mic]:before{font-weight:600}[icon=tab]:before{font-family:auto}[icon=pinch]:before{transform:rotate(90deg)}[icon=crescent-moon]:before,[icon=moon]:before{filter:grayscale(1)}.list{border:1px solid rgba(0,0,0,.2)}.list[header]{padding-top:40px}.list>div{height:7vh;padding:2vh;transition:all .2s}.list>div{border-bottom:1px solid rgba(0,0,0,.2)}.list>div:first-child{border-top:1px solid rgba(0,0,0,.2)}.list>div.active{border-left:7px solid #222}.list>div:hover{text-shadow:0 0 1px #000}.nodata{padding:10% 5%;margin:auto;font-size:1.5rem;text-align:center}button.fab{position:fixed;bottom:0;right:0;width:50px;margin:20px;border-radius:50%;z-index:5}.backdrop:before{content:'';position:fixed;top:0;left:0;height:100vh;width:100vw;background:rgba(0,0,0,.7);animation:fade-in .2s;z-index:9}.loading{color:transparent!important;position:relative}.loading>*{visibility:hidden}.loading:after{content:'';position:absolute;top:0;bottom:0;left:0;right:0;width:25px;height:25px;margin:auto;border-radius:50%;border:.25rem solid rgba(255,255,255,.2);border-top-color:#fff;animation:spin 1s infinite linear;visibility:visible}.big.loading:after{position:fixed;width:100px;height:100px;z-index:10}.loading2{perspective:120px}.loading2:after{content:"";position:absolute;left:25px;top:25px;width:50px;height:50px;background-color:#3498db;animation:flip 1s infinite linear}@keyframes stamp{50%{transform:scale(1.2)}}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}@keyframes flip{0%{transform:rotate(0)}50%{transform:rotateY(180deg)}100%{transform:rotateY(180deg) rotateX(180deg)}}@keyframes zoom-in{0%{transform:scale(0)}100%{transform:scale(1)}}@keyframes zoom-out{0%{transform:scale(1)}100%{transform:scale(0)}}@keyframes fade-in{0%{opacity:0}100%{opacity:1}}@keyframes fade-out{0%{opacity:1}100%{opacity:0}}@keyframes slide-in{0%{left:-100vw}100%{left:0}}@keyframes slide-out{0%{left:0}100%{left:-100vw}}@keyframes fold-in{0%{height:var(--elem-h);overflow:hidden}100%{height:0;overflow:hidden}}@keyframes fold-out{0%{height:0;overflow:hidden}100%{height:var(--elem-h);overflow:hidden}}.hidden{position:absolute;visibility:hidden}.rel,.rel_>*{position:relative}.fix,.fix_>*{position:fixed}.inline,.inline_>*{display:inline-block;margin-top:0;margin-bottom:0}.floatl,.floatl_>*{float:left}.floatr,.floatr_>*{float:right}.left,.left_>*{position:absolute;left:0}.right,.right_>*{position:absolute;right:0}.top,.top_>*{position:absolute;top:0}.bottom,.bottom_>*{position:absolute;bottom:0}.centerx,.centerx_>*{position:absolute;left:0;right:0;margin:auto!important}.centery,.centery_>*{position:absolute;top:0;bottom:0;margin:auto!important}.center,.center_>*{position:absolute;left:0;right:0;top:0;bottom:0;margin:auto!important}.fcenterx,.fcenterx_>*{display:flex;justify-content:center}.fcentery,.fcentery_>*{display:flex;align-items:center}.fcenter,.fcenter_>*{display:flex;justify-content:center;align-items:center}.scrollx,.scrollx_>*{width:100%;overflow-x:auto;overflow-y:hidden}.scrolly,.scrolly_>*{height:100%;overflow-x:hidden;overflow-y:auto}.scroll,.scroll_>*{overflow:auto}.textl,.textl_>*{text-align:left}.textr,.textr_>*{text-align:right}.textc,.textc_>*{text-align:center}.fullw,.fullw_>*{width:100%}.fullh,.fullh_>*{height:100%}.halfw,.halfw_>*{width:50%}.halfh,.halfh_>*{height:50%}.autow,.autow_>*{width:auto}.autoh,.autoh_>*{height:auto}.autom,.autom_>*{margin:auto!important}.m0{margin:0!important}.pad-s,.pad-s_>*{padding:calc(var(--pad) * .5)}.pad,.pad_>*{padding:var(--pad)}.pad-l,.pad-l_>*{padding:calc(var(--pad) * 1.5)}.p0{padding:0!important}.round,.round_>*{border-radius:50%}.columns-2,.columns-3{display:flex;flex-wrap:wrap;align-content:flex-start}.columns-2>*{width:49%;margin-right:2%}.columns-3>*{width:32%;margin-right:2%}.columns-2>:nth-child(2n),.columns-3>:nth-child(3n){margin-right:0}.wrap{flex-wrap:wrap}.nowrap{flex-wrap:nowrap}.scale-up,.scale-up_>*{transition:all .2s ease-in-out}.scale-up:hover,.scale-up_>:hover{transform:scale(1.1)}[fx=toast]{position:fixed;display:flex;left:0;right:0;bottom:-100px;width:100vw;max-width:600px;min-height:90px;max-height:90px;padding:20px;margin:auto;overflow:hidden;text-overflow:ellipsis;z-index:10;transition:bottom ease-out .25s}[fx=toast].active{bottom:0}[fx=toast] [icon]::before{border-radius:50%;font-size:2rem;line-height:1.6;box-shadow:0 0 0 1px}[fx=toast] [icon=warning]::before{background:#ff0;line-height:1.4}[fx=toast] [icon=error]::before{background:red;line-height:1.4}[fx=toast] [icon=accept]::before{background:green}.fx-stack-container>*{transition:margin-top 2s ease;margin-top:0}.fx-stack-el{margin-top:100px}.fx-stamp-container>*{transition:opacity .3s;animation:stamp .3s}.fx-stamp-el{opacity:0;animation:none}.flip-container{perspective:1000px;position:relative}.flipper{transition:.6s;transform-style:preserve-3d;position:absolute}.flipper.flip{transform:rotateY(180deg)}.flipper .back,.flipper .front{backface-visibility:hidden;top:0;left:0}.flipper .front{z-index:2;transform:rotateY(0)}.flipper .back{transform:rotateY(180deg)}::-webkit-scrollbar{width:10px;background:0 0}::-webkit-scrollbar-thumb{background-color:rgba(0,0,0,.3);background-clip:content-box;border-left:solid transparent 2px;border-right:solid transparent 2px;border-radius:4px}::-webkit-scrollbar-thumb:hover{background-color:rgba(0,0,0,.4)}@-moz-document url-prefix(http://),url-prefix(https://){scrollbar{-moz-appearance:none!important;background:#0f0!important}scrollbarbutton,thumb{-moz-appearance:none!important;background-color:#00f!important}scrollbarbutton:hover,thumb:hover{-moz-appearance:none!important;background-color:red!important}scrollbarbutton{display:none!important}scrollbar[orient=vertical]{min-width:15px!important}}input[type=range]{-webkit-appearance:none;background:0 0}input[type=range]:focus{outline:0}input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;height:20px;width:20px;background-color:red;border-radius:50%;border:1px solid #000;margin-top:-5px;cursor:pointer}input[type=range]::-webkit-slider-runnable-track{width:100%;height:10px;background:green;border:1px solid #222;border-radius:5px;cursor:pointer}input[type=range]::-ms-track{width:100%;cursor:pointer;background:0 0;border-color:transparent;color:transparent}@media only screen and (min-width:800px){.show-phone,.show-tablet{position:absolute;visibility:hidden}.pad-s-desktop,.pad-s-desktop_>*{padding:calc(var(--pad) * .5)}.pad-desktop,.pad-desktop_>*{padding:var(--pad)}.pad-l-desktop,.pad-l-desktop_>*{padding:calc(var(--pad) * 1.5)}.p0-desktop{padding:0}}@media only screen and (min-width:500px) and (max-width:800px){.pad-s-tablet,.pad-s-tablet_>*{padding:calc(var(--pad) * .5)}.pad-tablet,.pad-tablet_>*{padding:var(--pad)}.pad-l-tablet,.pad-l-tablet_>*{padding:calc(var(--pad) * 1.5)}.p0-tablet{padding:0}}@media only screen and (max-width:800px){[page][header]:before{line-height:.8}.hide-tablet{display:none}.show-tablet{position:relative;visibility:visible}[header].hh-tablet:before{display:none}[header].hh-tablet[page]{padding-top:0}[header].hh-tablet[panel]{padding-top:20px}[header].hh-tablet[section]{padding-top:15px}}@media only screen and (max-width:500px){[page]{padding-bottom:0;overflow-y:auto}[panel]{padding:15px;border-radius:0}[template]>.controls>.columns,[template]>.controls>.sizes{display:none}[options]{bottom:0;left:0!important;right:0;height:80%!important;margin:auto}.row{padding-left:0}.row:not(.rigid)>[class*=col-],[class*=columns-]:not(.rigid)>*{min-width:100%}.hide-phone{display:none}.show-phone{position:relative;visibility:visible}[header].hh-phone:before{display:none}[header].hh-phone[page]{padding-top:0}[header].hh-phone[panel],[header].hh-phone[section]{padding-top:15px}.pad-s-phone{padding-left:5%;padding-right:5%}.pad-phone{padding-left:10%;padding-right:10%}.pad-l-phone{padding-left:15%;padding-right:15%}.p0-phone{padding:0}}</style>` + genIconStyles() )
 
 bootstrap()
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./blocks/all":1,"./components":9,"./extensions":10,"./fx":11,"./icons":12,"./themes":14,"./utils":15}],14:[function(require,module,exports){
+},{"./blocks/all":1,"./components":10,"./extensions":11,"./fx":12,"./icons":13,"./themes":15,"./utils":16}],15:[function(require,module,exports){
 exports.themes = {
 
     base : {
         font : 'normal 14px Apple Color Emoji, Segoe UI Emoji, NotoColorEmoji, Segoe UI Symbol, Android Emoji, EmojiSymbols, EmojiOne Mozilla',
         palette : {
-            white   : '#fff',
+            white   : '#eee',
             lighter : '#ddd',
             light   : '#bbb',
-            mid     : '#888',
+            mid     : '#999',
             dark    : '#444',
             darker  : '#222',
-            black   : '#000',
+            black   : '#111',
             detail  : 'darkcyan',
-            lighten : 'rgba(255,255,255,0.5)',
+            lighten : 'rgba(255,255,255,0.2)',
             darken  : 'rgba(0,0,0,0.2)',
         },
     },
@@ -2898,56 +3344,72 @@ exports.themes = {
 exports.themeMaps = {
 
     dark : {
-        page    : 'darker lighten', // bg, header bg
-        panel   : 'dark lighten',   // bg, header bg
-        section : 'mid lighten',    // bg, header bg
+        page    : 'black lighten', // bg, header bg
+        panel   : 'darker lighten',   // bg, header bg
+        section : 'dark lighten',    // bg, header bg
         field   : 'light darker',   // bg, text
         btn     : 'detail darker',  // bg, text
-        header  : 'darker',         // text
-        label   : 'darker',         // text
-        text    : 'darker',         // text
+        header  : 'light',          // text
+        label   : 'light',          // text
+        text    : 'light',          // text
     },
 
     light : {
-        page    : 'lighter darken',
+        page    : 'light darken',
         panel   : 'mid lighten',
-        section : 'light darken',
+        section : 'lighten darken',
         field   : 'lighter dark',
-        btn     : 'detail light',
-        header  : 'dark',
-        label   : 'mid',
+        btn     : 'detail dark',
+        header  : 'darker',
+        label   : 'darker',
         text    : 'darker',
     },
     
 }
-},{}],15:[function(require,module,exports){
-const is = {}
-'object function array string number regex boolean'.split(' ').forEach(function(t){
-    is[t] = function(exp){ return type(exp) === t }
-})
+},{}],16:[function(require,module,exports){
 function type(exp) {
-        var clazz = Object.prototype.toString.call(exp)
-        return clazz.substring(8, clazz.length-1).toLowerCase()
+    const clazz = Object.prototype.toString.call(exp)
+    return clazz.substring(8, clazz.length-1).toLowerCase()
 }
-function sameType(exp1, exp2) {
-    return type(exp1) === type(exp2)
-}
-function exists(ref) {
-    return ref !== undefined && ref !== null
-}
+
+const is = {}
+'object function array string number regex boolean'.split(' ')
+    .forEach(t => {
+        is[t] = exp => type(exp) === t
+    })
+is.empty = exp =>
+    (is.array(exp) || is.string(exp)) ? exp.length === 0
+    : is.object(exp) ? Object.keys(exp).length === 0
+    : false
+
+const sameType = (exp1, exp2) => type(exp1) === type(exp2)
+
+const exists = ref => ref !== undefined && ref !== null
+
+
+const compose = (...funcs) => funcs.reduce((prev, curr) => (...args) => curr(prev(...args)))
+
+
+const prepTemplate = tmpl_func => data => data.map( compose( checkData, tmpl_func )).join('')
 
 
 function inject(sources) {
-    if (is.string(sources)) sources = sources.split(' ')
+    if (is.string(sources)) sources = sources.split(',')
     if (!is.array(sources)) return rasti.error('Invalid sources, must be an array or a string')
-    var script,
-        body = $('body'),
-        inject = (sources) => {
-            script = $('<script>').attr('src', sources.shift())
-            if (sources.length) script.attr('onload', () => inject(sources))
-            body.append(script)
+    const body = $('body')
+    function do_inject(sources) {
+        const src = sources.shift().trim()
+        const script = $('<script>').attr('src', src)
+        script[0].onload = () => {
+            rasti.log('> Loaded %s', src)
+            sources.length
+                ? do_inject(sources)
+                : rasti.log('All sources loaded')
         }
-    inject(sources)
+        rasti.log('> Loading %s ...', src)
+        body.append(script)
+    }
+    do_inject(sources)
 }
 
 
@@ -3014,7 +3476,6 @@ function htmlEscape(str) {
 }
 
 
-
 function resolveAttr($el, name) {
     var value = $el.attr(name) || $el.attr('name') || $el.attr('prop') || $el.attr('nav') || $el.attr('section') || $el.attr('panel') || $el.attr('page') || $el.attr('template')
     if (!value) rasti.warn('Could not resolve value of [%s] attribute in el:', name, $el[0])
@@ -3022,21 +3483,10 @@ function resolveAttr($el, name) {
 }
 
 
-function rastiError(msg, ...args){
-    this.msg = msg
-    this.el = args.pop()
-    this.args = args
-}
+const random = () => (Math.random() * 6 | 0) + 1
 
 
-function random() {
-    return (Math.random() * 6 | 0) + 1
-}
-
-
-function onMobile() {
-    return window.innerWidth < 500
-}
+const onMobile = () => window.innerWidth < 500
 
 
 module.exports = {
@@ -3044,15 +3494,16 @@ module.exports = {
     type,
     sameType,
     exists,
+    compose,
+    prepTemplate,
     inject,
     checkData,
     html,
     resolveAttr,
     random,
     onMobile,
-    rastiError,
 }
 
-},{}]},{},[13])(13)
+},{}]},{},[14])(14)
 });
 //# sourceMappingURL=rasti.map
