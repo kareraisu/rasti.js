@@ -3,6 +3,7 @@ const { History, Pager, state, crud } = require('./components')
 const utils = require('./utils')
 const { is, sameType, exists, resolveAttr, html } = utils
 const { themes, themeMaps } = require('./themes')
+let media
 
 const options = {
     history : true,
@@ -17,17 +18,10 @@ const options = {
     imgPath : 'img/',
     imgExt  : '.png',
     page_sizes : [5, 10, 20, 50],
-}
-
-const breakpoints = {
-    phone : 500,
-    tablet : 800,
-}
-const media = {on:{}}
-for (let device in breakpoints) {
-    const query = window.matchMedia(`(max-width: ${ breakpoints[device] }px)`)
-    media[device] = query.matches
-    media.on[device] = handler => query.addListener(handler)
+    media   : {
+        phone : 500,
+        tablet : 800,
+    },
 }
 
 const TEXT_ATTRS = 'label header text placeholder'.split(' ')
@@ -93,6 +87,7 @@ function rasti(name, container) {
     this.themes = themes
     this.themeMaps = themeMaps
     this.sidemenu = null
+    this.media = {}
 
 
     // public methods
@@ -155,10 +150,7 @@ function rasti(name, container) {
         }
 
 
-        // apply defaults
-        Object.keys(self.defaults).forEach( key => {
-            //if (!self.options[key]) self.options[key] = self.defaults[key]
-        })
+        setMedia(self.options.media)
 
 
         // define lang (if applicable)
@@ -1365,6 +1357,46 @@ function rasti(name, container) {
         var string = self.langs[lang][key]
         if ( !is.string(string) ) warn('Lang [%s] does not contain key [%s]', lang, key)
         else return string
+    }
+
+
+    function setMedia(breakpoints) {
+        const err = 'Cannot create media matcher: '
+        if (!is.object(breakpoints) || is.empty(breakpoints)) throw err + `no media breakpoints supplied`
+        media = {on:{}}
+        const queries = {}
+        for (let device in breakpoints) {
+            const bp = breakpoints[device]
+            if (!is.number(bp)) throw err + `invalid breakpoint declared for device "${device}", must be a number`
+            queries[device] = window.matchMedia(`(max-width: ${ bp }px)`)
+            Object.defineProperty(media, device, {
+                get: () => queries[device].matches
+            })
+            media.on[device] = handler => queries[device].addListener(handler)
+            /** 
+             * TODO sync up js and css
+             *
+             * Ideally I would like to set css environment vars (one per device/bp)
+             * and read them via env() function in the media query declarations,
+             * but css environment vars are still not fully standardized
+             * ( env() is ready, but there is still no definition on how to set the env vars,
+             *  see issue #2 in https://drafts.csswg.org/css-env-1/#issues-index )
+             * 
+             * So I guess for now the most convenient workaround would be to
+             * change the media queries declarations via DOM manipulation
+             * (it's rasti's way anyways :P).
+             *
+             * Steps would be:
+             * 1. Figure a way to identify each mq declaration, and then for each:
+             * 2. Parse the mq declaration string identifying the breakpoint values
+             * 3. Create a new string replacing the breakpoint values
+             * 4. Replace the mq declaration string with the new one
+             * 5. Let the browser do its magic
+             * 
+             */
+
+        }
+        self.media = media
     }
 
 
