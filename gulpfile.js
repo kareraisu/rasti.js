@@ -21,13 +21,15 @@ const browserSync = require('browser-sync').create()
 const s = gulp.series
 const p = gulp.parallel
 
+process.env.APP_PATH = process.env.APP_PATH || 'C:/Users/ale/Documents/repos/rasti-demo'
+
 const paths = {
-    app : 'C:/Users/ale/Documents/rasti-demo',
-    dist : process.env.PROD ? 'dist' : 'C:/Users/ale/Documents/rasti-demo/dist'
+    app : process.env.APP_PATH,
+    dist : process.env.PROD ? 'dist' : process.env.APP_PATH + '/dist'
 }
 
 
-function bundle(minCss) {
+function bundle() {
     return browserify({
         entries: ['src/rasti.js'],
         standalone: 'rasti', // create an umd module (which, when loaded in a
@@ -47,7 +49,7 @@ function bundle(minCss) {
     .pipe(buffer())
     // inject rasti css
     .pipe( replace('rasti.css', fs.readFileSync(
-        minCss ? paths.dist + '/rasti.min.css'
+        process.env.PROD ? paths.dist + '/rasti.min.css'
         : 'src/rasti.css'
     )))
 }
@@ -61,14 +63,14 @@ gulp.task('minify-css', () =>
 )
 
 
-gulp.task('bundle', s('minify-css', () =>
-    merge2( gulp.src('lib/zepto.min.js'), bundle(true) )
+gulp.task('bundle', () =>
+    merge2( gulp.src('lib/zepto.min.js'), bundle() )
     .pipe(concat('rasti.js'))
-    .pipe(gulp.dest(paths.dist))
+    .pipe(gulp.dest(paths.dist)
 ))
 
 
-gulp.task('prod', s('bundle', () =>
+gulp.task('prod', s('minify-css', 'bundle', () =>
     gulp.src(paths.dist + '/rasti.js')
     .pipe(minify())
     // trim ES6 template strings whitespace
