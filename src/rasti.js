@@ -61,6 +61,7 @@ function rasti(name, container) {
     const __pagers = new Map()
     const __crud = crud(this)
     const __state = {}
+    const __templates = {}
     let __history
     let __invalid_data_count = 0
 
@@ -68,21 +69,16 @@ function rasti(name, container) {
     // public properties
 
     this.options = Object.assign({}, options)
-    this.defaults = {
-        stats : this.options.stats,
-        noData : this.options.noData,
-    }
     this.active = {
         page  : null,
         theme : '',
         lang  : '',
     }
     this.state = state(this, __name)
+    this.data = {}
     this.props = {}
     this.methods = {}
     this.pages = {}
-    this.templates = {}
-    this.data = {}
     this.langs = {}
     this.themes = themes
     this.themeMaps = themeMaps
@@ -435,14 +431,14 @@ function rasti(name, container) {
         if ( is.string(data) ) data = data.split( $el.attr('separator') || self.options.separator )
         if ( !is.array(data) ) data = [data]
 
-        let template = self.templates[name]
+        let template = __templates[name]
         let html
         if ( !template || is.string(template) ) try {
             html = template || $el.html()
             html = html.trim()
             template = genTemplate(html)
             template.html = html
-            self.templates[name] = template
+            __templates[name] = template
         }
         catch(err) {
             return error(errPrefix + 'parsing error: ' + err)
