@@ -1454,7 +1454,7 @@ function rasti(name, container) {
 rasti.log = log
 rasti.warn = warn
 rasti.error = error
-rasti.utils = utils
+rasti.utils = utils.public
 rasti.blocks = require('./blocks/all')
 rasti.icons = require('./icons')
 rasti.fx = require('./fx')

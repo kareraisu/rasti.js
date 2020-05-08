@@ -117,20 +117,25 @@ function resolveAttr($el, name) {
 const random = () => (Math.random() * 6 | 0) + 1
 
 
-const onMobile = () => window.innerWidth < 500
-
-
-module.exports = {
+const public = {
     is,
     type,
     sameType,
     exists,
-    compose,
-    prepTemplate,
     inject,
+    random,
+    compose,
+}
+
+const private = {
+    prepTemplate,
     checkData,
     html,
     resolveAttr,
-    random,
-    onMobile,
+}
+
+module.exports = {
+    ...public,
+    ...private,
+    public
 }

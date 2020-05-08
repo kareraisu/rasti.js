@@ -1,4 +1,4 @@
-const { is, onMobile, prepTemplate } = require('../utils')
+const { is, media, prepTemplate } = require('../utils')
 
 module.exports = {
 
@@ -54,7 +54,7 @@ init($el) {
     $el.on('click', function(e) {
         e.stopPropagation()
         $options.siblings('[options]').hide() // hide other options
-        if ( onMobile() ) $options.parent().addClass('backdrop')
+        if ( media.phone ) $options.parent().addClass('backdrop')
         $options.css('left', this.getBoundingClientRect().right).show()
         $options.find('input').focus()
     })
@@ -62,7 +62,7 @@ init($el) {
     $el.closest('[page]').on('click', '*:not(option)', function(e) {
         if ( $(e.target).attr('name') === name
           || $(e.target).parent().attr('name') === name ) return
-        if ( onMobile() ) $options.parent().removeClass('backdrop')
+        if ( media.phone ) $options.parent().removeClass('backdrop')
         $options.hide()
     })
 
@@ -91,7 +91,7 @@ init($el) {
 
     $options.on('click', 'option', toggleOption)
 
-    if ( !onMobile() )
+    if ( !media.phone )
         $options.on('click', function(e) { $options.find('input').focus() })
 
     $options.on('input', 'input', function(e) {
@@ -122,7 +122,7 @@ init($el) {
                 rasti.warn('Dropped %s overflowed values in el:', dif, el)
             }
             $el.addClass('full')
-            if ( onMobile() ) $options.parent().removeClass('backdrop')
+            if ( media.phone ) $options.parent().removeClass('backdrop')
             $options.hide()
         }
         else {
