@@ -1429,6 +1429,7 @@ rasti.error = error
 rasti.utils = utils
 rasti.blocks = require('./blocks/all')
 rasti.icons = require('./icons')
+rasti.icons.svg = require('./svg')
 rasti.fx = require('./fx')
 rasti.options = {log : 'debug'}
 
@@ -1481,6 +1482,7 @@ function genBlockStyles() {
 function genIconStyles() {
     let styles = ['<style icons>'], glyph
     for (let category in rasti.icons) {
+        if (category == 'svg') continue
         category = rasti.icons[category]
         for (let name in category) {
             glyph = category[name]
@@ -1488,9 +1490,18 @@ function genIconStyles() {
             styles.push(style)
         }
     }
-    styles = styles.concat( genIconFixesStyles() )
+    styles = styles.concat( genIconFixesStyles(), genSvgIconsStyles() )
     styles.push('</style>')
     return styles.join('')
+}
+
+
+function genSvgIconsStyles() {
+    let svg
+    return Object.entries(rasti.icons.svg).map(([name, [size, paths]]) => {
+        svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}">${paths}</svg>`
+        return `[icon=${name}]:before{background-image:url('data:image/svg+xml,${svg}')}`
+    })
 }
 
 

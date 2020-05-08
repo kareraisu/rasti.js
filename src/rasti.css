@@ -770,6 +770,7 @@ nav > div, nav > a {
     padding: 0;
 }
 [icon]:before {
+    content: '';
     display: inline-block;
     flex-grow: 0;
     height: 50px;
@@ -778,6 +779,9 @@ nav > div, nav > a {
     line-height: 2;
     text-align: center;
     text-decoration: none;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 .small[icon], .small_ > [icon] {
     min-height: 35px;
