@@ -1,7 +1,7 @@
 require('./extensions')
 const { History, Pager, state, crud } = require('./components')
 const utils = require('./utils')
-const { is, sameType, exists, resolveAttr, html } = utils
+const { is, sameType, resolveAttr, html } = utils
 const { themes, themeMaps } = require('./themes')
 let media
 
@@ -44,7 +44,7 @@ function rasti(name, container) {
 
     const self = this
     const errPrefix = 'Cannot create rasti app: '
-    if ( !is.string(name) ) return error(errPrefix + 'app must have a name!')
+    if ( is.not.string(name) ) return error(errPrefix + 'app must have a name!')
     name = name.replace(' ', '')
 
     if ( !container ) container = $('body')
@@ -99,7 +99,8 @@ function rasti(name, container) {
 
 
     function config(props) {
-        if (!props || !is.object(props)) return error('Cannot configure app [%s]: no properties found', __name)
+        if ( is.nil(props) ) return warn('Called config() on app [%s] with no arguments', __name)
+        if ( is.not.object(props) ) return error('Cannot config app [%s]: invalid config object', __name)
         for (let key in props) {
             const known = is.object(self[key])
             const valid = is.object(props[key])
@@ -114,7 +115,7 @@ function rasti(name, container) {
             if ('data methods'.includes(key)) {
                 for (let name in props[key]) {
                     const value = props[key][name]
-                    if (key == 'methods' && !is.function(value))
+                    if (key == 'methods' && is.not.function(value))
                         warn('Invalid method [%s], must be a function', name)
                     else
                         self[key][name] = is.function(value) ? value.bind(self) : value
@@ -136,9 +137,9 @@ function rasti(name, container) {
 
         // cache options
         if (options) {
-            if ( !is.object(options) ) warn('Init options must be an object!')
+            if ( is.not.object(options) ) warn('Init options must be an object!')
             else Object.keys(self.options).forEach( key => {
-                if ( exists(options[key]) ) {
+                if ( is.def(options[key]) ) {
                     if ( !sameType(self.options[key], options[key])  ) warn('Init option [%s] is invalid', key)
                     else self.options[key] = options[key]
                 }
@@ -353,16 +354,16 @@ function rasti(name, container) {
         if ($prevPage) $prevPage.removeClass('active')
 
         if (prevPage && prevPage.out) {
-            !is.function(prevPage.out)
+            is.not.function(prevPage.out)
                 ? warn('Page [%s] {out} property must be a function!', prevPagename)
                 : prevPage.out(params)
         }
 
         self.active.page = $page
 
-        if ( params && !is.object(params) ) warn('Page [%s] nav params must be an object!', pagename)
+        if ( params && is.not.object(params) ) warn('Page [%s] nav params must be an object!', pagename)
         if (page && page.in) {
-            !is.function(page.in)
+            is.not.function(page.in)
                 ? warn('Page [%s] {in} property must be a function!', pagename)
                 : page.in(params)
         }
@@ -421,7 +422,7 @@ function rasti(name, container) {
             if (!data) return error(errPrefix + 'undefined data source "%s" resolved for element:', datakey, el)
         }
         if ( is.string(data) ) data = data.split( $el.attr('separator') || self.options.separator )
-        if ( !is.array(data) ) data = [data]
+        if ( is.not.array(data) ) data = [data]
 
         let template = __templates[name]
         let html
@@ -435,7 +436,7 @@ function rasti(name, container) {
         catch(err) {
             return error(errPrefix + 'parsing error: ' + err)
         }
-        if ( !is.function(template) ) return error(errPrefix + 'template must be a string or a function')
+        if ( is.not.function(template) ) return error(errPrefix + 'template must be a string or a function')
 
         if ( data && !data.length ) return $el.html(`<div class="nodata">${ self.options.noData }</div>`).addClass('rendered')
 
@@ -488,7 +489,7 @@ function rasti(name, container) {
             errPrefix = 'Cannot set lang [%s]: '
 
         if (!lang) return error(errPrefix + 'lang not found', langName)
-        if ( !is.object(lang) ) return error(errPrefix + 'lang must be an object!', langName)
+        if ( is.not.object(lang) ) return error(errPrefix + 'lang must be an object!', langName)
 
         log('Setting lang [%s]', langName)
         self.active.lang = langName
@@ -611,7 +612,7 @@ function rasti(name, container) {
         if (!block) return error('Undefined block type "%s" declared in [block] attribute of element:', type, el)
 
         if (!el.initialized) {
-            if (exists(block.init) && !is.function(block.init))
+            if (is.def(block.init) && is.not.function(block.init))
                 return error('Invalid "init" prop defined in block type "%s", must be a function', type)
             if (is.function(block.init))
                 block.init($el)
@@ -623,7 +624,7 @@ function rasti(name, container) {
             if (!datakey) return
 
             data = self.data[datakey]
-            if (!exists(data)) return warn('Detected non-existant data ref in data source "%s" declared in [data] attribute of element:', datakey, el)
+            if (is.nil(data)) return warn('Detected non-existant data ref in data source "%s" declared in [data] attribute of element:', datakey, el)
             if (is.empty(data)) return
         }
 
@@ -638,7 +639,7 @@ function rasti(name, container) {
             : render(data)
 
         function render(data) {
-            if (!exists(data)) warn('Detected non-existant data ref when trying to render element', el)
+            if (is.nil(data)) warn('Detected non-existant data ref when trying to render element', el)
             if (is.empty(data)) return
             else try {
                 block.render(data, $el)
@@ -708,8 +709,8 @@ function rasti(name, container) {
         if (!fxkey) return
         const fx = rasti.fx[fxkey]
         if (!fx) return warn('Undefined fx "%s" declared in [fx] attribute of element', fxkey, el)
-        if ( !is.function(fx) ) return error('fx.%s must be a function!', fxkey)
-        if ( selector && !is.string(selector) ) return error('Cannot apply fx, invalid selector provided for el', el)
+        if ( is.not.function(fx) ) return error('fx.%s must be a function!', fxkey)
+        if ( selector && is.not.string(selector) ) return error('Cannot apply fx, invalid selector provided for el', el)
         const $target = selector ? $el.find(selector) : $el
         if (!$target.length) return warn('Cannot apply fx, cannot find target "%s" in el', target, el)
         fx($target)
@@ -729,7 +730,7 @@ function rasti(name, container) {
             if (prop) {
                 if ( $el.hasAttr('transient') ) trans = true
                 
-                if ( exists(el.value) ) {
+                if ( $el.hasAttr('template') || is.def(el.value) ) {
                     // it's an element, so bind it
                     bindElement($el, {prop, trans}, state)
                 }
@@ -802,11 +803,11 @@ function rasti(name, container) {
         let page, $page
         for (let name in self.pages) {
             page = self.pages[name]
-            if ( !is.object(page) ) return error('pages.%s must be an object!', name)
+            if ( is.not.object(page) ) return error('pages.%s must be an object!', name)
             $page = container.find('[page='+ name +']')
             if ( !$page.length ) return error('No container found for page "%s". Please bind one via [page] attribute', name)
             if (page.init) {
-                if ( !is.function(page.init) ) return error('pages.%s.init must be a function!', name)
+                if ( is.not.function(page.init) ) return error('pages.%s.init must be a function!', name)
                 else {
                     log('Initializing page [%s]', name)
                     self.active.page = $page // to allow app.get() etc in page.init
@@ -1265,7 +1266,7 @@ function rasti(name, container) {
 
     function submitAjax(method, callback) {
         var ajax = self.methods[ method ]
-        if ( !is.function(ajax) ) return error('Ajax method ['+ method +'] is not defined')
+        if ( is.not.function(ajax) ) return error('Ajax method ['+ method +'] is not defined')
 
         var $form = container.find('[ajax='+ method +']')
         if (!$form.length) return error('No container element bound to ajax method [%s]. Please bind one via [ajax] attribute', method)
@@ -1343,24 +1344,24 @@ function rasti(name, container) {
 
 
     function getString(lang, key) {
-        if ( !is.object(self.langs[lang]) ) {
+        if ( is.not.object(self.langs[lang]) ) {
             error('Lang [%s] is not defined', lang)
             return
         }
         var string = self.langs[lang][key]
-        if ( !is.string(string) ) warn('Lang [%s] does not contain key [%s]', lang, key)
+        if ( is.not.string(string) ) warn('Lang [%s] does not contain key [%s]', lang, key)
         else return string
     }
 
 
     function setMedia(breakpoints) {
         const err = 'Cannot create media matcher: '
-        if (!is.object(breakpoints) || is.empty(breakpoints)) throw err + `no media breakpoints supplied`
+        if (is.not.object(breakpoints) || is.empty(breakpoints)) throw err + `no media breakpoints supplied`
         media = {on:{}}
         const queries = {}
         for (let device in breakpoints) {
             const bp = breakpoints[device]
-            if (!is.number(bp)) throw err + `invalid breakpoint declared for device "${device}", must be a number`
+            if (is.not.number(bp)) throw err + `invalid breakpoint declared for device "${device}", must be a number`
             queries[device] = window.matchMedia(`(max-width: ${ bp }px)`)
             Object.defineProperty(media, device, {
                 get: () => queries[device].matches

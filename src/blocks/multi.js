@@ -9,7 +9,7 @@ render(data, $el) {
     if (!name) return rasti.error('Could not resolve name of element:', el)
 
     if ( is.string(data) ) data = data.split(', ')
-    if ( !is.array(data) ) throw 'invalid data, must be string or array'
+    if ( is.not.array(data) ) throw 'invalid data, must be string or array'
 
     $el[0].total = data.length // WARNING : SIDE EFFECTS
 

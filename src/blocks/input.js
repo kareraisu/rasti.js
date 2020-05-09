@@ -7,7 +7,7 @@ render(data, $el) {
         const separator = $el.attr('separator') || ','
         data = data.split(separator)
     }
-    if ( !is.array(data) ) throw 'invalid data, must be string or array'
+    if ( is.not.array(data) ) throw 'invalid data, must be string or array'
     const html = data
         .map( d => `<option value="${d.trim()}"></option>` )
         .join('')

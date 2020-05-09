@@ -1,4 +1,4 @@
-const { is, resolveAttr } = require('./utils')
+const { is, exists, resolveAttr } = require('./utils')
 
 class History {
 
@@ -43,11 +43,11 @@ class Pager {
 
     constructor(id, results, sizes) {
         this.id = id
-        if ( !is.string(id) ) return rasti.error('Pager id must be a string')
+        if ( is.not.string(id) ) return rasti.error('Pager id must be a string')
         this.logid = `Pager for template [${ this.id }]:`
-        if ( !is.array(results) ) return rasti.error('%s Results must be an array', this.logid)
+        if ( is.not.array(results) ) return rasti.error('%s Results must be an array', this.logid)
         this.results = results
-        if ( !is.array(sizes) || !is.number(sizes[0]) ) return rasti.error('%s Page sizes must be an array of numbers', this.logid)
+        if ( is.not.array(sizes) || is.not.number(sizes[0]) ) return rasti.error('%s Page sizes must be an array of numbers', this.logid)
         this.sizes = sizes
         this.setPageSize(this.sizes[0])
     }
@@ -74,14 +74,14 @@ class Pager {
 
     setPageSize(size) {
         size = parseInt(size)
-        if ( !is.number(size) ) return rasti.error('%s Must specify a number as the page size', this.logid)
+        if ( is.not.number(size) ) return rasti.error('%s Must specify a number as the page size', this.logid)
         this.page_size = size
         this.page = 0
         this.total = Math.ceil(this.results.length / this.page_size)
     }
 
     getPageResults(page) {
-        if ( !is.number(page) ) {
+        if ( is.not.number(page) ) {
             rasti.error('%s Must specify a page number to get results from', this.logid)
             return []
         }
@@ -117,7 +117,7 @@ function state(app, app_id) {
             try {
                 state = JSON.parse( localStorage.getItem('rasti.' + app_id) )
                 if ( !state ) rasti.log('No saved state found for app [%s]', app_id)
-                else if ( !is.object(state) ) invalid()
+                else if ( is.not.object(state) ) invalid()
                 else return state
             }
             catch(err) {
@@ -169,7 +169,7 @@ function crud(app) {
             // FIXME: app ns is not available here
             const crudns = app.crud[metadata.crudns]
             const method = crudns && crudns[methodname]
-            if (method && !is.function(method)) {
+            if (method && is.not.function(method)) {
                 rasti.error('Illegal crud method "%s", must be a function!', name)
                 return false
             }

@@ -16,9 +16,8 @@ is.not = Object.fromEntries( Object.entries(is).map(([k,f]) => [k, exp => !f(exp
 is.def = ref => ref !== undefined && ref !== null
 is.nil = ref => !is.def(ref)
 
-const sameType = (exp1, exp2) => type(exp1) === type(exp2)
 
-const exists = ref => ref !== undefined && ref !== null
+const sameType = (exp1, exp2) => type(exp1) === type(exp2)
 
 
 const compose = (...funcs) => funcs.reduce((prev, curr) => (...args) => curr(prev(...args)))
@@ -29,7 +28,7 @@ const prepTemplate = tmpl_func => data => data.map( compose( checkData, tmpl_fun
 
 function inject(sources) {
     if (is.string(sources)) sources = sources.split(',')
-    if (!is.array(sources)) return rasti.error('Invalid sources, must be an array or a string')
+    if (is.not.array(sources)) return rasti.error('Invalid sources, must be an array or a string')
     const body = $('body')
     function do_inject(sources) {
         const src = sources.shift().trim()
@@ -53,12 +52,12 @@ function checkData(data) {
         data = {value: data, label: data, alias: data.toLowerCase()}
         break
     case 'object':
-        if ( !is.string(data.value) || !is.string(data.label) ) {
+        if ( is.not.string(data.value) || is.not.string(data.label) ) {
             rasti.error('Invalid data object (must have string properties "value" and "label"):', data)
             //invalid_count++
             data = {value: '', label: 'INVALID DATA', alias: ''}
         }
-        else if ( !is.string(data.alias) ) {
+        else if ( is.not.string(data.alias) ) {
             if (data.alias) {
                 rasti.error('Invalid data property "alias" (must be a string):', data)
                 //invalid_count++
@@ -124,7 +123,6 @@ const public = {
     is,
     type,
     sameType,
-    exists,
     inject,
     random,
     compose,
