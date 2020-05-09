@@ -1,9 +1,9 @@
 module.exports = {
 
 app : {
+    gear : '⚙️',
     user : '👤',
     users : '👥',
-    gear : '⚙️',
     lock : '🔒',
     'open-lock' : '🔓',
     key : '🔑',
@@ -127,16 +127,16 @@ electronics : {
 },
 
 tools : {
-    bricks : '🧱',
+    tools : '🛠️',
+    tools2 : '⚒️',
     wrench : '🔧',
     hammer : '🔨',
     pick : '⛏️',
     axe : '🪓',
-    tools : '🛠️',
-    tools2 : '⚒️',
     toolbox : '🧰',
     clamp : '🗜️',
     bolt : '🔩',
+    bricks : '🧱',
     anchor : '⚓',
     scales : '⚖️',
     'old-key' : '🗝️',
@@ -170,11 +170,6 @@ tools : {
 },
 
 vehicles : {
-    skateboard : '🛹',
-    scooter : '🛴',
-    bicycle : '🚲',
-    motorscooter : '🛵',
-    motorcycle : '🏍️',
     car : '🚗',
     'race-car' : '🏎️',
     rv : '🚙',
@@ -183,6 +178,11 @@ vehicles : {
     truck : '🚚',
     ambulance : '🚑',
     'fire-engine' : '🚒',
+    skateboard : '🛹',
+    scooter : '🛴',
+    bicycle : '🚲',
+    motorscooter : '🛵',
+    motorcycle : '🏍️',
     metro : '🚇',
     train : '🚄',
     locomotive : '🚂',
@@ -218,6 +218,9 @@ buildings : {
 },
 
 characters : {
+    jack : '⛄️',
+    jack2 : '☃️',
+    teddy : '🧸',
     teacherm : '👨‍🏫',
     teacherw : '👩‍🏫',
     scientistm : '👨‍🔬',
@@ -248,9 +251,6 @@ characters : {
     vampirew : '🧛‍♀️',
     zombiem : '🧟‍♂️',
     zombiew : '🧟‍♀️',
-    jack : '⛄️',
-    jack2 : '☃️',
-    teddy : '🧸',
 },
 
 faces : {
@@ -267,9 +267,9 @@ faces : {
 },
 
 animals : {
-    hippo : '🦛',
     elefant : '🐘',
     rhino : '🦏',
+    hippo : '🦛',
     monkey : '🐒',
     gorilla : '🦍',
     orangutan : '🦧',
@@ -345,8 +345,8 @@ animals : {
 },
 
 plants : {
-    leaf : '🍂',
     herb : '🌿',
+    leaf : '🍂',
     maple : '🍁',
     shamrock : '☘️',
     luck : '🍀',
@@ -399,17 +399,17 @@ nature : {
 },
 
 'food & drink' : {
+    burger : '🍔',
     sandwich : '🥪',
     kebab : '🥙',
     taco : '🌮',
     burrito : '🌯',
     salad : '🥗',
-    paella : '🥘',
-    burger : '🍔',
     pizza : '🍕',
     'hot-dog' : '🌭',
     fries : '🍟',
     spaghetti : '🍝',
+    paella : '🥘',
     falafel : '🧆',
     bread : '🍞',
     bread2 : '🥖',
