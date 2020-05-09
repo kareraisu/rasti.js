@@ -278,14 +278,6 @@ function rasti(name, container) {
         })
 
 
-        // init prop-bound templates
-        container.find('[prop][template]').each( (i, el) => {
-            const $el = $(el)
-            const prop = $el.attr('prop')
-            bindElement($el, {prop}, self.props)
-        })
-
-
         // init crud templates
         initCrud()
 
@@ -734,7 +726,7 @@ function rasti(name, container) {
             const prop = $el.attr('prop')
             let trans
 
-            if (prop && !$el.hasAttr('template')) {
+            if (prop) {
                 if ( $el.hasAttr('transient') ) trans = true
                 
                 if ( exists(el.value) ) {
@@ -742,14 +734,12 @@ function rasti(name, container) {
                     bindElement($el, {prop, trans}, state)
                 }
                 else {
-                    // it's a container prop
-                    const defobjval = {}
-                    if (trans) defobjval.__trans = true
-                    // go down one level in the state tree
-                    state[prop] = state[prop] || defobjval
-                    const newroot = state[prop]
-                    // and keep looking
-                    bindProps($el, newroot)
+                    // it's a container prop, initialize value if applicable
+                    state[prop] = state[prop] || {}
+                    // set transient flag if applicable
+                    if (trans) state[prop].__trans = true
+                    // keep looking using the prop as root
+                    bindProps($el, state[prop])
                 }
             }
             // else keep looking
@@ -773,7 +763,10 @@ function rasti(name, container) {
         // (unless triggered from state _setter)
         $el.on('change', (e, params) => {
             if ( !(params && params._setter) )
-                state[prop] = $el.is('[type=checkbox]') ? $el[0].checked : $el.val()
+                state[prop] = $el.is('textarea') ? $el.text()
+                    : $el.is('input[type=checkbox]') ? $el[0].checked
+                    : $el.is('input[type=range]') ? parseInt($el.val())
+                    : $el.val()
         })
 
         // update dom on state change
@@ -796,10 +789,8 @@ function rasti(name, container) {
         if ( $el.is('[template]') )
             render($el, value)
         else {
-            $el.is('textarea')
-                ? $el.text( value )
-            : $el.is('[type=checkbox]')
-                ? $el[0].checked = !!value
+            $el.is('textarea') ? $el.text( value )
+            : $el.is('[type=checkbox]') ? $el[0].checked = !!value
             : $el.val( value )
 
             $el.trigger('change', {_setter})

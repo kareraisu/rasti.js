@@ -12,6 +12,9 @@ is.empty = exp =>
     (is.array(exp) || is.string(exp)) ? exp.length === 0
     : is.object(exp) ? Object.keys(exp).length === 0
     : false
+is.not = Object.fromEntries( Object.entries(is).map(([k,f]) => [k, exp => !f(exp)]) )
+is.def = ref => ref !== undefined && ref !== null
+is.nil = ref => !is.def(ref)
 
 const sameType = (exp1, exp2) => type(exp1) === type(exp2)
 

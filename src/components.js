@@ -128,12 +128,21 @@ function state(app, app_id) {
             const state = app.state.get()
             if (state) {
                 rasti.log('Restoring state...')
-                app.props = state.props
+                match(app.props, state.props)
                 if (state.theme) app.setTheme(state.theme)
                 if (state.lang) app.setLang(state.lang)
                 rasti.log('State restored')
             }
             return state
+
+            function match(t1, t2) {
+                if ( is.nil(t2) || is.nil(t2) ) return
+                for (let name in t1) {
+                    is.object(t1[name])
+                        ? match(t1[name], t2[name])
+                        : t1[name] = t2[name]
+                }
+            }
         } },
         clear : { value : _ => {
             window.localStorage.removeItem('rasti.' + app_id)
