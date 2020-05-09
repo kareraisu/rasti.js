@@ -935,10 +935,16 @@ function rasti(name, container) {
                 const method = self.methods[methodName]
                 if ( !method ) return error('Undefined method "%s" declared in [on-%s] attribute of element:', methodName, action, el)
                 const $template = $el.closest('[template]')
-                $template.length && !$el.hasAttr('template')
-                    ? $template.on(action, `[on-${action}=${methodName}]`, method)
-                    : $el.on(action, method)
-                if (action == 'click') $el.addClass('clickable')
+                if ($template.length && !$el.hasAttr('template')) {
+                    if (!$template[0].events) $template[0].events = []
+                    const selector = `[on-${action}=${methodName}]`
+                    const shouldRegister = !$template[0].events.includes(selector)
+                    if (shouldRegister) {
+                        $template.on(action, selector, method)
+                            [0].events.push(selector)
+                    }
+                }
+                else $el.on(action, method)
             })
         }
     }
