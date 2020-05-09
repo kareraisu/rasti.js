@@ -327,7 +327,8 @@ nav:not([hidden]) ~ [page]:not(.hide-nav) {
 [foldable] {
     position: relative;
 }
-[foldable] {
+[foldable],
+[foldable][class*=pad] {
     padding-top: 30px;
 }
 [header]:not([page]) {
@@ -540,6 +541,8 @@ nav > div, nav > a {
     height: 100%;
     min-width: 80vw !important;
     max-width: 80vw;
+    overflow-x: hidden;
+    overflow-y: auto;
     z-index: 10;
 }
 [sidemenu].enabled.open {
@@ -676,7 +679,7 @@ nav > div, nav > a {
 
 
 [show], [hide], [toggle],
-[onclick],
+[onclick], [on-click],
 .clickable {
     cursor: pointer;
 }
