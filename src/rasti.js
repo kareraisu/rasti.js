@@ -308,7 +308,7 @@ function rasti(name, container) {
             .on('click', '[foldable]', e => {
                 const el = e.target
                 if (!el.hasAttribute('foldable')) return
-                const isOpen = el.clientHeight > 30
+                const isOpen = el.clientHeight > 35 // NOTE this must be kept in sync with the css!
                 document.body.style.setProperty("--elem-h", el.orig_h)
                 if (isOpen) {
                     el.classList.remove('open')
@@ -397,9 +397,9 @@ function rasti(name, container) {
     }
 
 
-    function render(el, data, time) {
+    function render(el, data, {time, scroll}={}) {
         let $el, name
-        let errPrefix = 'Cannot render template'
+        let errPrefix = 'Cannot render template, '
         if ( is.string(el) ) {
             name = el
             errPrefix += ' ['+ name +']: '
@@ -438,7 +438,12 @@ function rasti(name, container) {
         }
         if ( is.not.function(template) ) return error(errPrefix + 'template must be a string or a function')
 
-        if ( data && !data.length ) return $el.html(`<div class="nodata">${ self.options.noData }</div>`).addClass('rendered')
+        if ( data && !data.length ) {
+            $el.html(`<div class="nodata">${ self.options.noData }</div>`)
+                .addClass('rendered')
+                .trigger('rendered')
+            return
+        }
 
         const isCrud = $el.hasAttr('crud')
         if (isCrud) {
@@ -457,7 +462,9 @@ function rasti(name, container) {
         const isPaged = $el.hasAttr('paged')
         isPaged
             ? initPager($el, template, data, getActiveLang())
-            : $el.html( template(data) )[0].scrollTo(0,0)
+            : $el.html( template(data) )
+        
+        if (isPaged || scroll) $el[0].scrollTo(0,0)
 
         if ( $el.hasAttr('stats') ) {
             const stats = '<div section class="stats">'
@@ -477,7 +484,7 @@ function rasti(name, container) {
             __crud.genInputEl($el)
         }
 
-        $el.addClass('rendered')
+        $el.addClass('rendered').trigger('rendered')
         if (!isPaged) applyFX($el)
 
         return self
@@ -532,15 +539,15 @@ function rasti(name, container) {
     function setTheme(themeString) {
         if (!themeString) return warn('Call to setTheme() with no argument')
 
-        var themeName = themeString.split(' ')[0],
+        const themeName = themeString.split(' ')[0],
             theme = self.themes[themeName],
             baseTheme = self.themes.base,
             baseMap = self.themeMaps.dark
 
         if (!theme) return error('Cannot set theme [%s]: theme not found', themeName)
 
-        var mapName = themeString.split(' ')[1] || ( is.object(theme.maps) && Object.keys(theme.maps)[0] ) || 'dark',
-            themeMap = ( is.object(theme.maps) && theme.maps[mapName] ) || self.themeMaps[mapName]
+        let mapName = themeString.split(' ')[1] || ( is.object(theme.maps) && Object.keys(theme.maps)[0] ) || 'dark',
+            themeMap = is.object(theme.maps) ? theme.maps[mapName] : self.themeMaps[mapName]
 
         if (!themeMap) {
             warn('Theme map [%s] not found, using default theme map [dark]', mapName)
@@ -554,8 +561,8 @@ function rasti(name, container) {
         // clone themeMap
         themeMap = {...themeMap}
 
-        var values = { font : theme.font || baseTheme.font, },
-            colorNames, colors, c1, c2, defaultColorName
+        const values = { font : theme.font || baseTheme.font, }
+        let colorNames, colors, c1, c2, defaultColorName
 
         // map palette colors to attributes
         for (let attr of Object.keys(baseMap)) {
@@ -571,10 +578,6 @@ function rasti(name, container) {
                     if (!colors[i]) {
                         warn('Color [%s] not found in theme nor base palette, using it as is', colorNames[i])
                         colors[i] = colorNames[i]
-                        /*
-                        warn('Mapping error in theme [%s] for attribute [%s]. Color [%s] not found. Falling back to default color [%s].', themeName, attr, colorNames[i], defaultColorName)
-                        colors[i] = baseTheme.palette[ defaultColorName ]
-                        */
                     }
                 }
             }
@@ -583,14 +586,19 @@ function rasti(name, container) {
             if (themeMap[attr]) delete themeMap[attr]
         }
 
-        var invalidKeys = Object.keys(themeMap)
+        const invalidKeys = Object.keys(themeMap)
         if (invalidKeys.length) warn('Ignored %s invalid theme map keys:', invalidKeys.length, invalidKeys)
+
+        // set base theme colors as css properties (use user-defined values if given)
+        for (let prop in baseTheme.palette) {
+            container[0].style.setProperty("--" + prop, theme.palette[prop] || baseTheme.palette[prop])
+        }
 
         // generate theme style and apply it
         container.find('.rs-theme').html( getThemeStyle(values) )
 
         // apply bg colors
-        var colorName, color
+        let colorName, color
         container.find('[bg]').each( (i, el) => {
             colorName = el.getAttribute('bg')
             color = theme.palette[colorName] || baseTheme.palette[colorName]
@@ -908,19 +916,22 @@ function rasti(name, container) {
             const callback = $el.attr('then')
             const template = $el.attr('render')
             const isValidCB = callback && is.function(self.methods[callback])
-            const start = window.performance.now()
+            
             if (!method)
                 return error('Missing method in [submit] attribute of el:', this)
+            
             if (callback && !isValidCB)
                 error('Undefined method [%s] declared in [then] attribute of el:', callback, this)
+            
             $el.addClass('loading').attr('disabled', true)
+            const start = window.performance.now()
             submitAjax(method, resdata => {
                 const time = Math.floor(window.performance.now() - start) / 1000
                 log('Ajax method [%s] took %s seconds', method, time)
                 if (isValidCB)
                     self.methods[callback](resdata)
                 if (template)
-                    render(template, resdata, time)
+                    render(template, resdata, {time})
                 $el.removeClass('loading').removeAttr('disabled')
             })
         })
@@ -1302,8 +1313,7 @@ function rasti(name, container) {
             ${ns} [panel][header]:before   { background-color: ${ values.panel[1] }; }
             ${ns} [section][header]:before { background-color: ${ values.section[1] }; }
 
-            ${ns} .tab-labels        { background-color: ${ values.panel[0] }; }
-            ${ns} .tab-labels > .bar { background-color: ${ values.btn[0] }; }
+            ${ns} .tab-labels { background-color: ${ values.panel[0] }; }
 
             ${ns} input:not([type]),
             ${ns} input[type=text],
@@ -1320,17 +1330,11 @@ function rasti(name, container) {
             ${ns} input[type=checkbox] {
                 border: 1px solid ${ values.field[1] };
             }
-            ${ns} input[type=radio]:checked,
-            ${ns} input[type=checkbox]:checked {
-                background-color: ${ values.btn[0] };
-            }
 
             ${ns} button,
-            ${ns} [block=buttons] > div.active,
             ${ns} nav > div.active,
             ${ns} nav > a.active,
-            ${ns} .list > div.active {
-                background-color: ${ values.btn[0] };
+            ${ns} [block=buttons] > div.active {
                 color: ${ values.btn[1] };
             }
             ${ns} [block=buttons] > div {

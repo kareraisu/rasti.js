@@ -29,6 +29,9 @@ style : `
         text-transform: uppercase;
         cursor: pointer;
     }
+    [block=buttons] > div.active {
+        background-color: var(--primary);
+    }
 `
 
 }
