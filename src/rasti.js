@@ -770,7 +770,7 @@ function rasti(name, container) {
 
         // update state on dom change
         // (unless triggered from state _setter)
-        $el.on('change', (e, params) => {
+        $el.is('[template]') || $el.on('change', (e, params) => {
             if ( !(params && params._setter) )
                 state[prop] = $el.is('textarea') ? $el.text()
                     : $el.is('input[type=checkbox]') ? $el[0].checked
@@ -778,32 +778,38 @@ function rasti(name, container) {
                     : $el.val()
         })
 
-        // update dom on state change
-        Object.defineProperty(state, prop, {
-            get : function() { return __state[prop] },
-            set : function(value) {
-                if (trans) {
-                    const val = is.string(value) ? new String(value) : value
-                    val.__trans = true
-                    __state[prop] = val
+        if ( is.nil(__state[prop]) ) {
+            // initialize internal register for prop
+            __state[prop] = {val: null, reg: [$el]}
+            // update dom on state change
+            Object.defineProperty(state, prop, {
+                get : function() { return __state[prop].val },
+                set : function(value) {
+                    if (trans) {
+                        // cast primitive values to objects to allow flagging
+                        const val = is.string(value) ? new String(value) : value
+                        val.__trans = true
+                        __state[prop].val = val
+                    }
+                    else __state[prop].val = value
+                    // update all registered elements
+                    __state[prop].reg.forEach($el => updateElement($el, value, true))
                 }
-                else __state[prop] = value
-                updateElement($el, value, true)
-            }
-        })
+            })
+        } else {
+            // register el to prop 
+            __state[prop].reg.push($el)
+        }
 
     }
 
     function updateElement($el, value, _setter) {
-        if ( $el.is('[template]') )
-            render($el, value)
-        else {
-            $el.is('textarea') ? $el.text( value )
-            : $el.is('[type=checkbox]') ? $el[0].checked = !!value
-            : $el.val( value )
+        $el.is('[template]') ? render($el, $el.is('[data]') ? null : value)
+        : $el.is('textarea') ? $el.text( value )
+        : $el.is('[type=checkbox]') ? $el[0].checked = !!value
+        : $el.val( value )
 
-            $el.trigger('change', {_setter})
-        }
+        $el.trigger('change', {_setter})
     }
 
 
