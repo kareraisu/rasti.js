@@ -28,6 +28,9 @@ body {
 *.active:focus {
     outline-color: var(--primary);
 }
+[key-nav] *:focus {
+    outline-style: solid;
+}
 
 a {
     text-decoration: none;

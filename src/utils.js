@@ -110,9 +110,67 @@ function htmlEscape(str) {
 
 
 function resolveAttr($el, name) {
-    var value = $el.attr(name) || $el.attr('name') || $el.attr('prop') || $el.attr('nav') || $el.attr('section') || $el.attr('panel') || $el.attr('page') || $el.attr('template')
+    var value = $el.attr(name) || $el.attr('name') || $el.attr('template') || $el.attr('prop') || $el.attr('nav') || $el.attr('section') || $el.attr('panel') || $el.attr('page')
     if (!value) rasti.warn('Could not resolve value of [%s] attribute in el:', name, $el[0])
     return value
+}
+
+
+/**
+ * Makes a widget navigatable via keyboard
+ * @param {jquery object} $el widget container
+ */
+function keyNav($el) {
+
+    if ($el.is('[template]')) {
+        $el.on('keydown', e => {
+            const $trigger = $(e.target)
+
+            switch(e.keyCode) {
+                case 37:
+                case 38:
+                    $trigger.off('blur')
+                        .prev().focus()
+                    return false
+                case 39:
+                case 40:
+                    $trigger.off('blur')
+                        .next().focus()
+                    return false
+                case 13:
+                case 32:
+                    $trigger.off('blur').click()
+                    setTimeout(() => $el.find('.active').focus(), 0)
+                    return false
+            }
+        })
+        .on('rendered', e => {
+            let $child, isActive,
+                noActive = true
+
+            $el.children().each((i, child) => {
+                $child = $(child)
+                isActive = $child.is('.active')
+                $child.attr('tabindex', isActive ? 0 : -1)
+                if (isActive) {
+                    noActive = false
+                    $child.on('focus', e => e.target.setAttribute('tabindex', -1))
+                }
+            })
+
+            if (noActive) {
+                $el.children().first()
+                    .attr('tabindex', 0)
+                    .on('focus', e => e.target.setAttribute('tabindex', -1))
+            }
+        })
+        .on('focus', 'div', e =>
+            $(e.target).one('blur', e => setTimeout(() => $el.find('.active').attr('tabindex', 0), 0))
+        )
+    } else {
+        $el.attr('tabindex', 0)
+            .on('keydown', e => !'Enter Space'.includes(e.key) || (e.target.click(), false))
+    }
 }
 
 
@@ -126,6 +184,7 @@ const public = {
     inject,
     random,
     compose,
+    keyNav
 }
 
 const private = {

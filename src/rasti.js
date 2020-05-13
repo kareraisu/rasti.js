@@ -266,6 +266,11 @@ function rasti(name, container) {
             }
         }
 
+        // init keyboard-navigatable elements
+        container.find('[key-nav]').each( (i, el) => {
+            utils.keyNav($(el))
+        })
+
         
         bindProps(container, self.props)
 
