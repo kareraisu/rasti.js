@@ -1,7 +1,7 @@
 require('./extensions')
 const { History, Pager, state, crud } = require('./components')
 const utils = require('./utils')
-const { is, sameType, resolveAttr, html } = utils
+const { is, sameType, resolveAttr, chain, safe, compose, html } = utils
 const { themes, themeMaps } = require('./themes')
 let media
 
@@ -93,19 +93,15 @@ function rasti(name, container) {
 
     // public methods
 
-    this.config = config
-    this.init = init
-    this.navTo = navTo
-    this.render = render
-    this.setLang = setLang
-    this.setTheme = setTheme
-    this.updateBlock = updateBlock
-    this.toggleFullScreen = toggleFullScreen
+    const api = compose(safe(error), chain(this))
 
+    
+    const config = api(props => {
 
-    function config(props) {
         if ( is.nil(props) ) return warn('Called config() on app [%s] with no arguments', __name)
-        if ( is.not.object(props) ) return error('Cannot config app [%s]: invalid config object', __name)
+
+        if ( is.not.object(props) ) throw ['Cannot config app [%s]: invalid config object', __name]
+
         for (let key in props) {
             const known = is.object(self[key])
             const valid = is.object(props[key])
@@ -128,11 +124,12 @@ function rasti(name, container) {
             }
             else Object.assign(self[key], props[key])
         }
-        return self
-    }
+
+    })
 
 
-    function init(options) {
+    const init = api(options => {
+
         const initStart = window.performance.now()
         log('Initializing app [%s]...', __name)
 
@@ -197,7 +194,7 @@ function rasti(name, container) {
         initSideMenu()
 
 
-        initModals()
+        //initModals()
         
         
         // init tabs
@@ -221,7 +218,7 @@ function rasti(name, container) {
         container.on('click change', '[render]:not([submit])', e => {
             const el = e.currentTarget
             const template = el.getAttribute('render')
-            if (!template) return error('Missing template name in [render] attribute of element:', el)
+            if (!template) throw ['Missing template name in [render] attribute of element:', el]
             render(template)
         })
 
@@ -323,13 +320,12 @@ function rasti(name, container) {
         const initTime = Math.floor(window.performance.now() - initStart) / 1000
         log('App [%s] initialized in %ss', __name, initTime)
 
-        return self
-    }
+    })
 
 
-    function navTo(pagename, params = {}, skipPushState) {
+    const navTo = api((pagename, params = {}, skipPushState) => {
 
-        if (!pagename) return error('Cannot navigate, page undefined')
+        if (!pagename) throw ['Cannot navigate, page undefined']
 
         var $prevPage = self.active.page,
             prevPagename = $prevPage && $prevPage.attr('page'),
@@ -340,7 +336,7 @@ function rasti(name, container) {
         var page = self.pages[pagename],
             $page = container.find('[page='+ pagename +']')
 
-        if (!$page.length) return error('Cannot navigate to page [%s]: page container not found', pagename)
+        if (!$page.length) throw ['Cannot navigate to page [%s]: page container not found', pagename]
 
         container.find('[menu]').hide()
         container.find('.rs-backdrop').removeClass('backdrop')
@@ -387,18 +383,19 @@ function rasti(name, container) {
         
         window.history.pushState(pagename, null, hash)
 
-        return self
-    }
+    })
 
 
-    function render(el, data, {time, scroll}={}) {
+    const render = api((el, data, {time, scroll}={}) => {
+
         let $el, name
         let errPrefix = 'Cannot render template [$],'
+
         if ( is.string(el) ) {
             name = el
-            errPrefix += ' ['+ name +']: '
+            errPrefix = errPrefix.replace('$', name)
             $el = container.find('[template='+ name +']')
-            if (!$el.length) return error(errPrefix + 'no element bound to template. Please bind one via [template] attribute.')
+            if ( !$el.length ) throw errPrefix + 'no element bound to template. Please bind one via [template] attribute.'
         }
         else {
             $el = el.nodeName ? $(el) : el
@@ -434,9 +431,9 @@ function rasti(name, container) {
             __templates[name] = template
         }
         catch(err) {
-            return error(errPrefix + 'parsing error: ' + err)
+            throw errPrefix + 'parsing error: ' + err
         }
-        if ( is.not.function(template) ) return error(errPrefix + 'template must be a string or a function')
+        if ( is.not.function(template) ) throw errPrefix + 'template must be a string or a function'
 
         if ( is.empty(data) ) {
             $el.html(`<div class="nodata">${ self.options.noData }</div>`)
@@ -487,16 +484,16 @@ function rasti(name, container) {
         $el.addClass('rendered').trigger('rendered')
         if (!isPaged) applyFX($el)
 
-        return self
-    }
+    })
 
 
-    function setLang(langName) {
+    const setLang = api(langName => {
+
         var lang = self.langs[ langName ],
             errPrefix = 'Cannot set lang [%s]: '
 
-        if (!lang) return error(errPrefix + 'lang not found', langName)
-        if ( is.not.object(lang) ) return error(errPrefix + 'lang must be an object!', langName)
+        if (!lang) throw [errPrefix + 'lang not found', langName]
+        if ( is.not.object(lang) ) throw [errPrefix + 'lang must be an object!', langName]
 
         log('Setting lang [%s]', langName)
         self.active.lang = langName
@@ -532,11 +529,11 @@ function rasti(name, container) {
             self.options[key] = lang['rasti_'+key] || default_texts[key]
         })
 
-        return self
-    }
+    })
 
 
-    function setTheme(themeString) {
+    const setTheme = api(themeString => {
+
         if (!themeString) return warn('Call to setTheme() with no argument')
 
         const themeName = themeString.split(' ')[0],
@@ -544,7 +541,7 @@ function rasti(name, container) {
             baseTheme = self.themes.base,
             baseMap = self.themeMaps.dark
 
-        if (!theme) return error('Cannot set theme [%s]: theme not found', themeName)
+        if (!theme) throw ['Cannot set theme [%s]: theme not found', themeName]
 
         let mapName = themeString.split(' ')[1] || ( is.object(theme.maps) && Object.keys(theme.maps)[0] ) || 'dark',
             themeMap = is.object(theme.maps) ? theme.maps[mapName] : self.themeMaps[mapName]
@@ -606,21 +603,23 @@ function rasti(name, container) {
             el.style['background-color'] = color || colorName
         })
 
-        return self
-    }
+    })
 
 
-    function updateBlock($el, data) {
+    const updateBlock = api(($el, data) => {
+
         const el = $el[0]
         let type = $el.attr('block') || el.nodeName.toLowerCase()
+
         if ('ol ul'.includes(type)) type = 'list'
-        if (!type) return error('Missing block type in [block] attribute of element:', el)
+        if (!type) throw ['Missing block type in [block] attribute of element:', el]
 
         const block = rasti.blocks[type]
-        if (!block) return error('Undefined block type "%s" declared in [block] attribute of element:', type, el)
+        if (!block) throw ['Undefined block type "%s" declared in [block] attribute of element:', type, el]
 
         if (!el.initialized) {
             if (is.def(block.init) && is.not.function(block.init))
+                throw ['Invalid "init" prop defined in block type "%s", must be a function', type]
             if (is.function(block.init)) try {
                 block.init($el)
             }
@@ -668,12 +667,13 @@ function rasti(name, container) {
             */
         }
 
-        return self
-    }
+    })
 
 
     function toggleFullScreen(e) {
+
         var prefixes = 'moz webkit'.split(' ')
+
         prefixes.forEach( p => {
             if ( ! (p + 'FullscreenElement' in document) ) return
             if ( !document[ p + 'FullscreenElement' ]) {
@@ -683,8 +683,19 @@ function rasti(name, container) {
                 document[ p + 'CancelFullScreen' ]();
             }
         })
-        return self
+        
     }
+
+    this.config = config
+    this.init = init
+    this.navTo = navTo
+    this.render = render
+    this.setLang = setLang
+    this.setTheme = setTheme
+    this.updateBlock = updateBlock
+    this.toggleFullScreen = toggleFullScreen
+
+    return this
 
 
     // internal utils
@@ -720,8 +731,8 @@ function rasti(name, container) {
         if (!fxkey) return
         const fx = rasti.fx[fxkey]
         if (!fx) return warn('Undefined fx "%s" declared in [fx] attribute of element', fxkey, el)
-        if ( is.not.function(fx) ) return error('fx.%s must be a function!', fxkey)
-        if ( selector && is.not.string(selector) ) return error('Cannot apply fx, invalid selector provided for el', el)
+        if ( is.not.function(fx) ) throw ['fx.%s must be a function!', fxkey]
+        if ( selector && is.not.string(selector) ) throw ['Cannot apply fx, invalid selector provided for el', el]
         const $target = selector ? $el.find(selector) : $el
         if (!$target.length) return warn('Cannot apply fx, cannot find target "%s" in el', target, el)
         fx($target)
@@ -820,11 +831,11 @@ function rasti(name, container) {
         let page, $page
         for (let name in self.pages) {
             page = self.pages[name]
-            if ( is.not.object(page) ) return error('pages.%s must be an object!', name)
+            if ( is.not.object(page) ) throw ['pages.%s must be an object!', name]
             $page = container.find('[page='+ name +']')
-            if ( !$page.length ) return error('No container found for page "%s". Please bind one via [page] attribute', name)
+            if ( !$page.length ) throw ['No container found for page "%s". Please bind one via [page] attribute', name]
             if (page.init) {
-                if ( is.not.function(page.init) ) return error('pages.%s.init must be a function!', name)
+                if ( is.not.function(page.init) ) throw ['pages.%s.init must be a function!', name]
                 else {
                     log('Initializing page [%s]', name)
                     self.active.page = $page // to allow app.get() etc in page.init
@@ -874,7 +885,7 @@ function rasti(name, container) {
             const page = $el.attr('nav')
             let params = {}
             if (!page)
-                return error('Missing page name in [nav] attribute of element:', el)
+                throw ['Missing page name in [nav] attribute of element:', el]
             if ($el.hasAttr('params')) {
                 const $page = self.active.page
                 let navparams = $el.attr('params')
@@ -927,7 +938,7 @@ function rasti(name, container) {
             const isValidCB = callback && is.function(self.methods[callback])
             
             if (!method)
-                return error('Missing method in [submit] attribute of el:', this)
+                throw ['Missing method in [submit] attribute of el:', this]
             
             if (callback && !isValidCB)
                 error('Undefined method [%s] declared in [then] attribute of el:', callback, this)
@@ -952,9 +963,9 @@ function rasti(name, container) {
             container.find('[on-'+ action +']').each( (i, el) => {
                 const $el = $(el)
                 const methodName = $el.attr('on-' + action)
-                if ( !methodName ) return error('Missing method in [on-%s] attribute of element:', action, el)
+                if ( !methodName ) throw ['Missing method in [on-%s] attribute of element:', action, el]
                 const method = self.methods[methodName]
-                if ( !method ) return error('Undefined method "%s" declared in [on-%s] attribute of element:', methodName, action, el)
+                if ( !method ) throw ['Undefined method "%s" declared in [on-%s] attribute of element:', methodName, action, el]
                 const $template = $el.closest('[template]')
                 if ($template.length && !$el.hasAttr('template')) {
                     if (!$template[0].events) $template[0].events = []
@@ -978,10 +989,10 @@ function rasti(name, container) {
                 const $page = $el.closest('[page]')
                 const targetSelector = $el.attr(action)
 
-                if ( !targetSelector ) return error('Missing target selector in [%s] attribute of element:', action, el)
+                if ( !targetSelector ) throw ['Missing target selector in [%s] attribute of element:', action, el]
                 let $target = $page.find('['+targetSelector+']')
                 if ( !$target.length ) $target = container.find('['+targetSelector+']')
-                if ( !$target.length ) return error('Could not find target [%s] declared in [%s] attribute of element:', targetSelector, action, el)
+                if ( !$target.length ) throw ['Could not find target [%s] declared in [%s] attribute of element:', targetSelector, action, el]
 
                 const target = $target[0]
 
@@ -1087,7 +1098,7 @@ function rasti(name, container) {
                 : $el.hasAttr('panel')
                     ? $el.children('[section]:not([modal])')
                     : undefined
-        if (!$tabs) return error('Cannot create tabs: container must be a [page] or a [panel]', el)
+        if (!$tabs) throw ['Cannot create tabs: container must be a [page] or a [panel]', el]
 
         var $labels = $('<div class="tab-labels">'),
             $bar = $('<div class="bar">'),
@@ -1287,10 +1298,10 @@ function rasti(name, container) {
 
     function submitAjax(method, callback) {
         var ajax = self.methods[ method ]
-        if ( is.not.function(ajax) ) return error('Ajax method ['+ method +'] is not defined')
+        if ( is.not.function(ajax) ) throw ['Ajax method ['+ method +'] is not defined']
 
         var $form = container.find('[ajax='+ method +']')
-        if (!$form.length) return error('No container element bound to ajax method [%s]. Please bind one via [ajax] attribute', method)
+        if (!$form.length) throw ['No container element bound to ajax method [%s]. Please bind one via [ajax] attribute', method]
 
         var reqdata = {}, prop
         $form.find('[prop]:not([private])').each( (i, el) => {
@@ -1482,10 +1493,8 @@ function rasti(name, container) {
         return $els
     }
 
-
-    return this
-
 }
+
 
 
 // static properties and methods
