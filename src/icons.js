@@ -13,6 +13,7 @@ app : {
     search : '🔍',
     add : '✚',
     remove : '🗕',
+    filter : '🕨',
     undo : '↶',
     redo : '↷',
     reload : '⟳',
