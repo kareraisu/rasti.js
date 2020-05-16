@@ -5,16 +5,13 @@ const { is, sameType, resolveAttr, html } = utils
 const { themes, themeMaps } = require('./themes')
 let media
 
-const options = {
+let default_options = {
     history : true,
     persist : true,
     root    : '',
     theme   : 'base',
     lang    : '',
     separator : ';',
-    stats   : '%n results in %t seconds',
-    noData  : 'No data available',
-    newEl   : 'New element',
     imgPath : 'img/',
     imgExt  : '.png',
     page_sizes : [5, 10, 20, 50],
@@ -23,6 +20,14 @@ const options = {
         tablet : 800,
     },
 }
+
+const default_texts = {
+    stats   : '%n results in %t seconds',
+    noData  : 'No data available',
+    newEl   : 'New element',
+}
+
+default_options = {...default_options, ...default_texts}
 
 const TEXT_ATTRS = 'label header text placeholder'.split(' ')
 const EVENT_ATTRS = 'click change hover input keydown submit load'.split(' ')
@@ -68,7 +73,7 @@ function rasti(name, container) {
 
     // public properties
 
-    this.options = Object.assign({}, options)
+    this.options = {...default_options}
     this.active = {
         page  : null,
         theme : '',
@@ -310,25 +315,9 @@ function rasti(name, container) {
 
 
         container
-            .on('click', '[foldable]', e => {
-                const el = e.target
-                if (!el.hasAttribute('foldable')) return
-                const isOpen = el.clientHeight > 35 // NOTE this must be kept in sync with the css!
-                document.body.style.setProperty("--elem-h", el.orig_h)
-                if (isOpen) {
-                    el.classList.remove('open')
-                    el.classList.add('folded')
-                }
-                else {
-                    el.classList.remove('folded')
-                    el.classList.add('open')
-                }
-            })
-            .on('click', '.backdrop', e => {
-                container.find('[menu].open').hide()
-                container.find('[modal].open').hide()
-                if (self.sidemenu && self.sidemenu.visible) self.sidemenu.hide()
-            })
+            .on('click', '[foldable]', toggleFoldable)
+            .on('click', '.backdrop', hideDialogs)
+            .on('keydown', hideDialogs)
             .removeClass('big loading backdrop')
 
         const initTime = Math.floor(window.performance.now() - initStart) / 1000
@@ -404,7 +393,7 @@ function rasti(name, container) {
 
     function render(el, data, {time, scroll}={}) {
         let $el, name
-        let errPrefix = 'Cannot render template, '
+        let errPrefix = 'Cannot render template [$],'
         if ( is.string(el) ) {
             name = el
             errPrefix += ' ['+ name +']: '
@@ -419,14 +408,20 @@ function rasti(name, container) {
                 name = ($el.attr('data') || $el.attr('prop')) + '-' + Date.now()
                 $el.attr('template', name)
             }
+            errPrefix = errPrefix.replace('$', name)
         }
         
-        if ( !data && $el.hasAttr('data') ) {
+        if ( is.nil(data) && $el.hasAttr('data') ) {
             const datakey = resolveAttr($el, 'data')
             data = self.data[datakey]
-            if (!data) return error(errPrefix + 'undefined data source "%s" resolved for element:', datakey, el)
+            if ( is.nil(data) ) throw errPrefix + `declared data source "${datakey}" is undefined`
         }
-        if ( is.string(data) ) data = data.split( $el.attr('separator') || self.options.separator )
+        
+        if ( is.string(data) ) {
+            let separator = $el.attr('separator') || self.options.separator
+            if (!separator.trim()) separator = '\\s'
+            data = data.split( new RegExp(`[\n${separator}]+`) ).filter(is.not.empty)
+        }
         if ( is.not.array(data) ) data = [data]
 
         let template = __templates[name]
@@ -443,7 +438,7 @@ function rasti(name, container) {
         }
         if ( is.not.function(template) ) return error(errPrefix + 'template must be a string or a function')
 
-        if ( data && !data.length ) {
+        if ( is.empty(data) ) {
             $el.html(`<div class="nodata">${ self.options.noData }</div>`)
                 .addClass('rendered')
                 .trigger('rendered')
@@ -533,8 +528,8 @@ function rasti(name, container) {
             }
         })
 
-        Object.keys(self.defaults).forEach( key => {
-            self.options[key] = lang['rasti_'+key] || self.defaults[key]
+        Object.keys(default_texts).forEach( key => {
+            self.options[key] = lang['rasti_'+key] || default_texts[key]
         })
 
         return self
@@ -626,9 +621,12 @@ function rasti(name, container) {
 
         if (!el.initialized) {
             if (is.def(block.init) && is.not.function(block.init))
-                return error('Invalid "init" prop defined in block type "%s", must be a function', type)
-            if (is.function(block.init))
+            if (is.function(block.init)) try {
                 block.init($el)
+            }
+            catch(err) {
+                error('Cannot init block [%s],', type, err)
+            }
             el.initialized = true
         }
 
@@ -792,7 +790,7 @@ function rasti(name, container) {
                 set : function(value) {
                     if (trans) {
                         // cast primitive values to objects to allow flagging
-                        const val = is.string(value) ? new String(value) : value
+                        const val = is.primitive(value) || is.nil(value) ? new Object(value) : value
                         val.__trans = true
                         __state[prop].val = val
                     }
@@ -1406,6 +1404,33 @@ function rasti(name, container) {
 
         }
         self.media = media
+    }
+
+
+    function toggleFoldable() {
+        return e => {
+            const el = e.target
+            if (!el.hasAttribute('foldable'))
+                return
+            const isOpen = el.clientHeight > 35 // NOTE this must be kept in sync with the css!
+            document.body.style.setProperty("--elem-h", el.orig_h)
+            if (isOpen) {
+                el.classList.remove('open')
+                el.classList.add('folded')
+            }
+            else {
+                el.classList.remove('folded')
+                el.classList.add('open')
+            }
+        }
+    }
+
+
+    function hideDialogs(e) {
+        if (e.key && e.key !== 'Escape') return
+        container.find('[menu].open').hide()
+        container.find('[modal].open').hide()
+        if (self.sidemenu && self.sidemenu.visible) self.sidemenu.hide()
     }
 
 
