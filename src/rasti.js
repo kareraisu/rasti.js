@@ -1572,7 +1572,7 @@ function genIconStyles() {
 
 function genIconFixesStyles() {
     const fixes = [
-        [`=error =sync =reload =remove =restore =stereo =img-file
+        [`=filter =error =sync =reload =remove =restore =stereo =img-file
             =latin2 =celtic =ankh =comunism =health ^=hg-`,
             { base: '2', small: '1.5', big: '3', huge: '4.4' } ],
         [`=close =network =pommee =diamonds`,

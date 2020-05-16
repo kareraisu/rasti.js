@@ -373,6 +373,7 @@ nav:not([hidden]) ~ [page]:not(.hide-nav) {
     align-items: center;
     justify-content: center;
     width: 100%;
+    text-transform: capitalize;
 }
 
 [header]:not([page]):before,
@@ -417,13 +418,11 @@ nav:not([hidden]) ~ [page]:not(.hide-nav) {
     background-origin: content-box;
 }
 
-
 [template] {
     position: relative;
-    visibility: hidden;
 }
-[template].rendered {
-    visibility: visible;
+[template]:not(.rendered) {
+    display: none;
 }
 [template] > .results {
     max-height: calc(100% - 60px);
@@ -480,10 +479,10 @@ nav:not([hidden]) ~ [page]:not(.hide-nav) {
 
 
 [h-flow] {
-    display: inline-block !important;
-    white-space: nowrap;
+    display: flex;
+    flex-wrap: nowrap;
     height: 100%;
-    width: 100%;
+    min-width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
 }
@@ -516,7 +515,7 @@ nav, .tab-labels {
     padding: 0;
     border-bottom: 1px solid var(--darkener);
     border-radius: 0;
-    text-transform: uppercase;
+    text-transform: capitalize;
 }
 nav {
     z-index: 8;
@@ -726,8 +725,9 @@ nav > div, nav > a {
 }
 [foldable].folded {
     animation: fold-in .2s;
-    height: 30px !important;
+    height: 0;
     overflow: hidden;
+    padding-top: 30px !important;
     padding-bottom: 0;
 }
 [foldable]:before {
@@ -736,6 +736,10 @@ nav > div, nav > a {
 }
 [foldable].folded:before {
     content: '▽  'attr(foldable);
+}
+[foldable].folded:focus:before,
+[foldable].folded:hover:before {
+    content: '▼  'attr(foldable);
 }
 
 
@@ -802,7 +806,20 @@ nav > div, nav > a {
     line-height: 2;
     text-align: center;
     text-decoration: none;
+    transition: all .2s;
 }
+
+[on-click][icon]:empty {
+    border: 1px solid transparent;
+    transition: all .2s;
+}
+[on-click][icon]:empty:hover {
+    border-color: var(--lightener)
+}
+[on-click][icon]:empty:focus {
+    border-color: var(--primary)
+}
+
 .small[icon], .small_ > [icon] {
     min-height: 35px;
 }
@@ -871,6 +888,7 @@ nav > div, nav > a {
 [icon^=hg-]:before {
     line-height: 1.3 !important;
 }
+[icon=filter]:before,
 [icon=sync]:before {
     line-height: 1.3 !important;
     transform: rotate(90deg);
