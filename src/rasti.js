@@ -1200,29 +1200,30 @@ function rasti(name, container) {
 
 
     function initPager($el, template, data, lang) {
-        const name = $el.attr('template'),
-            pager = newPager(name, data, self.options.page_sizes)
-        let paging, sizes, columns, size=0, col=1
-
-        if (pager.total > 1) {
-            paging = `<div class="paging fcenter small_ inline_">
-                <button icon=left3 />
-                <span class=page />
-                <button icon=right3 />
-            </div>`
-
-            sizes = `<button icon=rows>${ self.options.page_sizes[0] }</button>`
+        const psizes = self.options.page_sizes
+        if ( Math.ceil(data.length / psizes[0]) < 2 ) {
+            // just one page, render as usual
+            $el.html( template(data).join('') )
+            return
         }
+
+        const name = $el.attr('template')
+        const pager = newPager(name, data, psizes)
+        let columns, size=0, col=1
 
         if ( $el.hasAttr('columns') )
             columns = `<button icon=columns>1</button>`
 
         $el.html(`
             <div class="results scrolly rigid"></div>
-            <div class="controls fcenter small_ inline_">
+            <div class="controls flex center small_ inline_">
                 ${ columns || '' }
-                ${ paging || '' }
-                ${ sizes || '' }
+                <div class="paging flex center small_ inline_">
+                    <button icon=left3 />
+                    <span class=page />
+                    <button icon=right3 />
+                </div>
+                <button icon=rows>${ psizes[0] }</button>
             </div>
         `)
 
