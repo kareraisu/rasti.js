@@ -1464,35 +1464,6 @@ function rasti(name, container) {
         $el[0].removeAttribute('icon')
     }
 
-
-    function get(selector) {
-        var $els = self.active.page && self.active.page.find('['+ selector +']')
-        if (!$els || !$els.length) $els = container.find('['+ selector +']')
-        if (!$els.length) warn('No elements found for selector [%s]', selector)
-        return $els
-    }
-
-    function set(selector, value) {
-        var $els = get(selector)
-        $els.each( (i, el) => {
-            el.value = value
-            $(el).change()
-        })
-        return $els
-    }
-
-    function add(selector, ...values) {
-        var $els = get(selector)
-        $els.each( (i, el) => {
-            values.forEach( val => {
-                if (is.array(val)) el.value = el.value.concat(val)
-                else el.value.push(val)
-            })
-            $(el).change()
-        })
-        return $els
-    }
-
 }
 
 
