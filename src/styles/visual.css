@@ -1,0 +1,111 @@
+.list {
+    border: 1px solid var(--darkener);
+}
+.list[header] {
+    padding-top: 40px;
+}
+.list > div {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 7vh;
+    padding: 2vh;
+    border: 1px solid transparent;
+    border-bottom-color: var(--darkener);
+    transition: all 0.2s;
+}
+.list > div:first-child {
+    border-top-color: var(--darkener);
+}
+.list > div:hover,
+.list > div:focus {
+    border-color: var(--lightener);
+    outline: none;
+}
+.list > div.active {
+    color: var(--primary);
+    font-weight: 600;
+}
+.list > div.active:focus {
+    border-color: var(--primary);
+}
+.list > div:hover:after,
+.list > div:focus:after,
+.list > div.active:after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0;
+    height: 100%;
+    width: 4px;
+    background-color: var(--lightener);
+}
+.list > div.active:after {
+    background-color: var(--primary);
+}
+
+.nodata {
+    padding: 10% 5%;
+    margin: auto;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+button.fab {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 50px;
+    margin: 20px;
+    border-radius: 50%;
+    z-index: 5;
+}
+
+.backdrop:before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    background: rgba(0,0,0,.7);
+    animation: fade-in .2s;
+    z-index: 9;
+}
+
+.loading {
+    color: transparent !important;
+    position: relative;
+}
+.loading > * {
+    visibility: hidden;
+}
+.loading:after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0; left: 0; right: 0;
+    width: 25px; height: 25px;
+    margin: auto;
+    border-radius: 50%;
+    border: 0.25rem solid var(--lighten);
+    border-top-color: white;
+    animation: spin 1s infinite linear;
+    visibility: visible;
+}
+.big.loading:after {
+    position: fixed;
+    width: 100px; height: 100px;
+    z-index: 10;
+}
+
+.loading2 {
+    perspective: 120px;
+}
+.loading2:after {
+    content: "";
+    position: absolute;
+    left: 25px; top: 25px;
+    width: 50px; height: 50px;
+    background-color: #3498db;
+    animation: flip 1s infinite linear;
+}

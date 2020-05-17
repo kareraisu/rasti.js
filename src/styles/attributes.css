@@ -1,0 +1,438 @@
+[page], [panel], [section] {
+    position: relative;
+    overflow: hidden;    
+}
+
+[page] {
+    min-height: 100vh;
+    width: 100vw !important;
+    padding-bottom: 10px;
+    margin-bottom: -5px;
+    overflow-y: auto;
+}
+[page]:not(.active) {
+	display: none !important;
+}
+nav:not([hidden]) ~ [page]:not(.hide-nav) {
+    min-height: calc(100vh - 50px);
+}
+.fullh[page] {
+    height: 100vh;
+}
+
+
+[panel] {
+    padding: 25px;
+    border-radius: 2px;
+}
+
+
+[section] {
+    padding: 20px;
+    border-radius: 2px;
+}
+[section] [label]:before {
+    text-shadow: 0 0 0 #000;
+}
+[section]>*:first-child:not([label]) {
+    margin-top: 0px;
+}
+[section]:not(:last-child) {
+    margin-bottom: 15px;
+}
+
+
+[header],
+[foldable] {
+    position: relative;
+}
+
+[foldable],
+[foldable][class*=pad]{
+    padding-top: 35px;
+}
+[header]:not([page]) {
+    padding-top: 45px;
+}
+[header].h-big {
+    padding-top: 55px;
+}
+[header][panel],
+[foldable][panel] {
+    padding-top: 65px;
+}
+
+[header]:before,
+[footer][page]:after,
+[foldable]:before {
+    content: attr(header);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    text-transform: capitalize;
+}
+
+[header]:not([page]):before,
+[foldable]:not([page]):before {
+    position: absolute;
+    top: 0; left: 0;
+}
+
+[header]:before,
+[foldable]:before {
+    height: 35px;
+    padding: 10px;
+    font-size: 1.2em;
+    line-height: 20px;
+}
+[header][panel]:before {
+    height: 40px;
+    font-size: 1.5em;
+}
+[header][page]:before,
+[header].h-big:before {
+    height: 50px;
+    margin-bottom: 15px;
+    font-size: 1.8em;
+    line-height: 30px;
+}
+
+[footer][page]:after {
+    content: attr(footer);
+}
+
+[page][header].h-fix:before {
+    position: fixed;
+    top: 0;
+}
+
+
+[movable] {
+    user-select: none;
+    cursor: move;
+}
+
+
+[resizable] {
+    resize: both;
+    overflow: hidden;
+}
+
+
+[foldable].open {
+    animation: fold-out .2s;
+}
+[foldable].folded {
+    animation: fold-in .2s;
+    height: 0;
+    overflow: hidden;
+    padding-top: 30px !important;
+    padding-bottom: 0;
+}
+[foldable]:before {
+    content: '△  'attr(foldable);
+    cursor: pointer;
+}
+[foldable].folded:before {
+    content: '▽  'attr(foldable);
+}
+[foldable].folded:focus:before,
+[foldable].folded:hover:before {
+    content: '▼  'attr(foldable);
+}
+
+
+[img] {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-origin: content-box;
+}
+
+
+[template] {
+    position: relative;
+}
+[template]:not(.rendered) {
+    display: none;
+}
+[template] > .results {
+    max-height: calc(100% - 60px);
+    margin: 0 -15px;
+    padding: 0 15px;
+}
+[template][stats] > .results {
+    max-height: calc(100% - 95px);
+}
+[template] > .controls {
+    height: 60px;
+    padding: 10px;
+    color: #fff;
+}
+[template] > .controls * {
+    margin: 0 2px;
+}
+[template] > .stats {
+    height: 40px;
+    padding: 10px;
+    font-size: 1.1em;
+}
+
+[paged] {
+    padding-bottom: 0 !important;
+}
+
+[crud] > * {
+    position: relative;
+}
+.rasti-crud-create {
+    display: block !important;
+}
+.rasti-crud,
+.rasti-crud-input,
+.rasti-crud-accept,
+.rasti-crud-cancel,
+[crud].active .rasti-crud-create {
+    display: none !important;
+}
+[crud].active .rasti-crud-input,
+[crud].active .rasti-crud-accept,
+[crud].active .rasti-crud-cancel {
+    display: inline-block !important;
+}
+[crud] > .rasti-crud {
+    bottom: -40px;
+    z-index: 1;
+}
+[crud]:hover > .rasti-crud,
+[crud]>*:hover > .rasti-crud {
+    display: block !important;
+}
+
+
+[h-flow] {
+    display: flex;
+    flex-wrap: nowrap;
+    height: 100%;
+    min-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+[h-flow] > * {
+    display: inline-block;
+    white-space: normal;
+    height: 100%;
+    min-width: 100%;
+    border-radius: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: auto !important;
+    margin-right: auto;
+    vertical-align: top;
+}
+.tab-labels + [h-flow] {
+    height: calc(100vh - 50px);
+}
+nav ~ [page] > .tab-labels + [h-flow] {
+    height: calc(100vh - 100px);
+}
+
+nav, .tab-labels {
+    display: flex;
+    align-items: center;
+    position: relative;
+    white-space: nowrap;
+    min-width: 100vw;
+    height: 50px;
+    padding: 0;
+    border-bottom: 1px solid var(--darkener);
+    border-radius: 0;
+    text-transform: capitalize;
+}
+nav {
+    z-index: 8;
+}
+.tab-labels {
+    justify-content: space-around;
+    z-index: 2;
+}
+.tab-labels > .bar {
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 4px;
+    transition: left 0.2s, width 0.2s;
+}
+nav > div, nav > a,
+[tab-label] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1 1 auto;
+    height: 100%;
+    min-width: 50px;
+    padding: 5px;
+    font-size: 1.4em;
+    text-shadow: 0 0 0 #000;
+    text-decoration: none;
+    border-right: 1px solid #0003;
+    color: inherit;
+    cursor: pointer;
+}
+nav > div, nav > a {
+    transition: all 0.2s;
+}
+[tab-label].active {
+    filter: contrast(1.5);
+}
+
+
+[sidemenu].enabled {
+    position: fixed !important;
+    top: 0;
+    left: -80vw;
+    height: 100%;
+    min-width: 80vw !important;
+    max-width: 80vw;
+    overflow-x: hidden;
+    overflow-y: auto;
+    z-index: 10;
+}
+[sidemenu].enabled.open {
+    left: 0;
+    animation: slide-in .2s;
+}
+[sidemenu].enabled.close {
+    animation: slide-out .2s;
+}
+
+
+[modal], .modal {
+    visibility: hidden;
+    position: fixed;
+    left: 0; right: 0; top: 0; bottom: 0;
+    margin: auto !important;
+    height: auto;
+    width: auto;
+    max-height: 600px;
+    max-width: 400px;
+    overflow-y: auto;
+    z-index: 10;
+}
+[modal].big, .modal.big {
+    max-height: 800px;
+    max-width: 600px;
+}
+[modal].small, .modal.small {
+    max-height: 400px;
+    max-width: 200px;
+}
+[modal].open {
+    visibility: visible;
+    animation: zoom-in .2s, fade-in .2s;
+}
+[modal].close {
+    animation: zoom-out .2s, fade-out .2s;
+}
+
+
+[menu] {
+    visibility: hidden;
+    position: fixed;
+    background-color: inherit;
+    box-shadow: 0 0 4px 4px var(--darkener);
+    z-index: 10;
+    cursor: pointer;
+}
+[menu] > div {
+    padding: 10px;
+    margin-bottom: 0;
+    text-transform: capitalize;
+}
+[menu] > div:not(:last-child) {
+    border-bottom: 1px solid #0003;
+}
+[menu].open {
+    visibility: visible;
+    animation: fold .2s reverse;
+}
+[menu].close {
+    animation: fold .2s;
+}
+
+
+[label] {
+    position: relative;
+    margin-top: 35px;
+    margin-bottom: 15px;
+    vertical-align: bottom;
+}
+[label][fixed]>* {
+    margin-bottom: 0;
+}
+[label]>input,
+[label]>select,
+[label]>textarea {
+    margin-top: 0 !important;
+}
+[label]:not([panel]):not([section]):before {
+    content: attr(label);
+    position: absolute;
+    height: 35px;
+    line-height: 35px;
+    font-size: 1.2em;
+    text-transform: capitalize;
+}
+[label]:before {
+    top: 0;
+    left: 0;
+    margin-top: -35px;
+}
+[label].big:before {
+    margin-left: 0;
+}
+[label][fixed]:before {
+    margin-top: -30px;
+    margin-left: 0;
+}
+.inline-label[label],
+.inline-label_ > [label] {
+    width: auto;
+    margin-top: 0;
+    padding-left: calc(40% + 10px);
+}
+.inline-label[label]:before,
+.inline-label_ > [label]:before {
+    top: auto;
+    width: 80%;
+    left: -40%;
+    margin-top: 0;
+    text-align: right;
+}
+.inline-label[label][fixed]:before,
+.inline-label_ > [label][fixed]:before {
+    margin-top: 0;
+    margin-left: -8px;
+}
+.below-label[label]:before,
+.below-label_ > [label]:before {
+    bottom: -40px;
+    left: 0;
+    right: 0;
+    margin-top: 0;
+    margin-left: 0;
+}
+.big [label] {
+    margin-top: 25px;
+    font-size: 1.2em;
+}
+.big [label]:before {
+    margin-top: -27px;
+}
+
+
+[show], [hide], [toggle],
+[onclick], [on-click],
+.clickable {
+    cursor: pointer;
+}

@@ -16,6 +16,12 @@ const cleanCSS = require('gulp-clean-css')
 const trimlines = require('gulp-trimlines')
 const replace = require('gulp-replace')
 
+/* TODO evaluate
+const postcss = require('gulp-postcss')
+const nested = require('postcss-nested')
+const extend = require('postcss-extend-rule')
+*/
+
 const browserSync = require('browser-sync').create()
 
 const s = gulp.series
@@ -48,29 +54,25 @@ function bundle() {
     // then turn stream into buffer (expected by some gulp plugins, i.e. babili, concat)
     .pipe(buffer())
     // inject rasti css
-    .pipe( replace('rasti.css', fs.readFileSync(
-        process.env.PROD ? paths.dist + '/rasti.min.css'
-        : 'src/rasti.css'
-    )))
+    .pipe( replace('rasti.css', fs.readFileSync( paths.dist + '/rasti.css' )))
 }
 
 
-gulp.task('minify-css', () =>
-    gulp.src('src/*.css')
+gulp.task('styles', () =>
+    gulp.src('src/rasti.css')
     .pipe(cleanCSS())
-    .pipe(rename('rasti.min.css'))
     .pipe(gulp.dest(paths.dist))
 )
 
 
-gulp.task('bundle', () =>
+gulp.task('bundle', s('styles', () =>
     merge2( gulp.src('lib/zepto.min.js'), bundle() )
     .pipe(concat('rasti.js'))
-    .pipe(gulp.dest(paths.dist)
+    .pipe(gulp.dest(paths.dist))
 ))
 
 
-gulp.task('prod', s('minify-css', 'bundle', () =>
+gulp.task('prod', s('bundle', () =>
     gulp.src(paths.dist + '/rasti.js')
     .pipe(minify())
     // trim ES6 template strings whitespace

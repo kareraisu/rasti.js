@@ -1,0 +1,157 @@
+/* desktop only */
+@media only screen and (min-width: 800px) {
+
+    .show-phone, .show-tablet {
+        position: absolute;
+        visibility: hidden;
+    }
+
+    .pad-s-desktop, .pad-s-desktop_>* {
+        padding: calc(var(--pad) * 0.5);
+    }
+    .pad-desktop, .pad-desktop_>* {
+        padding: var(--pad);
+    }
+    .pad-l-desktop, .pad-l-desktop_>* {
+        padding: calc(var(--pad) * 1.5);
+    }
+    .p0-desktop {
+        padding: 0;
+    }
+
+}
+
+
+/* tablet only */
+@media only screen and (min-width: 500px) and (max-width: 800px) {
+
+    .show-phone {
+        position: absolute;
+        visibility: hidden;
+    }
+
+    .pad-s-tablet, .pad-s-tablet_>* {
+        padding: calc(var(--pad) * 0.5);
+    }
+    .pad-tablet, .pad-tablet_>* {
+        padding: var(--pad);
+    }
+    .pad-l-tablet, .pad-l-tablet_>* {
+        padding: calc(var(--pad) * 1.5);
+    }
+    .p0-tablet {
+        padding: 0;
+    }
+
+}
+
+
+/* tablet and phone */
+@media only screen and (max-width: 800px) {
+
+    [page][header]:before {
+        line-height: 0.8;
+    }
+
+    .hide-tablet {
+        display: none;
+    }
+    .show-tablet {
+        position: relative;
+        visibility: visible;
+    }
+
+    [header].hh-tablet:before {
+        display: none;
+    }
+    [header].hh-tablet[page] {
+        padding-top: 0;
+    }
+    [header].hh-tablet[panel] {
+        padding-top: 20px;
+    }
+    [header].hh-tablet[section] {
+        padding-top: 15px;
+    }
+
+}
+
+
+/* phone only */
+@media only screen and (max-width: 500px) {
+
+    [page] {
+        padding-bottom: 0;
+        overflow-y: auto;
+    }
+
+    [panel] {
+        padding: 15px;
+        border-radius: 0;
+    }
+
+    [template] > .controls > .columns,
+    [template] > .controls > .sizes {
+        display: none;
+    }
+
+    [options] {
+        bottom: 0;
+        left: 0 !important;
+        right: 0;
+        height: 80% !important;
+        margin: auto;
+    }
+
+    .row {
+        padding-left: 0;
+    }
+
+    .row:not(.rigid) > [class*=col-],
+    [class*=columns-]:not(.rigid) > * {
+        min-width: 100%;
+    }
+
+    .hide-phone {
+        display: none;
+    }
+    .show-phone {
+        position: relative;
+        visibility: visible;
+    }
+
+    [header].hh-phone:before {
+        display: none;
+    }
+    [header].hh-phone[page] {
+        padding-top: 0;
+    }
+    [header].hh-phone[panel],
+    [header].hh-phone[section] {
+        padding-top: 15px;
+    }
+
+    .pad-s-phone {
+        padding: calc(var(--pad) * 0.5);
+    }
+    .pad-phone {
+        padding: calc(var(--pad));
+    }
+    .pad-l-phone {
+        padding: calc(var(--pad) * 1.5);
+    }
+    .p0-phone {
+        padding: 0;
+    }
+
+    .bottom-phone {
+        position: absolute;
+        bottom: 0;
+    }
+
+    .up-phone {
+        position: absolute;
+        top: 0;
+    }
+
+}

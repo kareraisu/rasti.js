@@ -1,0 +1,37 @@
+.row {
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    align-content: flex-start;
+    padding-left: 1%;
+}
+.col {
+    /*min-height: min-content !important;*/
+    display: flex;
+    flex-flow: column nowrap;
+    align-content: flex-start;
+    align-items: center;
+}
+.row > .col-1,  .col > .row-1  { flex-basis: 07.33%; }
+.row > .col-2,  .col > .row-2  { flex-basis: 15.66%; }
+.row > .col-3,  .col > .row-3  { flex-basis: 24.00%; }
+.row > .col-4,  .col > .row-4  { flex-basis: 32.33%; }
+.row > .col-5,  .col > .row-5  { flex-basis: 40.66%; }
+.row > .col-6,  .col > .row-6  { flex-basis: 49.00%; }
+.row > .col-7,  .col > .row-7  { flex-basis: 57.33%; }
+.row > .col-8,  .col > .row-8  { flex-basis: 65.66%; }
+.row > .col-9,  .col > .row-9  { flex-basis: 74.00%; }
+.row > .col-10, .col > .row-10 { flex-basis: 82.33%; }
+.row > .col-11, .col > .row-11 { flex-basis: 90.66%; }
+.row [class*=col-] {
+    margin-left: 0 !important;
+}
+.row [class*=col-]:not(:last-child) {
+    margin-right: 1% !important;
+}
+.col [class*=row-]{
+    margin-top: 0 !important;
+    margin-bottom: 1vh !important;
+}
+
+.page-options { flex-basis: initial !important; }
