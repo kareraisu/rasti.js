@@ -1,0 +1,188 @@
+.hidden {
+    position: absolute;
+    visibility: hidden;
+}
+
+.rel, .rel_>* {
+    position: relative;
+}
+
+.abs, .abs_>* {
+    position: absolute;
+}
+
+.fix, .fix_>* {
+    position: fixed;
+}
+
+.inline, .inline_>* {
+    display: inline-block;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.flex, .flex_>* {
+    display: flex;
+}
+
+.floatl, .floatl_>* {
+    float: left;
+}
+.floatr, .floatr_>* {
+    float: right;
+}
+
+.left, .left_>* {
+    position: absolute;
+    left: 0;
+}
+.right, .right_>* {
+    position: absolute;
+    right: 0;
+}
+.top, .top_>* {
+    position: absolute;
+    top: 0;
+}
+.bottom, .bottom_>* {
+    position: absolute;
+    bottom: 0;
+}
+
+.abs.centerx, .abs_.centerx_>* {
+    left: 0; right: 0;
+    margin: auto !important;
+}
+.abs.centery, .abs_.centery_>* {
+    top: 0; bottom: 0;
+    margin: auto !important;
+}
+.abs.center, .abs_.center_>* {
+    left: 0; right: 0; top: 0; bottom: 0;
+    margin: auto !important;
+}
+
+.flex.centerx, .flex_.centerx_>* {
+    justify-content: center;
+}
+.flex.centery, .flex_.centery_>* {
+    align-items: center;
+}
+.flex.center, .flex_.center_>* {
+    justify-content: center;
+    align-items: center;
+}
+
+.scrollx, .scrollx_>* {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+.scrolly, .scrolly_>* {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.scroll, .scroll_>* {
+    overflow: auto;
+}
+
+.textl, .textl_>* {
+    text-align: left;
+}
+.textr, .textr_>* {
+    text-align: right;
+}
+.textc, .textc_>* {
+    text-align: center;
+}
+
+.fullw, .fullw_>* {
+    width: 100%;
+}
+.fullh, .fullh_>* {
+    height: 100%;
+}
+.halfw, .halfw_>* {
+    width: 50%;
+}
+.halfh, .halfh_>* {
+    height: 50%;
+}
+.autow, .autow_>* {
+    width: auto;
+}
+.autoh, .autoh_>* {
+    height: auto;
+}
+
+.autom, .autom_>* {
+    margin: auto !important;
+}
+.m0 {
+    margin: 0 !important;
+}
+
+.pad-s, .pad-s_>* {
+    padding: calc(var(--pad) * 0.5);
+}
+.pad, .pad_>* {
+    padding: var(--pad);
+}
+.pad-l, .pad-l_>* {
+    padding: calc(var(--pad) * 1.5);
+}
+
+.p0 {
+    padding: 0 !important;
+}
+
+.round, .round_>* {
+    border-radius: 50%;
+}
+
+.columns-2, .columns-3 {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+}
+.columns-2 > * {
+    width: 49%;
+    margin-right: 2%;
+}
+.columns-3 > * {
+    width: 32%;
+    margin-right: 2%;
+}
+.columns-2 > *:nth-child(2n),
+.columns-3 > *:nth-child(3n) {
+    margin-right: 0;
+}
+
+.wrap {
+    flex-wrap: wrap;
+}
+.nowrap {
+    flex-wrap: nowrap;
+}
+
+.upper {
+    text-transform: uppercase;
+}
+
+.h-left:before {
+    justify-content: left;
+}
+.h-left:not([foldable]):before {
+    padding-left: 0;
+}
+.h-upper:before {
+    text-transform: uppercase;
+}
+
+.scale-up, .scale-up_>* {
+    transition: all .2s ease-in-out;
+}
+.scale-up:hover, .scale-up_>*:hover {
+    transform: scale(1.1);
+}

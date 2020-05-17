@@ -1,0 +1,153 @@
+[icon] {
+    min-height: 50px;
+}
+[icon]:empty {
+    padding: 0;
+}
+[icon]:before {
+    display: inline-block;
+    flex-grow: 0;
+    height: 50px;
+    width: 50px;
+    font-size: 1.5rem;
+    line-height: 2;
+    text-align: center;
+    text-decoration: none;
+    transition: all .2s;
+}
+
+[on-click][icon]:empty {
+    border: 1px solid transparent;
+    transition: all .2s;
+}
+[on-click][icon]:empty:hover {
+    border-color: var(--lightener)
+}
+[on-click][icon]:empty:focus {
+    border-color: var(--primary)
+}
+
+.small[icon], .small_ > [icon] {
+    min-height: 35px;
+}
+.small[icon]:before, .small_ > [icon]:before {
+    height: 35px;
+    width: 35px;
+    font-size: 1.2rem;
+    line-height: 1.7;
+}
+.big[icon]:before, .big_ > [icon]:before {
+    height: 70px;
+    width: 70px;
+    font-size: 2.2rem;
+    line-height: 1.9;
+}
+.huge[icon]:before, .huge_ > [icon]:before {
+    height: 100px;
+    width: 100px;
+    font-size: 3.2rem;
+    line-height: 1.9;
+}
+.round[icon]:before, .round_ > [icon]:before {
+    border-radius: 50%;
+}
+
+/* input element icon fix */
+.floating[icon] {
+    position: relative;
+    padding-left: 0;
+}
+.floating[icon]:before {
+    position: absolute;
+    top: 0;
+    left: 4px;
+    height: 35px;
+    width: 35px;
+    font-size: 1.1rem;
+}
+.floating[icon] > input {
+    padding-left: 45px;
+}
+
+/* specific icon fixes */
+[icon=remove]:before {
+    line-height: 0.6 !important;
+    font-weight: 600;
+}
+[icon=close]:before,
+[icon=network]:before {
+    line-height: 1 !important;
+}
+[icon=diamonds]:before {
+    line-height: 1.1 !important;
+}
+[icon=restore]:before,
+[icon=pommee]:before {
+    line-height: 1.2 !important;
+}
+[icon=reload]:before,
+[icon=stereo]:before,
+[icon=img-file]:before,
+[icon=latin2]:before,
+[icon=celtic]:before,
+[icon=ankh]:before,
+[icon=comunism]:before,
+[icon^=hg-]:before {
+    line-height: 1.3 !important;
+}
+[icon=filter]:before,
+[icon=sync]:before {
+    line-height: 1.3 !important;
+    transform: rotate(90deg);
+}
+[icon=error]:before {
+    line-height: 1.35 !important;
+    font-weight: 600;
+}
+[icon=copy]:before {
+    line-height: 1.5 !important;
+    font-weight: 600;
+    font-size: 1.7rem;
+}
+[icon=health]:before {
+    line-height: 1.5 !important;
+}
+[icon=warning]:before {
+    line-height: 1.6 !important;
+}
+[icon=minimize]:before,
+[icon=maximize]:before {
+    line-height: 1.7 !important;
+}
+[icon=undo]:before,
+[icon=play]:before {
+    line-height: 1.7 !important;
+    transform: rotate(90deg);
+}
+[icon=redo]:before {
+    line-height: 1.7 !important;
+    transform: rotate(-90deg);
+}
+[icon=shift]:before,
+[icon=caps-lock]:before,
+[icon=return]:before {
+    font-family: auto;
+    font-weight: 600;
+}
+[icon=desktop]:before,
+[icon=printer]:before,
+[icon=studio-mic]:before,
+[icon=candle]:before,
+[icon=stopwatch]:before {
+    font-weight: 600;
+}
+[icon=tab]:before {
+    font-family: auto;
+}
+[icon=pinch]:before {
+    transform: rotate(90deg);
+}
+[icon=moon]:before,
+[icon=crescent-moon]:before {
+    filter: grayscale(1);
+}

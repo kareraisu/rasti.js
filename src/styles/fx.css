@@ -1,0 +1,78 @@
+[fx=toast] {
+    position: fixed;
+    display: flex;
+    left: 0; right: 0;
+    bottom: -100px;
+    width: 100vw;
+    max-width: 600px;
+    min-height: 90px;
+    max-height: 90px;
+    padding: 20px;
+    margin: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    z-index: 10;
+    transition: bottom ease-out 0.25s;
+}
+[fx=toast].active {
+    bottom: 0;
+}
+[fx=toast] [icon]::before {
+    border-radius: 50%;
+    font-size: 2rem;
+    line-height: 1.6;
+    box-shadow: 0 0 0px 1px;
+}
+[fx=toast] [icon=warning]::before {
+    background: yellow;
+    line-height: 1.4;
+}
+[fx=toast] [icon=error]::before {
+    background: red;
+    line-height: 1.4;
+}
+[fx=toast] [icon=accept]::before {
+    background: green;
+}
+
+.fx-stack-container > * {
+    transition: margin-top 2s ease; /*FIXME: NOT WORKING*/
+    margin-top: 0;
+}
+.fx-stack-el {
+    margin-top: 100px;
+}
+
+.fx-stamp-container > * {
+    transition: opacity 0.3s;
+    animation: stamp 0.3s;
+}
+.fx-stamp-el {
+    opacity: 0;
+    animation: none;
+}
+
+.flip-container {
+    perspective: 1000px;
+    position: relative;
+}
+.flipper {
+    transition: 0.6s;
+    transform-style: preserve-3d;
+    position: absolute;
+}
+.flipper.flip  {
+    transform: rotateY(180deg);
+}
+.flipper .front, .flipper .back {
+    backface-visibility: hidden;
+    top: 0;
+    left: 0;
+}
+.flipper .front {
+    z-index: 2;
+    transform: rotateY(0deg);
+}
+.flipper .back {
+    transform: rotateY(180deg);
+}
