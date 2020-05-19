@@ -23,7 +23,7 @@ init($el) {
     $el.on('change', function(e) {
         // update component ui
         let $input, checked
-        $el.find('input').each(function(i, input){
+        $el.find('input').each( input => {
             $input = $(input)
             checked = values.includes( $input.attr('value') )
             $input.prop('checked', checked)

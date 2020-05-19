@@ -28,7 +28,7 @@ init($el) {
 
     if (!$el.attr('data')) {
         // clone original options
-        $el.find('option').each(function(i, opt) {
+        $el.find('option').each( opt => {
             $options.append(`<div value="${opt.value}">${opt.innerHTML}</div>`)
         })
     }

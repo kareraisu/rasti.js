@@ -1,8 +1,8 @@
-require('./extensions')
-const { History, Pager, state, crud } = require('./components')
-const utils = require('./utils')
+require('./js/extensions')
+const { History, Pager, state, crud } = require('./js/components')
+const utils = require('./js/utils')
 const { is, sameType, resolveAttr, chain, safe, compose, html } = utils
-const { themes, themeMaps } = require('./themes')
+const { themes, themeMaps } = require('./js/themes')
 let media
 
 let default_options = {
@@ -30,7 +30,7 @@ const default_texts = {
 default_options = {...default_options, ...default_texts}
 
 const TEXT_ATTRS = 'label header text placeholder'.split(' ')
-const EVENT_ATTRS = 'click change hover input keydown submit load'.split(' ')
+const EVENT_ATTRS = 'hover focus blur click change input keydown submit load error'.split(' ')
 const ACTION_ATTRS = 'show hide toggle'.split(' ')
 const NOCHILD_TAGS = 'input select textarea img'.split(' ')
 
@@ -135,7 +135,7 @@ function rasti(name, container) {
 
         container
             .addClass('big loading backdrop')
-            .removeAttr('hidden')
+            [0].removeAttribute('hidden')
 
         // cache options
         if (options) {
@@ -166,27 +166,27 @@ function rasti(name, container) {
         container.append('<div class=rs-backdrop>')
 
         // append page-options containers
-        container.find('[page]').each( (i, el) => {
+        container.find('[page]').each( el => {
             $(el).append('<div class="page-options">')
         })
 
 
         // fix labels
         NOCHILD_TAGS.forEach( tag => {
-            container.find(tag + '[label]').each( (i, el) => {
+            container.find(tag + '[label]').each( el => {
                 fixLabel($(el))
             })
         })
 
 
         // fix input icons
-        container.find('input[icon]').each( (i, el) => {
+        container.find('input[icon]').each( el => {
             fixIcon($(el))
         })
 
 
-        // init blocks
-        container.find('[data]:not([template])').each( (i, el) => {
+        // init blocks and data templates
+        container.find('[data]').each( el => {
             updateBlock($(el))
         })
 
@@ -199,7 +199,7 @@ function rasti(name, container) {
         
         // init tabs
         function initTabs(selector) {
-            container.find(selector).each( (i, el) => { createTabs(el) })
+            container.find(selector).each(createTabs)
         }
         initTabs('.tabs')
         if (media.tablet || media.phone) initTabs('.tabs-tablet')
@@ -218,18 +218,19 @@ function rasti(name, container) {
         container.on('click change', '[render]:not([submit])', e => {
             const el = e.currentTarget
             const template = el.getAttribute('render')
-            if (!template) throw ['Missing template name in [render] attribute of element:', el]
-            render(template)
+            template
+                ? render(template)
+                : error('Missing template name in [render] attribute of element:', el)
         })
 
 
         // init element dependencies
-        container.find('[bind]').each( (i, el) => {
+        container.find('[bind]').each( el => {
             const $el = $(el)
             const deps = $el.attr('bind')
             if (deps) deps.split(' ').forEach( dep => {
                 $el.closest('[page]').find('[prop='+ dep +']')
-                    .change( e => { updateBlock($el) })
+                    .on('change', e => { updateBlock($el) })
             })
         })
 
@@ -240,7 +241,7 @@ function rasti(name, container) {
         // resolve empty attributes
         TEXT_ATTRS.forEach( attr => {
             let $el
-            container.find('['+attr+'=""]').each( (i, el) => {
+            container.find('['+attr+'=""]').each( el => {
                 $el = $(el)
                 $el.attr( attr, resolveAttr($el, attr) )
             })
@@ -248,7 +249,7 @@ function rasti(name, container) {
 
 
         // resolve bg images
-        container.find('[img]').each( (i, el) => {
+        container.find('[img]').each( el => {
             let path = resolveAttr($(el), 'img')
             if (path.indexOf('/')==-1) path = self.options.imgPath + path
             if (path.charAt(path.length-4)!='.') path += self.options.imgExt
@@ -269,7 +270,7 @@ function rasti(name, container) {
         }
 
         // init keyboard-navigatable elements
-        container.find('[key-nav]').each( (i, el) => {
+        container.find('[key-nav]').each( el => {
             utils.keyNav($(el))
         })
 
@@ -278,12 +279,6 @@ function rasti(name, container) {
 
         
         initState()
-
-
-        // render data templates
-        container.find('[data][template]').each( (i, el) => {
-            render(el)
-        })
 
 
         // init crud templates
@@ -300,14 +295,14 @@ function rasti(name, container) {
 
 
         // init movable elements
-        container.find('[movable]').each( (i, el) => {
+        container.find('[movable]').each( el => {
             $(el).move()
         })
 
 
         // cache height of foldable elements
-        container.find('[foldable]').add('[menu]').each( (i, el) => {
-            el.orig_h = el.clientHeight + 'px'
+        container.find('[foldable]').add('[menu]').each( el => {
+            el._height = el.clientHeight + 'px'
         })
 
 
@@ -504,7 +499,7 @@ function rasti(name, container) {
             $elems = $elems.add('['+attr+']')
         })
 
-        $elems.each( (i, el) => {
+        $elems.each( el => {
             if (el.hasAttribute('fixed')) el = el.children[0]
             $el = $(el)
             keys = el.langkeys
@@ -596,7 +591,7 @@ function rasti(name, container) {
 
         // apply bg colors
         let colorName, color
-        container.find('[bg]').each( (i, el) => {
+        container.find('[bg]').each( el => {
             colorName = el.getAttribute('bg')
             color = theme.palette[colorName] || baseTheme.palette[colorName]
             if (!color) warn('Color [%s] not found in theme palette, using it as is', colorName, el)
@@ -686,19 +681,13 @@ function rasti(name, container) {
         
     }
 
-    this.config = config
-    this.init = init
-    this.navTo = navTo
-    this.render = render
-    this.setLang = setLang
-    this.setTheme = setTheme
-    this.updateBlock = updateBlock
-    this.toggleFullScreen = toggleFullScreen
+    // expose api
+    Object.assign(this, {config, init, navTo, render, setLang, setTheme, updateBlock})
 
     return this
 
 
-    // internal utils
+    // internal helpers
 
     function genTemplate(tmp_string) {
         return tmp_data => evalTemplate(
@@ -713,8 +702,8 @@ function rasti(name, container) {
 
     function evalTemplate(tmp_string, tmp_data, data, props, methods, lang) {
         try {
-            return tmp_data
-                ? tmp_data.map(el => eval('html`'+tmp_string+'`'))
+            return is.array(tmp_data)
+                ? tmp_data.map(el => eval('html`'+tmp_string+'`')).join('')
                 : eval('html`'+tmp_string+'`')
         } catch (err) {
             error('Error evaluating template string\n%s:', tmp_string, err.message)
@@ -744,7 +733,7 @@ function rasti(name, container) {
 
     
     function bindProps($container, state) {
-        $container.children().each( (i, el) => {
+        $container.children().each( el => {
             const $el = $(el)
             const prop = $el.attr('prop')
             let trans
@@ -838,7 +827,7 @@ function rasti(name, container) {
                 if ( is.not.function(page.init) ) throw ['pages.%s.init must be a function!', name]
                 else {
                     log('Initializing page [%s]', name)
-                    self.active.page = $page // to allow app.get() etc in page.init
+                    self.active.page = $page
                     page.init()
                 }
             }
@@ -862,7 +851,7 @@ function rasti(name, container) {
             setLang(self.options.lang)
         // if no lang, generate texts
         if (!self.options.lang) {
-            container.find('[text]').each((i, el) => {
+            container.find('[text]').each( el => {
                 $(el).text($(el).attr('text'))
             })
         }
@@ -916,7 +905,7 @@ function rasti(name, container) {
                 }
                 else {
                     // get values of all navparams in page
-                    $page.find('[navparam]').each((i, el) => {
+                    $page.find('[navparam]').each( el => {
                         const $el = $(el)
                         const key = resolveAttr($el, 'navparam')
                         if (key)
@@ -952,7 +941,7 @@ function rasti(name, container) {
                     self.methods[callback](resdata)
                 if (template)
                     render(template, resdata, {time})
-                $el.removeClass('loading').removeAttr('disabled')
+                $el.removeClass('loading')[0].removeAttribute('disabled')
             })
         })
     }
@@ -960,7 +949,7 @@ function rasti(name, container) {
 
     function initEvents() {
         for (let action of EVENT_ATTRS) {
-            container.find('[on-'+ action +']').each( (i, el) => {
+            container.find('[on-'+ action +']').each( el => {
                 const $el = $(el)
                 const methodName = $el.attr('on-' + action)
                 if ( !methodName ) throw ['Missing method in [on-%s] attribute of element:', action, el]
@@ -984,7 +973,7 @@ function rasti(name, container) {
 
     function initActions() {
         for (let action of ACTION_ATTRS) {
-            container.find('['+ action +']').each( (i, el) => {
+            container.find('['+ action +']').each( el => {
                 const $el = $(el)
                 const $page = $el.closest('[page]')
                 const targetSelector = $el.attr(action)
@@ -999,7 +988,7 @@ function rasti(name, container) {
                 $el.on('click', e => {
                     e.stopPropagation()
                     $target.addClass('target')
-                    container.find('[menu]:not(.target)').hide()
+                    //container.find('[menu]:not(.target)').hide()
                     $target.removeClass('target')
                     is.function(target[action]) ? target[action]() : $target[action]()
                     const isVisible = target.style.display != 'none'
@@ -1011,10 +1000,10 @@ function rasti(name, container) {
 
 
     function initFieldValidations() {
-        container.find('button[validate]').each( (i, btn) => {
+        container.find('button[validate]').each( btn => {
             const $fields = $(btn).parent().find('input[required]')
             btn.disabled = isAnyFieldInvalid($fields)
-            $fields.each( (i, field) => {
+            $fields.each( field => {
                 $(field).on('keydown', e => {
                     btn.disabled = isAnyFieldInvalid($fields)
                     if (e.key == 'Enter' && !btn.disabled) btn.click()
@@ -1024,9 +1013,8 @@ function rasti(name, container) {
 
         function isAnyFieldInvalid($fields) {
             let valid = true
-            $fields.each( (i, field) => {
+            $fields.each( field => {
                 valid = valid && field.validity.valid
-                return valid
             })
             return !valid
         }
@@ -1034,7 +1022,7 @@ function rasti(name, container) {
    
 
     function initModals() {
-        container.find('[modal]').each((i, el) => {
+        container.find('[modal]').each( el => {
             // add close btn
             $('<div icon=close class="top right clickable" />')
                 .on('click', e => {
@@ -1046,104 +1034,92 @@ function rasti(name, container) {
 
 
     function initSideMenu() {
-        self.sidemenu = (function (el) {
-            
-            if (!el) return
-
-            el.enabled = false
-            el.visible = false
-
-            el.show = () => {
-                if (!el.enabled) return
-                $(el).show()
-                el.visible = true
-            }
-            el.hide = () => {
-                if (!el.enabled) return
-                $(el).hide()
-                el.visible = false
-            }
-            el.toggle = () => {
-                if (!el.enabled) return
-                el.visible ? el.hide() : el.show()
-            }
-
-            el.enable = () => {
-                el.classList.add('enabled')
-                el.enabled = true
-            }
-            el.disable = () => {
-                el.classList.remove('enabled')
-                el.enabled = false
-            }
-            el.switch = () => {
-                el.enabled ? el.disable() : el.enable()
-            }
-
-            return el
-
-        })( container.find('[sidemenu]')[0] )
+        self.sidemenu = (el => el &&
+            Object.assign(el, {
+                enabled : false,
+                visible : false,
+                show() {
+                    $(el).show()
+                },
+                hide() {
+                    $(el).hide()
+                },
+                toggle() {
+                    $(el).toggle()
+                },
+                enable() {
+                    el.classList.add('enabled')
+                    el.enabled = true
+                },
+                disable() {
+                    el.classList.remove('enabled')
+                    el.enabled = false
+                },
+                switch() {
+                    el.enabled ? el.disable() : el.enable()
+                },
+            })
+        )( container.find('[sidemenu]')[0] )
 
         if (self.sidemenu) {
-            if (media.phone) self.sidemenu.enable()
-            media.on.phone(() => { self.sidemenu.switch() })
+            media.phone && self.sidemenu.enable()
+            media.on.phone(self.sidemenu.switch)
         }
     }
 
 
     function createTabs(el) {
-        var $el = $(el),
-            $tabs = $el.hasAttr('page')
-                ? $el.children('[panel]:not([modal])')
-                : $el.hasAttr('panel')
-                    ? $el.children('[section]:not([modal])')
-                    : undefined
-        if (!$tabs) throw ['Cannot create tabs: container must be a [page] or a [panel]', el]
+        const $el = $(el),
+            $tabs = $el.children(),
+            $labels = $('<div class="tab-labels">'),
+            $bar = $('<div class="bar">')
+        
+        let $tab, label, position
 
-        var $labels = $('<div class="tab-labels">'),
-            $bar = $('<div class="bar">'),
-            $tab, label, position
-
-        $tabs.each( (i, tab) => {
+        $tabs.each( (tab, i) => {
             $tab = $(tab)
             $tab.attr('tab', i)
             label = resolveAttr($tab, 'tab-label') || 'TAB ' + (i+1)
 
-            $labels.append($(`<div tab-label=${i} text="${ label }">`))
+            $labels.append(`<div tab-label=${i} text="${ label }">`)
         })
 
-        $labels.append($bar).prependTo($el)
-        var $flow = $tabs.wrapAll('<div h-flow>').parent()
+        $el.addClass('tab-group')
+            .before( $labels.append($bar) )
 
         $labels.on('click', e => {
-            var $label = $(e.target),
+            const $label = $(e.target),
                 tabnr = $label.attr('tab-label'),
                 $tab = $tabs.filter(`[tab="${ tabnr }"]`)
 
             $tabs.removeClass('active')
-            $tab.addClass('active')[0].scrollIntoView()
+            $tab.addClass('active')
+            $tab[0].scrollIntoView()
 
             $labels.children().removeClass('active')
             $label.addClass('active')
-
         })
 
-        $flow.on('scroll', e => {
+        $el.on('scroll', e => {
             position = e.target.scrollLeft / e.target.scrollWidth
-            $bar.css({ left : position * e.target.offsetWidth })
+            $bar[0].style.left = position * e.target.offsetWidth +'px'
         })
 
         container.on('rasti-nav', e => {
             if (!isInActivePage($el)) return
-            $bar.css({ width : $flow[0].offsetWidth / $tabs.length })
             if (!$labels.children('.active').length) $labels.children().first().click()
+            updateBarWidth()
         })
 
-        $(window).on('resize', e => {
+        window.addEventListener('resize', ev => {
             if (!isInActivePage($el)) return
             $labels.find('.active').click()
-            $bar.css({ width : $flow[0].offsetWidth / $tabs.length })
+            updateBarWidth()
         })
+
+        function updateBarWidth() {
+            $bar[0].style.width = $labels.find('.active')[0].offsetWidth +'px'
+        }
 
         function isInActivePage($el) {
             return self.active.page.find($el).length
@@ -1154,12 +1130,14 @@ function rasti(name, container) {
 
 
     function initCrud() {
-        container.find('[crud][template]').each((i, el) => {
+        container.find('[crud][template]').each( el => {
             const $el = $(el)
             const template = resolveAttr($el, 'template')
             const datakey = resolveAttr($el, 'data')
             const crudkey = resolveAttr($el, 'crud')
+
             render(el)
+
             $el.on('click', '.rasti-crud-delete', e => {
                 const $controls = $(e.currentTarget).closest('[data-id]')
                 const id = $controls.attr('data-id')
@@ -1177,14 +1155,14 @@ function rasti(name, container) {
                     rasti.error(err)
                 }
             })
-            $el.on('click', '.rasti-crud-update', e => {
+            .on('click', '.rasti-crud-update', e => {
                 // TODO: add update logic
             })
-            $el.on('click', '.rasti-crud-create', e => {
+            .on('click', '.rasti-crud-create', e => {
                 __crud.showInputEl($el)
                 $el.addClass('active')
             })
-            $el.on('click', '.rasti-crud-accept', e => {
+            .on('click', '.rasti-crud-accept', e => {
                 // TODO: finish this
                 let newel
                 try {
@@ -1202,7 +1180,7 @@ function rasti(name, container) {
                     rasti.error(err)
                 }
             })
-            $el.on('click', '.rasti-crud-cancel', e => {
+            .on('click', '.rasti-crud-cancel', e => {
                 __crud.hideInputEl($el)
                 $el.removeClass('active')
             })
@@ -1230,9 +1208,9 @@ function rasti(name, container) {
             <div class="controls flex center small_ inline_">
                 ${ columns || '' }
                 <div class="paging flex center small_ inline_">
-                    <button icon=left3 />
-                    <span class=page />
-                    <button icon=right3 />
+                    <button icon=left3></button>
+                    <span class=page></span>
+                    <button icon=right3></button>
                 </div>
                 <button icon=rows>${ psizes[0] }</button>
             </div>
@@ -1304,7 +1282,7 @@ function rasti(name, container) {
         if (!$form.length) throw ['No container element bound to ajax method [%s]. Please bind one via [ajax] attribute', method]
 
         var reqdata = {}, prop
-        $form.find('[prop]:not([private])').each( (i, el) => {
+        $form.find('[prop]:not([private])').each( el => {
             $el = $(el)
             prop = $el.attr('prop')
             if (prop) {
@@ -1425,7 +1403,7 @@ function rasti(name, container) {
             if (!el.hasAttribute('foldable'))
                 return
             const isOpen = el.clientHeight > 35 // NOTE this must be kept in sync with the css!
-            document.body.style.setProperty("--elem-h", el.orig_h)
+            document.body.style.setProperty("--elem-h", el._height)
             if (isOpen) {
                 el.classList.remove('open')
                 el.classList.add('folded')
@@ -1467,20 +1445,18 @@ function rasti(name, container) {
 }
 
 
-
 // static properties and methods
 
 rasti.log = log
 rasti.warn = warn
 rasti.error = error
 rasti.utils = utils.public
-rasti.blocks = require('./blocks/all')
-rasti.icons = require('./icons')
-rasti.fx = require('./fx')
+rasti.blocks = require('./js/blocks/all')
+rasti.icons = require('./js/icons')
+rasti.fx = require('./js/fx')
 rasti.options = {log : 'debug'}
 
 module.exports = global.rasti = Object.freeze(rasti)
-
 
 
 /*
@@ -1490,21 +1466,22 @@ function bootstrap() {
     const appContainers = $(document).find('[rasti]')
     let appName, app
 
-    appContainers.forEach( container => {
-        appName = container.getAttribute('rasti')
+    appContainers.each( container => {
+        const $container = $(container)
+        appName = $container.attr('rasti')
         if (!appName) error('Missing app name in [rasti] attribute of app container:', container)
         else if (global[appName]) error('Name [%s] already taken, please choose another name for app in container:', appName, container)
         else {
             global[appName] = app = new rasti(appName, container)
             Object.keys(app.options).forEach( key => {
-                if (container.hasAttribute(key)) {
-                    app.options[key] = container.getAttribute(key)
+                if ($container.hasAttr(key)) {
+                    app.options[key] = $container.attr(key)
                     // non-value boolean attributes are true
                     if (is.boolean(options[key]) && !app.options[key]) app.options[key] = true
                 }
             })
             // load any declared sources
-            var sources = container.getAttribute('src')
+            var sources = $container.attr('src')
             if (sources) {
                 log('Loading sources for app [%s]...', appName)
                 utils.inject(sources)

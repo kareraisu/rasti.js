@@ -3,7 +3,7 @@ module.exports = {
 stack : $el => {
     $el.addClass('fx-stack-container')
     const $children = $el.children()
-    $children.each( (i, el) => {
+    $children.each( (el, i) => {
         el.classList.add('fx-stack-el')
         setTimeout( _ => {
             el.classList.remove('fx-stack-el')
@@ -17,7 +17,7 @@ stack : $el => {
 stamp : $el => {
     $el.addClass('fx-stamp-container')
     const $children = $el.children()
-    $children.each( (i, el) => {
+    $children.each( (el, i) => {
         el.classList.add('fx-stamp-el')
         setTimeout( _ => {
             el.classList.remove('fx-stamp-el')
