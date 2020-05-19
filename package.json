@@ -3,8 +3,8 @@
   "version": "1.0.1",
   "description": "a simple webapp prototyping framework",
   "scripts": {
-    "start": "gulp",
-    "build": "cross-env PROD=true gulp prod",
+    "start": "gulp dev --silent",
+    "build": "cross-env PROD=true gulp prod --silent",
     "test": "echo \"No test specified\"",
     "prepublishOnly": "npm run build && git add . && git commit -m 'build'"
   },
@@ -29,17 +29,18 @@
     "browser-sync": "^2.18.11",
     "browserify": "^14.3.0",
     "cross-env": "^7.0.2",
-    "exorcist": "^0.4.0",
     "gulp": "^4.0",
     "gulp-babel-minify": "^0.5.1",
     "gulp-clean-css": "^3.2.0",
     "gulp-concat": "^2.6.1",
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.5.4",
+    "gulp-sizereport": "^1.2.1",
+    "gulp-sourcemaps": "^2.6.5",
     "gulp-trimlines": "^1.0.1",
     "merge2": "^1.0.3",
     "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0"
+    "vinyl-source-stream": "^2.0.0"
   },
   "main": "dist/rasti.min.js",
   "directories": {

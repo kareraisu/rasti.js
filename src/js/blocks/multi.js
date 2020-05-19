@@ -102,7 +102,7 @@ init($el) {
 
     $el.on('change', function(e, params){
         if (params && params.ui) return // change triggered from ui, do nothing
-        $selected.children().each(function(i, el) {
+        $selected.children().each( el => {
             $options.append(el)
         })
         for (var val of el.value) {

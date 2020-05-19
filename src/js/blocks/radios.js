@@ -20,7 +20,7 @@ init($el) {
     })
     $el.on('change', function(e) {
         // update component ui
-        $el.find('[value="'+ $el.val() +'"]').prop('checked', true)
+        $el.find('[value="'+ $el.val() +'"]').checked = true
     })
 },
 

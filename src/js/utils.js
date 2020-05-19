@@ -67,6 +67,11 @@ function inject(sources) {
                 ? do_inject(sources)
                 : rasti.log('All sources loaded')
         }
+
+        $el[0].onerror = e => {
+            rasti.error('> Error loading %s', src, e)
+        }
+        
         rasti.log('> Loading %s ...', src)
         $body.append($el)
     }
@@ -177,7 +182,7 @@ function keyNav($el) {
             let $child, isActive,
                 noActive = true
 
-            $el.children().each((i, child) => {
+            $el.children().each( child => {
                 $child = $(child)
                 isActive = $child.is('.active')
                 $child.attr('tabindex', isActive ? 0 : -1)

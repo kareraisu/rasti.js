@@ -278,8 +278,8 @@ function crud(app) {
         },
 
         persistNewEl : $el => {
-            $el.find('.rasti-crud-input').removeClass('.rasti-crud-input')
-                .find('[contenteditable]').removeAttr('[contenteditable]')
+            $el.find('.rasti-crud-input').removeClass('rasti-crud-input')
+                .find('[contenteditable]')[0].removeAttribute('contenteditable')
             app.crud.genInputEl($el)
         },
     }

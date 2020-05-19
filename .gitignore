@@ -1,5 +1,6 @@
 .DS_Store
 *.zip
+*.temp
 .vscode
 node_modules
 app

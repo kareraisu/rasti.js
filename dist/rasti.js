@@ -1,5 +1,3 @@
-/* Zepto v1.2.0 - zepto event ajax form ie - zeptojs.com/license */
-!function(t,e){"function"==typeof define&&define.amd?define(function(){return e(t)}):e(t)}(this,function(t){var e=function(){function $(t){return null==t?String(t):S[C.call(t)]||"object"}function F(t){return"function"==$(t)}function k(t){return null!=t&&t==t.window}function M(t){return null!=t&&t.nodeType==t.DOCUMENT_NODE}function R(t){return"object"==$(t)}function Z(t){return R(t)&&!k(t)&&Object.getPrototypeOf(t)==Object.prototype}function z(t){var e=!!t&&"length"in t&&t.length,n=r.type(t);return"function"!=n&&!k(t)&&("array"==n||0===e||"number"==typeof e&&e>0&&e-1 in t)}function q(t){return a.call(t,function(t){return null!=t})}function H(t){return t.length>0?r.fn.concat.apply([],t):t}function I(t){return t.replace(/::/g,"/").replace(/([A-Z]+)([A-Z][a-z])/g,"$1_$2").replace(/([a-z\d])([A-Z])/g,"$1_$2").replace(/_/g,"-").toLowerCase()}function V(t){return t in l?l[t]:l[t]=new RegExp("(^|\\s)"+t+"(\\s|$)")}function _(t,e){return"number"!=typeof e||h[I(t)]?e:e+"px"}function B(t){var e,n;return c[t]||(e=f.createElement(t),f.body.appendChild(e),n=getComputedStyle(e,"").getPropertyValue("display"),e.parentNode.removeChild(e),"none"==n&&(n="block"),c[t]=n),c[t]}function U(t){return"children"in t?u.call(t.children):r.map(t.childNodes,function(t){return 1==t.nodeType?t:void 0})}function X(t,e){var n,r=t?t.length:0;for(n=0;r>n;n++)this[n]=t[n];this.length=r,this.selector=e||""}function J(t,r,i){for(n in r)i&&(Z(r[n])||L(r[n]))?(Z(r[n])&&!Z(t[n])&&(t[n]={}),L(r[n])&&!L(t[n])&&(t[n]=[]),J(t[n],r[n],i)):r[n]!==e&&(t[n]=r[n])}function W(t,e){return null==e?r(t):r(t).filter(e)}function Y(t,e,n,r){return F(e)?e.call(t,n,r):e}function G(t,e,n){null==n?t.removeAttribute(e):t.setAttribute(e,n)}function K(t,n){var r=t.className||"",i=r&&r.baseVal!==e;return n===e?i?r.baseVal:r:void(i?r.baseVal=n:t.className=n)}function Q(t){try{return t?"true"==t||("false"==t?!1:"null"==t?null:+t+""==t?+t:/^[\[\{]/.test(t)?r.parseJSON(t):t):t}catch(e){return t}}function tt(t,e){e(t);for(var n=0,r=t.childNodes.length;r>n;n++)tt(t.childNodes[n],e)}var e,n,r,i,O,P,o=[],s=o.concat,a=o.filter,u=o.slice,f=t.document,c={},l={},h={"column-count":1,columns:1,"font-weight":1,"line-height":1,opacity:1,"z-index":1,zoom:1},p=/^\s*<(\w+|!)[^>]*>/,d=/^<(\w+)\s*\/?>(?:<\/\1>|)$/,m=/<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,g=/^(?:body|html)$/i,v=/([A-Z])/g,y=["val","css","html","text","data","width","height","offset"],x=["after","prepend","before","append"],b=f.createElement("table"),E=f.createElement("tr"),j={tr:f.createElement("tbody"),tbody:b,thead:b,tfoot:b,td:E,th:E,"*":f.createElement("div")},w=/complete|loaded|interactive/,T=/^[\w-]*$/,S={},C=S.toString,N={},A=f.createElement("div"),D={tabindex:"tabIndex",readonly:"readOnly","for":"htmlFor","class":"className",maxlength:"maxLength",cellspacing:"cellSpacing",cellpadding:"cellPadding",rowspan:"rowSpan",colspan:"colSpan",usemap:"useMap",frameborder:"frameBorder",contenteditable:"contentEditable"},L=Array.isArray||function(t){return t instanceof Array};return N.matches=function(t,e){if(!e||!t||1!==t.nodeType)return!1;var n=t.matches||t.webkitMatchesSelector||t.mozMatchesSelector||t.oMatchesSelector||t.matchesSelector;if(n)return n.call(t,e);var r,i=t.parentNode,o=!i;return o&&(i=A).appendChild(t),r=~N.qsa(i,e).indexOf(t),o&&A.removeChild(t),r},O=function(t){return t.replace(/-+(.)?/g,function(t,e){return e?e.toUpperCase():""})},P=function(t){return a.call(t,function(e,n){return t.indexOf(e)==n})},N.fragment=function(t,n,i){var o,s,a;return d.test(t)&&(o=r(f.createElement(RegExp.$1))),o||(t.replace&&(t=t.replace(m,"<$1></$2>")),n===e&&(n=p.test(t)&&RegExp.$1),n in j||(n="*"),a=j[n],a.innerHTML=""+t,o=r.each(u.call(a.childNodes),function(){a.removeChild(this)})),Z(i)&&(s=r(o),r.each(i,function(t,e){y.indexOf(t)>-1?s[t](e):s.attr(t,e)})),o},N.Z=function(t,e){return new X(t,e)},N.isZ=function(t){return t instanceof N.Z},N.init=function(t,n){var i;if(!t)return N.Z();if("string"==typeof t)if(t=t.trim(),"<"==t[0]&&p.test(t))i=N.fragment(t,RegExp.$1,n),t=null;else{if(n!==e)return r(n).find(t);i=N.qsa(f,t)}else{if(F(t))return r(f).ready(t);if(N.isZ(t))return t;if(L(t))i=q(t);else if(R(t))i=[t],t=null;else if(p.test(t))i=N.fragment(t.trim(),RegExp.$1,n),t=null;else{if(n!==e)return r(n).find(t);i=N.qsa(f,t)}}return N.Z(i,t)},r=function(t,e){return N.init(t,e)},r.extend=function(t){var e,n=u.call(arguments,1);return"boolean"==typeof t&&(e=t,t=n.shift()),n.forEach(function(n){J(t,n,e)}),t},N.qsa=function(t,e){var n,r="#"==e[0],i=!r&&"."==e[0],o=r||i?e.slice(1):e,s=T.test(o);return t.getElementById&&s&&r?(n=t.getElementById(o))?[n]:[]:1!==t.nodeType&&9!==t.nodeType&&11!==t.nodeType?[]:u.call(s&&!r&&t.getElementsByClassName?i?t.getElementsByClassName(o):t.getElementsByTagName(e):t.querySelectorAll(e))},r.contains=f.documentElement.contains?function(t,e){return t!==e&&t.contains(e)}:function(t,e){for(;e&&(e=e.parentNode);)if(e===t)return!0;return!1},r.type=$,r.isFunction=F,r.isWindow=k,r.isArray=L,r.isPlainObject=Z,r.isEmptyObject=function(t){var e;for(e in t)return!1;return!0},r.isNumeric=function(t){var e=Number(t),n=typeof t;return null!=t&&"boolean"!=n&&("string"!=n||t.length)&&!isNaN(e)&&isFinite(e)||!1},r.inArray=function(t,e,n){return o.indexOf.call(e,t,n)},r.camelCase=O,r.trim=function(t){return null==t?"":String.prototype.trim.call(t)},r.uuid=0,r.support={},r.expr={},r.noop=function(){},r.map=function(t,e){var n,i,o,r=[];if(z(t))for(i=0;i<t.length;i++)n=e(t[i],i),null!=n&&r.push(n);else for(o in t)n=e(t[o],o),null!=n&&r.push(n);return H(r)},r.each=function(t,e){var n,r;if(z(t)){for(n=0;n<t.length;n++)if(e.call(t[n],n,t[n])===!1)return t}else for(r in t)if(e.call(t[r],r,t[r])===!1)return t;return t},r.grep=function(t,e){return a.call(t,e)},t.JSON&&(r.parseJSON=JSON.parse),r.each("Boolean Number String Function Array Date RegExp Object Error".split(" "),function(t,e){S["[object "+e+"]"]=e.toLowerCase()}),r.fn={constructor:N.Z,length:0,forEach:o.forEach,reduce:o.reduce,push:o.push,sort:o.sort,splice:o.splice,indexOf:o.indexOf,concat:function(){var t,e,n=[];for(t=0;t<arguments.length;t++)e=arguments[t],n[t]=N.isZ(e)?e.toArray():e;return s.apply(N.isZ(this)?this.toArray():this,n)},map:function(t){return r(r.map(this,function(e,n){return t.call(e,n,e)}))},slice:function(){return r(u.apply(this,arguments))},ready:function(t){return w.test(f.readyState)&&f.body?t(r):f.addEventListener("DOMContentLoaded",function(){t(r)},!1),this},get:function(t){return t===e?u.call(this):this[t>=0?t:t+this.length]},toArray:function(){return this.get()},size:function(){return this.length},remove:function(){return this.each(function(){null!=this.parentNode&&this.parentNode.removeChild(this)})},each:function(t){return o.every.call(this,function(e,n){return t.call(e,n,e)!==!1}),this},filter:function(t){return F(t)?this.not(this.not(t)):r(a.call(this,function(e){return N.matches(e,t)}))},add:function(t,e){return r(P(this.concat(r(t,e))))},is:function(t){return this.length>0&&N.matches(this[0],t)},not:function(t){var n=[];if(F(t)&&t.call!==e)this.each(function(e){t.call(this,e)||n.push(this)});else{var i="string"==typeof t?this.filter(t):z(t)&&F(t.item)?u.call(t):r(t);this.forEach(function(t){i.indexOf(t)<0&&n.push(t)})}return r(n)},has:function(t){return this.filter(function(){return R(t)?r.contains(this,t):r(this).find(t).size()})},eq:function(t){return-1===t?this.slice(t):this.slice(t,+t+1)},first:function(){var t=this[0];return t&&!R(t)?t:r(t)},last:function(){var t=this[this.length-1];return t&&!R(t)?t:r(t)},find:function(t){var e,n=this;return e=t?"object"==typeof t?r(t).filter(function(){var t=this;return o.some.call(n,function(e){return r.contains(e,t)})}):1==this.length?r(N.qsa(this[0],t)):this.map(function(){return N.qsa(this,t)}):r()},closest:function(t,e){var n=[],i="object"==typeof t&&r(t);return this.each(function(r,o){for(;o&&!(i?i.indexOf(o)>=0:N.matches(o,t));)o=o!==e&&!M(o)&&o.parentNode;o&&n.indexOf(o)<0&&n.push(o)}),r(n)},parents:function(t){for(var e=[],n=this;n.length>0;)n=r.map(n,function(t){return(t=t.parentNode)&&!M(t)&&e.indexOf(t)<0?(e.push(t),t):void 0});return W(e,t)},parent:function(t){return W(P(this.pluck("parentNode")),t)},children:function(t){return W(this.map(function(){return U(this)}),t)},contents:function(){return this.map(function(){return this.contentDocument||u.call(this.childNodes)})},siblings:function(t){return W(this.map(function(t,e){return a.call(U(e.parentNode),function(t){return t!==e})}),t)},empty:function(){return this.each(function(){this.innerHTML=""})},pluck:function(t){return r.map(this,function(e){return e[t]})},show:function(){return this.each(function(){"none"==this.style.display&&(this.style.display=""),"none"==getComputedStyle(this,"").getPropertyValue("display")&&(this.style.display=B(this.nodeName))})},replaceWith:function(t){return this.before(t).remove()},wrap:function(t){var e=F(t);if(this[0]&&!e)var n=r(t).get(0),i=n.parentNode||this.length>1;return this.each(function(o){r(this).wrapAll(e?t.call(this,o):i?n.cloneNode(!0):n)})},wrapAll:function(t){if(this[0]){r(this[0]).before(t=r(t));for(var e;(e=t.children()).length;)t=e.first();r(t).append(this)}return this},wrapInner:function(t){var e=F(t);return this.each(function(n){var i=r(this),o=i.contents(),s=e?t.call(this,n):t;o.length?o.wrapAll(s):i.append(s)})},unwrap:function(){return this.parent().each(function(){r(this).replaceWith(r(this).children())}),this},clone:function(){return this.map(function(){return this.cloneNode(!0)})},hide:function(){return this.css("display","none")},toggle:function(t){return this.each(function(){var n=r(this);(t===e?"none"==n.css("display"):t)?n.show():n.hide()})},prev:function(t){return r(this.pluck("previousElementSibling")).filter(t||"*")},next:function(t){return r(this.pluck("nextElementSibling")).filter(t||"*")},html:function(t){return 0 in arguments?this.each(function(e){var n=this.innerHTML;r(this).empty().append(Y(this,t,e,n))}):0 in this?this[0].innerHTML:null},text:function(t){return 0 in arguments?this.each(function(e){var n=Y(this,t,e,this.textContent);this.textContent=null==n?"":""+n}):0 in this?this.pluck("textContent").join(""):null},attr:function(t,r){var i;return"string"!=typeof t||1 in arguments?this.each(function(e){if(1===this.nodeType)if(R(t))for(n in t)G(this,n,t[n]);else G(this,t,Y(this,r,e,this.getAttribute(t)))}):0 in this&&1==this[0].nodeType&&null!=(i=this[0].getAttribute(t))?i:e},removeAttr:function(t){return this.each(function(){1===this.nodeType&&t.split(" ").forEach(function(t){G(this,t)},this)})},prop:function(t,e){return t=D[t]||t,1 in arguments?this.each(function(n){this[t]=Y(this,e,n,this[t])}):this[0]&&this[0][t]},removeProp:function(t){return t=D[t]||t,this.each(function(){delete this[t]})},data:function(t,n){var r="data-"+t.replace(v,"-$1").toLowerCase(),i=1 in arguments?this.attr(r,n):this.attr(r);return null!==i?Q(i):e},val:function(t){return 0 in arguments?(null==t&&(t=""),this.each(function(e){this.value=Y(this,t,e,this.value)})):this[0]&&(this[0].multiple?r(this[0]).find("option").filter(function(){return this.selected}).pluck("value"):this[0].value)},offset:function(e){if(e)return this.each(function(t){var n=r(this),i=Y(this,e,t,n.offset()),o=n.offsetParent().offset(),s={top:i.top-o.top,left:i.left-o.left};"static"==n.css("position")&&(s.position="relative"),n.css(s)});if(!this.length)return null;if(f.documentElement!==this[0]&&!r.contains(f.documentElement,this[0]))return{top:0,left:0};var n=this[0].getBoundingClientRect();return{left:n.left+t.pageXOffset,top:n.top+t.pageYOffset,width:Math.round(n.width),height:Math.round(n.height)}},css:function(t,e){if(arguments.length<2){var i=this[0];if("string"==typeof t){if(!i)return;return i.style[O(t)]||getComputedStyle(i,"").getPropertyValue(t)}if(L(t)){if(!i)return;var o={},s=getComputedStyle(i,"");return r.each(t,function(t,e){o[e]=i.style[O(e)]||s.getPropertyValue(e)}),o}}var a="";if("string"==$(t))e||0===e?a=I(t)+":"+_(t,e):this.each(function(){this.style.removeProperty(I(t))});else for(n in t)t[n]||0===t[n]?a+=I(n)+":"+_(n,t[n])+";":this.each(function(){this.style.removeProperty(I(n))});return this.each(function(){this.style.cssText+=";"+a})},index:function(t){return t?this.indexOf(r(t)[0]):this.parent().children().indexOf(this[0])},hasClass:function(t){return t?o.some.call(this,function(t){return this.test(K(t))},V(t)):!1},addClass:function(t){return t?this.each(function(e){if("className"in this){i=[];var n=K(this),o=Y(this,t,e,n);o.split(/\s+/g).forEach(function(t){r(this).hasClass(t)||i.push(t)},this),i.length&&K(this,n+(n?" ":"")+i.join(" "))}}):this},removeClass:function(t){return this.each(function(n){if("className"in this){if(t===e)return K(this,"");i=K(this),Y(this,t,n,i).split(/\s+/g).forEach(function(t){i=i.replace(V(t)," ")}),K(this,i.trim())}})},toggleClass:function(t,n){return t?this.each(function(i){var o=r(this),s=Y(this,t,i,K(this));s.split(/\s+/g).forEach(function(t){(n===e?!o.hasClass(t):n)?o.addClass(t):o.removeClass(t)})}):this},scrollTop:function(t){if(this.length){var n="scrollTop"in this[0];return t===e?n?this[0].scrollTop:this[0].pageYOffset:this.each(n?function(){this.scrollTop=t}:function(){this.scrollTo(this.scrollX,t)})}},scrollLeft:function(t){if(this.length){var n="scrollLeft"in this[0];return t===e?n?this[0].scrollLeft:this[0].pageXOffset:this.each(n?function(){this.scrollLeft=t}:function(){this.scrollTo(t,this.scrollY)})}},position:function(){if(this.length){var t=this[0],e=this.offsetParent(),n=this.offset(),i=g.test(e[0].nodeName)?{top:0,left:0}:e.offset();return n.top-=parseFloat(r(t).css("margin-top"))||0,n.left-=parseFloat(r(t).css("margin-left"))||0,i.top+=parseFloat(r(e[0]).css("border-top-width"))||0,i.left+=parseFloat(r(e[0]).css("border-left-width"))||0,{top:n.top-i.top,left:n.left-i.left}}},offsetParent:function(){return this.map(function(){for(var t=this.offsetParent||f.body;t&&!g.test(t.nodeName)&&"static"==r(t).css("position");)t=t.offsetParent;return t})}},r.fn.detach=r.fn.remove,["width","height"].forEach(function(t){var n=t.replace(/./,function(t){return t[0].toUpperCase()});r.fn[t]=function(i){var o,s=this[0];return i===e?k(s)?s["inner"+n]:M(s)?s.documentElement["scroll"+n]:(o=this.offset())&&o[t]:this.each(function(e){s=r(this),s.css(t,Y(this,i,e,s[t]()))})}}),x.forEach(function(n,i){var o=i%2;r.fn[n]=function(){var n,a,s=r.map(arguments,function(t){var i=[];return n=$(t),"array"==n?(t.forEach(function(t){return t.nodeType!==e?i.push(t):r.zepto.isZ(t)?i=i.concat(t.get()):void(i=i.concat(N.fragment(t)))}),i):"object"==n||null==t?t:N.fragment(t)}),u=this.length>1;return s.length<1?this:this.each(function(e,n){a=o?n:n.parentNode,n=0==i?n.nextSibling:1==i?n.firstChild:2==i?n:null;var c=r.contains(f.documentElement,a);s.forEach(function(e){if(u)e=e.cloneNode(!0);else if(!a)return r(e).remove();a.insertBefore(e,n),c&&tt(e,function(e){if(!(null==e.nodeName||"SCRIPT"!==e.nodeName.toUpperCase()||e.type&&"text/javascript"!==e.type||e.src)){var n=e.ownerDocument?e.ownerDocument.defaultView:t;n.eval.call(n,e.innerHTML)}})})})},r.fn[o?n+"To":"insert"+(i?"Before":"After")]=function(t){return r(t)[n](this),this}}),N.Z.prototype=X.prototype=r.fn,N.uniq=P,N.deserializeValue=Q,r.zepto=N,r}();return t.Zepto=e,void 0===t.$&&(t.$=e),function(e){function h(t){return t._zid||(t._zid=n++)}function p(t,e,n,r){if(e=d(e),e.ns)var i=m(e.ns);return(a[h(t)]||[]).filter(function(t){return t&&(!e.e||t.e==e.e)&&(!e.ns||i.test(t.ns))&&(!n||h(t.fn)===h(n))&&(!r||t.sel==r)})}function d(t){var e=(""+t).split(".");return{e:e[0],ns:e.slice(1).sort().join(" ")}}function m(t){return new RegExp("(?:^| )"+t.replace(" "," .* ?")+"(?: |$)")}function g(t,e){return t.del&&!f&&t.e in c||!!e}function v(t){return l[t]||f&&c[t]||t}function y(t,n,i,o,s,u,f){var c=h(t),p=a[c]||(a[c]=[]);n.split(/\s/).forEach(function(n){if("ready"==n)return e(document).ready(i);var a=d(n);a.fn=i,a.sel=s,a.e in l&&(i=function(t){var n=t.relatedTarget;return!n||n!==this&&!e.contains(this,n)?a.fn.apply(this,arguments):void 0}),a.del=u;var c=u||i;a.proxy=function(e){if(e=T(e),!e.isImmediatePropagationStopped()){e.data=o;var n=c.apply(t,e._args==r?[e]:[e].concat(e._args));return n===!1&&(e.preventDefault(),e.stopPropagation()),n}},a.i=p.length,p.push(a),"addEventListener"in t&&t.addEventListener(v(a.e),a.proxy,g(a,f))})}function x(t,e,n,r,i){var o=h(t);(e||"").split(/\s/).forEach(function(e){p(t,e,n,r).forEach(function(e){delete a[o][e.i],"removeEventListener"in t&&t.removeEventListener(v(e.e),e.proxy,g(e,i))})})}function T(t,n){return(n||!t.isDefaultPrevented)&&(n||(n=t),e.each(w,function(e,r){var i=n[e];t[e]=function(){return this[r]=b,i&&i.apply(n,arguments)},t[r]=E}),t.timeStamp||(t.timeStamp=Date.now()),(n.defaultPrevented!==r?n.defaultPrevented:"returnValue"in n?n.returnValue===!1:n.getPreventDefault&&n.getPreventDefault())&&(t.isDefaultPrevented=b)),t}function S(t){var e,n={originalEvent:t};for(e in t)j.test(e)||t[e]===r||(n[e]=t[e]);return T(n,t)}var r,n=1,i=Array.prototype.slice,o=e.isFunction,s=function(t){return"string"==typeof t},a={},u={},f="onfocusin"in t,c={focus:"focusin",blur:"focusout"},l={mouseenter:"mouseover",mouseleave:"mouseout"};u.click=u.mousedown=u.mouseup=u.mousemove="MouseEvents",e.event={add:y,remove:x},e.proxy=function(t,n){var r=2 in arguments&&i.call(arguments,2);if(o(t)){var a=function(){return t.apply(n,r?r.concat(i.call(arguments)):arguments)};return a._zid=h(t),a}if(s(n))return r?(r.unshift(t[n],t),e.proxy.apply(null,r)):e.proxy(t[n],t);throw new TypeError("expected function")},e.fn.bind=function(t,e,n){return this.on(t,e,n)},e.fn.unbind=function(t,e){return this.off(t,e)},e.fn.one=function(t,e,n,r){return this.on(t,e,n,r,1)};var b=function(){return!0},E=function(){return!1},j=/^([A-Z]|returnValue$|layer[XY]$|webkitMovement[XY]$)/,w={preventDefault:"isDefaultPrevented",stopImmediatePropagation:"isImmediatePropagationStopped",stopPropagation:"isPropagationStopped"};e.fn.delegate=function(t,e,n){return this.on(e,t,n)},e.fn.undelegate=function(t,e,n){return this.off(e,t,n)},e.fn.live=function(t,n){return e(document.body).delegate(this.selector,t,n),this},e.fn.die=function(t,n){return e(document.body).undelegate(this.selector,t,n),this},e.fn.on=function(t,n,a,u,f){var c,l,h=this;return t&&!s(t)?(e.each(t,function(t,e){h.on(t,n,a,e,f)}),h):(s(n)||o(u)||u===!1||(u=a,a=n,n=r),(u===r||a===!1)&&(u=a,a=r),u===!1&&(u=E),h.each(function(r,o){f&&(c=function(t){return x(o,t.type,u),u.apply(this,arguments)}),n&&(l=function(t){var r,s=e(t.target).closest(n,o).get(0);return s&&s!==o?(r=e.extend(S(t),{currentTarget:s,liveFired:o}),(c||u).apply(s,[r].concat(i.call(arguments,1)))):void 0}),y(o,t,u,a,n,l||c)}))},e.fn.off=function(t,n,i){var a=this;return t&&!s(t)?(e.each(t,function(t,e){a.off(t,n,e)}),a):(s(n)||o(i)||i===!1||(i=n,n=r),i===!1&&(i=E),a.each(function(){x(this,t,i,n)}))},e.fn.trigger=function(t,n){return t=s(t)||e.isPlainObject(t)?e.Event(t):T(t),t._args=n,this.each(function(){t.type in c&&"function"==typeof this[t.type]?this[t.type]():"dispatchEvent"in this?this.dispatchEvent(t):e(this).triggerHandler(t,n)})},e.fn.triggerHandler=function(t,n){var r,i;return this.each(function(o,a){r=S(s(t)?e.Event(t):t),r._args=n,r.target=a,e.each(p(a,t.type||t),function(t,e){return i=e.proxy(r),r.isImmediatePropagationStopped()?!1:void 0})}),i},"focusin focusout focus blur load resize scroll unload click dblclick mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave change select keydown keypress keyup error".split(" ").forEach(function(t){e.fn[t]=function(e){return 0 in arguments?this.bind(t,e):this.trigger(t)}}),e.Event=function(t,e){s(t)||(e=t,t=e.type);var n=document.createEvent(u[t]||"Events"),r=!0;if(e)for(var i in e)"bubbles"==i?r=!!e[i]:n[i]=e[i];return n.initEvent(t,r,!0),T(n)}}(e),function(e){function p(t,n,r){var i=e.Event(n);return e(t).trigger(i,r),!i.isDefaultPrevented()}function d(t,e,n,i){return t.global?p(e||r,n,i):void 0}function m(t){t.global&&0===e.active++&&d(t,null,"ajaxStart")}function g(t){t.global&&!--e.active&&d(t,null,"ajaxStop")}function v(t,e){var n=e.context;return e.beforeSend.call(n,t,e)===!1||d(e,n,"ajaxBeforeSend",[t,e])===!1?!1:void d(e,n,"ajaxSend",[t,e])}function y(t,e,n,r){var i=n.context,o="success";n.success.call(i,t,o,e),r&&r.resolveWith(i,[t,o,e]),d(n,i,"ajaxSuccess",[e,n,t]),b(o,e,n)}function x(t,e,n,r,i){var o=r.context;r.error.call(o,n,e,t),i&&i.rejectWith(o,[n,e,t]),d(r,o,"ajaxError",[n,r,t||e]),b(e,n,r)}function b(t,e,n){var r=n.context;n.complete.call(r,e,t),d(n,r,"ajaxComplete",[e,n]),g(n)}function E(t,e,n){if(n.dataFilter==j)return t;var r=n.context;return n.dataFilter.call(r,t,e)}function j(){}function w(t){return t&&(t=t.split(";",2)[0]),t&&(t==c?"html":t==f?"json":a.test(t)?"script":u.test(t)&&"xml")||"text"}function T(t,e){return""==e?t:(t+"&"+e).replace(/[&?]{1,2}/,"?")}function S(t){t.processData&&t.data&&"string"!=e.type(t.data)&&(t.data=e.param(t.data,t.traditional)),!t.data||t.type&&"GET"!=t.type.toUpperCase()&&"jsonp"!=t.dataType||(t.url=T(t.url,t.data),t.data=void 0)}function C(t,n,r,i){return e.isFunction(n)&&(i=r,r=n,n=void 0),e.isFunction(r)||(i=r,r=void 0),{url:t,data:n,success:r,dataType:i}}function O(t,n,r,i){var o,s=e.isArray(n),a=e.isPlainObject(n);e.each(n,function(n,u){o=e.type(u),i&&(n=r?i:i+"["+(a||"object"==o||"array"==o?n:"")+"]"),!i&&s?t.add(u.name,u.value):"array"==o||!r&&"object"==o?O(t,u,r,n):t.add(n,u)})}var i,o,n=+new Date,r=t.document,s=/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,a=/^(?:text|application)\/javascript/i,u=/^(?:text|application)\/xml/i,f="application/json",c="text/html",l=/^\s*$/,h=r.createElement("a");h.href=t.location.href,e.active=0,e.ajaxJSONP=function(i,o){if(!("type"in i))return e.ajax(i);var c,p,s=i.jsonpCallback,a=(e.isFunction(s)?s():s)||"Zepto"+n++,u=r.createElement("script"),f=t[a],l=function(t){e(u).triggerHandler("error",t||"abort")},h={abort:l};return o&&o.promise(h),e(u).on("load error",function(n,r){clearTimeout(p),e(u).off().remove(),"error"!=n.type&&c?y(c[0],h,i,o):x(null,r||"error",h,i,o),t[a]=f,c&&e.isFunction(f)&&f(c[0]),f=c=void 0}),v(h,i)===!1?(l("abort"),h):(t[a]=function(){c=arguments},u.src=i.url.replace(/\?(.+)=\?/,"?$1="+a),r.head.appendChild(u),i.timeout>0&&(p=setTimeout(function(){l("timeout")},i.timeout)),h)},e.ajaxSettings={type:"GET",beforeSend:j,success:j,error:j,complete:j,context:null,global:!0,xhr:function(){return new t.XMLHttpRequest},accepts:{script:"text/javascript, application/javascript, application/x-javascript",json:f,xml:"application/xml, text/xml",html:c,text:"text/plain"},crossDomain:!1,timeout:0,processData:!0,cache:!0,dataFilter:j},e.ajax=function(n){var u,f,s=e.extend({},n||{}),a=e.Deferred&&e.Deferred();for(i in e.ajaxSettings)void 0===s[i]&&(s[i]=e.ajaxSettings[i]);m(s),s.crossDomain||(u=r.createElement("a"),u.href=s.url,u.href=u.href,s.crossDomain=h.protocol+"//"+h.host!=u.protocol+"//"+u.host),s.url||(s.url=t.location.toString()),(f=s.url.indexOf("#"))>-1&&(s.url=s.url.slice(0,f)),S(s);var c=s.dataType,p=/\?.+=\?/.test(s.url);if(p&&(c="jsonp"),s.cache!==!1&&(n&&n.cache===!0||"script"!=c&&"jsonp"!=c)||(s.url=T(s.url,"_="+Date.now())),"jsonp"==c)return p||(s.url=T(s.url,s.jsonp?s.jsonp+"=?":s.jsonp===!1?"":"callback=?")),e.ajaxJSONP(s,a);var P,d=s.accepts[c],g={},b=function(t,e){g[t.toLowerCase()]=[t,e]},C=/^([\w-]+:)\/\//.test(s.url)?RegExp.$1:t.location.protocol,N=s.xhr(),O=N.setRequestHeader;if(a&&a.promise(N),s.crossDomain||b("X-Requested-With","XMLHttpRequest"),b("Accept",d||"*/*"),(d=s.mimeType||d)&&(d.indexOf(",")>-1&&(d=d.split(",",2)[0]),N.overrideMimeType&&N.overrideMimeType(d)),(s.contentType||s.contentType!==!1&&s.data&&"GET"!=s.type.toUpperCase())&&b("Content-Type",s.contentType||"application/x-www-form-urlencoded"),s.headers)for(o in s.headers)b(o,s.headers[o]);if(N.setRequestHeader=b,N.onreadystatechange=function(){if(4==N.readyState){N.onreadystatechange=j,clearTimeout(P);var t,n=!1;if(N.status>=200&&N.status<300||304==N.status||0==N.status&&"file:"==C){if(c=c||w(s.mimeType||N.getResponseHeader("content-type")),"arraybuffer"==N.responseType||"blob"==N.responseType)t=N.response;else{t=N.responseText;try{t=E(t,c,s),"script"==c?(1,eval)(t):"xml"==c?t=N.responseXML:"json"==c&&(t=l.test(t)?null:e.parseJSON(t))}catch(r){n=r}if(n)return x(n,"parsererror",N,s,a)}y(t,N,s,a)}else x(N.statusText||null,N.status?"error":"abort",N,s,a)}},v(N,s)===!1)return N.abort(),x(null,"abort",N,s,a),N;var A="async"in s?s.async:!0;if(N.open(s.type,s.url,A,s.username,s.password),s.xhrFields)for(o in s.xhrFields)N[o]=s.xhrFields[o];for(o in g)O.apply(N,g[o]);return s.timeout>0&&(P=setTimeout(function(){N.onreadystatechange=j,N.abort(),x(null,"timeout",N,s,a)},s.timeout)),N.send(s.data?s.data:null),N},e.get=function(){return e.ajax(C.apply(null,arguments))},e.post=function(){var t=C.apply(null,arguments);return t.type="POST",e.ajax(t)},e.getJSON=function(){var t=C.apply(null,arguments);return t.dataType="json",e.ajax(t)},e.fn.load=function(t,n,r){if(!this.length)return this;var a,i=this,o=t.split(/\s/),u=C(t,n,r),f=u.success;return o.length>1&&(u.url=o[0],a=o[1]),u.success=function(t){i.html(a?e("<div>").html(t.replace(s,"")).find(a):t),f&&f.apply(i,arguments)},e.ajax(u),this};var N=encodeURIComponent;e.param=function(t,n){var r=[];return r.add=function(t,n){e.isFunction(n)&&(n=n()),null==n&&(n=""),this.push(N(t)+"="+N(n))},O(r,t,n),r.join("&").replace(/%20/g,"+")}}(e),function(t){t.fn.serializeArray=function(){var e,n,r=[],i=function(t){return t.forEach?t.forEach(i):void r.push({name:e,value:t})};return this[0]&&t.each(this[0].elements,function(r,o){n=o.type,e=o.name,e&&"fieldset"!=o.nodeName.toLowerCase()&&!o.disabled&&"submit"!=n&&"reset"!=n&&"button"!=n&&"file"!=n&&("radio"!=n&&"checkbox"!=n||o.checked)&&i(t(o).val())}),r},t.fn.serialize=function(){var t=[];return this.serializeArray().forEach(function(e){t.push(encodeURIComponent(e.name)+"="+encodeURIComponent(e.value))}),t.join("&")},t.fn.submit=function(e){if(0 in arguments)this.bind("submit",e);else if(this.length){var n=t.Event("submit");this.eq(0).trigger(n),n.isDefaultPrevented()||this.get(0).submit()}return this}}(e),function(){try{getComputedStyle(void 0)}catch(e){var n=getComputedStyle;t.getComputedStyle=function(t,e){try{return n(t,e)}catch(r){return null}}}}(),e});
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.rasti = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 module.exports = {
 	list    : require('./list'),
@@ -43,11 +41,14 @@ style : `
         text-transform: uppercase;
         cursor: pointer;
     }
+    [block=buttons] > div.active {
+        background-color: var(--primary);
+    }
 `
 
 }
 
-},{"../utils":16}],3:[function(require,module,exports){
+},{"../utils":15}],3:[function(require,module,exports){
 const { random, prepTemplate } = require('../utils')
 
 module.exports = {
@@ -73,7 +74,7 @@ init($el) {
     $el.on('change', function(e) {
         // update component ui
         let $input, checked
-        $el.find('input').each(function(i, input){
+        $el.find('input').each( input => {
             $input = $(input)
             checked = values.includes( $input.attr('value') )
             $input.prop('checked', checked)
@@ -82,7 +83,7 @@ init($el) {
 },
 
 }
-},{"../utils":16}],4:[function(require,module,exports){
+},{"../utils":15}],4:[function(require,module,exports){
 const { is, random } = require('../utils')
 
 module.exports = {
@@ -92,7 +93,7 @@ render(data, $el) {
         const separator = $el.attr('separator') || ','
         data = data.split(separator)
     }
-    if ( !is.array(data) ) throw 'invalid data, must be string or array'
+    if ( is.not.array(data) ) throw 'invalid data, must be string or array'
     const html = data
         .map( d => `<option value="${d.trim()}"></option>` )
         .join('')
@@ -108,7 +109,7 @@ init($el) {
 },
 
 }
-},{"../utils":16}],5:[function(require,module,exports){
+},{"../utils":15}],5:[function(require,module,exports){
 const { is } = require('../utils')
 
 module.exports = {
@@ -118,7 +119,7 @@ render(data, $el) {
         const separator = $el.attr('separator') || ','
         data = data.split(separator)
     }
-    if ( !is.array(data) ) throw 'invalid data, must be string or array'
+    if ( is.not.array(data) ) throw 'invalid data, must be string or array'
     const html = data
         .map( d => `<li>${d.trim()}</li>` )
         .join('')
@@ -126,8 +127,8 @@ render(data, $el) {
 },
 
 }
-},{"../utils":16}],6:[function(require,module,exports){
-const { is, onMobile, prepTemplate } = require('../utils')
+},{"../utils":15}],6:[function(require,module,exports){
+const { is, media, prepTemplate } = require('../utils')
 
 module.exports = {
 
@@ -138,7 +139,7 @@ render(data, $el) {
     if (!name) return rasti.error('Could not resolve name of element:', el)
 
     if ( is.string(data) ) data = data.split(', ')
-    if ( !is.array(data) ) throw 'invalid data, must be string or array'
+    if ( is.not.array(data) ) throw 'invalid data, must be string or array'
 
     $el[0].total = data.length // WARNING : SIDE EFFECTS
 
@@ -183,7 +184,7 @@ init($el) {
     $el.on('click', function(e) {
         e.stopPropagation()
         $options.siblings('[options]').hide() // hide other options
-        if ( onMobile() ) $options.parent().addClass('backdrop')
+        if ( media.phone ) $options.parent().addClass('backdrop')
         $options.css('left', this.getBoundingClientRect().right).show()
         $options.find('input').focus()
     })
@@ -191,7 +192,7 @@ init($el) {
     $el.closest('[page]').on('click', '*:not(option)', function(e) {
         if ( $(e.target).attr('name') === name
           || $(e.target).parent().attr('name') === name ) return
-        if ( onMobile() ) $options.parent().removeClass('backdrop')
+        if ( media.phone ) $options.parent().removeClass('backdrop')
         $options.hide()
     })
 
@@ -220,7 +221,7 @@ init($el) {
 
     $options.on('click', 'option', toggleOption)
 
-    if ( !onMobile() )
+    if ( !media.phone )
         $options.on('click', function(e) { $options.find('input').focus() })
 
     $options.on('input', 'input', function(e) {
@@ -231,7 +232,7 @@ init($el) {
 
     $el.on('change', function(e, params){
         if (params && params.ui) return // change triggered from ui, do nothing
-        $selected.children().each(function(i, el) {
+        $selected.children().each( el => {
             $options.append(el)
         })
         for (var val of el.value) {
@@ -251,7 +252,7 @@ init($el) {
                 rasti.warn('Dropped %s overflowed values in el:', dif, el)
             }
             $el.addClass('full')
-            if ( onMobile() ) $options.parent().removeClass('backdrop')
+            if ( media.phone ) $options.parent().removeClass('backdrop')
             $options.hide()
         }
         else {
@@ -340,7 +341,7 @@ style : `
 `
 
 }
-},{"../utils":16}],7:[function(require,module,exports){
+},{"../utils":15}],7:[function(require,module,exports){
 const { random, prepTemplate } = require('../utils')
 
 module.exports = {
@@ -363,12 +364,12 @@ init($el) {
     })
     $el.on('change', function(e) {
         // update component ui
-        $el.find('[value="'+ $el.val() +'"]').prop('checked', true)
+        $el.find('[value="'+ $el.val() +'"]').checked = true
     })
 },
 
 }
-},{"../utils":16}],8:[function(require,module,exports){
+},{"../utils":15}],8:[function(require,module,exports){
 const { prepTemplate } = require('../utils')
 
 module.exports = {
@@ -399,7 +400,7 @@ init($el) {
 
     if (!$el.attr('data')) {
         // clone original options
-        $el.find('option').each(function(i, opt) {
+        $el.find('option').each( opt => {
             $options.append(`<div value="${opt.value}">${opt.innerHTML}</div>`)
         })
     }
@@ -476,7 +477,7 @@ style : `
 
 }
 
-},{"../utils":16}],9:[function(require,module,exports){
+},{"../utils":15}],9:[function(require,module,exports){
 const { is } = require('../utils')
 
 module.exports = {
@@ -515,8 +516,8 @@ render(data, $el) {
 },
 
 }
-},{"../utils":16}],10:[function(require,module,exports){
-const { is, resolveAttr } = require('./utils')
+},{"../utils":15}],10:[function(require,module,exports){
+const { is, exists, resolveAttr } = require('./utils')
 
 class History {
 
@@ -561,11 +562,11 @@ class Pager {
 
     constructor(id, results, sizes) {
         this.id = id
-        if ( !is.string(id) ) return rasti.error('Pager id must be a string')
+        if ( is.not.string(id) ) return rasti.error('Pager id must be a string')
         this.logid = `Pager for template [${ this.id }]:`
-        if ( !is.array(results) ) return rasti.error('%s Results must be an array', this.logid)
+        if ( is.not.array(results) ) return rasti.error('%s Results must be an array', this.logid)
         this.results = results
-        if ( !is.array(sizes) || !is.number(sizes[0]) ) return rasti.error('%s Page sizes must be an array of numbers', this.logid)
+        if ( is.not.array(sizes) || is.not.number(sizes[0]) ) return rasti.error('%s Page sizes must be an array of numbers', this.logid)
         this.sizes = sizes
         this.setPageSize(this.sizes[0])
     }
@@ -592,14 +593,14 @@ class Pager {
 
     setPageSize(size) {
         size = parseInt(size)
-        if ( !is.number(size) ) return rasti.error('%s Must specify a number as the page size', this.logid)
+        if ( is.not.number(size) ) return rasti.error('%s Must specify a number as the page size', this.logid)
         this.page_size = size
         this.page = 0
         this.total = Math.ceil(this.results.length / this.page_size)
     }
 
     getPageResults(page) {
-        if ( !is.number(page) ) {
+        if ( is.not.number(page) ) {
             rasti.error('%s Must specify a page number to get results from', this.logid)
             return []
         }
@@ -635,7 +636,7 @@ function state(app, app_id) {
             try {
                 state = JSON.parse( localStorage.getItem('rasti.' + app_id) )
                 if ( !state ) rasti.log('No saved state found for app [%s]', app_id)
-                else if ( !is.object(state) ) invalid()
+                else if ( is.not.object(state) ) invalid()
                 else return state
             }
             catch(err) {
@@ -646,12 +647,21 @@ function state(app, app_id) {
             const state = app.state.get()
             if (state) {
                 rasti.log('Restoring state...')
-                app.props = state.props
+                match(app.props, state.props)
                 if (state.theme) app.setTheme(state.theme)
                 if (state.lang) app.setLang(state.lang)
                 rasti.log('State restored')
             }
             return state
+
+            function match(t1, t2) {
+                if ( is.nil(t2) || is.nil(t2) ) return
+                for (let name in t1) {
+                    is.object(t1[name])
+                        ? match(t1[name], t2[name])
+                        : t1[name] = t2[name]
+                }
+            }
         } },
         clear : { value : _ => {
             window.localStorage.removeItem('rasti.' + app_id)
@@ -678,7 +688,7 @@ function crud(app) {
             // FIXME: app ns is not available here
             const crudns = app.crud[metadata.crudns]
             const method = crudns && crudns[methodname]
-            if (method && !is.function(method)) {
+            if (method && is.not.function(method)) {
                 rasti.error('Illegal crud method "%s", must be a function!', name)
                 return false
             }
@@ -787,8 +797,8 @@ function crud(app) {
         },
 
         persistNewEl : $el => {
-            $el.find('.rasti-crud-input').removeClass('.rasti-crud-input')
-                .find('[contenteditable]').removeAttr('[contenteditable]')
+            $el.find('.rasti-crud-input').removeClass('rasti-crud-input')
+                .find('[contenteditable]')[0].removeAttribute('contenteditable')
             app.crud.genInputEl($el)
         },
     }
@@ -802,33 +812,33 @@ module.exports = {
     crud,
 }
 
-},{"./utils":16}],11:[function(require,module,exports){
+},{"./utils":15}],11:[function(require,module,exports){
 const { is } = require('./utils')
 
-// prototype extensions
-Object.defineProperties(Array.prototype, {
-    get : { value : function(i) {
-       return i < 0 ? this[this.length + i] : this[i]
-    }},
-    new : { value : function(el, i) {
-        i = i || this.length
-        var isNew = this.indexOf(el) < 0
-        if (isNew) this.splice(i, 0, el)
-        return isNew
-    }},
-    remove : { value : function(el) {
-        this.update(el)
-    }},
-    update : { value : function(el, newel) {
-        var i = this.indexOf(el)
-        var found = i > -1
-        if (found) this.splice(i, 1, newel)
-        return found
-    }},
-    capitalize : { value : function() {
-       return typeof this == 'string' && this.length && this[0].toUpperCase() + this.slice(1).toLowerCase()
-    }},
-})
+
+// built-in objects extensions
+
+Array.prototype.get = function(i) {
+    return i < 0 ? this[this.length + i] : this[i]
+}
+Array.prototype.new = function(el, i) {
+    i = i || this.length
+    var isNew = this.indexOf(el) < 0
+    if (isNew) this.splice(i, 0, el)
+    return isNew
+}
+Array.prototype.remove = function(el) {
+    this.update(el)
+}
+Array.prototype.update = function(el, newel) {
+    var i = this.indexOf(el)
+    var found = i > -1
+    if (found) this.splice(i, 1, newel)
+    return found
+}
+Array.prototype.capitalize = function() {
+    return typeof this == 'string' && this.length && this[0].toUpperCase() + this.slice(1).toLowerCase()
+}
 
 Object.filter = (obj, predicate) => {
     const traverse = (obj, predicate) => Object.fromEntries(
@@ -841,41 +851,83 @@ Object.filter = (obj, predicate) => {
     return traverse(obj, predicate)
 }
 
+
 // $ extensions
-$.fn.hasAttr = function(name) {
+
+$.prototype.hasAttr = function(name) {
     return this[0] && this[0].hasAttribute(name)
 }
 
-;['show', 'hide'].forEach(method => {
-    var origFn = $.fn[method]
-    $.fn[method] = function() {
+const helper = {
+    show() {
+        if (!this[0]) return
+        this[0].style.display = this[0]._display || helper.initd(this)
+    },
+    hide() {
+        if (!this[0]) return
+        this[0]._display = this[0].style.display || helper.initd(this)
+        this[0].style.display = 'none'
+    },
+    initd(ref) {
+        const computed = helper.getd(ref)
+        return ['','none'].includes(computed) ? 'block' : computed
+    },
+    getd(ref) {
+        return ref[0].computedStyleMap().get('display').value
+    }
+}
+for (let method of ['show', 'hide']) {
+    $.prototype[method] = function() {
         const isSpecial = this.hasAttr('menu') || this.hasAttr('modal') || this.hasAttr('sidemenu')
         if (isSpecial) {
-            document.body.style.setProperty("--elem-h", this[0].orig_h)
+            if (this[0].enabled === false) return this
+            document.body.style.setProperty("--elem-h", this[0]._height)
             const backdrop = this.closest('[rasti]').find('.rs-backdrop')
-            if (method == 'show') {
-                this.addClass('open')
-                backdrop.addClass('backdrop')
-                this[0].visible = true
-                origFn.call(this)
-            }
-            if (method == 'hide') {
-                this.removeClass('open')
-                this.addClass('close')
-                backdrop.removeClass('backdrop')
-                this[0].visible = false
-                setTimeout( () => {
-                    this.removeClass('close')
-                    origFn.call(this)
-                }, 500)
+            switch(method) {
+                case 'show':
+                    this.addClass('open')
+                    backdrop.addClass('backdrop')
+                    this[0].visible = true
+                    helper[method].call(this)
+                    break
+                case 'hide':
+                    this.removeClass('open')
+                    this.addClass('close')
+                    backdrop.removeClass('backdrop')
+                    this[0].visible = false
+                    setTimeout( () => {
+                        this.removeClass('close')
+                        helper[method].call(this)
+                    }, 500)
             }
         }
-        else origFn.call(this)
+        else helper[method].call(this)
         return this
     }
-})
+}
+$.prototype.toggle = function() {
+    if (!this[0]) return this
+    !this[0].visible || ['','none'].includes(this[0].style.display) ? this.show() : this.hide()
+}
 
-$.fn.move = function(options) {
+for (let event of 'focus blur click change input keydown submit load error'.split(' ')) {
+    $.prototype[event] = function(selector, handler) {
+        (selector || handler)
+            ? this.on(event, selector, handler)
+            : this.trigger(event)
+    }
+}
+
+$.prototype.prev = function() {
+    if (!this[0]) return this
+    return $(this[0].previousSibling)
+}
+$.prototype.next = function() {
+    if (!this[0]) return this
+    return $(this[0].nextSibling)
+}
+
+$.prototype.move = function(options) {
     var options = Object.assign({
             handle: this,
             container: this.parent()
@@ -929,13 +981,13 @@ $.fn.move = function(options) {
     }
 }
 
-},{"./utils":16}],12:[function(require,module,exports){
+},{"./utils":15}],12:[function(require,module,exports){
 module.exports = {
 
 stack : $el => {
     $el.addClass('fx-stack-container')
     const $children = $el.children()
-    $children.each( (i, el) => {
+    $children.each( (el, i) => {
         el.classList.add('fx-stack-el')
         setTimeout( _ => {
             el.classList.remove('fx-stack-el')
@@ -949,7 +1001,7 @@ stack : $el => {
 stamp : $el => {
     $el.addClass('fx-stamp-container')
     const $children = $el.children()
-    $children.each( (i, el) => {
+    $children.each( (el, i) => {
         el.classList.add('fx-stamp-el')
         setTimeout( _ => {
             el.classList.remove('fx-stamp-el')
@@ -973,9 +1025,9 @@ toast : $el => {
 module.exports = {
 
 app : {
+    gear : '⚙️',
     user : '👤',
     users : '👥',
-    gear : '⚙️',
     lock : '🔒',
     'open-lock' : '🔓',
     key : '🔑',
@@ -985,6 +1037,7 @@ app : {
     search : '🔍',
     add : '✚',
     remove : '🗕',
+    filter : '🕨',
     undo : '↶',
     redo : '↷',
     reload : '⟳',
@@ -1099,16 +1152,16 @@ electronics : {
 },
 
 tools : {
-    bricks : '🧱',
+    tools : '🛠️',
+    tools2 : '⚒️',
     wrench : '🔧',
     hammer : '🔨',
     pick : '⛏️',
     axe : '🪓',
-    tools : '🛠️',
-    tools2 : '⚒️',
     toolbox : '🧰',
     clamp : '🗜️',
     bolt : '🔩',
+    bricks : '🧱',
     anchor : '⚓',
     scales : '⚖️',
     'old-key' : '🗝️',
@@ -1142,11 +1195,6 @@ tools : {
 },
 
 vehicles : {
-    skateboard : '🛹',
-    scooter : '🛴',
-    bicycle : '🚲',
-    motorscooter : '🛵',
-    motorcycle : '🏍️',
     car : '🚗',
     'race-car' : '🏎️',
     rv : '🚙',
@@ -1155,6 +1203,11 @@ vehicles : {
     truck : '🚚',
     ambulance : '🚑',
     'fire-engine' : '🚒',
+    skateboard : '🛹',
+    scooter : '🛴',
+    bicycle : '🚲',
+    motorscooter : '🛵',
+    motorcycle : '🏍️',
     metro : '🚇',
     train : '🚄',
     locomotive : '🚂',
@@ -1190,6 +1243,9 @@ buildings : {
 },
 
 characters : {
+    jack : '⛄️',
+    jack2 : '☃️',
+    teddy : '🧸',
     teacherm : '👨‍🏫',
     teacherw : '👩‍🏫',
     scientistm : '👨‍🔬',
@@ -1220,9 +1276,6 @@ characters : {
     vampirew : '🧛‍♀️',
     zombiem : '🧟‍♂️',
     zombiew : '🧟‍♀️',
-    jack : '⛄️',
-    jack2 : '☃️',
-    teddy : '🧸',
 },
 
 faces : {
@@ -1239,9 +1292,9 @@ faces : {
 },
 
 animals : {
-    hippo : '🦛',
     elefant : '🐘',
     rhino : '🦏',
+    hippo : '🦛',
     monkey : '🐒',
     gorilla : '🦍',
     orangutan : '🦧',
@@ -1317,8 +1370,8 @@ animals : {
 },
 
 plants : {
-    leaf : '🍂',
     herb : '🌿',
+    leaf : '🍂',
     maple : '🍁',
     shamrock : '☘️',
     luck : '🍀',
@@ -1371,17 +1424,17 @@ nature : {
 },
 
 'food & drink' : {
+    burger : '🍔',
     sandwich : '🥪',
     kebab : '🥙',
     taco : '🌮',
     burrito : '🌯',
     salad : '🥗',
-    paella : '🥘',
-    burger : '🍔',
     pizza : '🍕',
     'hot-dog' : '🌭',
     fries : '🍟',
     spaghetti : '🍝',
+    paella : '🥘',
     falafel : '🧆',
     bread : '🍞',
     bread2 : '🥖',
@@ -1788,41 +1841,335 @@ animal faces
 }
 
 },{}],14:[function(require,module,exports){
-(function (global){
-require('./extensions')
-const { History, Pager, state, crud } = require('./components')
-const utils = require('./utils')
-const { is, sameType, exists, resolveAttr, html } = utils
-const { themes, themeMaps } = require('./themes')
+exports.themes = {
 
-const options = {
+    base : {
+        font : 'normal 14px Apple Color Emoji, Segoe UI Emoji, NotoColorEmoji, Segoe UI Symbol, Android Emoji, EmojiSymbols, EmojiOne Mozilla',
+        palette : {
+            primary    : 'darkcyan',
+            danger     : 'red',
+            success    : 'green',
+            darkest    : '#111',
+            darker     : '#222',
+            dark       : '#444',
+            mid        : '#999',
+            light      : '#bbb',
+            lighter    : '#ddd',
+            lightest   : '#eee',
+            darken     : 'rgba(0,0,0,0.05)',
+            darkener   : 'rgba(0,0,0,0.2)',
+            darkenest  : 'rgba(0,0,0,0.5)',
+            lighten    : 'rgba(255,255,255,0.05)',
+            lightener  : 'rgba(255,255,255,0.2)',
+            lightenest : 'rgba(255,255,255,0.5)',
+        },
+    },
+
+}
+
+
+exports.themeMaps = {
+
+    dark : {
+        page    : 'darkest lighten',  // bg, header bg
+        panel   : 'darker lighten',   // bg, header bg
+        section : 'dark lighten',     // bg, header bg
+        field   : 'transparent light',// bg, text
+        btn     : 'primary darker',   // bg, text
+        header  : 'light',            // text
+        label   : 'light',            // text
+        text    : 'light',            // text
+    },
+
+    light : {
+        page    : 'light darken',
+        panel   : 'mid lighten',
+        section : 'lighten darken',
+        field   : 'transparent dark',
+        btn     : 'primary dark',
+        header  : 'darker',
+        label   : 'darker',
+        text    : 'darker',
+    },
+    
+}
+},{}],15:[function(require,module,exports){
+function type(exp) {
+    const clazz = Object.prototype.toString.call(exp)
+    return clazz.substring(8, clazz.length-1).toLowerCase()
+}
+
+const primitives = 'string number boolean symbol'
+const all_types = 'object function array regexp ' + primitives
+
+const is = {}
+all_types.split(' ')
+    .forEach(t => {
+        is[t] = exp => type(exp) === t
+    })
+is.primitive = exp => primitives.includes( type(exp) )
+is.empty = exp =>
+    (is.array(exp) || is.string(exp)) ? exp.length === 0
+    : is.object(exp) ? Object.keys(exp).length === 0
+    : false
+is.not = Object.fromEntries( Object.entries(is).map(([k,f]) => [k, exp => !f(exp)]) )
+is.def = ref => ref !== undefined && ref !== null
+is.nil = ref => !is.def(ref)
+
+
+const sameType = (exp1, exp2) => type(exp1) === type(exp2)
+
+
+const compose = (...funcs) => funcs.reduce((prev, curr) => (...args) => curr(prev(...args)))
+
+
+const chain = ref => method => (...args) => { method(...args); return ref }
+
+
+const safe = err_handler => method => (...args) => {
+    try { method(...args) }
+    catch(err) { is.array(err) ? err_handler(...err) : err_handler(err) }
+}
+
+
+const prepTemplate = tmpl_func => data => data.map( compose( checkData, tmpl_func )).join('')
+
+
+function inject(sources) {
+    if (is.string(sources)) sources = sources.split(',')
+    if (is.not.array(sources)) return rasti.error('Invalid sources, must be an array or a string')
+    const $body = $(document.body)
+
+    function do_inject(sources) {
+        const src = sources.shift().trim()
+        const ext = src.split('.')[1]
+        let $el
+
+        switch (ext) {
+            case 'js':
+                $el = $('<script>').attr('src', src)
+                break
+            case 'css':
+                $el = $('<link rel=stylesheet>').attr('href', src)
+                break
+            default:
+                rasti.error('Invalid source "%s", must be a js script or a css stylesheet', src)
+                return
+        }
+  
+        $el[0].onload = () => {
+            rasti.log('> Loaded %s', src)
+            sources.length
+                ? do_inject(sources)
+                : rasti.log('All sources loaded')
+        }
+
+        $el[0].onerror = e => {
+            rasti.error('> Error loading %s', src, e)
+        }
+        
+        rasti.log('> Loading %s ...', src)
+        $body.append($el)
+    }
+
+    do_inject(sources)
+}
+
+
+function checkData(data) {
+    switch (typeof data) {
+        case 'string':
+            data = {value: data, label: data, alias: data.toLowerCase()}
+            break
+        case 'object':
+            if ( is.not.string(data.value) || is.not.string(data.label) ) {
+                rasti.error('Invalid data object (must have string properties "value" and "label"):', data)
+                //invalid_count++
+                data = {value: '', label: 'INVALID DATA', alias: ''}
+            }
+            else if ( is.not.string(data.alias) ) {
+                if (data.alias) {
+                    rasti.error('Invalid data property "alias" (must be a string):', data)
+                    //invalid_count++
+                }
+                data.alias = data.value.toLowerCase()
+            }
+            else data.alias = data.alias.toLowerCase() +' '+ data.value.toLowerCase()
+            break
+        default:
+            rasti.error('Invalid data (must be a string or an object):', data)
+            //invalid_count++
+            data = {value: '', label: 'INVALID DATA', alias: ''}
+    }
+    return data
+}
+
+
+function html(templateObject, ...substs) {
+    // Use raw template strings (don’t want backslashes to be interpreted)
+    const raw = templateObject.raw
+    let result = ''
+
+    substs.forEach((subst, i) => {
+        let lit = raw[i]
+        // Turn array into string
+        if ( is.array(subst) ) subst = subst.join('')
+        // If subst is preceded by an !, escape it
+        if ( lit.endsWith('!') ) {
+            subst = htmlEscape(subst)
+            lit = lit.slice(0, -1)
+        }
+        result += lit
+        result += subst
+    })
+    // Take care of last template string
+    result += raw[raw.length - 1]
+
+    return result
+}
+
+
+function htmlEscape(str) {
+    return str.replace(/&/g, '&amp;') // first!
+        .replace(/>/g, '&gt;')
+        .replace(/</g, '&lt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/`/g, '&#96;')
+}
+
+
+function resolveAttr($el, name) {
+    var value = $el.attr(name) || $el.attr('name') || $el.attr('template') || $el.attr('prop') || $el.attr('nav') || $el.attr('section') || $el.attr('panel') || $el.attr('page')
+    if (!value) rasti.warn('Could not resolve value of [%s] attribute in el:', name, $el[0])
+    return value
+}
+
+
+/**
+ * Makes a widget navigatable via keyboard
+ * @param {jquery object} $el widget container
+ */
+function keyNav($el) {
+
+    if ($el.is('[template]')) {
+        $el.on('keydown', e => {
+            const $trigger = $(e.target)
+
+            switch(e.keyCode) {
+                case 37:
+                case 38:
+                    $trigger.off('blur')
+                        .prev().focus()
+                    return false
+                case 39:
+                case 40:
+                    $trigger.off('blur')
+                        .next().focus()
+                    return false
+                case 13:
+                case 32:
+                    $trigger.off('blur').click()
+                    setTimeout(() => $el.find('.active').focus(), 0)
+                    return false
+            }
+        })
+        .on('rendered', e => {
+            let $child, isActive,
+                noActive = true
+
+            $el.children().each( child => {
+                $child = $(child)
+                isActive = $child.is('.active')
+                $child.attr('tabindex', isActive ? 0 : -1)
+                if (isActive) {
+                    noActive = false
+                    $child.on('focus', e => e.target.setAttribute('tabindex', -1))
+                }
+            })
+
+            if (noActive) {
+                $el.children().first()
+                    .attr('tabindex', 0)
+                    .on('focus', e => e.target.setAttribute('tabindex', -1))
+            }
+        })
+        .on('focus', 'div', e =>
+            $(e.target).one('blur', e => setTimeout(() => $el.find('.active').attr('tabindex', 0), 0))
+        )
+    } else {
+        $el.attr('tabindex', 0)
+            .on('keydown', e => !'Enter Space'.includes(e.key) || (e.target.click(), false))
+    }
+}
+
+
+const random = () => (Math.random() * 6 | 0) + 1
+
+
+const public = {
+    is,
+    type,
+    sameType,
+    inject,
+    random,
+    compose,
+    chain,
+    safe,
+    keyNav,
+}
+
+const private = {
+    prepTemplate,
+    checkData,
+    html,
+    resolveAttr,
+}
+
+module.exports = {
+    ...public,
+    ...private,
+    public,
+}
+
+},{}],16:[function(require,module,exports){
+(function (global){
+/* Umbrella JS 3.1.0 umbrellajs.com */
+
+var u=$=function(t,e){return this instanceof u?t instanceof u?t:("string"==typeof t&&(t=this.select(t,e)),t&&t.nodeName&&(t=[t]),void(this.nodes=this.slice(t))):new u(t,e)};u.prototype={get 0(){return this.nodes[0]},get length(){return this.nodes.length}},u.prototype.nodes=[],u.prototype.add=function(t){return this.nodes=this.nodes.concat(this.select(t)),this},u.prototype.addClass=function(){return this.eacharg(arguments,function(t,e){t.classList.add(e)})},u.prototype.adjacent=function(i,t,n){return"number"==typeof t&&(t=0===t?[]:new Array(t).join().split(",").map(Number.call,Number)),this.each(function(r,o){var e=document.createDocumentFragment();u(t||{}).map(function(t,e){var n="function"==typeof i?i.call(this,t,e,r,o):i;return"string"==typeof n?this.generate(n):u(n)}).each(function(t){this.isInPage(t)?e.appendChild(u(t).clone().first()):e.appendChild(t)}),n.call(this,r,e)})},u.prototype.after=function(t,e){return this.adjacent(t,e,function(t,e){t.parentNode.insertBefore(e,t.nextSibling)})},u.prototype.append=function(t,e){return this.adjacent(t,e,function(t,e){t.appendChild(e)})},u.prototype.args=function(t,e,n){return"function"==typeof t&&(t=t(e,n)),"string"!=typeof t&&(t=this.slice(t).map(this.str(e,n))),t.toString().split(/[\s,]+/).filter(function(t){return t.length})},u.prototype.array=function(o){o=o;var i=this;return this.nodes.reduce(function(t,e,n){var r;return o?((r=o.call(i,e,n))||(r=!1),"string"==typeof r&&(r=u(r)),r instanceof u&&(r=r.nodes)):r=e.innerHTML,t.concat(!1!==r?r:[])},[])},u.prototype.attr=function(t,e,r){return r=r?"data-":"",this.pairs(t,e,function(t,e){return t.getAttribute(r+e)},function(t,e,n){t.setAttribute(r+e,n)})},u.prototype.before=function(t,e){return this.adjacent(t,e,function(t,e){t.parentNode.insertBefore(e,t)})},u.prototype.children=function(t){return this.map(function(t){return this.slice(t.children)}).filter(t)},u.prototype.clone=function(){return this.map(function(t,e){var n=t.cloneNode(!0),r=this.getAll(n);return this.getAll(t).each(function(t,e){for(var n in this.mirror)this.mirror[n]&&this.mirror[n](t,r.nodes[e])}),n})},u.prototype.getAll=function(t){return u([t].concat(u("*",t).nodes))},u.prototype.mirror={},u.prototype.mirror.events=function(t,e){if(t._e)for(var n in t._e)t._e[n].forEach(function(t){u(e).on(n,t)})},u.prototype.mirror.select=function(t,e){u(t).is("select")&&(e.value=t.value)},u.prototype.mirror.textarea=function(t,e){u(t).is("textarea")&&(e.value=t.value)},u.prototype.closest=function(e){return this.map(function(t){do{if(u(t).is(e))return t}while((t=t.parentNode)&&t!==document)})},u.prototype.data=function(t,e){return this.attr(t,e,!0)},u.prototype.each=function(t){return this.nodes.forEach(t.bind(this)),this},u.prototype.eacharg=function(n,r){return this.each(function(e,t){this.args(n,e,t).forEach(function(t){r.call(this,e,t)},this)})},u.prototype.empty=function(){return this.each(function(t){for(;t.firstChild;)t.removeChild(t.firstChild)})},u.prototype.filter=function(e){var t=function(t){return t.matches=t.matches||t.msMatchesSelector||t.webkitMatchesSelector,t.matches(e||"*")};return"function"==typeof e&&(t=e),e instanceof u&&(t=function(t){return-1!==e.nodes.indexOf(t)}),u(this.nodes.filter(t))},u.prototype.find=function(e){return this.map(function(t){return u(e||"*",t)})},u.prototype.first=function(){return this.nodes[0]||!1},u.prototype.generate=function(t){return/^\s*<tr[> ]/.test(t)?u(document.createElement("table")).html(t).children().children().nodes:/^\s*<t(h|d)[> ]/.test(t)?u(document.createElement("table")).html(t).children().children().children().nodes:/^\s*<script>/.test(t)?u(document.createElement("script")).nodes:/^\s*</.test(t)?u(document.createElement("div")).html(t).children().nodes:document.createTextNode(t)},u.prototype.getset=function(e,n,t){return void 0===n?this.first()[e]||t:this.each(function(t){t[e]=n})},u.prototype.handle=function(){var t=this.slice(arguments).map(function(e){return"function"==typeof e?function(t){t.preventDefault(),e.apply(this,arguments)}:e},this);return this.on.apply(this,t)},u.prototype.hasClass=function(){return this.is("."+this.args(arguments).join("."))},u.prototype.html=function(e){return void 0===e?this.first().innerHTML||"":this.each(function(t){t.innerHTML=e})},u.prototype.is=function(t){return 0<this.filter(t).length},u.prototype.isInPage=function(t){return t!==document.body&&document.body.contains(t)},u.prototype.last=function(){return this.nodes[this.length-1]||!1},u.prototype.map=function(t){return t?u(this.array(t)).unique():this},u.prototype.not=function(e){return this.filter(function(t){return!u(t).is(e||!0)})},u.prototype.off=function(t){return this.eacharg(t,function(e,n){u(e._e?e._e[n]:[]).each(function(t){e.removeEventListener(n,t)})})},u.prototype.on=function(t,e,r){if("string"==typeof e){var o=e;e=function(e){var n=arguments;u(e.currentTarget).find(o).each(function(t){if(t===e.target||t.contains(e.target)){try{Object.defineProperty(e,"currentTarget",{get:function(){return t}})}catch(t){}r.apply(t,n)}})}}var n=function(t){return e.apply(this,[t].concat(t.detail||[]))};return this.eacharg(t,function(t,e){t.addEventListener(e,n),t._e=t._e||{},t._e[e]=t._e[e]||[],t._e[e].push(n)})},u.prototype.pairs=function(n,t,e,r){if(void 0!==t){var o=n;(n={})[o]=t}return"object"==typeof n?this.each(function(t){for(var e in n)r(t,e,n[e])}):this.length?e(this.first(),n):""},u.prototype.param=function(e){return Object.keys(e).map(function(t){return this.uri(t)+"="+this.uri(e[t])}.bind(this)).join("&")},u.prototype.parent=function(t){return this.map(function(t){return t.parentNode}).filter(t)},u.prototype.prepend=function(t,e){return this.adjacent(t,e,function(t,e){t.insertBefore(e,t.firstChild)})},u.prototype.remove=function(){return this.each(function(t){t.parentNode&&t.parentNode.removeChild(t)})},u.prototype.removeClass=function(){return this.eacharg(arguments,function(t,e){t.classList.remove(e)})},u.prototype.replace=function(t,e){var n=[];return this.adjacent(t,e,function(t,e){n=n.concat(this.slice(e.children)),t.parentNode.replaceChild(e,t)}),u(n)},u.prototype.scroll=function(){return this.first().scrollIntoView({behavior:"smooth"}),this},u.prototype.select=function(t,e){return t=t.replace(/^\s*/,"").replace(/\s*$/,""),/^</.test(t)?u().generate(t):this.slice((e||document).querySelectorAll(t))},u.prototype.serialize=function(){var r=this;return this.slice(this.first().elements).reduce(function(e,n){return!n.name||n.disabled||"file"===n.type?e:/(checkbox|radio)/.test(n.type)&&!n.checked?e:"select-multiple"===n.type?(u(n.options).each(function(t){t.selected&&(e+="&"+r.uri(n.name)+"="+r.uri(t.value))}),e):e+"&"+r.uri(n.name)+"="+r.uri(n.value)},"").slice(1)},u.prototype.siblings=function(t){return this.parent().children(t).not(this)},u.prototype.size=function(){return this.first().getBoundingClientRect()},u.prototype.slice=function(t){return t&&0!==t.length&&"string"!=typeof t&&"[object Function]"!==t.toString()?t.length?[].slice.call(t.nodes||t):[t]:[]},u.prototype.str=function(e,n){return function(t){return"function"==typeof t?t.call(this,e,n):t.toString()}},u.prototype.text=function(t){return this.getset("textContent",t,"")},u.prototype.toggleClass=function(t,e){return!!e===e?this[e?"addClass":"removeClass"](t):this.eacharg(t,function(t,e){t.classList.toggle(e)})},u.prototype.trigger=function(t){var o=this.slice(arguments).slice(1);return this.eacharg(t,function(t,e){var n,r={bubbles:!0,cancelable:!0,detail:o};try{n=new window.CustomEvent(e,r)}catch(t){(n=document.createEvent("CustomEvent")).initCustomEvent(e,!0,!0,o)}t.dispatchEvent(n)})},u.prototype.unique=function(){return u(this.nodes.reduce(function(t,e){return null!=e&&!1!==e&&-1===t.indexOf(e)?t.concat(e):t},[]))},u.prototype.uri=function(t){return encodeURIComponent(t).replace(/!/g,"%21").replace(/'/g,"%27").replace(/\(/g,"%28").replace(/\)/g,"%29").replace(/\*/g,"%2A").replace(/%20/g,"+")},u.prototype.val=function(t){return this.getset("value",t)},u.prototype.wrap=function(t){return this.map(function(e){return u(t).each(function(t){(function(t){for(;t.firstElementChild;)t=t.firstElementChild;return u(t)})(t).append(e.cloneNode(!0)),e.parentNode.replaceChild(t,e)})})},"object"==typeof module&&module.exports&&(module.exports=u,module.exports.u=u);
+require('./js/extensions')
+const { History, Pager, state, crud } = require('./js/components')
+const utils = require('./js/utils')
+const { is, sameType, resolveAttr, chain, safe, compose, html } = utils
+const { themes, themeMaps } = require('./js/themes')
+let media
+
+let default_options = {
     history : true,
     persist : true,
     root    : '',
     theme   : 'base',
     lang    : '',
     separator : ';',
-    stats   : '%n results in %t seconds',
-    noData  : 'No data available',
-    newEl   : 'New element',
     imgPath : 'img/',
     imgExt  : '.png',
     page_sizes : [5, 10, 20, 50],
+    media   : {
+        phone : 500,
+        tablet : 800,
+    },
 }
 
-const breakpoints = {
-    phone : 500,
-    tablet : 800,
+const default_texts = {
+    stats   : '%n results in %t seconds',
+    noData  : 'No data available',
+    newEl   : 'New element',
 }
-const media = {on:{}}
-for (let device in breakpoints) {
-    const query = window.matchMedia(`(max-width: ${ breakpoints[device] }px)`)
-    media[device] = query.matches
-    media.on[device] = handler => query.addListener(handler)
-}
+
+default_options = {...default_options, ...default_texts}
 
 const TEXT_ATTRS = 'label header text placeholder'.split(' ')
-const EVENT_ATTRS = 'click change hover input keydown submit load'.split(' ')
+const EVENT_ATTRS = 'hover focus blur click change input keydown submit load error'.split(' ')
 const ACTION_ATTRS = 'show hide toggle'.split(' ')
 const NOCHILD_TAGS = 'input select textarea img'.split(' ')
 
@@ -1841,7 +2188,7 @@ function rasti(name, container) {
 
     const self = this
     const errPrefix = 'Cannot create rasti app: '
-    if ( !is.string(name) ) return error(errPrefix + 'app must have a name!')
+    if ( is.not.string(name) ) return error(errPrefix + 'app must have a name!')
     name = name.replace(' ', '')
 
     if ( !container ) container = $('body')
@@ -1858,48 +2205,42 @@ function rasti(name, container) {
     const __pagers = new Map()
     const __crud = crud(this)
     const __state = {}
+    const __templates = {}
     let __history
     let __invalid_data_count = 0
 
 
     // public properties
 
-    this.options = Object.assign({}, options)
-    this.defaults = {
-        stats : this.options.stats,
-        noData : this.options.noData,
-    }
+    this.options = {...default_options}
     this.active = {
         page  : null,
         theme : '',
         lang  : '',
     }
     this.state = state(this, __name)
+    this.data = {}
     this.props = {}
     this.methods = {}
     this.pages = {}
-    this.templates = {}
-    this.data = {}
     this.langs = {}
     this.themes = themes
     this.themeMaps = themeMaps
     this.sidemenu = null
+    this.media = {}
 
 
     // public methods
 
-    this.config = config
-    this.init = init
-    this.navTo = navTo
-    this.render = render
-    this.setLang = setLang
-    this.setTheme = setTheme
-    this.updateBlock = updateBlock
-    this.toggleFullScreen = toggleFullScreen
+    const api = compose(safe(error), chain(this))
 
+    
+    const config = api(props => {
 
-    function config(props) {
-        if (!props || !is.object(props)) return error('Cannot configure app [%s]: no properties found', __name)
+        if ( is.nil(props) ) return warn('Called config() on app [%s] with no arguments', __name)
+
+        if ( is.not.object(props) ) throw ['Cannot config app [%s]: invalid config object', __name]
+
         for (let key in props) {
             const known = is.object(self[key])
             const valid = is.object(props[key])
@@ -1914,7 +2255,7 @@ function rasti(name, container) {
             if ('data methods'.includes(key)) {
                 for (let name in props[key]) {
                     const value = props[key][name]
-                    if (key == 'methods' && !is.function(value))
+                    if (key == 'methods' && is.not.function(value))
                         warn('Invalid method [%s], must be a function', name)
                     else
                         self[key][name] = is.function(value) ? value.bind(self) : value
@@ -1922,23 +2263,24 @@ function rasti(name, container) {
             }
             else Object.assign(self[key], props[key])
         }
-        return self
-    }
+
+    })
 
 
-    function init(options) {
+    const init = api(options => {
+
         const initStart = window.performance.now()
         log('Initializing app [%s]...', __name)
 
         container
             .addClass('big loading backdrop')
-            .removeAttr('hidden')
+            [0].removeAttribute('hidden')
 
         // cache options
         if (options) {
-            if ( !is.object(options) ) warn('Init options must be an object!')
+            if ( is.not.object(options) ) warn('Init options must be an object!')
             else Object.keys(self.options).forEach( key => {
-                if ( exists(options[key]) ) {
+                if ( is.def(options[key]) ) {
                     if ( !sameType(self.options[key], options[key])  ) warn('Init option [%s] is invalid', key)
                     else self.options[key] = options[key]
                 }
@@ -1946,10 +2288,7 @@ function rasti(name, container) {
         }
 
 
-        // apply defaults
-        Object.keys(self.defaults).forEach( key => {
-            //if (!self.options[key]) self.options[key] = self.defaults[key]
-        })
+        setMedia(self.options.media)
 
 
         // define lang (if applicable)
@@ -1966,27 +2305,27 @@ function rasti(name, container) {
         container.append('<div class=rs-backdrop>')
 
         // append page-options containers
-        container.find('[page]').each( (i, el) => {
+        container.find('[page]').each( el => {
             $(el).append('<div class="page-options">')
         })
 
 
         // fix labels
         NOCHILD_TAGS.forEach( tag => {
-            container.find(tag + '[label]').each( (i, el) => {
+            container.find(tag + '[label]').each( el => {
                 fixLabel($(el))
             })
         })
 
 
         // fix input icons
-        container.find('input[icon]').each( (i, el) => {
+        container.find('input[icon]').each( el => {
             fixIcon($(el))
         })
 
 
-        // init blocks
-        container.find('[data]:not([template])').each( (i, el) => {
+        // init blocks and data templates
+        container.find('[data]').each( el => {
             updateBlock($(el))
         })
 
@@ -1994,12 +2333,12 @@ function rasti(name, container) {
         initSideMenu()
 
 
-        initModals()
+        //initModals()
         
         
         // init tabs
         function initTabs(selector) {
-            container.find(selector).each( (i, el) => { createTabs(el) })
+            container.find(selector).each(createTabs)
         }
         initTabs('.tabs')
         if (media.tablet || media.phone) initTabs('.tabs-tablet')
@@ -2018,18 +2357,19 @@ function rasti(name, container) {
         container.on('click change', '[render]:not([submit])', e => {
             const el = e.currentTarget
             const template = el.getAttribute('render')
-            if (!template) return error('Missing template name in [render] attribute of element:', el)
-            render(template)
+            template
+                ? render(template)
+                : error('Missing template name in [render] attribute of element:', el)
         })
 
 
         // init element dependencies
-        container.find('[bind]').each( (i, el) => {
+        container.find('[bind]').each( el => {
             const $el = $(el)
             const deps = $el.attr('bind')
             if (deps) deps.split(' ').forEach( dep => {
                 $el.closest('[page]').find('[prop='+ dep +']')
-                    .change( e => { updateBlock($el) })
+                    .on('change', e => { updateBlock($el) })
             })
         })
 
@@ -2040,7 +2380,7 @@ function rasti(name, container) {
         // resolve empty attributes
         TEXT_ATTRS.forEach( attr => {
             let $el
-            container.find('['+attr+'=""]').each( (i, el) => {
+            container.find('['+attr+'=""]').each( el => {
                 $el = $(el)
                 $el.attr( attr, resolveAttr($el, attr) )
             })
@@ -2048,7 +2388,7 @@ function rasti(name, container) {
 
 
         // resolve bg images
-        container.find('[img]').each( (i, el) => {
+        container.find('[img]').each( el => {
             let path = resolveAttr($(el), 'img')
             if (path.indexOf('/')==-1) path = self.options.imgPath + path
             if (path.charAt(path.length-4)!='.') path += self.options.imgExt
@@ -2068,25 +2408,16 @@ function rasti(name, container) {
             }
         }
 
+        // init keyboard-navigatable elements
+        container.find('[key-nav]').each( el => {
+            utils.keyNav($(el))
+        })
+
         
         bindProps(container, self.props)
 
         
         initState()
-
-
-        // render data templates
-        container.find('[data][template]').each( (i, el) => {
-            render(el)
-        })
-
-
-        // init prop-bound templates
-        container.find('[prop][template]').each( (i, el) => {
-            const $el = $(el)
-            const prop = $el.attr('prop')
-            bindElement($el, {prop}, self.props)
-        })
 
 
         // init crud templates
@@ -2103,49 +2434,32 @@ function rasti(name, container) {
 
 
         // init movable elements
-        container.find('[movable]').each( (i, el) => {
+        container.find('[movable]').each( el => {
             $(el).move()
         })
 
 
         // cache height of foldable elements
-        container.find('[foldable]').add('[menu]').each( (i, el) => {
-            el.orig_h = el.clientHeight + 'px'
+        container.find('[foldable]').add('[menu]').each( el => {
+            el._height = el.clientHeight + 'px'
         })
 
 
         container
-            .on('click', '[foldable]', e => {
-                const el = e.target
-                if (!el.hasAttribute('foldable')) return
-                const isOpen = el.clientHeight > 30
-                document.body.style.setProperty("--elem-h", el.orig_h)
-                if (isOpen) {
-                    el.classList.remove('open')
-                    el.classList.add('folded')
-                }
-                else {
-                    el.classList.remove('folded')
-                    el.classList.add('open')
-                }
-            })
-            .on('click', '.backdrop', e => {
-                container.find('[menu].open').hide()
-                container.find('[modal].open').hide()
-                if (self.sidemenu && self.sidemenu.visible) self.sidemenu.hide()
-            })
+            .on('click', '[foldable]', toggleFoldable)
+            .on('click', '.backdrop', hideDialogs)
+            .on('keydown', hideDialogs)
             .removeClass('big loading backdrop')
 
         const initTime = Math.floor(window.performance.now() - initStart) / 1000
         log('App [%s] initialized in %ss', __name, initTime)
 
-        return self
-    }
+    })
 
 
-    function navTo(pagename, params = {}, skipPushState) {
+    const navTo = api((pagename, params = {}, skipPushState) => {
 
-        if (!pagename) return error('Cannot navigate, page undefined')
+        if (!pagename) throw ['Cannot navigate, page undefined']
 
         var $prevPage = self.active.page,
             prevPagename = $prevPage && $prevPage.attr('page'),
@@ -2156,7 +2470,7 @@ function rasti(name, container) {
         var page = self.pages[pagename],
             $page = container.find('[page='+ pagename +']')
 
-        if (!$page.length) return error('Cannot navigate to page [%s]: page container not found', pagename)
+        if (!$page.length) throw ['Cannot navigate to page [%s]: page container not found', pagename]
 
         container.find('[menu]').hide()
         container.find('.rs-backdrop').removeClass('backdrop')
@@ -2164,16 +2478,16 @@ function rasti(name, container) {
         if ($prevPage) $prevPage.removeClass('active')
 
         if (prevPage && prevPage.out) {
-            !is.function(prevPage.out)
+            is.not.function(prevPage.out)
                 ? warn('Page [%s] {out} property must be a function!', prevPagename)
                 : prevPage.out(params)
         }
 
         self.active.page = $page
 
-        if ( params && !is.object(params) ) warn('Page [%s] nav params must be an object!', pagename)
+        if ( params && is.not.object(params) ) warn('Page [%s] nav params must be an object!', pagename)
         if (page && page.in) {
-            !is.function(page.in)
+            is.not.function(page.in)
                 ? warn('Page [%s] {in} property must be a function!', pagename)
                 : page.in(params)
         }
@@ -2203,18 +2517,19 @@ function rasti(name, container) {
         
         window.history.pushState(pagename, null, hash)
 
-        return self
-    }
+    })
 
 
-    function render(el, data, time) {
+    const render = api((el, data, {time, scroll}={}) => {
+
         let $el, name
-        let errPrefix = 'Cannot render template'
+        let errPrefix = 'Cannot render template [$],'
+
         if ( is.string(el) ) {
             name = el
-            errPrefix += ' ['+ name +']: '
+            errPrefix = errPrefix.replace('$', name)
             $el = container.find('[template='+ name +']')
-            if (!$el.length) return error(errPrefix + 'no element bound to template. Please bind one via [template] attribute.')
+            if ( !$el.length ) throw errPrefix + 'no element bound to template. Please bind one via [template] attribute.'
         }
         else {
             $el = el.nodeName ? $(el) : el
@@ -2224,31 +2539,42 @@ function rasti(name, container) {
                 name = ($el.attr('data') || $el.attr('prop')) + '-' + Date.now()
                 $el.attr('template', name)
             }
+            errPrefix = errPrefix.replace('$', name)
         }
         
-        if ( !data && $el.hasAttr('data') ) {
+        if ( is.nil(data) && $el.hasAttr('data') ) {
             const datakey = resolveAttr($el, 'data')
             data = self.data[datakey]
-            if (!data) return error(errPrefix + 'undefined data source "%s" resolved for element:', datakey, el)
+            if ( is.nil(data) ) throw errPrefix + `declared data source "${datakey}" is undefined`
         }
-        if ( is.string(data) ) data = data.split( $el.attr('separator') || self.options.separator )
-        if ( !is.array(data) ) data = [data]
+        
+        if ( is.string(data) ) {
+            let separator = $el.attr('separator') || self.options.separator
+            if (!separator.trim()) separator = '\\s'
+            data = data.split( new RegExp(`[\n${separator}]+`) ).filter(is.not.empty)
+        }
+        if ( is.not.array(data) ) data = [data]
 
-        let template = self.templates[name]
+        let template = __templates[name]
         let html
         if ( !template || is.string(template) ) try {
             html = template || $el.html()
             html = html.trim()
             template = genTemplate(html)
             template.html = html
-            self.templates[name] = template
+            __templates[name] = template
         }
         catch(err) {
-            return error(errPrefix + 'parsing error: ' + err)
+            throw errPrefix + 'parsing error: ' + err
         }
-        if ( !is.function(template) ) return error(errPrefix + 'template must be a string or a function')
+        if ( is.not.function(template) ) throw errPrefix + 'template must be a string or a function'
 
-        if ( data && !data.length ) return $el.html(`<div class="nodata">${ self.options.noData }</div>`).addClass('rendered')
+        if ( is.empty(data) ) {
+            $el.html(`<div class="nodata">${ self.options.noData }</div>`)
+                .addClass('rendered')
+                .trigger('rendered')
+            return
+        }
 
         const isCrud = $el.hasAttr('crud')
         if (isCrud) {
@@ -2267,7 +2593,9 @@ function rasti(name, container) {
         const isPaged = $el.hasAttr('paged')
         isPaged
             ? initPager($el, template, data, getActiveLang())
-            : $el.html( template(data) )[0].scrollTo(0,0)
+            : $el.html( template(data) )
+        
+        if (isPaged || scroll) $el[0].scrollTo(0,0)
 
         if ( $el.hasAttr('stats') ) {
             const stats = '<div section class="stats">'
@@ -2287,19 +2615,19 @@ function rasti(name, container) {
             __crud.genInputEl($el)
         }
 
-        $el.addClass('rendered')
+        $el.addClass('rendered').trigger('rendered')
         if (!isPaged) applyFX($el)
 
-        return self
-    }
+    })
 
 
-    function setLang(langName) {
+    const setLang = api(langName => {
+
         var lang = self.langs[ langName ],
             errPrefix = 'Cannot set lang [%s]: '
 
-        if (!lang) return error(errPrefix + 'lang not found', langName)
-        if ( !is.object(lang) ) return error(errPrefix + 'lang must be an object!', langName)
+        if (!lang) throw [errPrefix + 'lang not found', langName]
+        if ( is.not.object(lang) ) throw [errPrefix + 'lang must be an object!', langName]
 
         log('Setting lang [%s]', langName)
         self.active.lang = langName
@@ -2310,7 +2638,7 @@ function rasti(name, container) {
             $elems = $elems.add('['+attr+']')
         })
 
-        $elems.each( (i, el) => {
+        $elems.each( el => {
             if (el.hasAttribute('fixed')) el = el.children[0]
             $el = $(el)
             keys = el.langkeys
@@ -2331,26 +2659,26 @@ function rasti(name, container) {
             }
         })
 
-        Object.keys(self.defaults).forEach( key => {
-            self.options[key] = lang['rasti_'+key] || self.defaults[key]
+        Object.keys(default_texts).forEach( key => {
+            self.options[key] = lang['rasti_'+key] || default_texts[key]
         })
 
-        return self
-    }
+    })
 
 
-    function setTheme(themeString) {
+    const setTheme = api(themeString => {
+
         if (!themeString) return warn('Call to setTheme() with no argument')
 
-        var themeName = themeString.split(' ')[0],
+        const themeName = themeString.split(' ')[0],
             theme = self.themes[themeName],
             baseTheme = self.themes.base,
             baseMap = self.themeMaps.dark
 
-        if (!theme) return error('Cannot set theme [%s]: theme not found', themeName)
+        if (!theme) throw ['Cannot set theme [%s]: theme not found', themeName]
 
-        var mapName = themeString.split(' ')[1] || ( is.object(theme.maps) && Object.keys(theme.maps)[0] ) || 'dark',
-            themeMap = ( is.object(theme.maps) && theme.maps[mapName] ) || self.themeMaps[mapName]
+        let mapName = themeString.split(' ')[1] || ( is.object(theme.maps) && Object.keys(theme.maps)[0] ) || 'dark',
+            themeMap = is.object(theme.maps) ? theme.maps[mapName] : self.themeMaps[mapName]
 
         if (!themeMap) {
             warn('Theme map [%s] not found, using default theme map [dark]', mapName)
@@ -2364,8 +2692,8 @@ function rasti(name, container) {
         // clone themeMap
         themeMap = {...themeMap}
 
-        var values = { font : theme.font || baseTheme.font, },
-            colorNames, colors, c1, c2, defaultColorName
+        const values = { font : theme.font || baseTheme.font, }
+        let colorNames, colors, c1, c2, defaultColorName
 
         // map palette colors to attributes
         for (let attr of Object.keys(baseMap)) {
@@ -2381,10 +2709,6 @@ function rasti(name, container) {
                     if (!colors[i]) {
                         warn('Color [%s] not found in theme nor base palette, using it as is', colorNames[i])
                         colors[i] = colorNames[i]
-                        /*
-                        warn('Mapping error in theme [%s] for attribute [%s]. Color [%s] not found. Falling back to default color [%s].', themeName, attr, colorNames[i], defaultColorName)
-                        colors[i] = baseTheme.palette[ defaultColorName ]
-                        */
                     }
                 }
             }
@@ -2393,39 +2717,49 @@ function rasti(name, container) {
             if (themeMap[attr]) delete themeMap[attr]
         }
 
-        var invalidKeys = Object.keys(themeMap)
+        const invalidKeys = Object.keys(themeMap)
         if (invalidKeys.length) warn('Ignored %s invalid theme map keys:', invalidKeys.length, invalidKeys)
+
+        // set base theme colors as css properties (use user-defined values if given)
+        for (let prop in baseTheme.palette) {
+            container[0].style.setProperty("--" + prop, theme.palette[prop] || baseTheme.palette[prop])
+        }
 
         // generate theme style and apply it
         container.find('.rs-theme').html( getThemeStyle(values) )
 
         // apply bg colors
-        var colorName, color
-        container.find('[bg]').each( (i, el) => {
+        let colorName, color
+        container.find('[bg]').each( el => {
             colorName = el.getAttribute('bg')
             color = theme.palette[colorName] || baseTheme.palette[colorName]
             if (!color) warn('Color [%s] not found in theme palette, using it as is', colorName, el)
             el.style['background-color'] = color || colorName
         })
 
-        return self
-    }
+    })
 
 
-    function updateBlock($el, data) {
+    const updateBlock = api(($el, data) => {
+
         const el = $el[0]
         let type = $el.attr('block') || el.nodeName.toLowerCase()
+
         if ('ol ul'.includes(type)) type = 'list'
-        if (!type) return error('Missing block type in [block] attribute of element:', el)
+        if (!type) throw ['Missing block type in [block] attribute of element:', el]
 
         const block = rasti.blocks[type]
-        if (!block) return error('Undefined block type "%s" declared in [block] attribute of element:', type, el)
+        if (!block) throw ['Undefined block type "%s" declared in [block] attribute of element:', type, el]
 
         if (!el.initialized) {
-            if (exists(block.init) && !is.function(block.init))
-                return error('Invalid "init" prop defined in block type "%s", must be a function', type)
-            if (is.function(block.init))
+            if (is.def(block.init) && is.not.function(block.init))
+                throw ['Invalid "init" prop defined in block type "%s", must be a function', type]
+            if (is.function(block.init)) try {
                 block.init($el)
+            }
+            catch(err) {
+                error('Cannot init block [%s],', type, err)
+            }
             el.initialized = true
         }
 
@@ -2434,7 +2768,7 @@ function rasti(name, container) {
             if (!datakey) return
 
             data = self.data[datakey]
-            if (!exists(data)) return warn('Detected non-existant data ref in data source "%s" declared in [data] attribute of element:', datakey, el)
+            if (is.nil(data)) return warn('Detected non-existant data ref in data source "%s" declared in [data] attribute of element:', datakey, el)
             if (is.empty(data)) return
         }
 
@@ -2449,7 +2783,7 @@ function rasti(name, container) {
             : render(data)
 
         function render(data) {
-            if (!exists(data)) warn('Detected non-existant data ref when trying to render element', el)
+            if (is.nil(data)) warn('Detected non-existant data ref when trying to render element', el)
             if (is.empty(data)) return
             else try {
                 block.render(data, $el)
@@ -2467,12 +2801,13 @@ function rasti(name, container) {
             */
         }
 
-        return self
-    }
+    })
 
 
     function toggleFullScreen(e) {
+
         var prefixes = 'moz webkit'.split(' ')
+
         prefixes.forEach( p => {
             if ( ! (p + 'FullscreenElement' in document) ) return
             if ( !document[ p + 'FullscreenElement' ]) {
@@ -2482,11 +2817,16 @@ function rasti(name, container) {
                 document[ p + 'CancelFullScreen' ]();
             }
         })
-        return self
+        
     }
 
+    // expose api
+    Object.assign(this, {config, init, navTo, render, setLang, setTheme, updateBlock})
 
-    // internal utils
+    return this
+
+
+    // internal helpers
 
     function genTemplate(tmp_string) {
         return tmp_data => evalTemplate(
@@ -2501,8 +2841,8 @@ function rasti(name, container) {
 
     function evalTemplate(tmp_string, tmp_data, data, props, methods, lang) {
         try {
-            return tmp_data
-                ? tmp_data.map(el => eval('html`'+tmp_string+'`'))
+            return is.array(tmp_data)
+                ? tmp_data.map(el => eval('html`'+tmp_string+'`')).join('')
                 : eval('html`'+tmp_string+'`')
         } catch (err) {
             error('Error evaluating template string\n%s:', tmp_string, err.message)
@@ -2519,8 +2859,8 @@ function rasti(name, container) {
         if (!fxkey) return
         const fx = rasti.fx[fxkey]
         if (!fx) return warn('Undefined fx "%s" declared in [fx] attribute of element', fxkey, el)
-        if ( !is.function(fx) ) return error('fx.%s must be a function!', fxkey)
-        if ( selector && !is.string(selector) ) return error('Cannot apply fx, invalid selector provided for el', el)
+        if ( is.not.function(fx) ) throw ['fx.%s must be a function!', fxkey]
+        if ( selector && is.not.string(selector) ) throw ['Cannot apply fx, invalid selector provided for el', el]
         const $target = selector ? $el.find(selector) : $el
         if (!$target.length) return warn('Cannot apply fx, cannot find target "%s" in el', target, el)
         fx($target)
@@ -2532,27 +2872,25 @@ function rasti(name, container) {
 
     
     function bindProps($container, state) {
-        $container.children().each( (i, el) => {
+        $container.children().each( el => {
             const $el = $(el)
             const prop = $el.attr('prop')
             let trans
 
-            if (prop && !$el.hasAttr('template')) {
+            if (prop) {
                 if ( $el.hasAttr('transient') ) trans = true
                 
-                if ( exists(el.value) ) {
+                if ( $el.hasAttr('template') || is.def(el.value) ) {
                     // it's an element, so bind it
                     bindElement($el, {prop, trans}, state)
                 }
                 else {
-                    // it's a container prop
-                    const defobjval = {}
-                    if (trans) defobjval.__trans = true
-                    // go down one level in the state tree
-                    state[prop] = state[prop] || defobjval
-                    const newroot = state[prop]
-                    // and keep looking
-                    bindProps($el, newroot)
+                    // it's a container prop, initialize value if applicable
+                    state[prop] = state[prop] || {}
+                    // set transient flag if applicable
+                    if (trans) state[prop].__trans = true
+                    // keep looking using the prop as root
+                    bindProps($el, state[prop])
                 }
             }
             // else keep looking
@@ -2574,39 +2912,46 @@ function rasti(name, container) {
 
         // update state on dom change
         // (unless triggered from state _setter)
-        $el.on('change', (e, params) => {
+        $el.is('[template]') || $el.on('change', (e, params) => {
             if ( !(params && params._setter) )
-                state[prop] = $el.is('[type=checkbox]') ? $el[0].checked : $el.val()
+                state[prop] = $el.is('textarea') ? $el.text()
+                    : $el.is('input[type=checkbox]') ? $el[0].checked
+                    : $el.is('input[type=range]') ? parseInt($el.val())
+                    : $el.val()
         })
 
-        // update dom on state change
-        Object.defineProperty(state, prop, {
-            get : function() { return __state[prop] },
-            set : function(value) {
-                if (trans) {
-                    const val = is.string(value) ? new String(value) : value
-                    val.__trans = true
-                    __state[prop] = val
+        if ( is.nil(__state[prop]) ) {
+            // initialize internal register for prop
+            __state[prop] = {val: null, reg: [$el]}
+            // update dom on state change
+            Object.defineProperty(state, prop, {
+                get : function() { return __state[prop].val },
+                set : function(value) {
+                    if (trans) {
+                        // cast primitive values to objects to allow flagging
+                        const val = is.primitive(value) || is.nil(value) ? new Object(value) : value
+                        val.__trans = true
+                        __state[prop].val = val
+                    }
+                    else __state[prop].val = value
+                    // update all registered elements
+                    __state[prop].reg.forEach($el => updateElement($el, value, true))
                 }
-                else __state[prop] = value
-                updateElement($el, value, true)
-            }
-        })
+            })
+        } else {
+            // register el to prop 
+            __state[prop].reg.push($el)
+        }
 
     }
 
     function updateElement($el, value, _setter) {
-        if ( $el.is('[template]') )
-            render($el, value)
-        else {
-            $el.is('textarea')
-                ? $el.text( value )
-            : $el.is('[type=checkbox]')
-                ? $el[0].checked = !!value
-            : $el.val( value )
+        $el.is('[template]') ? render($el, $el.is('[data]') ? null : value)
+        : $el.is('textarea') ? $el.text( value )
+        : $el.is('[type=checkbox]') ? $el[0].checked = !!value
+        : $el.val( value )
 
-            $el.trigger('change', {_setter})
-        }
+        $el.trigger('change', {_setter})
     }
 
 
@@ -2614,14 +2959,14 @@ function rasti(name, container) {
         let page, $page
         for (let name in self.pages) {
             page = self.pages[name]
-            if ( !is.object(page) ) return error('pages.%s must be an object!', name)
+            if ( is.not.object(page) ) throw ['pages.%s must be an object!', name]
             $page = container.find('[page='+ name +']')
-            if ( !$page.length ) return error('No container found for page "%s". Please bind one via [page] attribute', name)
+            if ( !$page.length ) throw ['No container found for page "%s". Please bind one via [page] attribute', name]
             if (page.init) {
-                if ( !is.function(page.init) ) return error('pages.%s.init must be a function!', name)
+                if ( is.not.function(page.init) ) throw ['pages.%s.init must be a function!', name]
                 else {
                     log('Initializing page [%s]', name)
-                    self.active.page = $page // to allow app.get() etc in page.init
+                    self.active.page = $page
                     page.init()
                 }
             }
@@ -2645,7 +2990,7 @@ function rasti(name, container) {
             setLang(self.options.lang)
         // if no lang, generate texts
         if (!self.options.lang) {
-            container.find('[text]').each((i, el) => {
+            container.find('[text]').each( el => {
                 $(el).text($(el).attr('text'))
             })
         }
@@ -2668,7 +3013,7 @@ function rasti(name, container) {
             const page = $el.attr('nav')
             let params = {}
             if (!page)
-                return error('Missing page name in [nav] attribute of element:', el)
+                throw ['Missing page name in [nav] attribute of element:', el]
             if ($el.hasAttr('params')) {
                 const $page = self.active.page
                 let navparams = $el.attr('params')
@@ -2699,7 +3044,7 @@ function rasti(name, container) {
                 }
                 else {
                     // get values of all navparams in page
-                    $page.find('[navparam]').each((i, el) => {
+                    $page.find('[navparam]').each( el => {
                         const $el = $(el)
                         const key = resolveAttr($el, 'navparam')
                         if (key)
@@ -2719,20 +3064,23 @@ function rasti(name, container) {
             const callback = $el.attr('then')
             const template = $el.attr('render')
             const isValidCB = callback && is.function(self.methods[callback])
-            const start = window.performance.now()
+            
             if (!method)
-                return error('Missing method in [submit] attribute of el:', this)
+                throw ['Missing method in [submit] attribute of el:', this]
+            
             if (callback && !isValidCB)
                 error('Undefined method [%s] declared in [then] attribute of el:', callback, this)
+            
             $el.addClass('loading').attr('disabled', true)
+            const start = window.performance.now()
             submitAjax(method, resdata => {
                 const time = Math.floor(window.performance.now() - start) / 1000
                 log('Ajax method [%s] took %s seconds', method, time)
                 if (isValidCB)
                     self.methods[callback](resdata)
                 if (template)
-                    render(template, resdata, time)
-                $el.removeClass('loading').removeAttr('disabled')
+                    render(template, resdata, {time})
+                $el.removeClass('loading')[0].removeAttribute('disabled')
             })
         })
     }
@@ -2740,17 +3088,23 @@ function rasti(name, container) {
 
     function initEvents() {
         for (let action of EVENT_ATTRS) {
-            container.find('[on-'+ action +']').each( (i, el) => {
+            container.find('[on-'+ action +']').each( el => {
                 const $el = $(el)
                 const methodName = $el.attr('on-' + action)
-                if ( !methodName ) return error('Missing method in [on-%s] attribute of element:', action, el)
+                if ( !methodName ) throw ['Missing method in [on-%s] attribute of element:', action, el]
                 const method = self.methods[methodName]
-                if ( !method ) return error('Undefined method "%s" declared in [on-%s] attribute of element:', methodName, action, el)
+                if ( !method ) throw ['Undefined method "%s" declared in [on-%s] attribute of element:', methodName, action, el]
                 const $template = $el.closest('[template]')
-                $template.length && !$el.hasAttr('template')
-                    ? $template.on(action, `[on-${action}=${methodName}]`, method)
-                    : $el.on(action, method)
-                if (action == 'click') $el.addClass('clickable')
+                if ($template.length && !$el.hasAttr('template')) {
+                    if (!$template[0].events) $template[0].events = []
+                    const selector = `[on-${action}=${methodName}]`
+                    const shouldRegister = !$template[0].events.includes(selector)
+                    if (shouldRegister) {
+                        $template.on(action, selector, method)
+                            [0].events.push(selector)
+                    }
+                }
+                else $el.on(action, method)
             })
         }
     }
@@ -2758,22 +3112,22 @@ function rasti(name, container) {
 
     function initActions() {
         for (let action of ACTION_ATTRS) {
-            container.find('['+ action +']').each( (i, el) => {
+            container.find('['+ action +']').each( el => {
                 const $el = $(el)
                 const $page = $el.closest('[page]')
                 const targetSelector = $el.attr(action)
 
-                if ( !targetSelector ) return error('Missing target selector in [%s] attribute of element:', action, el)
+                if ( !targetSelector ) throw ['Missing target selector in [%s] attribute of element:', action, el]
                 let $target = $page.find('['+targetSelector+']')
                 if ( !$target.length ) $target = container.find('['+targetSelector+']')
-                if ( !$target.length ) return error('Could not find target [%s] declared in [%s] attribute of element:', targetSelector, action, el)
+                if ( !$target.length ) throw ['Could not find target [%s] declared in [%s] attribute of element:', targetSelector, action, el]
 
                 const target = $target[0]
 
                 $el.on('click', e => {
                     e.stopPropagation()
                     $target.addClass('target')
-                    container.find('[menu]:not(.target)').hide()
+                    //container.find('[menu]:not(.target)').hide()
                     $target.removeClass('target')
                     is.function(target[action]) ? target[action]() : $target[action]()
                     const isVisible = target.style.display != 'none'
@@ -2785,10 +3139,10 @@ function rasti(name, container) {
 
 
     function initFieldValidations() {
-        container.find('button[validate]').each( (i, btn) => {
+        container.find('button[validate]').each( btn => {
             const $fields = $(btn).parent().find('input[required]')
             btn.disabled = isAnyFieldInvalid($fields)
-            $fields.each( (i, field) => {
+            $fields.each( field => {
                 $(field).on('keydown', e => {
                     btn.disabled = isAnyFieldInvalid($fields)
                     if (e.key == 'Enter' && !btn.disabled) btn.click()
@@ -2798,9 +3152,8 @@ function rasti(name, container) {
 
         function isAnyFieldInvalid($fields) {
             let valid = true
-            $fields.each( (i, field) => {
+            $fields.each( field => {
                 valid = valid && field.validity.valid
-                return valid
             })
             return !valid
         }
@@ -2808,7 +3161,7 @@ function rasti(name, container) {
    
 
     function initModals() {
-        container.find('[modal]').each((i, el) => {
+        container.find('[modal]').each( el => {
             // add close btn
             $('<div icon=close class="top right clickable" />')
                 .on('click', e => {
@@ -2820,104 +3173,92 @@ function rasti(name, container) {
 
 
     function initSideMenu() {
-        self.sidemenu = (function (el) {
-            
-            if (!el) return
-
-            el.enabled = false
-            el.visible = false
-
-            el.show = () => {
-                if (!el.enabled) return
-                $(el).show()
-                el.visible = true
-            }
-            el.hide = () => {
-                if (!el.enabled) return
-                $(el).hide()
-                el.visible = false
-            }
-            el.toggle = () => {
-                if (!el.enabled) return
-                el.visible ? el.hide() : el.show()
-            }
-
-            el.enable = () => {
-                el.classList.add('enabled')
-                el.enabled = true
-            }
-            el.disable = () => {
-                el.classList.remove('enabled')
-                el.enabled = false
-            }
-            el.switch = () => {
-                el.enabled ? el.disable() : el.enable()
-            }
-
-            return el
-
-        })( container.find('[sidemenu]')[0] )
+        self.sidemenu = (el => el &&
+            Object.assign(el, {
+                enabled : false,
+                visible : false,
+                show() {
+                    $(el).show()
+                },
+                hide() {
+                    $(el).hide()
+                },
+                toggle() {
+                    $(el).toggle()
+                },
+                enable() {
+                    el.classList.add('enabled')
+                    el.enabled = true
+                },
+                disable() {
+                    el.classList.remove('enabled')
+                    el.enabled = false
+                },
+                switch() {
+                    el.enabled ? el.disable() : el.enable()
+                },
+            })
+        )( container.find('[sidemenu]')[0] )
 
         if (self.sidemenu) {
-            if (media.phone) self.sidemenu.enable()
-            media.on.phone(() => { self.sidemenu.switch() })
+            media.phone && self.sidemenu.enable()
+            media.on.phone(self.sidemenu.switch)
         }
     }
 
 
     function createTabs(el) {
-        var $el = $(el),
-            $tabs = $el.hasAttr('page')
-                ? $el.children('[panel]:not([modal])')
-                : $el.hasAttr('panel')
-                    ? $el.children('[section]:not([modal])')
-                    : undefined
-        if (!$tabs) return error('Cannot create tabs: container must be a [page] or a [panel]', el)
+        const $el = $(el),
+            $tabs = $el.children(),
+            $labels = $('<div class="tab-labels">'),
+            $bar = $('<div class="bar">')
+        
+        let $tab, label, position
 
-        var $labels = $('<div class="tab-labels">'),
-            $bar = $('<div class="bar">'),
-            $tab, label, position
-
-        $tabs.each( (i, tab) => {
+        $tabs.each( (tab, i) => {
             $tab = $(tab)
             $tab.attr('tab', i)
             label = resolveAttr($tab, 'tab-label') || 'TAB ' + (i+1)
 
-            $labels.append($(`<div tab-label=${i} text="${ label }">`))
+            $labels.append(`<div tab-label=${i} text="${ label }">`)
         })
 
-        $labels.append($bar).prependTo($el)
-        var $flow = $tabs.wrapAll('<div h-flow>').parent()
+        $el.addClass('tab-group')
+            .before( $labels.append($bar) )
 
         $labels.on('click', e => {
-            var $label = $(e.target),
+            const $label = $(e.target),
                 tabnr = $label.attr('tab-label'),
                 $tab = $tabs.filter(`[tab="${ tabnr }"]`)
 
             $tabs.removeClass('active')
-            $tab.addClass('active')[0].scrollIntoView()
+            $tab.addClass('active')
+            $tab[0].scrollIntoView()
 
             $labels.children().removeClass('active')
             $label.addClass('active')
-
         })
 
-        $flow.on('scroll', e => {
+        $el.on('scroll', e => {
             position = e.target.scrollLeft / e.target.scrollWidth
-            $bar.css({ left : position * e.target.offsetWidth })
+            $bar[0].style.left = position * e.target.offsetWidth +'px'
         })
 
         container.on('rasti-nav', e => {
             if (!isInActivePage($el)) return
-            $bar.css({ width : $flow[0].offsetWidth / $tabs.length })
             if (!$labels.children('.active').length) $labels.children().first().click()
+            updateBarWidth()
         })
 
-        $(window).on('resize', e => {
+        window.addEventListener('resize', ev => {
             if (!isInActivePage($el)) return
             $labels.find('.active').click()
-            $bar.css({ width : $flow[0].offsetWidth / $tabs.length })
+            updateBarWidth()
         })
+
+        function updateBarWidth() {
+            $bar[0].style.width = $labels.find('.active')[0].offsetWidth +'px'
+        }
 
         function isInActivePage($el) {
             return self.active.page.find($el).length
@@ -2928,12 +3269,14 @@ function rasti(name, container) {
 
 
     function initCrud() {
-        container.find('[crud][template]').each((i, el) => {
+        container.find('[crud][template]').each( el => {
             const $el = $(el)
             const template = resolveAttr($el, 'template')
             const datakey = resolveAttr($el, 'data')
             const crudkey = resolveAttr($el, 'crud')
+
             render(el)
+
             $el.on('click', '.rasti-crud-delete', e => {
                 const $controls = $(e.currentTarget).closest('[data-id]')
                 const id = $controls.attr('data-id')
@@ -2951,14 +3294,14 @@ function rasti(name, container) {
                     rasti.error(err)
                 }
             })
-            $el.on('click', '.rasti-crud-update', e => {
+            .on('click', '.rasti-crud-update', e => {
                 // TODO: add update logic
             })
-            $el.on('click', '.rasti-crud-create', e => {
+            .on('click', '.rasti-crud-create', e => {
                 __crud.showInputEl($el)
                 $el.addClass('active')
             })
-            $el.on('click', '.rasti-crud-accept', e => {
+            .on('click', '.rasti-crud-accept', e => {
                 // TODO: finish this
                 let newel
                 try {
@@ -2976,7 +3319,7 @@ function rasti(name, container) {
                     rasti.error(err)
                 }
             })
-            $el.on('click', '.rasti-crud-cancel', e => {
+            .on('click', '.rasti-crud-cancel', e => {
                 __crud.hideInputEl($el)
                 $el.removeClass('active')
             })
@@ -2985,29 +3328,30 @@ function rasti(name, container) {
 
 
     function initPager($el, template, data, lang) {
-        const name = $el.attr('template'),
-            pager = newPager(name, data, self.options.page_sizes)
-        let paging, sizes, columns, size=0, col=1
-
-        if (pager.total > 1) {
-            paging = `<div class="paging fcenter small_ inline_">
-                <button icon=left3 />
-                <span class=page />
-                <button icon=right3 />
-            </div>`
-
-            sizes = `<button icon=rows>${ self.options.page_sizes[0] }</button>`
+        const psizes = self.options.page_sizes
+        if ( Math.ceil(data.length / psizes[0]) < 2 ) {
+            // just one page, render as usual
+            $el.html( template(data).join('') )
+            return
         }
+
+        const name = $el.attr('template')
+        const pager = newPager(name, data, psizes)
+        let columns, size=0, col=1
 
         if ( $el.hasAttr('columns') )
             columns = `<button icon=columns>1</button>`
 
         $el.html(`
             <div class="results scrolly rigid"></div>
-            <div class="controls fcenter small_ inline_">
+            <div class="controls flex center small_ inline_">
                 ${ columns || '' }
-                ${ paging || '' }
-                ${ sizes || '' }
+                <div class="paging flex center small_ inline_">
+                    <button icon=left3></button>
+                    <span class=page></span>
+                    <button icon=right3></button>
+                </div>
+                <button icon=rows>${ psizes[0] }</button>
             </div>
         `)
 
@@ -3071,13 +3415,13 @@ function rasti(name, container) {
 
     function submitAjax(method, callback) {
         var ajax = self.methods[ method ]
-        if ( !is.function(ajax) ) return error('Ajax method ['+ method +'] is not defined')
+        if ( is.not.function(ajax) ) throw ['Ajax method ['+ method +'] is not defined']
 
         var $form = container.find('[ajax='+ method +']')
-        if (!$form.length) return error('No container element bound to ajax method [%s]. Please bind one via [ajax] attribute', method)
+        if (!$form.length) throw ['No container element bound to ajax method [%s]. Please bind one via [ajax] attribute', method]
 
         var reqdata = {}, prop
-        $form.find('[prop]:not([private])').each( (i, el) => {
+        $form.find('[prop]:not([private])').each( el => {
             $el = $(el)
             prop = $el.attr('prop')
             if (prop) {
@@ -3107,8 +3451,7 @@ function rasti(name, container) {
             ${ns} [panel][header]:before   { background-color: ${ values.panel[1] }; }
             ${ns} [section][header]:before { background-color: ${ values.section[1] }; }
 
-            ${ns} .tab-labels        { background-color: ${ values.panel[0] }; }
-            ${ns} .tab-labels > .bar { background-color: ${ values.btn[0] }; }
+            ${ns} .tab-labels { background-color: ${ values.panel[0] }; }
 
             ${ns} input:not([type]),
             ${ns} input[type=text],
@@ -3125,17 +3468,11 @@ function rasti(name, container) {
             ${ns} input[type=checkbox] {
                 border: 1px solid ${ values.field[1] };
             }
-            ${ns} input[type=radio]:checked,
-            ${ns} input[type=checkbox]:checked {
-                background-color: ${ values.btn[0] };
-            }
 
             ${ns} button,
-            ${ns} [block=buttons] > div.active,
             ${ns} nav > div.active,
             ${ns} nav > a.active,
-            ${ns} .list > div.active {
-                background-color: ${ values.btn[0] };
+            ${ns} [block=buttons] > div.active {
                 color: ${ values.btn[1] };
             }
             ${ns} [block=buttons] > div {
@@ -3149,13 +3486,80 @@ function rasti(name, container) {
 
 
     function getString(lang, key) {
-        if ( !is.object(self.langs[lang]) ) {
+        if ( is.not.object(self.langs[lang]) ) {
             error('Lang [%s] is not defined', lang)
             return
         }
         var string = self.langs[lang][key]
-        if ( !is.string(string) ) warn('Lang [%s] does not contain key [%s]', lang, key)
+        if ( is.not.string(string) ) warn('Lang [%s] does not contain key [%s]', lang, key)
         else return string
+    }
+
+
+    function setMedia(breakpoints) {
+        const err = 'Cannot create media matcher: '
+        if (is.not.object(breakpoints) || is.empty(breakpoints)) throw err + `no media breakpoints supplied`
+        media = {on:{}}
+        const queries = {}
+        for (let device in breakpoints) {
+            const bp = breakpoints[device]
+            if (is.not.number(bp)) throw err + `invalid breakpoint declared for device "${device}", must be a number`
+            queries[device] = window.matchMedia(`(max-width: ${ bp }px)`)
+            Object.defineProperty(media, device, {
+                get: () => queries[device].matches
+            })
+            media.on[device] = handler => queries[device].addListener(handler)
+            /** 
+             * TODO sync up js and css
+             *
+             * Ideally I would like to set css environment vars (one per device/bp)
+             * and read them via env() function in the media query declarations,
+             * but css environment vars are still not fully standardized
+             * ( env() is ready, but there is still no definition on how to set the env vars,
+             *  see issue #2 in https://drafts.csswg.org/css-env-1/#issues-index )
+             * 
+             * So I guess for now the most convenient workaround would be to
+             * change the media queries declarations via DOM manipulation
+             * (it's rasti's way anyways :P).
+             *
+             * Steps would be:
+             * 1. Figure a way to identify each mq declaration, and then for each:
+             * 2. Parse the mq declaration string identifying the breakpoint values
+             * 3. Create a new string replacing the breakpoint values
+             * 4. Replace the mq declaration string with the new one
+             * 5. Let the browser do its magic
+             * 
+             */
+
+        }
+        self.media = media
+    }
+
+
+    function toggleFoldable() {
+        return e => {
+            const el = e.target
+            if (!el.hasAttribute('foldable'))
+                return
+            const isOpen = el.clientHeight > 35 // NOTE this must be kept in sync with the css!
+            document.body.style.setProperty("--elem-h", el._height)
+            if (isOpen) {
+                el.classList.remove('open')
+                el.classList.add('folded')
+            }
+            else {
+                el.classList.remove('folded')
+                el.classList.add('open')
+            }
+        }
+    }
+
+
+    function hideDialogs(e) {
+        if (e.key && e.key !== 'Escape') return
+        container.find('[menu].open').hide()
+        container.find('[modal].open').hide()
+        if (self.sidemenu && self.sidemenu.visible) self.sidemenu.hide()
     }
 
 
@@ -3177,38 +3581,6 @@ function rasti(name, container) {
         $el[0].removeAttribute('icon')
     }
 
-
-    function get(selector) {
-        var $els = self.active.page && self.active.page.find('['+ selector +']')
-        if (!$els || !$els.length) $els = container.find('['+ selector +']')
-        if (!$els.length) warn('No elements found for selector [%s]', selector)
-        return $els
-    }
-
-    function set(selector, value) {
-        var $els = get(selector)
-        $els.each( (i, el) => {
-            el.value = value
-            $(el).change()
-        })
-        return $els
-    }
-
-    function add(selector, ...values) {
-        var $els = get(selector)
-        $els.each( (i, el) => {
-            values.forEach( val => {
-                if (is.array(val)) el.value = el.value.concat(val)
-                else el.value.push(val)
-            })
-            $(el).change()
-        })
-        return $els
-    }
-
-
-    return this
-
 }
 
 
@@ -3217,14 +3589,13 @@ function rasti(name, container) {
 rasti.log = log
 rasti.warn = warn
 rasti.error = error
-rasti.utils = utils
-rasti.blocks = require('./blocks/all')
-rasti.icons = require('./icons')
-rasti.fx = require('./fx')
+rasti.utils = utils.public
+rasti.blocks = require('./js/blocks/all')
+rasti.icons = require('./js/icons')
+rasti.fx = require('./js/fx')
 rasti.options = {log : 'debug'}
 
 module.exports = global.rasti = Object.freeze(rasti)
-
 
 
 /*
@@ -3234,21 +3605,22 @@ function bootstrap() {
     const appContainers = $(document).find('[rasti]')
     let appName, app
 
-    appContainers.forEach( container => {
-        appName = container.getAttribute('rasti')
+    appContainers.each( container => {
+        const $container = $(container)
+        appName = $container.attr('rasti')
         if (!appName) error('Missing app name in [rasti] attribute of app container:', container)
         else if (global[appName]) error('Name [%s] already taken, please choose another name for app in container:', appName, container)
         else {
             global[appName] = app = new rasti(appName, container)
             Object.keys(app.options).forEach( key => {
-                if (container.hasAttribute(key)) {
-                    app.options[key] = container.getAttribute(key)
+                if ($container.hasAttr(key)) {
+                    app.options[key] = $container.attr(key)
                     // non-value boolean attributes are true
                     if (is.boolean(options[key]) && !app.options[key]) app.options[key] = true
                 }
             })
             // load any declared sources
-            var sources = container.getAttribute('src')
+            var sources = $container.attr('src')
             if (sources) {
                 log('Loading sources for app [%s]...', appName)
                 utils.inject(sources)
@@ -3287,7 +3659,7 @@ function genIconStyles() {
 
 function genIconFixesStyles() {
     const fixes = [
-        [`=error =sync =reload =remove =restore =stereo =img-file
+        [`=filter =error =sync =reload =remove =restore =stereo =img-file
             =latin2 =celtic =ankh =comunism =health ^=hg-`,
             { base: '2', small: '1.5', big: '3', huge: '4.4' } ],
         [`=close =network =pommee =diamonds`,
@@ -3313,197 +3685,13 @@ function genIconFixesStyles() {
 }
 
 
-$('head').prepend( genBlockStyles() + `<style>:root{--pad:20px}body{margin:0;overflow-x:hidden;text-shadow:0 0 0}*,:after,:before{box-sizing:border-box;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;transition:background-color .2s}a{text-decoration:none;font-weight:600}h1{font-size:3em}h2{font-size:2em}h3{font-size:1.5em}h1,h2,h3{margin-top:0}p.big{font-size:1.5em}ol,ul{padding:5px 10px 5px 30px;border-radius:2px}li:not(:last-child){margin-bottom:5px}caption,table,tbody,td,tfoot,th,thead,tr{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline}table{border:1px solid #0003;width:100%;text-align:center;border-collapse:collapse}table td,table th{border:1px solid #0003;padding:4px 5px}table thead{background:#ddd;border-bottom:3px solid #0003}table thead th{font-weight:700;text-align:center}table tfoot{font-weight:700;border-top:3px solid #0003}.field,button,input,select,textarea{min-height:35px;width:100%;padding:5px 10px;margin:0 0 15px 0;border:0;border-radius:2px;outline:0;font-family:inherit!important;font-size:inherit;vertical-align:text-bottom}input[type=email]:focus:invalid,input[type=password]:focus:invalid,input[type=tel]:focus:invalid,input[type=text]:focus:invalid{border-top-left-radius:0;border-bottom-left-radius:0;box-shadow:-4px 0 0 0 red}input[type=email]:focus:valid,input[type=password]:focus:valid,input[type=tel]:focus:valid,input[type=text]:focus:valid{border-top-left-radius:0;border-bottom-left-radius:0;box-shadow:-4px 0 0 0 green}button,input[type=range],select{cursor:pointer}button{display:inline-block;height:50px;width:auto;min-width:50px;padding:10px 20px;border:1px solid rgba(0,0,0,.1);font-size:1.2em;text-align:center;text-decoration:none;text-transform:uppercase}button:not(:disabled):hover{filter:contrast(1.5)}button:disabled{filter:contrast(.5);cursor:auto}button[icon]{display:flex;align-items:center;justify-content:center;padding:0}select{appearance:none;-moz-appearance:none;-webkit-appearance:none}option{cursor:pointer}textarea{height:70px;resize:none}.big_>button,.big_>input,button.big,input.big{min-height:70px;margin-bottom:25px;font-size:1.5em}.small_>button,.small_>input,button.small,input.small{min-height:25px;max-height:25px;font-size:1em}input[type=checkbox],input[type=radio]{-webkit-appearance:none;appearance:none;min-height:25px;width:25px;margin:5px;font-size:2em;line-height:.6;text-align:center;vertical-align:middle;cursor:pointer}input[type=radio]{border-radius:50%}input[type=checkbox]+label,input[type=radio]+label{height:40px;max-width:90%;overflow:hidden;text-overflow:ellipsis;vertical-align:middle;cursor:pointer}input[type=checkbox]:checked::before{content:'⨯';display:inline-block;position:absolute;color:#222}input[type=radio]:checked::after{display:inline-block;position:absolute;height:16px;width:16px;margin-left:-33px;background-color:#000;border-radius:50%}input[type=checkbox]:checked,input[type=checkbox]:focus,input[type=checkbox]:hover,input[type=radio]:checked,input[type=radio]:focus,input[type=radio]:hover{box-shadow:inset 0 0 4px #000}input[type=checkbox]+label:hover,input[type=checkbox]:focus+label,input[type=checkbox]:hover+label,input[type=radio]+label:hover,input[type=radio]:focus+label,input[type=radio]:hover+label{font-weight:600}input[type=checkbox].toggle{position:relative;height:26px;width:44px;border-radius:12px;transition:background-color .4s}input[type=checkbox].toggle::before{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background-color:#000;transition:left .4s}input[type=checkbox].toggle:checked::before{left:20px}meter,progress{width:100%;margin:0;border-radius:2px}meter{height:8px;border:1px solid #ccc}meter::-webkit-meter-bar{background:#fff}meter::-webkit-meter-optimum-value{background:linear-gradient(to bottom,#62c462,#51a351)}meter::-webkit-meter-suboptimum-value{background:linear-gradient(to bottom,#fbb450,#f89406)}meter::-webkit-meter-even-less-good-value{background:linear-gradient(to bottom,#ee5f5b,#bd362f)}hr{display:flex;align-items:center;height:30px;border:none}hr::before{content:'';display:block;height:2px;width:100%;background-color:rgba(0,0,0,.5)}[page],[panel],[section]{position:relative;overflow:hidden}[page]{min-height:100vh;width:100vw!important;padding-bottom:10px;margin-bottom:-5px;overflow-y:auto}[page]:not(.active){display:none!important}nav:not([hidden])~[page]:not(.hide-nav){min-height:calc(100vh - 50px)}.fullh[page]{height:100vh}[panel]{padding:25px;border-radius:2px}[section]{padding:20px;border-radius:2px}[section] [label]:before{text-shadow:0 0 0 #000}[section]>:first-child:not([label]){margin-top:0}[section]:not(:last-child){margin-bottom:15px}[foldable],[header]{position:relative}[foldable]{padding-top:30px}[header]:not([page]){padding-top:45px}[foldable][panel],[header][panel]{padding-top:65px}[foldable]:before,[footer][page]:after,[header][page]:before,[header][panel]:before,[header][section]:before{content:attr(header);display:flex;align-items:center;justify-content:center;width:100%;text-transform:uppercase}[header][page]:before{height:50px;margin-bottom:15px;font-size:1.8em;line-height:30px}[foldable]:not([page]):before,[header]:not([page]):before{position:absolute;top:0;left:0}[header][panel]:before{height:40px;padding:10px;font-size:1.5em;line-height:20px}[foldable]:before,[header]:before{height:30px;padding:10px;font-size:1.2em;line-height:20px}[footer][page]:after{content:attr(footer)}[page][header][fix-header]:before{position:fixed;top:0}[page][footer][fix-footer]:after{position:fixed;bottom:0}[img]{background-repeat:no-repeat;background-position:center;background-size:contain;background-origin:content-box}[template]{position:relative;visibility:hidden}[template].rendered{visibility:visible}[template]>.results{max-height:calc(100% - 60px);margin:0 -15px;padding:0 15px}[template][stats]>.results{max-height:calc(100% - 95px)}[template]>.controls{height:60px;padding:10px;color:#fff}[template]>.controls *{margin:0 2px}[template]>.stats{height:40px;padding:10px;font-size:1.1em}[paged]{padding-bottom:0!important}[crud]>*{position:relative}.rasti-crud-create{display:block!important}.rasti-crud,.rasti-crud-accept,.rasti-crud-cancel,.rasti-crud-input,[crud].active .rasti-crud-create{display:none!important}[crud].active .rasti-crud-accept,[crud].active .rasti-crud-cancel,[crud].active .rasti-crud-input{display:inline-block!important}[crud]>.rasti-crud{bottom:-40px;z-index:1}[crud]:hover>.rasti-crud,[crud]>:hover>.rasti-crud{display:block!important}[h-flow]{display:inline-block!important;white-space:nowrap;height:100%;width:100%;overflow-x:auto;overflow-y:hidden}[h-flow]>*{display:inline-block;white-space:normal;height:100%;min-width:100%;border-radius:0;margin-top:0;margin-bottom:0;margin-left:auto!important;margin-right:auto;vertical-align:top}.tab-labels+[h-flow]{height:calc(100vh - 50px)}nav~[page]>.tab-labels+[h-flow]{height:calc(100vh - 100px)}.tab-labels,nav{display:flex;align-items:center;position:relative;white-space:nowrap;min-width:100vw;height:50px;padding:0;border-bottom:1px solid rgba(0,0,0,.2);border-radius:0;text-transform:uppercase}nav{z-index:8}.tab-labels{justify-content:space-around;z-index:2}.tab-labels>.bar{position:absolute;bottom:0;left:0;height:4px;transition:left .2s,width .2s}[tab-label],nav>a,nav>div{display:flex;justify-content:center;align-items:center;flex:1 1 auto;height:100%;min-width:50px;padding:5px;font-size:1.4em;text-shadow:0 0 0 #000;text-decoration:none;border-right:1px solid #0003;color:inherit;cursor:pointer}nav>a,nav>div{transition:all .2s}[tab-label].active{filter:contrast(1.5)}[sidemenu].enabled{position:fixed!important;top:0;left:-80vw;height:100%;min-width:80vw!important;max-width:80vw;z-index:10}[sidemenu].enabled.open{left:0;animation:slide-in .2s}[sidemenu].enabled.close{animation:slide-out .2s}.modal,[modal]{visibility:hidden;position:fixed;left:0;right:0;top:0;bottom:0;margin:auto!important;height:auto;width:auto;max-height:600px;max-width:400px;overflow-y:auto;z-index:10}.modal.big,[modal].big{max-height:800px;max-width:600px}.modal.small,[modal].small{max-height:400px;max-width:200px}[modal].open{visibility:visible;animation:zoom-in .2s,fade-in .2s}[modal].close{animation:zoom-out .2s,fade-out .2s}[menu]{visibility:hidden;position:fixed;background-color:inherit;box-shadow:0 0 4px 4px rgba(0,0,0,.2);z-index:10;cursor:pointer}[menu]>div{padding:10px;margin-bottom:0;text-transform:capitalize}[menu]>div:not(:last-child){border-bottom:1px solid #0003}[menu].open{visibility:visible;animation:fold .2s reverse}[menu].close{animation:fold .2s}[label]{position:relative;margin-top:35px;margin-bottom:15px;vertical-align:bottom}[label][fixed]>*{margin-bottom:0}[label]>input,[label]>select,[label]>textarea{margin-top:0!important}[label]:not([panel]):not([section]):before{content:attr(label);position:absolute;height:35px;line-height:35px;font-size:1.2em;text-transform:capitalize}[label]:before{top:0;left:0;margin-top:-35px}[label].big:before{margin-left:0}[label][fixed]:before{margin-top:-30px;margin-left:0}.inline-label[label],.inline-label_>[label]{width:auto;margin-top:0;padding-left:calc(40% + 10px)}.inline-label[label]:before,.inline-label_>[label]:before{top:auto;width:80%;left:-40%;margin-top:0;text-align:right}.inline-label[label][fixed]:before,.inline-label_>[label][fixed]:before{margin-top:0;margin-left:-8px}.below-label[label]:before,.below-label_>[label]:before{bottom:-40px;left:0;right:0;margin-top:0;margin-left:0}.big [label]{margin-top:25px;font-size:1.2em}.big [label]:before{margin-top:-27px}.clickable,[hide],[onclick],[show],[toggle]{cursor:pointer}[movable]{user-select:none;cursor:move}[resizable]{resize:both;overflow:hidden}[foldable].open{animation:fold-out .2s}[foldable].folded{animation:fold-in .2s;height:30px!important;overflow:hidden;padding-bottom:0}[foldable]:before{content:attr(foldable) '  △';cursor:pointer}[foldable].folded:before{content:attr(foldable) '  ▽'}.row{width:100%;display:flex;flex-flow:row wrap;align-content:flex-start;padding-left:1%}.col{display:flex;flex-flow:column nowrap;align-content:flex-start;align-items:center}.col>.row-1,.row>.col-1{flex-basis:7.33%}.col>.row-2,.row>.col-2{flex-basis:15.66%}.col>.row-3,.row>.col-3{flex-basis:24%}.col>.row-4,.row>.col-4{flex-basis:32.33%}.col>.row-5,.row>.col-5{flex-basis:40.66%}.col>.row-6,.row>.col-6{flex-basis:49%}.col>.row-7,.row>.col-7{flex-basis:57.33%}.col>.row-8,.row>.col-8{flex-basis:65.66%}.col>.row-9,.row>.col-9{flex-basis:74%}.col>.row-10,.row>.col-10{flex-basis:82.33%}.col>.row-11,.row>.col-11{flex-basis:90.66%}.row [class*=col-]{margin-left:0!important}.row [class*=col-]:not(:last-child){margin-right:1%!important}.col [class*=row-]{margin-top:0!important;margin-bottom:1vh!important}.page-options{flex-basis:initial!important}[icon]{min-height:50px}[icon]:empty{padding:0}[icon]:before{display:inline-block;flex-grow:0;height:50px;width:50px;font-size:1.5rem;line-height:2;text-align:center;text-decoration:none}.small[icon],.small_>[icon]{min-height:35px}.small[icon]:before,.small_>[icon]:before{height:35px;width:35px;font-size:1.2rem;line-height:1.7}.big[icon]:before,.big_>[icon]:before{height:70px;width:70px;font-size:2.2rem;line-height:1.9}.huge[icon]:before,.huge_>[icon]:before{height:100px;width:100px;font-size:3.2rem;line-height:1.9}.round[icon]:before,.round_>[icon]:before{border-radius:50%}.floating[icon]{position:relative;padding-left:0}.floating[icon]:before{position:absolute;top:0;left:4px;height:35px;width:35px;font-size:1.1rem}.floating[icon]>input{padding-left:45px}[icon=remove]:before{line-height:.6!important;font-weight:600}[icon=close]:before,[icon=network]:before{line-height:1!important}[icon=diamonds]:before{line-height:1.1!important}[icon=pommee]:before,[icon=restore]:before{line-height:1.2!important}[icon=ankh]:before,[icon=celtic]:before,[icon=comunism]:before,[icon=img-file]:before,[icon=latin2]:before,[icon=reload]:before,[icon=stereo]:before,[icon^=hg-]:before{line-height:1.3!important}[icon=sync]:before{line-height:1.3!important;transform:rotate(90deg)}[icon=error]:before{line-height:1.35!important;font-weight:600}[icon=copy]:before{line-height:1.5!important;font-weight:600;font-size:1.7rem}[icon=health]:before{line-height:1.5!important}[icon=warning]:before{line-height:1.6!important}[icon=maximize]:before,[icon=minimize]:before{line-height:1.7!important}[icon=play]:before,[icon=undo]:before{line-height:1.7!important;transform:rotate(90deg)}[icon=redo]:before{line-height:1.7!important;transform:rotate(-90deg)}[icon=caps-lock]:before,[icon=return]:before,[icon=shift]:before{font-family:auto;font-weight:600}[icon=candle]:before,[icon=desktop]:before,[icon=printer]:before,[icon=stopwatch]:before,[icon=studio-mic]:before{font-weight:600}[icon=tab]:before{font-family:auto}[icon=pinch]:before{transform:rotate(90deg)}[icon=crescent-moon]:before,[icon=moon]:before{filter:grayscale(1)}.list{border:1px solid rgba(0,0,0,.2)}.list[header]{padding-top:40px}.list>div{height:7vh;padding:2vh;transition:all .2s}.list>div{border-bottom:1px solid rgba(0,0,0,.2)}.list>div:first-child{border-top:1px solid rgba(0,0,0,.2)}.list>div.active{border-left:7px solid #222}.list>div:hover{text-shadow:0 0 1px #000}.nodata{padding:10% 5%;margin:auto;font-size:1.5rem;text-align:center}button.fab{position:fixed;bottom:0;right:0;width:50px;margin:20px;border-radius:50%;z-index:5}.backdrop:before{content:'';position:fixed;top:0;left:0;height:100vh;width:100vw;background:rgba(0,0,0,.7);animation:fade-in .2s;z-index:9}.loading{color:transparent!important;position:relative}.loading>*{visibility:hidden}.loading:after{content:'';position:absolute;top:0;bottom:0;left:0;right:0;width:25px;height:25px;margin:auto;border-radius:50%;border:.25rem solid rgba(255,255,255,.2);border-top-color:#fff;animation:spin 1s infinite linear;visibility:visible}.big.loading:after{position:fixed;width:100px;height:100px;z-index:10}.loading2{perspective:120px}.loading2:after{content:"";position:absolute;left:25px;top:25px;width:50px;height:50px;background-color:#3498db;animation:flip 1s infinite linear}@keyframes stamp{50%{transform:scale(1.2)}}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}@keyframes flip{0%{transform:rotate(0)}50%{transform:rotateY(180deg)}100%{transform:rotateY(180deg) rotateX(180deg)}}@keyframes zoom-in{0%{transform:scale(0)}100%{transform:scale(1)}}@keyframes zoom-out{0%{transform:scale(1)}100%{transform:scale(0)}}@keyframes fade-in{0%{opacity:0}100%{opacity:1}}@keyframes fade-out{0%{opacity:1}100%{opacity:0}}@keyframes slide-in{0%{left:-100vw}100%{left:0}}@keyframes slide-out{0%{left:0}100%{left:-100vw}}@keyframes fold-in{0%{height:var(--elem-h);overflow:hidden}100%{height:0;overflow:hidden}}@keyframes fold-out{0%{height:0;overflow:hidden}100%{height:var(--elem-h);overflow:hidden}}.hidden{position:absolute;visibility:hidden}.rel,.rel_>*{position:relative}.fix,.fix_>*{position:fixed}.inline,.inline_>*{display:inline-block;margin-top:0;margin-bottom:0}.floatl,.floatl_>*{float:left}.floatr,.floatr_>*{float:right}.left,.left_>*{position:absolute;left:0}.right,.right_>*{position:absolute;right:0}.top,.top_>*{position:absolute;top:0}.bottom,.bottom_>*{position:absolute;bottom:0}.centerx,.centerx_>*{position:absolute;left:0;right:0;margin:auto!important}.centery,.centery_>*{position:absolute;top:0;bottom:0;margin:auto!important}.center,.center_>*{position:absolute;left:0;right:0;top:0;bottom:0;margin:auto!important}.fcenterx,.fcenterx_>*{display:flex;justify-content:center}.fcentery,.fcentery_>*{display:flex;align-items:center}.fcenter,.fcenter_>*{display:flex;justify-content:center;align-items:center}.scrollx,.scrollx_>*{width:100%;overflow-x:auto;overflow-y:hidden}.scrolly,.scrolly_>*{height:100%;overflow-x:hidden;overflow-y:auto}.scroll,.scroll_>*{overflow:auto}.textl,.textl_>*{text-align:left}.textr,.textr_>*{text-align:right}.textc,.textc_>*{text-align:center}.fullw,.fullw_>*{width:100%}.fullh,.fullh_>*{height:100%}.halfw,.halfw_>*{width:50%}.halfh,.halfh_>*{height:50%}.autow,.autow_>*{width:auto}.autoh,.autoh_>*{height:auto}.autom,.autom_>*{margin:auto!important}.m0{margin:0!important}.pad-s,.pad-s_>*{padding:calc(var(--pad) * .5)}.pad,.pad_>*{padding:var(--pad)}.pad-l,.pad-l_>*{padding:calc(var(--pad) * 1.5)}.p0{padding:0!important}.round,.round_>*{border-radius:50%}.columns-2,.columns-3{display:flex;flex-wrap:wrap;align-content:flex-start}.columns-2>*{width:49%;margin-right:2%}.columns-3>*{width:32%;margin-right:2%}.columns-2>:nth-child(2n),.columns-3>:nth-child(3n){margin-right:0}.wrap{flex-wrap:wrap}.nowrap{flex-wrap:nowrap}.scale-up,.scale-up_>*{transition:all .2s ease-in-out}.scale-up:hover,.scale-up_>:hover{transform:scale(1.1)}[fx=toast]{position:fixed;display:flex;left:0;right:0;bottom:-100px;width:100vw;max-width:600px;min-height:90px;max-height:90px;padding:20px;margin:auto;overflow:hidden;text-overflow:ellipsis;z-index:10;transition:bottom ease-out .25s}[fx=toast].active{bottom:0}[fx=toast] [icon]::before{border-radius:50%;font-size:2rem;line-height:1.6;box-shadow:0 0 0 1px}[fx=toast] [icon=warning]::before{background:#ff0;line-height:1.4}[fx=toast] [icon=error]::before{background:red;line-height:1.4}[fx=toast] [icon=accept]::before{background:green}.fx-stack-container>*{transition:margin-top 2s ease;margin-top:0}.fx-stack-el{margin-top:100px}.fx-stamp-container>*{transition:opacity .3s;animation:stamp .3s}.fx-stamp-el{opacity:0;animation:none}.flip-container{perspective:1000px;position:relative}.flipper{transition:.6s;transform-style:preserve-3d;position:absolute}.flipper.flip{transform:rotateY(180deg)}.flipper .back,.flipper .front{backface-visibility:hidden;top:0;left:0}.flipper .front{z-index:2;transform:rotateY(0)}.flipper .back{transform:rotateY(180deg)}::-webkit-scrollbar{width:10px;background:0 0}::-webkit-scrollbar-thumb{background-color:rgba(0,0,0,.3);background-clip:content-box;border-left:solid transparent 2px;border-right:solid transparent 2px;border-radius:4px}::-webkit-scrollbar-thumb:hover{background-color:rgba(0,0,0,.4)}@-moz-document url-prefix(http://),url-prefix(https://){scrollbar{-moz-appearance:none!important;background:#0f0!important}scrollbarbutton,thumb{-moz-appearance:none!important;background-color:#00f!important}scrollbarbutton:hover,thumb:hover{-moz-appearance:none!important;background-color:red!important}scrollbarbutton{display:none!important}scrollbar[orient=vertical]{min-width:15px!important}}input[type=range]{-webkit-appearance:none;background:0 0}input[type=range]:focus{outline:0}input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;height:20px;width:20px;background-color:red;border-radius:50%;border:1px solid #000;margin-top:-5px;cursor:pointer}input[type=range]::-webkit-slider-runnable-track{width:100%;height:10px;background:green;border:1px solid #222;border-radius:5px;cursor:pointer}input[type=range]::-ms-track{width:100%;cursor:pointer;background:0 0;border-color:transparent;color:transparent}@media only screen and (min-width:800px){.show-phone,.show-tablet{position:absolute;visibility:hidden}.pad-s-desktop,.pad-s-desktop_>*{padding:calc(var(--pad) * .5)}.pad-desktop,.pad-desktop_>*{padding:var(--pad)}.pad-l-desktop,.pad-l-desktop_>*{padding:calc(var(--pad) * 1.5)}.p0-desktop{padding:0}}@media only screen and (min-width:500px) and (max-width:800px){.pad-s-tablet,.pad-s-tablet_>*{padding:calc(var(--pad) * .5)}.pad-tablet,.pad-tablet_>*{padding:var(--pad)}.pad-l-tablet,.pad-l-tablet_>*{padding:calc(var(--pad) * 1.5)}.p0-tablet{padding:0}}@media only screen and (max-width:800px){[page][header]:before{line-height:.8}.hide-tablet{display:none}.show-tablet{position:relative;visibility:visible}[header].hh-tablet:before{display:none}[header].hh-tablet[page]{padding-top:0}[header].hh-tablet[panel]{padding-top:20px}[header].hh-tablet[section]{padding-top:15px}}@media only screen and (max-width:500px){[page]{padding-bottom:0;overflow-y:auto}[panel]{padding:15px;border-radius:0}[template]>.controls>.columns,[template]>.controls>.sizes{display:none}[options]{bottom:0;left:0!important;right:0;height:80%!important;margin:auto}.row{padding-left:0}.row:not(.rigid)>[class*=col-],[class*=columns-]:not(.rigid)>*{min-width:100%}.hide-phone{display:none}.show-phone{position:relative;visibility:visible}[header].hh-phone:before{display:none}[header].hh-phone[page]{padding-top:0}[header].hh-phone[panel],[header].hh-phone[section]{padding-top:15px}.pad-s-phone{padding-left:5%;padding-right:5%}.pad-phone{padding-left:10%;padding-right:10%}.pad-l-phone{padding-left:15%;padding-right:15%}.p0-phone{padding:0}}</style>` + genIconStyles() )
+$('head').prepend( genBlockStyles() + `<style>:root{--pad:20px}body{margin:0;overflow-x:hidden;text-shadow:0 0 0}*,:after,:before{box-sizing:border-box;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;transition:background-color .2s}:focus{outline-style:none;outline-color:var(--lightener)}.active:focus{outline-color:var(--primary)}[key-nav] :focus{outline-style:solid}a{text-decoration:none;font-weight:600}h1{font-size:3em}h2{font-size:2.3em}h3{font-size:1.7em}h1,h2,h3{margin-top:0}p.big{font-size:1.5em}ol,ul{padding:5px 10px 5px 30px;border-radius:2px}li:not(:last-child){margin-bottom:5px}caption,table,tbody,td,tfoot,th,thead,tr{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline}table{border:1px solid #0003;width:100%;text-align:center;border-collapse:collapse}table td,table th{border:1px solid #0003;padding:4px 5px}table thead{background:#ddd;border-bottom:3px solid #0003}table thead th{font-weight:700;text-align:center}table tfoot{font-weight:700;border-top:3px solid #0003}.field,button,input,select,textarea{min-height:35px;width:100%;padding:5px 10px;margin:0 0 15px 0;border:0;border-radius:2px;outline:0;font-family:inherit!important;font-size:inherit;vertical-align:text-bottom;transition:all .2s}input{border-radius:0}input:not([type]),input[type=email],input[type=password],input[type=tel],input[type=text]{box-shadow:0 2px 0 0 var(--lighten)}input:not([type]):hover,input[type=email]:hover,input[type=password]:hover,input[type=tel]:hover,input[type=text]:hover{box-shadow:0 2px 0 0 var(--lightener)}input:not([type]):focus,input[type=email]:focus,input[type=password]:focus,input[type=tel]:focus,input[type=text]:focus{box-shadow:0 2px 0 0 var(--primary)}input:not([type]):focus:invalid,input[type=email]:focus:invalid,input[type=password]:focus:invalid,input[type=tel]:focus:invalid,input[type=text]:focus:invalid{box-shadow:0 2px 0 0 var(--danger)}button,input[type=range],option,select{cursor:pointer}button{display:inline-block;height:50px;width:auto;min-width:50px;padding:10px 20px;border:1px solid rgba(0,0,0,.1);font-size:1.2em;text-align:center;text-decoration:none;text-transform:capitalize}button:not(:disabled):focus,button:not(:disabled):hover{filter:contrast(1.5)}button:disabled{filter:contrast(.5);cursor:auto}button[icon]{display:flex;align-items:center;justify-content:center;padding:0}select{appearance:none;-moz-appearance:none;-webkit-appearance:none}textarea{height:70px;resize:none}.big_>button,.big_>input,button.big,input.big{min-height:70px;margin-bottom:25px;font-size:1.5em}.small_>button,.small_>input,button.small,input.small{min-height:25px;max-height:25px;font-size:1em}input[type=checkbox],input[type=radio]{-webkit-appearance:none;appearance:none;min-height:25px;width:25px;margin:5px;font-size:2em;line-height:.6;text-align:center;vertical-align:middle;cursor:pointer}input[type=radio]{border-radius:50%}input[type=checkbox]+label,input[type=radio]+label{height:40px;max-width:90%;overflow:hidden;text-overflow:ellipsis;vertical-align:middle;cursor:pointer}input[type=checkbox]:checked::before{content:'⨯';display:inline-block;position:absolute;color:#222}input[type=radio]:checked::after{display:inline-block;position:absolute;height:16px;width:16px;margin-left:-33px;background-color:#000;border-radius:50%}input[type=checkbox]:checked,input[type=checkbox]:focus,input[type=checkbox]:hover,input[type=radio]:checked,input[type=radio]:focus,input[type=radio]:hover{box-shadow:inset 0 0 4px #000}input[type=checkbox]+label:hover,input[type=checkbox]:focus+label,input[type=checkbox]:hover+label,input[type=radio]+label:hover,input[type=radio]:focus+label,input[type=radio]:hover+label{font-weight:600}input[type=checkbox].toggle{position:relative;height:26px;width:44px;border-radius:12px;transition:background-color .4s}input[type=checkbox].toggle::before{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background-color:#000;transition:left .4s}input[type=checkbox].toggle:checked::before{left:20px}meter,progress{width:100%;margin:0;border-radius:2px}meter{height:8px;border:1px solid #ccc}hr{display:flex;align-items:center;height:30px;border:none}hr::before{content:'';display:block;height:2px;width:100%;background-color:var(--darkener)}.tab-labels>.bar,button,input[type=checkbox]:checked,input[type=radio]:checked,nav>a.active,nav>div.active{background-color:var(--primary)}[page],[panel],[section]{position:relative;overflow:hidden}[page]{min-height:100vh;width:100vw!important;padding-bottom:10px;margin-bottom:-5px;overflow-y:auto}[page]:not(.active){display:none!important}nav:not([hidden])~[page]:not(.hide-nav){min-height:calc(100vh - 50px)}.fullh[page]{height:100vh}[panel]{padding:25px;border-radius:2px}[section]{padding:20px;border-radius:2px}[section] [label]:before{text-shadow:0 0 0 #000}[section]>:first-child:not([label]){margin-top:0}[section]:not(:last-child){margin-bottom:15px}[foldable],[header]{position:relative}[foldable],[foldable][class*=pad]{padding-top:35px}[header]:not([page]){padding-top:45px}[header].h-big{padding-top:55px}[foldable][panel],[header][panel]{padding-top:65px}[foldable]:before,[footer][page]:after,[header]:before{content:attr(header);display:flex;align-items:center;justify-content:center;width:100%;text-transform:capitalize}[foldable]:not([page]):before,[header]:not([page]):before{position:absolute;top:0;left:0}[foldable]:before,[header]:before{height:35px;padding:10px;font-size:1.2em;line-height:20px}[header][panel]:before{height:40px;font-size:1.5em}[header].h-big:before,[header][page]:before{height:50px;margin-bottom:15px;font-size:1.8em;line-height:30px}[footer][page]:after{content:attr(footer)}[page][header].h-fix:before{position:fixed;top:0}[movable]{user-select:none;cursor:move}[resizable]{resize:both;overflow:hidden}[foldable].open{animation:fold-out .2s}[foldable].folded{animation:fold-in .2s;height:0;overflow:hidden;padding-top:30px!important;padding-bottom:0}[foldable]:before{content:'△  'attr(foldable);cursor:pointer}[foldable].folded:before{content:'▽  'attr(foldable)}[foldable].folded:focus:before,[foldable].folded:hover:before{content:'▼  'attr(foldable)}[img]{background-repeat:no-repeat;background-position:center;background-size:contain;background-origin:content-box}[template]{position:relative}[template]:not(.rendered){display:none}[template]>.results{max-height:calc(100% - 60px);margin:0 -15px;padding:0 15px}[template][stats]>.results{max-height:calc(100% - 95px)}[template]>.controls{height:60px;padding:10px;color:#fff}[template]>.controls *{margin:0 2px}[template]>.stats{height:40px;padding:10px;font-size:1.1em}[paged]{padding-bottom:0!important}[crud]>*{position:relative}.rasti-crud-create{display:block!important}.rasti-crud,.rasti-crud-accept,.rasti-crud-cancel,.rasti-crud-input,[crud].active .rasti-crud-create{display:none!important}[crud].active .rasti-crud-accept,[crud].active .rasti-crud-cancel,[crud].active .rasti-crud-input{display:inline-block!important}[crud]>.rasti-crud{bottom:-40px;z-index:1}[crud]:hover>.rasti-crud,[crud]>:hover>.rasti-crud{display:block!important}[sidemenu].enabled{position:fixed!important;top:0;left:-80vw;height:100%;min-width:80vw!important;max-width:80vw;overflow-x:hidden;overflow-y:auto;z-index:10}[sidemenu].enabled.open{left:0;animation:slide-in .2s}[sidemenu].enabled.close{animation:slide-out .2s}.modal,[modal]{visibility:hidden;position:fixed;left:0;right:0;top:0;bottom:0;margin:auto!important;height:auto;width:auto;max-height:600px;max-width:400px;overflow-y:auto;z-index:10}.modal.big,[modal].big{max-height:800px;max-width:600px}.modal.small,[modal].small{max-height:400px;max-width:200px}[modal].open{visibility:visible;animation:zoom-in .2s,fade-in .2s}[modal].close{animation:zoom-out .2s,fade-out .2s}[menu]{visibility:hidden;position:fixed;background-color:inherit;box-shadow:0 0 4px 4px var(--darkener);z-index:10;cursor:pointer}[menu]>div{padding:10px;margin-bottom:0;text-transform:capitalize}[menu]>div:not(:last-child){border-bottom:1px solid #0003}[menu].open{visibility:visible;animation:fold .2s reverse}[menu].close{animation:fold .2s}[label]{position:relative;margin-top:35px;margin-bottom:15px;vertical-align:bottom}[label][fixed]>*{margin-bottom:0}[label]>input,[label]>select,[label]>textarea{margin-top:0!important}[label]:not([panel]):not([section]):before{content:attr(label);position:absolute;height:35px;line-height:35px;font-size:1.2em;text-transform:capitalize}[label]:before{top:0;left:0;margin-top:-35px}[label].big:before{margin-left:0}[label][fixed]:before{margin-top:-30px;margin-left:0}.inline-label[label],.inline-label_>[label]{width:auto;margin-top:0;padding-left:calc(40% + 10px)}.inline-label[label]:before,.inline-label_>[label]:before{top:auto;width:80%;left:-40%;margin-top:0;text-align:right}.inline-label[label][fixed]:before,.inline-label_>[label][fixed]:before{margin-top:0;margin-left:-8px}.below-label[label]:before,.below-label_>[label]:before{bottom:-40px;left:0;right:0;margin-top:0;margin-left:0}.big [label]{margin-top:25px;font-size:1.2em}.big [label]:before{margin-top:-27px}.clickable,[hide],[on-click],[onclick],[show],[toggle]{cursor:pointer}.hidden{position:absolute;visibility:hidden}.rel,.rel_>*{position:relative}.abs,.abs_>*{position:absolute}.fix,.fix_>*{position:fixed}.inline,.inline_>*{display:inline-block;margin-top:0;margin-bottom:0}.flex,.flex_>*{display:flex}.floatl,.floatl_>*{float:left}.floatr,.floatr_>*{float:right}.left,.left_>*{position:absolute;left:0}.right,.right_>*{position:absolute;right:0}.top,.top_>*{position:absolute;top:0}.bottom,.bottom_>*{position:absolute;bottom:0}.abs.centerx,.abs_.centerx_>*{left:0;right:0;margin:auto!important}.abs.centery,.abs_.centery_>*{top:0;bottom:0;margin:auto!important}.abs.center,.abs_.center_>*{left:0;right:0;top:0;bottom:0;margin:auto!important}.flex.centerx,.flex_.centerx_>*{justify-content:center}.flex.centery,.flex_.centery_>*{align-items:center}.flex.center,.flex_.center_>*{justify-content:center;align-items:center}.scrollx,.scrollx_>*{width:100%;overflow-x:auto;overflow-y:hidden}.scrolly,.scrolly_>*{height:100%;overflow-x:hidden;overflow-y:auto}.scroll,.scroll_>*{overflow:auto}.textl,.textl_>*{text-align:left}.textr,.textr_>*{text-align:right}.textc,.textc_>*{text-align:center}.fullw,.fullw_>*{width:100%}.fullh,.fullh_>*{height:100%}.halfw,.halfw_>*{width:50%}.halfh,.halfh_>*{height:50%}.autow,.autow_>*{width:auto}.autoh,.autoh_>*{height:auto}.autom,.autom_>*{margin:auto!important}.m0{margin:0!important}.pad-s,.pad-s_>*{padding:calc(var(--pad) * .5)}.pad,.pad_>*{padding:var(--pad)}.pad-l,.pad-l_>*{padding:calc(var(--pad) * 1.5)}.p0{padding:0!important}.round,.round_>*{border-radius:50%}.columns-2,.columns-3{display:flex;flex-wrap:wrap;align-content:flex-start}.columns-2>*{width:49%;margin-right:2%}.columns-3>*{width:32%;margin-right:2%}.columns-2>:nth-child(2n),.columns-3>:nth-child(3n){margin-right:0}.wrap{flex-wrap:wrap}.nowrap{flex-wrap:nowrap}.upper{text-transform:uppercase}.h-left:before{justify-content:left}.h-left:not([foldable]):before{padding-left:0}.h-upper:before{text-transform:uppercase}.scale-up,.scale-up_>*{transition:all .2s ease-in-out}.scale-up:hover,.scale-up_>:hover{transform:scale(1.1)}.tab-group{display:flex;flex-wrap:nowrap;height:100%;min-width:100%;overflow-x:auto;overflow-y:hidden}.tab-group>*{display:inline-block;white-space:normal;height:100%;min-width:100%;border-radius:0;margin-top:0;margin-bottom:0;margin-left:auto!important;margin-right:auto;vertical-align:top}.tab-labels+.tab-group{height:calc(100vh - 50px)}nav~[page]>.tab-labels+.tab-group{height:calc(100vh - 100px)}.tab-labels,nav{position:relative;display:flex;align-items:center;white-space:nowrap;min-width:100vw;height:50px;padding:0;border-bottom:1px solid var(--darkener);border-radius:0;text-transform:capitalize}nav{z-index:8}.tab-labels{justify-content:space-around;z-index:2}.tab-labels>.bar{position:absolute;bottom:0;left:0;height:4px;transition:left .2s,width .2s}[tab-label],nav>a,nav>div{display:flex;justify-content:center;align-items:center;flex:1 1 auto;height:100%;min-width:50px;padding:5px;font-size:1.4em;text-shadow:0 0 0 #000;text-decoration:none;border-right:1px solid #0003;color:inherit;cursor:pointer}nav>a,nav>div{transition:all .2s}[tab-label].active{filter:contrast(1.5)}.list{border:1px solid var(--darkener)}.list[header]{padding-top:40px}.list>div{position:relative;display:flex;align-items:center;height:7vh;padding:2vh;border:1px solid transparent;border-bottom-color:var(--darkener);transition:all .2s}.list>div:first-child{border-top-color:var(--darkener)}.list>div:focus,.list>div:hover{border-color:var(--lightener);outline:0}.list>div.active{color:var(--primary);font-weight:600}.list>div.active:focus{border-color:var(--primary)}.list>div.active:after,.list>div:focus:after,.list>div:hover:after{content:'';display:block;position:absolute;left:0;height:100%;width:4px;background-color:var(--lightener)}.list>div.active:after{background-color:var(--primary)}.nodata{padding:10% 5%;margin:auto;font-size:1.5rem;text-align:center}button.fab{position:fixed;bottom:0;right:0;width:50px;margin:20px;border-radius:50%;z-index:5}.backdrop:before{content:'';position:fixed;top:0;left:0;height:100vh;width:100vw;background:rgba(0,0,0,.7);animation:fade-in .2s;z-index:9}.loading{color:transparent!important;position:relative}.loading>*{visibility:hidden}.loading:after{content:'';position:absolute;top:0;bottom:0;left:0;right:0;width:25px;height:25px;margin:auto;border-radius:50%;border:.25rem solid var(--lighten);border-top-color:#fff;animation:spin 1s infinite linear;visibility:visible}.big.loading:after{position:fixed;width:100px;height:100px;z-index:10}.loading2{perspective:120px}.loading2:after{content:"";position:absolute;left:25px;top:25px;width:50px;height:50px;background-color:#3498db;animation:flip 1s infinite linear}.row{width:100%;display:flex;flex-flow:row wrap;align-content:flex-start;padding-left:1%}.col{display:flex;flex-flow:column nowrap;align-content:flex-start;align-items:center}.col>.row-1,.row>.col-1{flex-basis:7.33%}.col>.row-2,.row>.col-2{flex-basis:15.66%}.col>.row-3,.row>.col-3{flex-basis:24%}.col>.row-4,.row>.col-4{flex-basis:32.33%}.col>.row-5,.row>.col-5{flex-basis:40.66%}.col>.row-6,.row>.col-6{flex-basis:49%}.col>.row-7,.row>.col-7{flex-basis:57.33%}.col>.row-8,.row>.col-8{flex-basis:65.66%}.col>.row-9,.row>.col-9{flex-basis:74%}.col>.row-10,.row>.col-10{flex-basis:82.33%}.col>.row-11,.row>.col-11{flex-basis:90.66%}.row [class*=col-]{margin-left:0!important}.row [class*=col-]:not(:last-child){margin-right:1%!important}.col [class*=row-]{margin-top:0!important;margin-bottom:1vh!important}.page-options{flex-basis:initial!important}::-webkit-scrollbar{width:4px;background-color:transparent}::-webkit-scrollbar-thumb{max-height:10px;background-color:var(--lighten);background-clip:content-box;border-radius:4px}::-webkit-scrollbar-thumb:hover{background-color:var(--primary)}@-moz-document url-prefix(http://),url-prefix(https://){scrollbar{-moz-appearance:none!important;background:#0f0!important}scrollbarbutton,thumb{-moz-appearance:none!important;background-color:#00f!important}scrollbarbutton:hover,thumb:hover{-moz-appearance:none!important;background-color:red!important}scrollbarbutton{display:none!important}scrollbar[orient=vertical]{min-width:15px!important}}input[type=range]{--bg:var(--lighten);-webkit-appearance:none;background:0 0}input[type=range]:hover{--bg:var(--lightener)}input[type=range]:focus{--bg:var(--primary)}input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;height:18px;width:18px;background-color:var(--primary);border-radius:50%;border:1px solid var(--darker);margin-top:-8px;cursor:pointer;transition:scale .2s}input[type=range]::-webkit-slider-runnable-track{width:100%;height:4px;background-color:var(--bg);border:1px solid var(--darker);border-radius:5px;cursor:pointer;transition:background-color .2s}input[type=range]:focus::-webkit-slider-thumb{transform:scale(1.1)}input[type=range]::-ms-track{width:100%;cursor:pointer;background:0 0;border-color:transparent;color:transparent}meter::-webkit-meter-bar{background:#fff}meter::-webkit-meter-optimum-value{background:linear-gradient(to bottom,#62c462,#51a351)}meter::-webkit-meter-suboptimum-value{background:linear-gradient(to bottom,#fbb450,#f89406)}meter::-webkit-meter-even-less-good-value{background:linear-gradient(to bottom,#ee5f5b,#bd362f)}[icon]{min-height:50px}[icon]:empty{padding:0}[icon]:before{display:inline-block;flex-grow:0;height:50px;width:50px;font-size:1.5rem;line-height:2;text-align:center;text-decoration:none;transition:all .2s}[on-click][icon]:empty{border:1px solid transparent;transition:all .2s}[on-click][icon]:empty:hover{border-color:var(--lightener)}[on-click][icon]:empty:focus{border-color:var(--primary)}.small[icon],.small_>[icon]{min-height:35px}.small[icon]:before,.small_>[icon]:before{height:35px;width:35px;font-size:1.2rem;line-height:1.7}.big[icon]:before,.big_>[icon]:before{height:70px;width:70px;font-size:2.2rem;line-height:1.9}.huge[icon]:before,.huge_>[icon]:before{height:100px;width:100px;font-size:3.2rem;line-height:1.9}.round[icon]:before,.round_>[icon]:before{border-radius:50%}.floating[icon]{position:relative;padding-left:0}.floating[icon]:before{position:absolute;top:0;left:4px;height:35px;width:35px;font-size:1.1rem}.floating[icon]>input{padding-left:45px}[icon=remove]:before{line-height:.6!important;font-weight:600}[icon=close]:before,[icon=network]:before{line-height:1!important}[icon=diamonds]:before{line-height:1.1!important}[icon=pommee]:before,[icon=restore]:before{line-height:1.2!important}[icon=ankh]:before,[icon=celtic]:before,[icon=comunism]:before,[icon=img-file]:before,[icon=latin2]:before,[icon=reload]:before,[icon=stereo]:before,[icon^=hg-]:before{line-height:1.3!important}[icon=filter]:before,[icon=sync]:before{line-height:1.3!important;transform:rotate(90deg)}[icon=error]:before{line-height:1.35!important;font-weight:600}[icon=copy]:before{line-height:1.5!important;font-weight:600;font-size:1.7rem}[icon=health]:before{line-height:1.5!important}[icon=warning]:before{line-height:1.6!important}[icon=maximize]:before,[icon=minimize]:before{line-height:1.7!important}[icon=play]:before,[icon=undo]:before{line-height:1.7!important;transform:rotate(90deg)}[icon=redo]:before{line-height:1.7!important;transform:rotate(-90deg)}[icon=caps-lock]:before,[icon=return]:before,[icon=shift]:before{font-family:auto;font-weight:600}[icon=candle]:before,[icon=desktop]:before,[icon=printer]:before,[icon=stopwatch]:before,[icon=studio-mic]:before{font-weight:600}[icon=tab]:before{font-family:auto}[icon=pinch]:before{transform:rotate(90deg)}[icon=crescent-moon]:before,[icon=moon]:before{filter:grayscale(1)}[fx=toast]{position:fixed;display:flex;left:0;right:0;bottom:-100px;width:100vw;max-width:600px;min-height:90px;max-height:90px;padding:20px;margin:auto;overflow:hidden;text-overflow:ellipsis;z-index:10;transition:bottom ease-out .25s}[fx=toast].active{bottom:0}[fx=toast] [icon]::before{border-radius:50%;font-size:2rem;line-height:1.6;box-shadow:0 0 0 1px}[fx=toast] [icon=warning]::before{background:#ff0;line-height:1.4}[fx=toast] [icon=error]::before{background:red;line-height:1.4}[fx=toast] [icon=accept]::before{background:green}.fx-stack-container>*{transition:margin-top 2s ease;margin-top:0}.fx-stack-el{margin-top:100px}.fx-stamp-container>*{transition:opacity .3s;animation:stamp .3s}.fx-stamp-el{opacity:0;animation:none}.flip-container{perspective:1000px;position:relative}.flipper{transition:.6s;transform-style:preserve-3d;position:absolute}.flipper.flip{transform:rotateY(180deg)}.flipper .back,.flipper .front{backface-visibility:hidden;top:0;left:0}.flipper .front{z-index:2;transform:rotateY(0)}.flipper .back{transform:rotateY(180deg)}@keyframes stamp{50%{transform:scale(1.2)}}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}@keyframes flip{0%{transform:rotate(0)}50%{transform:rotateY(180deg)}100%{transform:rotateY(180deg) rotateX(180deg)}}@keyframes zoom-in{0%{transform:scale(0)}100%{transform:scale(1)}}@keyframes zoom-out{0%{transform:scale(1)}100%{transform:scale(0)}}@keyframes fade-in{0%{opacity:0}100%{opacity:1}}@keyframes fade-out{0%{opacity:1}100%{opacity:0}}@keyframes slide-in{0%{left:-100vw}100%{left:0}}@keyframes slide-out{0%{left:0}100%{left:-100vw}}@keyframes fold-in{0%{height:var(--elem-h);overflow:hidden}100%{height:0;overflow:hidden}}@keyframes fold-out{0%{height:0;overflow:hidden}100%{height:var(--elem-h);overflow:hidden}}@media only screen and (min-width:800px){.show-phone,.show-tablet{position:absolute;visibility:hidden}.pad-s-desktop,.pad-s-desktop_>*{padding:calc(var(--pad) * .5)}.pad-desktop,.pad-desktop_>*{padding:var(--pad)}.pad-l-desktop,.pad-l-desktop_>*{padding:calc(var(--pad) * 1.5)}.p0-desktop{padding:0}}@media only screen and (min-width:500px) and (max-width:800px){.show-phone{position:absolute;visibility:hidden}.pad-s-tablet,.pad-s-tablet_>*{padding:calc(var(--pad) * .5)}.pad-tablet,.pad-tablet_>*{padding:var(--pad)}.pad-l-tablet,.pad-l-tablet_>*{padding:calc(var(--pad) * 1.5)}.p0-tablet{padding:0}}@media only screen and (max-width:800px){[page][header]:before{line-height:.8}.hide-tablet{display:none}.show-tablet{position:relative;visibility:visible}[header].hh-tablet:before{display:none}[header].hh-tablet[page]{padding-top:0}[header].hh-tablet[panel]{padding-top:20px}[header].hh-tablet[section]{padding-top:15px}}@media only screen and (max-width:500px){[page]{padding-bottom:0;overflow-y:auto}[panel]{padding:15px;border-radius:0}[template]>.controls>.columns,[template]>.controls>.sizes{display:none}[options]{bottom:0;left:0!important;right:0;height:80%!important;margin:auto}.row{padding-left:0}.row:not(.rigid)>[class*=col-],[class*=columns-]:not(.rigid)>*{min-width:100%}.hide-phone{display:none}.show-phone{position:relative;visibility:visible}[header].hh-phone:before{display:none}[header].hh-phone[page]{padding-top:0}[header].hh-phone[panel],[header].hh-phone[section]{padding-top:15px}.pad-s-phone{padding:calc(var(--pad) * .5)}.pad-phone{padding:calc(var(--pad))}.pad-l-phone{padding:calc(var(--pad) * 1.5)}.p0-phone{padding:0}.bottom-phone{position:absolute;bottom:0}.up-phone{position:absolute;top:0}}</style>` + genIconStyles() )
 
 bootstrap()
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./blocks/all":1,"./components":10,"./extensions":11,"./fx":12,"./icons":13,"./themes":15,"./utils":16}],15:[function(require,module,exports){
-exports.themes = {
-
-    base : {
-        font : 'normal 14px Apple Color Emoji, Segoe UI Emoji, NotoColorEmoji, Segoe UI Symbol, Android Emoji, EmojiSymbols, EmojiOne Mozilla',
-        palette : {
-            white   : '#eee',
-            lighter : '#ddd',
-            light   : '#bbb',
-            mid     : '#999',
-            dark    : '#444',
-            darker  : '#222',
-            black   : '#111',
-            detail  : 'darkcyan',
-            lighten : 'rgba(255,255,255,0.2)',
-            darken  : 'rgba(0,0,0,0.2)',
-        },
-    },
-
-}
-
-
-exports.themeMaps = {
-
-    dark : {
-        page    : 'black lighten', // bg, header bg
-        panel   : 'darker lighten',   // bg, header bg
-        section : 'dark lighten',    // bg, header bg
-        field   : 'light darker',   // bg, text
-        btn     : 'detail darker',  // bg, text
-        header  : 'light',          // text
-        label   : 'light',          // text
-        text    : 'light',          // text
-    },
-
-    light : {
-        page    : 'light darken',
-        panel   : 'mid lighten',
-        section : 'lighten darken',
-        field   : 'lighter dark',
-        btn     : 'detail dark',
-        header  : 'darker',
-        label   : 'darker',
-        text    : 'darker',
-    },
-    
-}
-},{}],16:[function(require,module,exports){
-function type(exp) {
-    const clazz = Object.prototype.toString.call(exp)
-    return clazz.substring(8, clazz.length-1).toLowerCase()
-}
-
-const is = {}
-'object function array string number regex boolean'.split(' ')
-    .forEach(t => {
-        is[t] = exp => type(exp) === t
-    })
-is.empty = exp =>
-    (is.array(exp) || is.string(exp)) ? exp.length === 0
-    : is.object(exp) ? Object.keys(exp).length === 0
-    : false
-
-const sameType = (exp1, exp2) => type(exp1) === type(exp2)
-
-const exists = ref => ref !== undefined && ref !== null
-
-
-const compose = (...funcs) => funcs.reduce((prev, curr) => (...args) => curr(prev(...args)))
-
-
-const prepTemplate = tmpl_func => data => data.map( compose( checkData, tmpl_func )).join('')
-
-
-function inject(sources) {
-    if (is.string(sources)) sources = sources.split(',')
-    if (!is.array(sources)) return rasti.error('Invalid sources, must be an array or a string')
-    const body = $('body')
-    function do_inject(sources) {
-        const src = sources.shift().trim()
-        const script = $('<script>').attr('src', src)
-        script[0].onload = () => {
-            rasti.log('> Loaded %s', src)
-            sources.length
-                ? do_inject(sources)
-                : rasti.log('All sources loaded')
-        }
-        rasti.log('> Loading %s ...', src)
-        body.append(script)
-    }
-    do_inject(sources)
-}
-
-
-function checkData(data) {
-    switch (typeof data) {
-    case 'string':
-        data = {value: data, label: data, alias: data.toLowerCase()}
-        break
-    case 'object':
-        if ( !is.string(data.value) || !is.string(data.label) ) {
-            rasti.error('Invalid data object (must have string properties "value" and "label"):', data)
-            //invalid_count++
-            data = {value: '', label: 'INVALID DATA', alias: ''}
-        }
-        else if ( !is.string(data.alias) ) {
-            if (data.alias) {
-                rasti.error('Invalid data property "alias" (must be a string):', data)
-                //invalid_count++
-            }
-            data.alias = data.value.toLowerCase()
-        }
-        else data.alias = data.alias.toLowerCase() +' '+ data.value.toLowerCase()
-        break
-    default:
-        rasti.error('Invalid data (must be a string or an object):', data)
-        //invalid_count++
-        data = {value: '', label: 'INVALID DATA', alias: ''}
-    }
-    return data
-}
-
-
-function html(templateObject, ...substs) {
-    // Use raw template strings (don’t want backslashes to be interpreted)
-    const raw = templateObject.raw
-    let result = ''
-
-    substs.forEach((subst, i) => {
-        let lit = raw[i]
-        // Turn array into string
-        if ( is.array(subst) ) subst = subst.join('')
-        // If subst is preceded by an !, escape it
-        if ( lit.endsWith('!') ) {
-            subst = htmlEscape(subst)
-            lit = lit.slice(0, -1)
-        }
-        result += lit
-        result += subst
-    })
-    // Take care of last template string
-    result += raw[raw.length - 1]
-
-    return result
-}
-
-
-function htmlEscape(str) {
-    return str.replace(/&/g, '&amp;') // first!
-        .replace(/>/g, '&gt;')
-        .replace(/</g, '&lt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
-        .replace(/`/g, '&#96;')
-}
-
-
-function resolveAttr($el, name) {
-    var value = $el.attr(name) || $el.attr('name') || $el.attr('prop') || $el.attr('nav') || $el.attr('section') || $el.attr('panel') || $el.attr('page') || $el.attr('template')
-    if (!value) rasti.warn('Could not resolve value of [%s] attribute in el:', name, $el[0])
-    return value
-}
-
-
-const random = () => (Math.random() * 6 | 0) + 1
-
-
-const onMobile = () => window.innerWidth < 500
-
-
-module.exports = {
-    is,
-    type,
-    sameType,
-    exists,
-    compose,
-    prepTemplate,
-    inject,
-    checkData,
-    html,
-    resolveAttr,
-    random,
-    onMobile,
-}
-
-},{}]},{},[14])(14)
+},{"./js/blocks/all":1,"./js/components":10,"./js/extensions":11,"./js/fx":12,"./js/icons":13,"./js/themes":14,"./js/utils":15}]},{},[16])(16)
 });
-//# sourceMappingURL=rasti.map
+
+//# sourceMappingURL=rasti.js.map
