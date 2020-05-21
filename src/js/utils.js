@@ -1,3 +1,8 @@
+/**
+ * Better 'typeof'.
+ * @param {any} exp Expression
+ * @returns {string} The type of the expression
+ */
 function type(exp) {
     const clazz = Object.prototype.toString.call(exp)
     return clazz.substring(8, clazz.length-1).toLowerCase()
@@ -6,6 +11,9 @@ function type(exp) {
 const primitives = 'string number boolean symbol'
 const all_types = 'object function array regexp ' + primitives
 
+/**
+ * Utility object for declarative type checking.
+ */
 const is = {}
 all_types.split(' ')
     .forEach(t => {
@@ -24,21 +32,47 @@ is.nil = ref => !is.def(ref)
 const sameType = (exp1, exp2) => type(exp1) === type(exp2)
 
 
+/**
+ * Composes functions.
+ * @param {function} funcs Functions to be composed
+ * @returns {function} Composition of the provided functions
+ */
 const compose = (...funcs) => funcs.reduce((prev, curr) => (...args) => curr(prev(...args)))
 
 
+/**
+ * Decorator "factory" for making methods chainable.
+ * @param {Object} ref An object reference
+ * @returns {function} A decorator that wraps a method returning the provided reference
+ */
 const chain = ref => method => (...args) => { method(...args); return ref }
 
 
+/**
+ * Decorator "factory" for making methods safe.
+ * @param {function} err_handler An error handler
+ * @returns {function} A decorator that wraps a method in a try-catch using the provided error handler
+ */
 const safe = err_handler => method => (...args) => {
     try { method(...args) }
     catch(err) { is.array(err) ? err_handler(...err) : err_handler(err) }
 }
 
 
+/**
+ * Decorator for "$check"ing the first argument of a method.
+ * @param {function} method Method to decorate
+ * @returns {function} Decorated method
+ */
 const $ify = method => (el, ...args) => method($check(el), ...args)
 
 
+/**
+ * Checks if an element is a $ instance, turns it to one if its a DOM node, throws if its sth else.
+ * @param {any} el Element to be checked
+ * @returns {$} $ instance of element
+ * @throws error
+ */
 function $check(el) {
     if (el instanceof $) return el
     else if (el instanceof Node) return $(el)
@@ -46,9 +80,20 @@ function $check(el) {
 }
 
 
+/**
+ * Decorator for templates, adds data checking.
+ * @private
+ * @param {function} tmpl_func Template function
+ * @returns {function} Decorated template with integrated data checking
+ */
 const prepTemplate = tmpl_func => data => data.map( compose( checkData, tmpl_func )).join('')
 
 
+/**
+ * Injects scripts or stylesheets into the document.
+ * @param {string | string[]} sources The URIs of the sources to inject
+ * @param {object} options Options object
+ */
 function inject(sources, {parallel}={}) {
     if (is.string(sources)) sources = sources.split(',')
     if (is.not.array(sources)) return rasti.error('Invalid sources, must be an array or a string')
@@ -60,14 +105,14 @@ function inject(sources, {parallel}={}) {
         const $el = 'css' === ext
             ? $('<link rel=stylesheet>').attr('href', src)
             : $('<script>').attr('src', src)
-
+  
         if (!parallel)
-        $el[0].onload = () => {
-            rasti.log('> Loaded %s', src)
-            sources.length
-                ? do_inject(sources)
-                : rasti.log('All sources loaded')
-        }
+            $el[0].onload = () => {
+                rasti.log('> Loaded %s', src)
+                sources.length
+                    ? do_inject(sources)
+                    : rasti.log('All sources loaded')
+            }
 
         $el[0].onerror = e => {
             rasti.error('> Error loading %s', src, e)
@@ -83,6 +128,12 @@ function inject(sources, {parallel}={}) {
 }
 
 
+/**
+ * Performs checks on the provided data and normalizes it. Used for rasti blocks.
+ * @private
+ * @param {string | object} data Data to normalize
+ * @returns {object} Normalized data
+ */
 function checkData(data) {
     switch (typeof data) {
         case 'string':
@@ -112,6 +163,13 @@ function checkData(data) {
 }
 
 
+/**
+ * Tagged template function for parsing/rendering html templates. Interpolates the substitutions into the html.
+ * @private
+ * @param {string[]} strings Chopped-up html template
+ * @param   {...any} substs Substitutions
+ * @returns {string} The interpolation
+ */
 function html(strings, ...substs) {
     // Use raw template strings (don’t want backslashes to be interpreted)
     const raw = strings.raw
@@ -136,6 +194,12 @@ function html(strings, ...substs) {
 }
 
 
+/**
+ * Helper for escaping html
+ * @private
+ * @param {string} str Html to escape
+ * @returns {string} Escaped html
+ */
 function htmlEscape(str) {
     return str.replace(/&/g, '&amp;') // first!
         .replace(/>/g, '&gt;')
@@ -146,6 +210,13 @@ function htmlEscape(str) {
 }
 
 
+/**
+ * Resolves the value of an attribute using a chain of fallback attributes.
+ * @private
+ * @param {Node | $} element Element
+ * @param {string} name Attribute name
+ * @returns {string | undefined} Resolved value (if any)
+ */
 const resolveAttr = $ify(($el, name) => {
     const attrs = `${name} name template prop nav section panel page`.split(' ')
     do { value = $el.attr( attrs.shift() ) } while (!value && attrs.length)
@@ -155,8 +226,10 @@ const resolveAttr = $ify(($el, name) => {
 
 
 /**
- * Makes a widget navigatable via keyboard
- * @param {jquery object} $el widget container
+ * Makes an element or a template navigatable via keyboard, which means it can be
+ * focused via Tab key, clicked via Enter or Space keys, and for templates
+ * its direct children can be traversed (same level only) via arrow keys.
+ * @param {Node | $} $el Element or template container
  */
 const keyNav = $ify($el => {
 
@@ -212,10 +285,14 @@ const keyNav = $ify($el => {
 })
 
 
+/**
+ * Quick and dirty random integer between 1 and 10
+ * @returns {Number} Random integer
+ */
 const random = () => (Math.random() * 6 | 0) + 1
 
 
-const public = {
+const publ = {
     is,
     type,
     sameType,
@@ -229,7 +306,7 @@ const public = {
     keyNav,
 }
 
-const private = {
+const priv = {
     prepTemplate,
     checkData,
     html,
@@ -237,7 +314,7 @@ const private = {
 }
 
 module.exports = {
-    ...public,
-    ...private,
-    public,
+    ...publ,
+    ...priv,
+    public: publ,
 }

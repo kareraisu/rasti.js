@@ -1,0 +1,32 @@
+{
+    "source": {
+        "include": ["readme.md", "src/js/utils.js"],
+        "exclude": ["dist", "lib"]
+    },
+    "opts": {
+        "destination": "docs/",
+        "template": "node_modules/docdash"
+    },
+    "plugins": [
+        "plugins/markdown"
+    ],
+    "docdash": {
+        "search": true,
+        "collapse": true,
+        "private": false,
+        "menu": {
+            "github": {
+                "href":"https://github.com/kareraisu/rasti.js",
+                "target":"_blank",
+                "class":"menu-item",
+                "id":"github_link"
+            },
+            "demos": {
+                "href":"https://github.com/kareraisu/rasti-demo",
+                "target":"_blank",
+                "class":"menu-item",
+                "id":"demos_link"
+            }
+        }
+    }
+}
