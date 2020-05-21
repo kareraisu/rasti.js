@@ -36,31 +36,32 @@ const safe = err_handler => method => (...args) => {
 }
 
 
+const $ify = method => (el, ...args) => method($check(el), ...args)
+
+
+function $check(el) {
+    if (el instanceof $) return el
+    else if (el instanceof Node) return $(el)
+    else throw 'invalid argument "el", must be a DOM node or a $ instance'
+}
+
+
 const prepTemplate = tmpl_func => data => data.map( compose( checkData, tmpl_func )).join('')
 
 
-function inject(sources) {
+function inject(sources, {parallel}={}) {
     if (is.string(sources)) sources = sources.split(',')
     if (is.not.array(sources)) return rasti.error('Invalid sources, must be an array or a string')
     const $body = $(document.body)
 
     function do_inject(sources) {
-        const src = sources.shift().trim()
+        const src = is.array(sources) ? sources.shift().trim() : sources.trim()
         const ext = src.split('.')[1]
-        let $el
+        const $el = 'css' === ext
+            ? $('<link rel=stylesheet>').attr('href', src)
+            : $('<script>').attr('src', src)
 
-        switch (ext) {
-            case 'js':
-                $el = $('<script>').attr('src', src)
-                break
-            case 'css':
-                $el = $('<link rel=stylesheet>').attr('href', src)
-                break
-            default:
-                rasti.error('Invalid source "%s", must be a js script or a css stylesheet', src)
-                return
-        }
-  
+        if (!parallel)
         $el[0].onload = () => {
             rasti.log('> Loaded %s', src)
             sources.length
@@ -76,7 +77,9 @@ function inject(sources) {
         $body.append($el)
     }
 
-    do_inject(sources)
+    parallel
+        ? sources.map(do_inject)
+        : do_inject(sources)
 }
 
 
@@ -109,9 +112,9 @@ function checkData(data) {
 }
 
 
-function html(templateObject, ...substs) {
+function html(strings, ...substs) {
     // Use raw template strings (don’t want backslashes to be interpreted)
-    const raw = templateObject.raw
+    const raw = strings.raw
     let result = ''
 
     substs.forEach((subst, i) => {
@@ -143,18 +146,19 @@ function htmlEscape(str) {
 }
 
 
-function resolveAttr($el, name) {
-    var value = $el.attr(name) || $el.attr('name') || $el.attr('template') || $el.attr('prop') || $el.attr('nav') || $el.attr('section') || $el.attr('panel') || $el.attr('page')
+const resolveAttr = $ify(($el, name) => {
+    const attrs = `${name} name template prop nav section panel page`.split(' ')
+    do { value = $el.attr( attrs.shift() ) } while (!value && attrs.length)
     if (!value) rasti.warn('Could not resolve value of [%s] attribute in el:', name, $el[0])
     return value
-}
+})
 
 
 /**
  * Makes a widget navigatable via keyboard
  * @param {jquery object} $el widget container
  */
-function keyNav($el) {
+const keyNav = $ify($el => {
 
     if ($el.is('[template]')) {
         $el.on('keydown', e => {
@@ -205,7 +209,7 @@ function keyNav($el) {
         $el.attr('tabindex', 0)
             .on('keydown', e => !'Enter Space'.includes(e.key) || (e.target.click(), false))
     }
-}
+})
 
 
 const random = () => (Math.random() * 6 | 0) + 1
@@ -220,6 +224,8 @@ const public = {
     compose,
     chain,
     safe,
+    $ify,
+    $check,
     keyNav,
 }
 
