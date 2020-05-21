@@ -1,7 +1,7 @@
 require('./js/extensions')
 const { History, Pager, state, crud } = require('./js/components')
 const utils = require('./js/utils')
-const { is, sameType, resolveAttr, chain, safe, compose, html } = utils
+const { is, sameType, resolveAttr, chain, safe, compose, $ify, $check, html } = utils
 const { themes, themeMaps } = require('./js/themes')
 let media
 
@@ -91,11 +91,13 @@ function rasti(name, container) {
     this.media = {}
 
 
-    // public methods
+    // decorators
 
     const api = compose(safe(error), chain(this))
-
     
+
+    // public methods
+
     const config = api(props => {
 
         if ( is.nil(props) ) return warn('Called config() on app [%s] with no arguments', __name)
@@ -173,16 +175,12 @@ function rasti(name, container) {
 
         // fix labels
         NOCHILD_TAGS.forEach( tag => {
-            container.find(tag + '[label]').each( el => {
-                fixLabel($(el))
-            })
+            container.find(tag + '[label]').each($ify(fixLabel))
         })
 
 
         // fix input icons
-        container.find('input[icon]').each( el => {
-            fixIcon($(el))
-        })
+        container.find('input[icon]').each($ify(fixIcon))
 
 
         // init blocks and data templates
@@ -272,9 +270,7 @@ function rasti(name, container) {
         }
 
         // init keyboard-navigatable elements
-        container.find('[key-nav]').each( el => {
-            utils.keyNav($(el))
-        })
+        container.find('[key-nav]').each(utils.keyNav)
 
         
         bindProps(container, self.props)
@@ -356,11 +352,11 @@ function rasti(name, container) {
 
         const $nav = container.find('nav')
         if ($nav.length) {
-        $page.hasClass('hide-nav')
+            $page.hasClass('hide-nav')
                 ? $nav.hide()
                 : $nav.show()
                     .find('[nav]').removeClass('active')
-            .filter('[nav='+ pagename +']').addClass('active')
+                    .filter('[nav='+ pagename +']').addClass('active')
         }
 
         container.trigger('rasti-nav')
@@ -393,7 +389,8 @@ function rasti(name, container) {
             if ( !$el.length ) throw errPrefix + 'no element bound to template. Please bind one via [template] attribute.'
         }
         else {
-            $el = el.nodeName ? $(el) : el
+            $el = $check(el)
+            el = $el[0]
             name = $el.attr('template')
             if (!name) {
                 // assign hashed name
@@ -601,7 +598,7 @@ function rasti(name, container) {
     })
 
 
-    const updateBlock = api(($el, data) => {
+    const updateBlock = api($ify(($el, data) => {
 
         const el = $el[0]
         let type = $el.attr('block') || el.nodeName.toLowerCase()
@@ -662,7 +659,7 @@ function rasti(name, container) {
             */
         }
 
-    })
+    }))
 
 
     function toggleFullScreen(e) {
