@@ -187,7 +187,9 @@ function rasti(name, container) {
 
         // init blocks and data templates
         container.find('[data]').each( el => {
-            updateBlock($(el))
+            el.hasAttribute('template')
+                ? render(el)
+                : updateBlock(el)
         })
 
 
@@ -322,9 +324,9 @@ function rasti(name, container) {
 
         if (!pagename) throw ['Cannot navigate, page undefined']
 
-        var $prevPage = self.active.page,
+        const $prevPage = self.active.page,
             prevPagename = $prevPage && $prevPage.attr('page'),
-            prevPage = prevPagename && self.pages[prevPagename]
+            prevPageConfig = prevPagename && self.pages[prevPagename]
 
         if (pagename == prevPagename) return
 
@@ -338,30 +340,28 @@ function rasti(name, container) {
 
         if ($prevPage) $prevPage.removeClass('active')
 
-        if (prevPage && prevPage.out) {
-            is.not.function(prevPage.out)
+        if (prevPageConfig && prevPageConfig.out) {
+            is.not.function(prevPageConfig.out)
                 ? warn('Page [%s] {out} property must be a function!', prevPagename)
-                : prevPage.out(params)
+                : prevPageConfig.out(params)
         }
 
-        self.active.page = $page
+        self.active.page = $page.addClass('active')
 
-        if ( params && is.not.object(params) ) warn('Page [%s] nav params must be an object!', pagename)
         if (page && page.in) {
-            is.not.function(page.in)
-                ? warn('Page [%s] {in} property must be a function!', pagename)
-                : page.in(params)
+            is.not.function(page.in) ? warn('Page [%s] {in} property must be a function!', pagename)
+            : params && is.not.object(params) ? warn('Page [%s] nav params must be an object!', pagename)
+            : page.in(is.object(params) && params)
         }
 
+        const $nav = container.find('nav')
+        if ($nav.length) {
         $page.hasClass('hide-nav')
-            ? container.find('nav').hide()
-            : container.find('nav').show()
-
-        $page.addClass('active')
-
-        container
-            .find('nav [nav]').removeClass('active')
+                ? $nav.hide()
+                : $nav.show()
+                    .find('[nav]').removeClass('active')
             .filter('[nav='+ pagename +']').addClass('active')
+        }
 
         container.trigger('rasti-nav')
 
@@ -859,10 +859,10 @@ function rasti(name, container) {
             navTo(prev_state.page)
         else {
             // nav to page in hash or to root or to first page container
-            const page = location.hash.substring(1) || self.options.root
-            navTo(page && self.pages[page]
-                ? page
-                : container.find('[page]').first().attr('page'))
+            let page = location.hash.substring(1) || self.options.root
+            !page && (page = container.find('[page]')[0]) && (page = page.getAttribute('page'))
+            !page ? warn('No pages found, please create at least one page for your app')
+            : navTo(page)
         }
     }
 
