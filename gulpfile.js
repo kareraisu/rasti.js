@@ -99,12 +99,12 @@ task('watch', (done) => {
     done()
 })
 
-task('report', () =>
+task('size', () =>
     src([paths.dist + '/rasti.js', paths.dist + '/rasti.min.js'])
     .pipe(sizereport(sizeopts))
 )
 
 task('build', s('styles', 'merge', 'bundle'))
 task('dev', s('build', 'watch'))
-task('prod', s('build', 'minify', 'report'))
+task('prod', s('build', 'minify', 'size'))
 task('default', s('dev'))
