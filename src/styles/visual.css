@@ -1,3 +1,78 @@
+.tab-group {
+    display: flex;
+    flex-wrap: nowrap;
+    height: 100%;
+    min-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+.tab-group > * {
+    display: inline-block;
+    white-space: normal;
+    height: 100%;
+    min-width: 100%;
+    border-radius: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: auto !important;
+    margin-right: auto;
+    vertical-align: top;
+}
+.tab-labels + .tab-group {
+    height: calc(100vh - 50px);
+}
+nav ~ [page] > .tab-labels + .tab-group {
+    height: calc(100vh - 100px);
+}
+
+nav, .tab-labels {
+    position: relative;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    min-width: 100vw;
+    height: 50px;
+    padding: 0;
+    border-bottom: 1px solid var(--darkener);
+    border-radius: 0;
+    text-transform: capitalize;
+}
+nav {
+    z-index: 8;
+}
+.tab-labels {
+    justify-content: space-around;
+    z-index: 2;
+}
+.tab-labels > .bar {
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 4px;
+    transition: left 0.2s, width 0.2s;
+}
+nav > div, nav > a,
+[tab-label] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1 1 auto;
+    height: 100%;
+    min-width: 50px;
+    padding: 5px;
+    font-size: 1.4em;
+    text-shadow: 0 0 0 #000;
+    text-decoration: none;
+    border-right: 1px solid #0003;
+    color: inherit;
+    cursor: pointer;
+}
+nav > div, nav > a {
+    transition: all 0.2s;
+}
+[tab-label].active {
+    filter: contrast(1.5);
+}
+
 .list {
     border: 1px solid var(--darkener);
 }
