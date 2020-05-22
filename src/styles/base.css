@@ -135,6 +135,7 @@ button {
     font-size: 1.2em;
     text-align: center;
     text-decoration: none;
+    text-transform: capitalize;
 }
 button:not(:disabled):focus,
 button:not(:disabled):hover {
