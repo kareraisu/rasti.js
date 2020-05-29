@@ -1,15 +1,13 @@
 {
     "source": {
-        "include": ["readme.md", "src/js/utils.js"],
+        "include": ["README.md", "src/js/utils.js"],
         "exclude": ["dist", "lib"]
     },
     "opts": {
         "destination": "docs/",
         "template": "node_modules/docdash"
     },
-    "plugins": [
-        "plugins/markdown"
-    ],
+    "plugins": [],
     "docdash": {
         "search": true,
         "collapse": true,

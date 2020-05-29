@@ -1,388 +1,243 @@
 # Rasti.js
 
-<img align=right height=150 src="http://www.rasti.com.ar/files/img_products/avion-2.png">
+<img align=right height=150 src="rasti-logo.png">
 
-Rasti is a tiny frontend framework for building prototypes in a fast and simple way. It was born from the process of building a prototype in which I wanted to be able to write just the essential, while also making the code as expressive as possible. This led to a super-terse attribute-driven html api backed by simple javascript objects classified in namespaces.
+Rasti.js is a tiny frontend framework for building web prototypes in a fast and simple way. It was born from the process of building a prototype with the desire of being able to write just the essential, while also making the markup as expressive as possible. This led to a declarative attribute-driven html API backed by namespaces and a thin js API consisting of just  6 methods and a couple of objects.
+
+# ❓ Why another framework? (for the love of Thor!)
+
+The main motivation behind Rasti.js is `conciseness`, with `flexibility` in a second place. This means that its main goal is to be `brief` yet `expressive`, which is another way of saying `simple` but `powerful`. The basics can be learned in 10 minutes, the whole framework in less than an hour.
+
+It is well suited for prototypes and small apps or demos and can be used as a stepping stone for jr devs before diving into more sophisticated frameworks like Vue or Angular (or React, though it is not a framework by itself and it deviates more in terms of cognitive load).
+
+# 🧰 What's included? (and what's not)
+
+Rasti.js is lightweight (40 KB minified, 30 KB gzipped) yet it includes all the features needed for making a nice Single Page App:
+
+- Navigation / Routing
+- Templating
+- State management
+- Reactivity
+- Components (called "blocks") (WIP)
+- Responsiveness
+- i18n / l10n
+- a11y (WIP)
+- Icons (700+)
+
+That said, it is not concerned (at least for the time being) with other (contextually crucial) things such as:
+- Security
+- Performance
+
+Just to be clear on that:
+
+**`*** DO NOT USE THIS FRAMEWORK FOR SENSITIVE STUFF. ALL YOUR DATA ARE BELONG TO US. YOU HAVE BEEN WARNED. ***`**
+
+Got it? Great! Moving on.
 
 
+# 🎮 Try it out!
 
-## Getting started
+Want to take rasti up for a spin? See if it suits you?  
+Do you learn by fiddling rather than reading boring stuff? (hey! ಠ_ಠ)
 
-The easiest way to get started is to download the rasti+zepto bundle, insert it into your html at the end of the body and declare your app in the body start tag, like so:
+If so, you can try it out [right now](https://codepen.io/kareraisu/pen/WNQqEgq?editors=1010), no config needed, no strings attached.
+
+You can also check out [the demos](https://rasti-demo.herokuapp.com/) to get a sense of what you can do with it.
+
+Interested? Awesome, read on!
+
+
+# 🚀 Getting started
+
+## Adding rasti.js and declaring your app
+
+### The straight-forward way
+
+The easiest way to get started with rasti.js is to add the CDN-hosted bundle to your html at the end of the `<head>` tag and declare your app in the `<body>` start tag with the `[rasti]` attribute, like so:
 
 ```html
-<body rasti="cool-app">
-    
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- head stuff -->
+    <script src=https://unpkg.com/@kareraisu/rasti></script>
+</head>
+<body rasti=coolApp>
     <!-- cool app here -->
-
-    <script src="rasti+zepto.min.js"></script>
 </body>
+</html>
 
 ```
 
-Alternatively, you can clone or download the whole repo, open the example app inside the 'app' folder and start fiddling with it. You can open it simply by opening the index.html in a browser, or you can set up the dev environment to have live-reload capabilities (for this, see the Contributing section).
+The `[rasti=coolApp]` declaration does 3 things:
+1. Creates a rasti instance named `coolApp`
+2. Binds it to the container
+3. Creates a `coolApp` global var to access the instance ( `window.coolApp = instance` )
 
 
+*Note: You can declare your app in any container element you wish, such as a `<div>`. The `<body>` just happens to be the most usual candidate.*
 
-## Initialization
+Of course you may also download the bundle to your local file system and load it from there. Just make sure to publish the bundle along with the rest of your app if you do.
+
+### The npm way
+
+Alternatively, you can install it as dependency of your project via npm (you must have [Node.js](https://nodejs.org) installed):
+
+```
+$ npm i @kareraisu/rasti
+```
+
+This will clone this whole repo to your `node_modules` folder and add an entry for it in the `dependencies` section of your `package.json` manifest file. The rasti.js bundles will be in `node_modules/kareraisu/rasti/dist`.
+
+
+## Adding some pages
+
+An app is made of one or more "screens" or "views". In rasti these are called "pages", since that is the common term used in the web (because a web site is a document).
+To add a page to your app simply create a `<div>` inside your app container with a `[page]` attribute with some meaningful name.
+
+```html
+<body rasti=cool_app>
+    
+    <div page=main>
+        <h1>This is the main page</h1>
+        <!-- main page content -->
+    </div>
+
+    <div page=about>
+        <h1>About this cool app</h1>
+        <!-- cool trivia -->
+    </div>
+
+</body>
+```
+
+## Navigating between pages
+
+For the user to be able to navigate to another page, simply add an element with a `[nav]` attribute with the name of the target page.
+
+```html
+<body rasti=cool_app>
+    
+    <div page=main>
+        <h1>This is the main page</h1>
+        <!-- could be like this -->
+        <button nav=about>About</button>
+        <!-- or this -->
+        <a nav=about>About</a>
+        <!-- or this -->
+        <span nav=about>About</span>
+    </div>
+
+    <div page=about>
+        <h1>About this app</h1>
+    </div>
+
+</body>
+```
+
+
+## Initializing the app
+
+Finally, to get your app running, just call `config()` with your app configuration and then `init()` with any init options you want. Note that these methods are chainable. 
 
 ```javascript
 
-app.extend({
+const config = {
     pages: {...},
     data: {...},
-    ajax: {...},
-    templates: {...},
+    methods: {...},
     themes: {...},
-    blocks: {...},
-    fx: {...},
-    utils: {...},
-})
-
-app.init({
-    root : 'rootPage', // defaults to first page in html
-    theme : 'myTheme', // defaults to 'base' theme
-})
-```
-
-
-
-## API
-
-The whole framework is driven by attributes which can be classified into seven categories. Also, there are some utility methods available.
-
-
-### Structure
-
-**[page]**  
-Defines a page of the app. A page is a top-level container. It's value must be a unique name among all the page containers defined within the app.
-
-**[panel]** and **[section]**  
-Define a container of related content. Panels contain sections.
-
-**[modal]**
-Defines a container as a modal element.
-
-**[menu]**
-Defines a container as a menu element.
-
-**[row]** and **[col-1]** to **[col-12]**  
-Define a responsive grid a la bootstrap (12 columns grid system). Rows contain columns.
-
-
-### Text
-
-**[header]**  
-Creates a header for a container, it's value becomes the text of the header. Can be used with panels and pages.
-
-**[label]**  
-Creates a label for an element, it's value becomes the text of the label. Can be used with any element, except panels and pages.
-
-**[text]**  
-Creates text within an element, it's value becomes the text.
-
-These three attributes can be localized by using a language key for their value.
-
-
-### Navigation
-
-**[nav]**  
-Defines a navigation action. It's value must be the name of a page. When the element is clicked, the app navigates to the specified page.
-
-**[navparam]**  
-Defines a navigation parameter. It's value must be a unique name among all the navparam elements defined within the enclosing page.
-
-**[params]**  
-Binds a params object to a nav action (if used, it must be accompanying a [nav] attribute). It's value must be a series of space separated navparam names, or empty. The current value of all specified navparam elements within the current page will be copied into an object which will be passed to the init function of the target page. If the attribute value is empty, the prior will apply to all existing navparam elements within the current page.
-
-
-### Blocks (custom elements)
-
-Rasti comes with a couple of custom elements for speeding up UI implementation. These elements are available via the [rasti] attribute:
-
-**[rasti=radios]**  
-Creates a group of related radio buttons.
-
-**[rasti=buttons]**  
-Creates a group of small related persistent buttons (currently singletons).
-
-**[rasti=multi]**  
-Creates a multi select element whose value is an array.
-Options:
-- [max] : must be a number, sets the maximum number of options that can be selected at once.
-- [filter] : must be a string or empty, enables filtering options via an input field, it's value will be the input's placeholder text.
-
-There is one more custom element that doesn't use the [rasti] attribute.
-
-**select[img]**  
-Creates a select capable of showing images in its options. The images are retrieved from the relative path specified in the [img] attribute.
-
-#### Adding blocks
-Blocks can be added to the framework via the {blocks} namespace (see the Configuration section).
-
-
-### Data
-
-**[field]**  
-Applies rasti styles to an element. If it has a value, it will be used as the key for the element's value in a potential ajax method data object.
-
-**[data]**  
-Binds the data source for an element. It's value must be the name of a defined data source (a key in the {data} namespace).
-
-**[ajax]**  
-Binds an ajax method to a container. It's value must be the name of a defined ajax method (a key in the {ajax} namespace).
-
-**[submit]**  
-Defines an element as a trigger for an ajax method. It's value must be the name of a defined ajax method. When the element is clicked, the method is called with a data object containing the current values of all the [field] elements within the [ajax] container bound to the ajax method.
-
-
-### Templating
-
-**[template]**  
-Binds a template to a container. It's value must be the name of a defined template (a key in the {template} namespace). Each time the template is executed, it's output is rendered inside the container.
-
-**[render]**  
-Defines an element as a trigger for a template. It's value must be the name of a defined template. When the element is clicked, the template is rendered.
-
-**[paging]**  
-Adds paging to a template. It's value must be a number, which indicates the page size (the maximum number of elements a page can hold).
-
-**[fx]**  
-Applies a visual effect to an element or container. It's value must be the name of a defined fx. When the element is rendered, the visual effect is displayed.
-
-
-### Actions
-
-**[on-click]**, **[on-change]**, **[on-hover]**, **[on-focus]**, **[on-load]**   
-Bind an utility method to an element's event. It's value must be the name of a defined utility method (a key in the {utils} namespace). When the event is triggered, the utility method will be called with the event object as its sole argument.
-
-**[show]**, **[hide]** and **[toggle]**   
-They allow an element's click or hover event to change another element's visibility in a simple fashion. It's value must be a selector string of the form 'attr=value' (the target element, which must be in the same page).
-
-
-### Functional
-
-**[movable]**
-Makes an element freely movable via drag and drop.
-
-**[resizable]**
-Makes an element resizable (adds a small handle in the bottom-right corner).
-
-**[foldable]**
-Makes an element foldable upon clicking on its header (must be used along with the [header] attr).
-
-
-### Utility Classes
-
-These are classes (values of the [class] attribute), and have two variants:
-- normal/single (no alteration): they affect the element to which they are applied.
-- container/batch (adding an underscore at the end): they affect all immediate children of the element to which they are applied.
-
-Their names are pretty straight-forward:
-- rel: relative positioning
-- fix: fixed positioning
-- inline: inline-block display
-- big, small: change the size of [field]s, [btn]s and [icon]s
-- round: make an element round (ie [btn]s and [icon]s)
-- floating: useful for creating [field]s with [icon]s
-- left, right, top, bottom: absolute positioning
-- centerx, centery, center: absolute centering in x, y or both
-- fcenterx, fcentery, fcenter: flex centering in x, y or both
-- fullw, fullh: full width or height
-- halfw, halfh: half width or height
-- autow, autoh: auto width or height
-- autom: auto margin
-- scrollx, scrolly, scroll: scroll in the x axis, y axis or both
-- columns-2, columns-3: arrange elements in 2 or 3 columns (these are meant for containers, thus they don't have an underscore variant)
-- scale-up: scale a bit upon hover
-
-Besides these, there are some classes that come in handy for tuning element visibility, spacing and structure across different viewport sizes. They are of the form `<name>-<size>`, where the sizes are `phone`, `tablet` and `desktop`:
-- show-<size>: shows the element for some viewport size
-- hide-<size>: hides the element for some viewport size
-- pad-s-<size>: applies a small padding to the element for some viewport size
-- pad-<size>: applies a medium padding to the element for some viewport size
-- pad-l-<size>: applies a large padding to the element for some viewport size
-- hh-<size>: hides any [header] defined on the element for some viewport size
-- tabs-<size>: creates tabs within the element for some viewport size (meant for containers)
-
-Also, you can use any theme's color name as a class to apply the color to an element as the background-color upon setting the theme. For example, a div with the class 'detail' will be applied a background-color: 'darkcyan' when setting the theme 'base' (set by default in app.init()). See the configuration section for more details on adding themes.
-
-
-### Methods
-**get(selector)**  
-selector : string  
-Returns a jquery object of the DOM element specified by the selector.
-
-**set(selector, value)**  
-selector : string, value : any  
-Sets the value of the DOM element specified by the selector.
-
-**add(selector, item)**  
-selector : string, item : any  
-Adds an item to the value of the DOM element specified by the selector. This must only be used with elements whose value is an array.
-
-These three methods target elements in the active page only, and the selectors must be strings with the form 'attribute=value' (or just 'attribute'). Their use is encouraged over jquery or native DOM querying since they trigger a change event on the target, which would otherwise need to be explicitly triggered for rasti blocks to update their UI.
-
-**navTo(pageName, navParams)**  
-pageName : string, navParams : object (optional)  
-Navigates to the given page. If navParams are provided, they are passed to the in() function of the page.
-
-**setTheme(themeName, mapName)**  
-themeName : string, mapName : string (optional)  
-Loads the given theme (either a default framework theme or else defined in the {themes} namespace). If a map name is provided, it will be first looked up in the theme and then -if not found- in the framework. If the map name is not found in neither, or is not provided, the default 'light' map will be used.
-
-**setLang(langName)**  
-langName : string  
-Loads the given language (which must be defined in the {langs} namespace).
-
-**updateBlock($el, data)**  
-$el : jQuery object, data : array or function (optional)  
-Updates the options/items of the given element (which must be a rasti block, a select or a list) according to the given data, or if no data argument is provided, to the data source specified in the [data] attribute of the element.
-
-
-
-## Namespaces
-
-Rasti allows to define the pages, data sources, ajax methods and templates of the app and also to add themes, languages, "blocks" (custom elements), visual effects and utility methods via the following namespaces. These are just object properties of any given rasti instance and can be accesed directly as such (instance.namespace) or -just for the sake of code brevity- they can also be extended using the extend() method.
-
-**pages: {...}**  
-Defines the pages of the app. Pages must be objects which can have any or all of the following properties:
-- url: a string which represents the page's url fragment identifier (aka 'hash'), which will be updated upon navigation (or will dictate navigation from the browser location bar).
-- init: a function with no arguments which is used to initialize the page state (this function is called once during app initialization).
-- in: a function which takes an optional 'navParams' object argument, used to update the page state upon navigation. This function is called everytime the user navigates into the page.
-- out: a function which takes an optional 'navParams' object argument, used to update the page state upon navigation. This function is called everytime the user navigates away from the page.
-
-**data: {...}**  
-Defines the data sources available for binding to elements via the [data] attribute. For templates, data sources can be anything the template expects. For rasti blocks, data sources must be arrays of strings or arrays of objects with string properties 'value' and 'label'.
-Data sources can also be functions with a callback argument, which should be called with the actual data, allowing for ajax-driven data sources.
-
-**ajax: {...}**  
-Defines the ajax methods available for binding to containers via the [ajax] attribute (and to triggers via the [submit] attribute). The ajax methods must take 2 arguments: a data object and a callback function.
-
-**templates: {...}**  
-Defines the templates available for binding to containers via the [template] attribute (and to triggers via the [render] attribute). The templates -as usual- must be functions that take a data object or array and return a string of html.
-
-**themes: {...}**  
-Adds themes available for applying via the setTheme() method. The themes must be objects with the following structure:
-
-```javascript
-themeName : {
-    font : 'normal 14px sans-serif',
-    palette : {
-        light:  '#ddd',
-        mid:    '#aaa',
-        dark:   '#444',
-        detail: 'darkcyan',
-    },
-    maps : {
-        mapName1 : {
-            page :    'light detail',
-            panel :   'dark detail',
-            section : 'mid dark',
-            field :   'light dark',
-            btn :     'detail light',
-            text :    'dark',
-            label :   'light',
-        },
-        mapName2 : {...},
-    }
+    langs: {...},
 }
+
+const options = {...}
+
+cool_app
+    .config(config)
+    .init(options)
+
 ```
 
-This is an example using the color names defined in the default themes and maps. The theming system uses maps to give more flexibility to themes, allowing to create variatons of the same palette. Thus, the names and quantity of the colors are without constraint, but if you want to use your own names, you must define at least one custom theme map with those names. If no map is defined, the default 'light' map will be used (in which case your theme must use the default color names or it won't load).
+And that's it!  
+Although there is one more thing worth mentioning...
 
-All theme map keys except 'text' and 'label' expect two colors, the first will be used for the background and the second for the header (in the case of containers) or the text of the element. (page, panel, section : 'bgcolor headercolor', fiel, btn : 'bgcolor textcolor').
+## Keeping it clean
+Of course that was just a tiny example. As you build your app, your config will grow and you may want to add some custom styles.  
+When that happens, it makes sense to split up your code and have the logic and the styles in separate files. You then would link to these files in your html using `<script>` and `<link>` elements.  
+You could do that... or you could let rasti do it for you by simply adding a `[src]` attribute to your app container with a comma-separated list of all the sources your app needs.
 
-**langs: {...}**  
-Adds languages available for loading via the setLang() method. Languages nust be simple maps of strings (objects with string properties). Upon loading the language, all [header], [label] and [placeholder] attributes whose value matches a key of the language map will have their value replaced by the corresponding string. [text] attributes values are also matched against the language map, but the corresponding string is applied as the element's inner html (any prior contents will be lost).
-
-**blocks: {...}**  
-Adds blocks available to be used via the [block] attribute. They must have the following structure:
-
-```javascript
- blockName : {
-    template : function(data) {...}, // data : array
-    init : function($el) {...},      // $el : jQuery object
-    style : `...`                    // string of css rules
-}
+```html
+<body rasti=coolApp src="cool.css, cool.js, ...">
 ```
 
-**fx: {...}**  
-Adds visual effects available for binding to elements or containers via the [fx] attribute. Visual effects must be functions that take a jquery-wrapped element (the element to which they are bound).
-Rasti comes prepackaged with the following effects to use right out of the box:
-
-* **stack** (container): produces a bottom-to-top stacking effect on the element's children
-
-* **stamp** (container): produces a stamp-like effect on the element's children
-
-* more to come (maybe)
-
-**utils: {...}**  
-Adds utility methods within the app namespace available for general use and for quick binding as element event handlers via the [on-...] attributes.
+The sources will then be loaded in the specified order and your html will be a bit cleaner.
 
 
+# 📖 Documentation
 
-## Roadmap
+The previous section was just to get your feet wet.
 
-These are some of the things I've got in mind:
+Check out [the docs](DOCS.md) for a full description of all the things rasti has to offer.
 
-- [ ] accordeon block
-- [ ] carruosel block
-- [ ] easy toasts
-- [ ] css variables
-- [ ] internal (instance) history
-- [ ] easy keyboard bindings (per page or global)
-- [ ] conditional dependencies
-- [ ] navbar utility classes (top, bottom, side)
-- [ ] fullscreen toggle handle
-- [ ] more fx's (fade, slide, flip, twist)
+You can also peek into the [demos sources](https://github.com/kareraisu/rasti-demo/tree/master/demos) to get some insights.
 
-Done:
-- [x] themes api
-- [x] blocks api
-- [x] templates
-- [x] function data sources
-- [x] url navigation
+
+# 🍻 Contributing
+
+We are always happy to hear from you!
+
+Let us know of any bugs you find, improvements you think of or features you would like by [creating an issue](https://github.com/kareraisu/rasti.js/issues) (check first if your concern is already addressed).
+
+You can also help by fixing existing issues or implementing improvements or new features yourself! Head over to [Contributing](CONTRIBUTING.md) for more details.
+
+
+
+# 🗺️ Roadmap
+
+These are some of the things that are coming:
+
+- [ ] Refactor blocks into actual (web standard) custom elements
+- [ ] Improve theming with css variables
+- [ ] Easy toasts
+- [ ] Easy keyboard bindings (per page and global)
+- [ ] More fx's (fade, slide, flip, twist)
+
+<details>
+  <summary>Things already done</summary>
+
+- [x] Templates
+- [x] State management and persistence
+- [x] Themes api
+- [x] Blocks api
+- [x] Page hooks
+- [x] Url navigation
+- [x] Function data sources
 - [x] i18n support
-- [x] field validation **(docs pending)**
-- [x] field dependency **(docs pending)**
-- [x] state management and persistence **(docs pending)**
-- [x] paging
-- [x] tabs
-- [x] modals
-- [x] icons **(docs pending)** 
-- [x] attribute fallback
-- [x] app bootstrapping
-- [x] single bundle (js+css+zepto)
-- [x] scrollbar styles
-- [x] move & resize
-- [x] 'loading' component (circle) **(bar & dots pending)**
+- [x] Internal (instance) history
+- [x] Field validation (📝)
+- [x] Field dependency (📝)
+- [x] Paging
+- [x] Sidenav (📝)
+- [x] Tabs (📝)
+- [x] Modals and menus
+- [x] Icons  (📝)
+- [x] Attribute fallback
+- [x] App bootstrapping
+- [x] Single bundle (js+css)
+- [x] Base styles
 
+(📝) : docs pending
 
-## Contributing / Dev environment setup
-
-1. Fork / clone / download the repo : `$ git clone https://github.com/kareraisu/rasti.js.git`
-
-2. cd into your local copy : `$ cd rasti.js`
-
-3. Install dependencies : `$ npm install` (install [Node.js](https://nodejs.org/) first if you don't have it)
-
-4. Start the live-reload server : `$ gulp` (this also generates the bundles and watches all the files, see the gulpfile.js if curious)
-
-5. Hack away
-
-6. Make a Pull Request (if you forked)
-
-Please let me know of any issues you may find, improvements you may think of or features you would like to see!
+</details>
 
 
 
-## About the name
+# 🧱 About the name
 
-[Rasti](https://en.wikipedia.org/wiki/Rasti) is a block construction toy made in Argentina that resembles Lego, but it's much simpler. This framework was built with simplicity in mind, and includes some "blocks", so the name fits nicely.
+[Rasti](https://en.wikipedia.org/wiki/Rasti) is a block construction toy made in [Argentina](https://www.google.com/search?q=argentina+landscape&tbm=isch) that resembles Lego, but it's much simpler. This framework was built with simplicity in mind, and includes some "blocks", so the name fits nicely.
 
 
 
-## License
+# 🖋️ License
 
-MIT
+Rasti.js is [MIT licensed](LICENSE), which basically means you can do whatever you want with it, just as long as you keep a copy of the license alongside it 🤙

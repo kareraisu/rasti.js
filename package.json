@@ -5,7 +5,8 @@
   "scripts": {
     "start": "gulp dev --silent",
     "build": "cross-env PROD=true gulp prod --silent",
-    "docs": "npx jsdoc -c jsdoc.json",
+    "docs": "npm run docs-toc && npx jsdoc -c jsdoc.json",
+    "docs-toc": "npx markdown-toc -i --maxdepth=2 DOCS.md",
     "test": "echo \"No test specified\"",
     "prepublishOnly": "npm run build && git add . && git commit -m 'build'"
   },
@@ -41,6 +42,7 @@
     "gulp-sourcemaps": "^2.6.5",
     "gulp-trimlines": "^1.0.1",
     "jsdoc": "^3.6.4",
+    "markdown-toc": "^1.2.0",
     "merge2": "^1.0.3",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^2.0.0"
