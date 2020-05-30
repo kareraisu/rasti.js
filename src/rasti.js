@@ -391,6 +391,12 @@ function rasti(name, container) {
         else {
             $el = $check(el)
             el = $el[0]
+
+            if ( $el.is('[block]') || $el.is('select') || $el.is('table') || $el.is('ol') || $el.is('ul') )
+                return updateBlock($el, data)
+
+            else if ( !$el.is('[template]') ) throw 'Cannot render element, must be a [template], a [block] or a <selec>, <table>, <ol> or <ul>'
+
             name = $el.attr('template')
             if (!name) {
                 // assign hashed name
@@ -679,7 +685,7 @@ function rasti(name, container) {
     }
 
     // expose api
-    Object.assign(this, {config, init, navTo, render, setLang, setTheme, updateBlock})
+    Object.assign(this, {config, init, navTo, render, setLang, setTheme})
 
     return this
 
@@ -804,7 +810,8 @@ function rasti(name, container) {
     }
 
     function updateElement($el, value, _setter) {
-        $el.is('[template]') ? render($el, $el.is('[data]') ? null : value)
+        $el.is('[data]') ? render($el)
+        : $el.is('[template]') ? render($el, value) 
         : $el.is('textarea') ? $el.text( value )
         : $el.is('[type=checkbox]') ? $el[0].checked = !!value
         : $el.val( value )
@@ -1472,9 +1479,13 @@ function bootstrap() {
             global[appName] = app = new rasti(appName, container)
             Object.keys(app.options).forEach( key => {
                 if ($container.hasAttr(key)) {
-                    app.options[key] = $container.attr(key)
-                    // non-value boolean attributes are true
-                    if (is.boolean(options[key]) && !app.options[key]) app.options[key] = true
+                    value = $container.attr(key)
+                    if (is.nil(value)) {
+                        // non-value boolean attributes are true
+                        if (is.boolean(app.options[key])) app.options[key] = true
+                        else warn('Detected empty init option [%s], please provide a value for it', key)
+                    }
+                    else app.options[key] = value
                 }
             })
             // load any declared sources
@@ -1483,6 +1494,7 @@ function bootstrap() {
                 log('Loading sources for app [%s]...', appName)
                 utils.inject(sources)
             }
+            if ($container.hasAttr('init')) app.init()
         }
     })
 }
