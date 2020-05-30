@@ -1,6 +1,6 @@
 {
   "name": "@kareraisu/rasti",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "a simple webapp prototyping framework",
   "scripts": {
     "start": "gulp dev --silent",
