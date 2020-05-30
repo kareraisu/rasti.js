@@ -25,8 +25,28 @@ body {
 }
 
 a {
-    text-decoration: none;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 5px;
+    color: var(--primary);
     font-weight: 600;
+    text-decoration: none;
+}
+a:after {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 0;
+    height: 1px;
+    width: 0;
+    background-color: var(--primary);
+    transition: all .2s;
+}
+a:focus:after,
+a:hover:after {
+    width: 100%;
 }
 
 h1 { font-size: 3em; }
